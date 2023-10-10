@@ -1,3 +1,6 @@
+mod math;
+
 fn main() {
-    println!("Hello, world!");
+    math::fast_exponentiation::hello();
+    math::expanded_euclidean_algorithm::hello();
 }
