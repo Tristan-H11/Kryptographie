@@ -13,7 +13,7 @@ use std::ops::Div;
 /// ```
 /// fast_exponentiation(95, 130, 7) // => '4'
 /// ```
-pub fn fast_exponentiation(base: i32, exponent: i32, modul: i32) -> i32 {
+pub fn fast_exponentiation(base: u128, exponent: u128, modul: u128) -> u128 {
     // Sonderbedingungen der Exponentiation
     if exponent == 0 {
         return 1;
