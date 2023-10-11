@@ -31,7 +31,7 @@ pub fn fast_exponentiation(base: u128, exponent: u128, modul: u128) -> u128 {
     } else {
         // Ist der Exponent gerade, so wird nur quadriert.
         base_to_square.pow(2) % modul
-    }
+    };
 }
 
 pub fn expanded_euclidean_algorithm() {}
