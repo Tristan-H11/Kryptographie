@@ -1,6 +1,7 @@
 use std::time::Instant;
 
 mod rsa;
+mod tests;
 
 fn main() {
     let start = Instant::now();

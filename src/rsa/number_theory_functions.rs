@@ -16,10 +16,10 @@ use std::ops::Div;
 pub fn fast_exponentiation(base: u128, exponent: u128, modul: u128) -> u128 {
     // Sonderbedingungen der Exponentiation
     if exponent == 0 {
-        return 1;
+        return 1; //TODO: muss hier nicht base % modul als Ergebnis kommen statt base?
     }
     if exponent == 1 {
-        return base;
+        return base; //TODO: muss hier nicht base % modul als Ergebnis kommen statt base?
     }
 
     // Berechnung des Zwischenschrittes mit halbiertem Exponenten.
