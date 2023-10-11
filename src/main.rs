@@ -1,9 +1,5 @@
-mod math;
+mod rsa;
 
 fn main() {
-
-
-
-    math::fast_exponentiation::hello();
-    math::expanded_euclidean_algorithm::hello();
+    println!("{}", rsa::number_theory_functions::fast_exponentiation(95, 130, 7));
 }
