@@ -1,5 +1,18 @@
 use std::ops::Div;
 
+///
+/// Schnelle Exponentiation der Potenz und Reduzierung um einen Modul.
+/// Alternativer Ansatz von Herrn Elsner zur schnellen Exponentiation durch Halbieren der Potenz.
+///
+/// # Argumente
+/// * `base` - Die Basis, von welcher die Potenz berechnet werden soll.
+/// * `exponent`- Der Exponent zur Berechnung der Potenz.
+/// * `modul` - Der Modul, durch den reduziert werden soll.
+///
+/// # Beispiel
+/// ```
+/// fast_exponentiation(95, 130, 7) // => '4'
+/// ```
 pub fn fast_exponentiation(base: i32, exponent: i32, modul: i32) -> i32 {
     // Sonderbedingungen der Exponentiation
     if exponent == 0 {
