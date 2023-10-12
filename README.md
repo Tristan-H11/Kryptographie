@@ -13,3 +13,14 @@ Dieses Projekt entsteht im Integrationsprojekt Kryptographie 1 und hat eine prof
 ### Programmierung
 Wenn der Checkstyle (Format) fehlschlägt, einfach auf der Konsole `cargo fmt` ausführen.
 `cargo fmt --check` zeigt die verstöße an, ohne die `--check`-Flag korrigiert er die Formatierung direkt.
+
+### Benchmarks
+#### Schnelle Exponentiation
+```rust
+let base = &ubig!(5345890).pow(50);
+let exponent = &ubig!(561563).pow(50);
+let modul = &ubig!(402).pow(453);
+
+fast_exponentiation(base, exponent, modul);
+```
+Die Zahlen sind über 1000-stellig und die Berechnung inklusive Erstellung der Zahlen dauert auf einem M2 ungefähr 250ms.
