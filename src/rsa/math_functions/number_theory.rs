@@ -29,7 +29,7 @@ pub fn fast_exponentiation(base: &UBig, exponent: &UBig, modul: &UBig) -> UBig {
     if exponent == &one {
         return base.rem_euclid(modul);
     }
- //Test
+
     // Berechnung des Zwischenschrittes mit halbiertem Exponenten.
     let base_to_square = fast_exponentiation(base, &exponent.div(2), modul);
 
