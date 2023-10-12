@@ -1,3 +1,5 @@
+use ibig::ops::RemEuclid;
+use ibig::{ubig, UBig};
 use std::ops::Div;
 
 ///
@@ -13,27 +15,30 @@ use std::ops::Div;
 /// ```
 /// fast_exponentiation(95, 130, 7) // => '4'
 /// ```
-pub fn fast_exponentiation(base: u128, exponent: u128, modul: u128) -> u128 {
+pub fn fast_exponentiation(base: &UBig, exponent: &UBig, modul: &UBig) -> UBig {
+    let zero: &UBig = &ubig!(0);
+    let one: &UBig = &ubig!(1);
+
     // Sonderbedingungen der Exponentiation
-    if modul == 1 {
-        return 0;
+    if modul == one {
+        return zero.clone();
     }
-    if exponent == 0 {
-        return 1;
+    if exponent == zero {
+        return one.clone();
     }
-    if exponent == 1 {
-        return base % modul;
+    if exponent == one {
+        return base.rem_euclid(modul);
     }
 
     // Berechnung des Zwischenschrittes mit halbiertem Exponenten.
-    let base_to_square = fast_exponentiation(base, exponent.div(2), modul);
+    let base_to_square = fast_exponentiation(base, &exponent.div(2), modul);
 
-    return if exponent % 2 == 1 {
+    return if exponent.rem_euclid(2) == 1 {
         // Ist der Exponent ungerade, wird die Basis erneut als Faktor herangezogen.
-        (base_to_square.pow(2) * base) % modul
+        (base_to_square.pow(2) * base).rem_euclid(modul)
     } else {
         // Ist der Exponent gerade, so wird nur quadriert.
-        base_to_square.pow(2) % modul
+        base_to_square.pow(2).rem_euclid(modul)
     };
 }
 
