@@ -19,12 +19,12 @@ pub fn is_uneven(x: &UBig) -> bool {
 /// Gibt zurück, ob die Zahl 0 ist.
 ///
 pub fn is_zero(x: &UBig) -> bool {
-    x == ubig!(0)
+    x == &ubig!(0)
 }
 
 ///
 /// Gibt zurück, ob die Zahl 1 ist.
 ///
 pub fn is_one(x: &UBig) -> bool {
-    x == ubig!(1)
+    x == &ubig!(1)
 }
