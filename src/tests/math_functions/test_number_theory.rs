@@ -50,7 +50,7 @@ mod tests {
     }
 
     #[test]
-    fn fast_exponentitation_big_numbers() {
+    fn fast_exponentiation_big_numbers() {
         let base = &ubig!(3459860).pow(50);
         let exponent = &ubig!(561563).pow(50);
         let modul = &ubig!(345902).pow(50);
