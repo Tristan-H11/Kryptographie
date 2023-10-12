@@ -1,1 +1,1 @@
-pub mod number_theory_functions;
+pub mod number_theory;

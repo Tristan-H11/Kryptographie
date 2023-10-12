@@ -1,1 +1,1 @@
-mod test_number_theory_functions;
+mod test_number_theory;
