@@ -7,3 +7,4 @@ edition = "2021"
 
 [dependencies]
 ibig = "0.3.6"
+rand = "0.8.5"
