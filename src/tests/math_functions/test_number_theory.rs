@@ -1,8 +1,8 @@
 #[cfg(test)]
 mod tests {
-    use std::str::FromStr;
     use crate::rsa::math_functions::number_theory::fast_exponentiation;
     use ibig::{ubig, UBig};
+    use std::str::FromStr;
 
     #[test]
     fn fast_exponentiation_happy_flow() {
