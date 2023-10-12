@@ -9,5 +9,5 @@ fn fast_exponentiation_happy_flow() {
 #[test]
 fn fast_exponentiation_exponent_one() {
     let result = fast_exponentiation(561563, 1, 564);
-    assert_eq!(result, 205); //TODO: muss hier nicht base % modul als Ergebnis kommen statt base?
+    assert_eq!(result, 383);
 }
