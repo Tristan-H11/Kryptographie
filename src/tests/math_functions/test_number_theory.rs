@@ -1,4 +1,4 @@
-use crate::rsa::number_theory_functions::fast_exponentiation;
+use crate::rsa::math_functions::number_theory::fast_exponentiation;
 
 #[test]
 fn fast_exponentiation_happy_flow() {
