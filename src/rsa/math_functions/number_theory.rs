@@ -41,3 +41,61 @@ pub fn fast_exponentiation(base: &UBig, exponent: &UBig, modul: &UBig) -> UBig {
 }
 
 pub fn expanded_euclidean_algorithm() {}
+
+/// Führt den Miller-Rabin-Primzahltest auf `maybe_prime` durch `repeats` Runden aus.
+///
+/// # Argumente
+/// * `maybe_prime` - Die zu testende Zahl.
+/// * `repeats` - Die Anzahl der Testrunden (Je mehr Runden, desto zuverlässiger).
+///
+/// # Rückgabe
+/// `true`, wenn `maybe_prime` wahrscheinlich eine Primzahl ist, andernfalls `false`.
+pub fn miller_rabin_test(maybe_prime: &UBig, repeats: u8) -> bool {
+    let zero: UBig = ubig!(0);
+    let one: UBig = ubig!(1);
+    let two: UBig = ubig!(2);
+    let three: UBig = ubig!(3);
+    let four: UBig = ubig!(4);
+
+    if maybe_prime == &zero || maybe_prime == &four {
+        return false;
+    }
+    if maybe_prime <= &three {
+        return true;
+    }
+
+    let mut d = maybe_prime - &one;
+    while d.is_even() {
+        d /= 2u32;
+    }
+
+    let mut rng = rand::thread_rng();
+    for _ in 0..repeats {
+        let a = rng.gen_range(ubig!(2u32)..maybe_prime - &ubig!(2u32));
+        let x = fast_exponentiation(&a, &d, maybe_prime);
+
+        if &x == &ubig!(1u32) || &x == maybe_prime - &ubig!(1u32) {
+            continue;
+        }
+
+        let mut i = 0;
+        let mut prev_x = x.clone();
+        while i < maybe_prime - &ubig!(1u32) {
+            x = (&prev_x * &prev_x) % maybe_prime;
+            if &x == &ubig!(1u32) {
+                return false;
+            }
+            if &x == maybe_prime - &ubig!(1u32) {
+                break;
+            }
+            prev_x = x.clone();
+            i += 1u32;
+        }
+
+        if &x != maybe_prime - &ubig!(1u32) {
+            return false;
+        }
+    }
+
+    true
+}
