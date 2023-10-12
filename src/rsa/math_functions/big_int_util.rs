@@ -1,6 +1,8 @@
 use ibig::ops::RemEuclid;
 use ibig::{UBig, ubig};
 
+// TODO: TESTEN
+
 ///
 /// Gibt zurück, ob die Zahl gerade ist.
 ///
@@ -27,4 +29,20 @@ pub fn is_zero(x: &UBig) -> bool {
 ///
 pub fn is_one(x: &UBig) -> bool {
     x == &ubig!(1)
+}
+
+///
+/// Gibt zurück, ob a teilt b.
+/// Also b % a == 0
+///
+pub fn divides(a: &UBig, b: &UBig) -> bool {
+    return b % a == ubig!(0);
+}
+
+///
+/// Gibt zurück, ob a teilt nicht b.
+/// Also b % a != 0
+///
+pub fn not_divides(a: &UBig, b: &UBig) -> bool {
+    return b % a != ubig!(0);
 }

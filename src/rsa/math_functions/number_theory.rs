@@ -1,7 +1,7 @@
 use ibig::ops::RemEuclid;
 use ibig::{rand, ubig, UBig};
 use std::ops::Div;
-use crate::rsa::math_functions::big_int_util::{is_even, is_one, is_zero};
+use crate::rsa::math_functions::big_int_util::{divides, is_even, is_one, is_zero, not_divides};
 
 ///
 /// Schnelle Exponentiation der Potenz und Reduzierung um einen Modul.
@@ -51,22 +51,11 @@ pub fn expanded_euclidean_algorithm() {}
 /// # Rückgabe
 /// `true`, wenn `maybe_prime` wahrscheinlich eine Primzahl ist, andernfalls `false`.
 pub fn miller_rabin_test(n: &UBig, repeats: u8) -> bool {
-    let zero: UBig = ubig!(0);
-    let one: UBig = ubig!(1);
-    let two: UBig = ubig!(2);
-    let three: UBig = ubig!(3);
-    let four: UBig = ubig!(4);
-
-    if n == &zero || n == &four {
-        return false;
-    }
-    if n == two || n == &three {
-        return true;
-    }
-
-    let below_n = n - &one;
-    let d = below_n / two;
-
+    let zero: &UBig = &ubig!(0);
+    let one: &UBig = &ubig!(1);
+    let two: &UBig = &ubig!(2);
+    let three: &UBig = &ubig!(3);
+    let four: &UBig = &ubig!(4);
 
 
 
