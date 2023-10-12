@@ -16,17 +16,17 @@ use std::ops::Div;
 /// fast_exponentiation(95, 130, 7) // => '4'
 /// ```
 pub fn fast_exponentiation(base: &UBig, exponent: &UBig, modul: &UBig) -> UBig {
-    let zero: &UBig = &ubig!(0);
-    let one: &UBig = &ubig!(1);
+    let zero: UBig = ubig!(0);
+    let one: UBig = ubig!(1);
 
     // Sonderbedingungen der Exponentiation
-    if modul == one {
-        return zero.clone();
+    if modul == &one {
+        return zero;
     }
-    if exponent == zero {
-        return one.clone();
+    if exponent == &zero {
+        return one;
     }
-    if exponent == one {
+    if exponent == &one {
         return base.rem_euclid(modul);
     }
 
