@@ -1,6 +1,7 @@
 use ibig::ops::RemEuclid;
-use ibig::{ubig, UBig};
+use ibig::{rand, ubig, UBig};
 use std::ops::Div;
+use crate::rsa::math_functions::big_int_util::{is_even, is_one, is_zero};
 
 ///
 /// Schnelle Exponentiation der Potenz und Reduzierung um einen Modul.
@@ -16,29 +17,26 @@ use std::ops::Div;
 /// fast_exponentiation(95, 130, 7) // => '4'
 /// ```
 pub fn fast_exponentiation(base: &UBig, exponent: &UBig, modul: &UBig) -> UBig {
-    let zero: UBig = ubig!(0);
-    let one: UBig = ubig!(1);
-
     // Sonderbedingungen der Exponentiation
-    if modul == &one {
-        return zero;
+    if is_one(&modul) {
+        return ubig!(0);
     }
-    if exponent == &zero {
-        return one;
+    if is_zero(&exponent) {
+        return ubig!(1);
     }
-    if exponent == &one {
+    if is_one(&exponent) {
         return base.rem_euclid(modul);
     }
 
     // Berechnung des Zwischenschrittes mit halbiertem Exponenten.
     let base_to_square = fast_exponentiation(base, &exponent.div(2), modul);
 
-    return if exponent.rem_euclid(2) == 1 {
-        // Ist der Exponent ungerade, wird die Basis erneut als Faktor herangezogen.
-        (base_to_square.pow(2) * base).rem_euclid(modul)
-    } else {
+    return if is_even(&exponent) {
         // Ist der Exponent gerade, so wird nur quadriert.
         base_to_square.pow(2).rem_euclid(modul)
+    } else {
+        // Ist der Exponent ungerade, wird die Basis erneut als Faktor herangezogen.
+        (base_to_square.pow(2) * base).rem_euclid(modul)
     };
 }
 
