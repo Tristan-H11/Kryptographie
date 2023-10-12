@@ -1,7 +1,9 @@
 use ibig::ops::RemEuclid;
-use ibig::{rand, ubig, UBig};
+use ibig::{ubig, UBig};
 use std::ops::Div;
-use crate::rsa::math_functions::big_int_util::{divides, is_even, is_one, is_zero, not_divides};
+use mod_exp::mod_exp;
+use rand::{Rng, thread_rng};
+use crate::rsa::math_functions::big_int_util::{is_even, is_one, is_zero};
 
 ///
 /// Schnelle Exponentiation der Potenz und Reduzierung um einen Modul.
@@ -50,14 +52,36 @@ pub fn expanded_euclidean_algorithm() {}
 ///
 /// # Rückgabe
 /// `true`, wenn `maybe_prime` wahrscheinlich eine Primzahl ist, andernfalls `false`.
-pub fn miller_rabin_test(n: &UBig, repeats: u8) -> bool {
-    let zero: &UBig = &ubig!(0);
-    let one: &UBig = &ubig!(1);
-    let two: &UBig = &ubig!(2);
-    let three: &UBig = &ubig!(3);
-    let four: &UBig = &ubig!(4);
+pub fn miller_rabin(p: u32, repeats: usize) -> bool {
+    let mut d = p - 1;
+    let mut r = 0;
 
+    while d % 2 == 0 {
+        d = d / 2;
+        r += 1;
+    }
 
+    // Fun Fact:
+    // Wenn man p = 221 (NICHT prim) setzt und das a manuell auf 174 setzt, kommt er
+    // fälschlicherweise auf "prim" als Ergebnis.
+    let mut is_maybe_prime: bool = false; //TODO: Heile machen, das geht noch nicht.
+    for _ in 0..repeats {
+        let a: u32 = thread_rng().gen_range(2..p - 1);
+        let mut x = mod_exp(a, d, p);
 
-    true
+        if x == 1 || x == p - 1 {
+            is_maybe_prime = true;
+        }
+        while r > 1 {
+            x = (x * x) % p;
+            if x == 1 {
+                is_maybe_prime = false;
+            }
+            if x == p - 1 {
+                is_maybe_prime = false;
+            }
+            r -= 1;
+        }
+    }
+    return is_maybe_prime;
 }
