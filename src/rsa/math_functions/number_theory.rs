@@ -53,11 +53,12 @@ pub fn expanded_euclidean_algorithm() {}
 /// # Rückgabe
 /// `true`, wenn `maybe_prime` wahrscheinlich eine Primzahl ist, andernfalls `false`.
 pub fn miller_rabin(p: u32, repeats: usize) -> bool {
-    let mut result = true;
     for _ in 0..repeats {
-        result &= miller_rabin_single(p)
+        if !miller_rabin_single(p) {
+            return false;
+        }
     }
-    result
+    true
 }
 
 /// Führt den Miller-Rabin-Primzahltest auf `n` aus.
@@ -67,7 +68,8 @@ pub fn miller_rabin(p: u32, repeats: usize) -> bool {
 ///
 /// # Rückgabe
 /// `true`, wenn `maybe_prime` wahrscheinlich eine Primzahl ist, andernfalls `false`.
-fn miller_rabin_single(p: u32) -> bool { // TODO: Auf BigInt umbauen.
+fn miller_rabin_single(p: u32) -> bool {
+    // TODO: Auf BigInt umbauen.
     let mut d = p - 1;
     let mut r = 0;
 
