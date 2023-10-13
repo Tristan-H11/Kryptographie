@@ -1,7 +1,7 @@
 #[cfg(test)]
 mod tests {
-    use ibig::ubig;
     use crate::rsa::math_functions::big_int_util::{divides, is_even, is_one, is_uneven, is_zero};
+    use ibig::ubig;
 
     #[test]
     fn test_is_even() {
@@ -32,7 +32,5 @@ mod tests {
         assert_eq!(divides(&ubig!(4), &ubig!(8)), true);
         assert_eq!(divides(&ubig!(1), &ubig!(89893457)), true);
         assert_eq!(divides(&ubig!(134505), &ubig!(89893457)), false);
-
     }
-
 }

@@ -1,5 +1,4 @@
-use ibig::ops::RemEuclid;
-use ibig::{UBig, ubig};
+use ibig::{ubig, UBig};
 
 // TODO: TESTEN
 
