@@ -1,6 +1,6 @@
 #[cfg(test)]
 mod tests {
-    use crate::rsa::math_functions::big_int_util::{divides, is_even, is_one, is_uneven, is_zero, not_divides, random_in_range};
+    use crate::rsa::math_functions::big_int_util::{decrement, divides, increment, is_even, is_one, is_uneven, is_zero, not_divides, random_in_range};
     use ibig::ubig;
 
     #[test]
@@ -39,6 +39,18 @@ mod tests {
         assert_eq!(not_divides(&ubig!(4), &ubig!(8)), false);
         assert_eq!(not_divides(&ubig!(1), &ubig!(89893457)), false);
         assert_eq!(not_divides(&ubig!(134505), &ubig!(89893457)), true);
+    }
+
+    #[test]
+    fn test_increment() {
+        assert_eq!(increment(&ubig!(3)), ubig!(4));
+        assert_eq!(increment(&ubig!(0)), ubig!(1));
+    }
+
+    #[test]
+    fn test_decrement() {
+        assert_eq!(decrement(&ubig!(3)), ubig!(2));
+        assert_eq!(decrement(&ubig!(1)), ubig!(0));
     }
 
     #[test]

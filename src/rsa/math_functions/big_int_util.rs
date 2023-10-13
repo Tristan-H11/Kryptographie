@@ -48,6 +48,20 @@ pub fn not_divides(a: &UBig, b: &UBig) -> bool {
 }
 
 ///
+/// Inkrementiert die übergebene Zahl.
+///
+pub fn increment(a: &UBig) -> UBig {
+    a + ubig!(1)
+}
+
+///
+/// Dekrementiert die übergebene Zahl.
+///
+pub fn decrement(a: &UBig) -> UBig {
+    a - ubig!(1)
+}
+
+///
 /// Gibt eine Zufallszahl im Bereich 2..high zurück.
 ///
 pub fn random_in_range(high: &UBig) -> UBig {
