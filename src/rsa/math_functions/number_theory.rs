@@ -55,9 +55,8 @@ fn extended_euclidean_algorithm(n: i128, modul: i128, mut xy: [i128; 3]) -> i128
     xy.rotate_left(1);
     //println!("{},{},{} n= {} m = {}",xy[0],xy[1],xy[2],n,modul); //debug
     if modul == 0 {
-        //check ob inverse existiert sonst error (durch 0 teilen XDDD ka wie error in rust geht)
         if n!=1 {
-            1/modul;
+            panic!("n has no inverse")
         }
         return xy[0];
     }else {
