@@ -77,7 +77,7 @@ fn miller_rabin_single(p: &UBig) -> bool {
 
     while is_even(&d) {
         d = d.div(two);
-        r = (r + one);
+        r = r + one;
     }
 
     // Fun Fact:
