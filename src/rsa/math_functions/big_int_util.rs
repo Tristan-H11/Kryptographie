@@ -7,14 +7,15 @@ use ibig::{UBig, ubig};
 /// Gibt zurück, ob die Zahl gerade ist.
 ///
 pub fn is_even(x: &UBig) -> bool {
-    return x.rem_euclid(2) == 0;
+    !is_uneven(x)
 }
 
 ///
 /// Gibt zurück, ob die Zahl ungerade ist.
 ///
 pub fn is_uneven(x: &UBig) -> bool {
-    return x.rem_euclid(2) == 1;
+    // Ist das letzte Bit eine 1, so ist die Zahl ungerade.
+    return x.bit(0);
 }
 
 ///
