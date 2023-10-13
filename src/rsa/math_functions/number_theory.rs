@@ -84,21 +84,20 @@ fn miller_rabin_single(p: &UBig) -> bool {
     // Wenn man p = 221 (NICHT prim) setzt und das a manuell auf 174 setzt, kommt er
     // fälschlicherweise auf "prim" als Ergebnis.
     let a = &random_in_range(&d);
-    let x = &fast_exponentiation(a, &d, p);
+    let mut x = fast_exponentiation(a, &d, p);
 
-    if is_one(x) || x == &decrement(p) {
+    if is_one(&x) || &x == &decrement(p) {
         return true;
     }
     while &r > one {
-        let x = &fast_exponentiation(x, two, p);
-        if is_one(x) {
+        x = fast_exponentiation(&x, two, p);
+        if is_one(&x) {
             return false;
         }
-        if x == &decrement(p) {
+        if &x == &decrement(p) {
             return true;
         }
         r = decrement(&r);
     }
-
     return false;
 }
