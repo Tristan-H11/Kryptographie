@@ -1,6 +1,8 @@
 #[cfg(test)]
 mod tests {
-    use crate::rsa::math_functions::big_int_util::{divides, is_even, is_one, is_uneven, is_zero};
+    use crate::rsa::math_functions::big_int_util::{
+        divides, is_even, is_one, is_uneven, is_zero, not_divides,
+    };
     use ibig::ubig;
 
     #[test]
@@ -32,5 +34,12 @@ mod tests {
         assert_eq!(divides(&ubig!(4), &ubig!(8)), true);
         assert_eq!(divides(&ubig!(1), &ubig!(89893457)), true);
         assert_eq!(divides(&ubig!(134505), &ubig!(89893457)), false);
+    }
+
+    #[test]
+    fn test_not_divides() {
+        assert_eq!(not_divides(&ubig!(4), &ubig!(8)), false);
+        assert_eq!(not_divides(&ubig!(1), &ubig!(89893457)), false);
+        assert_eq!(not_divides(&ubig!(134505), &ubig!(89893457)), true);
     }
 }
