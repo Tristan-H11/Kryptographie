@@ -70,7 +70,11 @@ mod tests {
 
     #[test]
     fn miller_rabin_test() {
-        assert_eq!(miller_rabin(89, 100), true);
-        assert_eq!(miller_rabin(221, 100), false);
+        assert_eq!(miller_rabin(&ubig!(11), 100), true);
+        assert_eq!(miller_rabin(&ubig!(872703038229333958015287123761), 100), true); // TODO Fällt durch??
+        assert_eq!(miller_rabin(&ubig!(2459872438590349034582), 100), false);
+        assert_eq!(miller_rabin(&ubig!(221), 100), false);
+        assert_eq!(miller_rabin(&ubig!(89), 100), true);  // TODO Fällt durch??
+
     }
 }
