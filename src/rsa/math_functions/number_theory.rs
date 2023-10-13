@@ -67,7 +67,7 @@ pub fn miller_rabin(p: u32, repeats: usize) -> bool {
 ///
 /// # Rückgabe
 /// `true`, wenn `maybe_prime` wahrscheinlich eine Primzahl ist, andernfalls `false`.
-fn miller_rabin_single(p: u32) -> bool {
+fn miller_rabin_single(p: u32) -> bool { // TODO: Auf BigInt umbauen.
     let mut d = p - 1;
     let mut r = 0;
 
