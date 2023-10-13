@@ -81,7 +81,133 @@
 // - When a message from Bob is received, it should be displayed in this field
 // - After decrypting, the decrypted text should be displayed and the originally encrypted received text should be erased
 
+// The field for displaying signatures should have the following properties:
+// - The signature is displayed in the label when the corresponding button is pressed
+// - When sending a message, the signature field is cleared
+// - Display the signature of a received encrypted message in the field
+
 // Mask Bob is set up exactly like that of Alice, except that here a message from Alice is received and one can be sent to Alice
 
-// Neue kommentare folgen
+use crate::rsa::gui::gui_math::GuiMath;
+extern crate druid;
+use druid::widget::{Button, Flex, Label, TextBox};
+use druid::{AppLauncher, Data, Lens, LocalizedString, Widget, WidgetExt, WindowDesc};
+
+#[derive(Clone, Data, Lens)]
+struct AppState {
+    miller_rabin_input: String,
+    open_key_result__e_a: String,
+    length_p1_input: i64,
+    length_p2_input: i64,
+    open_key_result__e_b: String,
+}
+
+fn calculate_window_size() -> (f64, f64) {
+    GuiMath::calculate_window_size()
+}
+
+fn build_main_ui_mask() -> impl Widget<AppState> {
+    let entry = TextBox::new()
+        .with_placeholder("Eingabe Schritte Miller-Rabin")
+        .lens(AppState::miller_rabin_input)
+        .padding(10.0);
+
+    let label = Label::new(|data: &AppState, _env: &_| {
+        format!("Öffentliche Schlüssel: {}", data.open_key_result__e_a)
+    }).padding(10.0);
+
+    let button = Button::new("Anzeigen")
+        .on_click(|_ctx, data: &mut AppState, _env| {
+            // Hier können Sie die Logik für die Berechnung des öffentlichen Schlüssels hinzufügen
+            data.open_key_result__e_a = format!("Berechneter Schlüssel für {}", data.miller_rabin_input);
+        })
+        .padding(10.0);
+
+    let mut flex = Flex::column();
+    flex.add_child(entry);
+    flex.add_spacer(10.0);
+    flex.add_child(button);
+    flex.add_spacer(10.0);
+    flex.add_child(label);
+    flex
+}
+
+
+pub struct Gui;
+impl Gui {
+    pub fn new() -> Self {
+        Gui
+    }
+    pub fn run(&self) {
+        let (window_width, window_height) = calculate_window_size();
+        let main_window = WindowDesc::new(|| build_main_ui_mask())
+            .title(LocalizedString::new("Hauptfenster"))
+            .window_size((window_width, window_height));
+
+        let initial_state = AppState {
+            miller_rabin_input: "".to_string(),
+            length_p1_input: 0,
+            length_p2_input: 0,
+            open_key_result__e_a: "".to_string(),
+            open_key_result__e_b: "".to_string(),
+        };
+
+        AppLauncher::with_window(main_window)
+            .use_simple_logger()
+            .launch(initial_state)
+            .expect("launch failed");
+    }
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 

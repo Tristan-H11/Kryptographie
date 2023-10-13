@@ -1,2 +1,2 @@
 pub mod math_functions;
-mod gui;
+pub(crate) mod gui;
