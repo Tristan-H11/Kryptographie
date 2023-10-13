@@ -1,4 +1,6 @@
-use crate::rsa::math_functions::big_int_util::{decrement, increment, is_even, is_one, is_zero, random_in_range};
+use crate::rsa::math_functions::big_int_util::{
+    decrement, increment, is_even, is_one, is_zero, random_in_range,
+};
 use ibig::ops::RemEuclid;
 use ibig::{ubig, UBig};
 use std::ops::Div;
