@@ -35,6 +35,11 @@
 // - Wenn Nachricht von Bob empfangen wird, soll diese in diesem Feld ausgegeben werden
 // - Nach dem Dechiffrieren soll der entschlüsselte Text angezeigt werden und der ursprünglich chiffrierte empfangene Text soll gelöscht werden
 
+// - Das Feld zum Anzeigen von Signaturen soll folgende eigenschaften haben:
+// - Die Signatur wird beim drücken des entsprechenden Buttons im lable angezeigt
+// - Beim versenden der Nachricht wird das Signaturfeld geleert
+// - die Signatur einer empfangenen chifrierten nachricht in dem Feld anzeigen lassen
+
 // Maske Bob ist genauso aufgebaut wie die von Alice, nur dass hier eine Nachricht von Alice empfangen wird und eine an Alice verschickt werden kann
 
 // -------------------------------------------------------------------------------------------------
@@ -78,5 +83,5 @@
 
 // Mask Bob is set up exactly like that of Alice, except that here a message from Alice is received and one can be sent to Alice
 
-
+// Neue kommentare folgen
 
