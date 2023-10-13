@@ -1,6 +1,7 @@
 [![Build](https://github.com/Tristan-H11/RSA-Implementation/actions/workflows/build.yml/badge.svg)](https://github.com/Tristan-H11/RSA-Implementation/actions/workflows/build.yml)
 [![Test](https://github.com/Tristan-H11/RSA-Implementation/actions/workflows/test.yml/badge.svg)](https://github.com/Tristan-H11/RSA-Implementation/actions/workflows/test.yml)
 [![Format Checkstyle](https://github.com/Tristan-H11/RSA-Implementation/actions/workflows/format.yml/badge.svg)](https://github.com/Tristan-H11/RSA-Implementation/actions/workflows/format.yml)
+[![Test Coverage](https://github.com/Tristan-H11/RSA-Implementation/actions/workflows/coverage.yml/badge.svg)](https://github.com/Tristan-H11/RSA-Implementation/actions/workflows/coverage.yml)
 # RSA Implementation in Kryptographie 1
 Dieses Projekt entsteht im Integrationsprojekt Kryptographie 1 und hat eine professionelle Implementation von RSA und dem zugehörigen Signaturverfahren zum Ziel.
 ### Was bereits in der ersten Woche programmiert werden kann:
