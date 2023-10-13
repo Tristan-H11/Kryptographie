@@ -1,9 +1,9 @@
+use crate::rsa::math_functions::big_int_util::{is_even, is_one, is_zero};
 use ibig::ops::RemEuclid;
 use ibig::{ubig, UBig};
-use std::ops::Div;
 use mod_exp::mod_exp;
-use rand::{Rng, thread_rng};
-use crate::rsa::math_functions::big_int_util::{is_even, is_one, is_zero};
+use rand::{thread_rng, Rng};
+use std::ops::Div;
 
 ///
 /// Schnelle Exponentiation der Potenz und Reduzierung um einen Modul.
@@ -52,9 +52,9 @@ pub fn expanded_euclidean_algorithm() {}
 ///
 /// # Rückgabe
 /// `true`, wenn `maybe_prime` wahrscheinlich eine Primzahl ist, andernfalls `false`.
-pub fn miller_rabin(p: u32, repeats: usize) -> bool{
+pub fn miller_rabin(p: u32, repeats: usize) -> bool {
     let mut result = true;
-    for _ in 0..repeats{
+    for _ in 0..repeats {
         result &= miller_rabin_single(p)
     }
     result
