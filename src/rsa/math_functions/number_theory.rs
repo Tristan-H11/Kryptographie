@@ -1,5 +1,5 @@
 use crate::rsa::math_functions::big_int_util::{
-    decrement, increment, is_even, is_one, is_zero, random_in_range,
+    decrement, is_even, is_one, is_zero, random_in_range,
 };
 use ibig::ops::RemEuclid;
 use ibig::{ubig, UBig};
@@ -69,16 +69,15 @@ pub fn miller_rabin(p: &UBig, repeats: usize) -> bool {
 /// # Rückgabe
 /// `true`, wenn `maybe_prime` wahrscheinlich eine Primzahl ist, andernfalls `false`.
 fn miller_rabin_single(p: &UBig) -> bool {
-    let zero = &ubig!(0);
     let one = &ubig!(1);
     let two = &ubig!(2);
 
     let mut d = decrement(p);
-    let r = &zero.clone();
+    let mut r = ubig!(0);
 
     while is_even(&d) {
         d = d.div(two);
-        increment(r);
+        r = (r + one);
     }
 
     // Fun Fact:
@@ -90,7 +89,7 @@ fn miller_rabin_single(p: &UBig) -> bool {
     if is_one(x) || x == &decrement(p) {
         return true;
     }
-    while r > one {
+    while &r > one {
         let x = &fast_exponentiation(x, two, p);
         if is_one(x) {
             return false;
@@ -98,7 +97,7 @@ fn miller_rabin_single(p: &UBig) -> bool {
         if x == &decrement(p) {
             return true;
         }
-        decrement(r);
+        r = decrement(&r);
     }
 
     return false;
