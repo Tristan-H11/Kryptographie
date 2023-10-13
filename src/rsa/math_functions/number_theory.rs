@@ -1,8 +1,8 @@
-use crate::rsa::math_functions::big_int_util::{is_even, is_one, is_zero};
+use crate::rsa::math_functions::big_int_util::{
+    decrement, is_even, is_one, is_zero, random_in_range,
+};
 use ibig::ops::RemEuclid;
 use ibig::{ubig, UBig};
-use mod_exp::mod_exp;
-use rand::{thread_rng, Rng};
 use std::ops::Div;
 
 ///
@@ -44,57 +44,66 @@ pub fn fast_exponentiation(base: &UBig, exponent: &UBig, modul: &UBig) -> UBig {
 
 pub fn expanded_euclidean_algorithm() {}
 
-/// Führt den Miller-Rabin-Primzahltest auf `n` durch `repeats` Runden aus.
+/// Führt den Miller-Rabin-Primzahltest auf `p` durch `repeats` Runden aus.
 ///
 /// # Argumente
-/// * `n` - Die zu testende Zahl.
+/// * `p` - Die zu testende Zahl >= 11.
 /// * `repeats` - Die Anzahl der Testrunden (Je mehr Runden, desto zuverlässiger).
 ///
 /// # Rückgabe
-/// `true`, wenn `maybe_prime` wahrscheinlich eine Primzahl ist, andernfalls `false`.
-pub fn miller_rabin(p: u32, repeats: usize) -> bool {
-    let mut result = true;
+/// `true`, wenn `p` wahrscheinlich eine Primzahl ist, andernfalls `false`.
+///
+/// # Beispiel
+/// ```
+/// miller_rabin(89, 40) // => true
+/// miller_rabin(221, 40) // => false
+/// ```
+pub fn miller_rabin(p: &UBig, repeats: usize) -> bool {
     for _ in 0..repeats {
-        result &= miller_rabin_single(p)
+        if !miller_rabin_single(p) {
+            return false;
+        }
     }
-    result
+    true
 }
 
-/// Führt den Miller-Rabin-Primzahltest auf `n` aus.
+/// Führt den Miller-Rabin-Primzahltest auf `p` aus.
 ///
 /// # Argumente
-/// * `n` - Die zu testende Zahl.
+/// * `p` - Die zu testende Zahl >= 11.
 ///
 /// # Rückgabe
-/// `true`, wenn `maybe_prime` wahrscheinlich eine Primzahl ist, andernfalls `false`.
-fn miller_rabin_single(p: u32) -> bool {
-    let mut d = p - 1;
-    let mut r = 0;
+/// `true`, wenn `p` wahrscheinlich eine Primzahl ist, andernfalls `false`.
+fn miller_rabin_single(p: &UBig) -> bool {
+    let one = &ubig!(1);
+    let two = &ubig!(2);
 
-    while d % 2 == 0 {
-        d = d / 2;
-        r += 1;
+    let mut d = decrement(p);
+    let mut r = ubig!(0);
+
+    while is_even(&d) {
+        d = d.div(two);
+        r = r + one;
     }
 
     // Fun Fact:
     // Wenn man p = 221 (NICHT prim) setzt und das a manuell auf 174 setzt, kommt er
     // fälschlicherweise auf "prim" als Ergebnis.
-    let a: u32 = thread_rng().gen_range(2..p - 1);
-    let mut x = mod_exp(a, d, p);
+    let a = &random_in_range(&d);
+    let mut x = fast_exponentiation(a, &d, p);
 
-    if x == 1 || x == p - 1 {
+    if is_one(&x) || &x == &decrement(p) {
         return true;
     }
-    while r > 1 {
-        x = (x * x) % p;
-        if x == 1 {
+    while &r > one {
+        x = fast_exponentiation(&x, two, p);
+        if is_one(&x) {
             return false;
         }
-        if x == p - 1 {
+        if &x == &decrement(p) {
             return true;
         }
-        r -= 1;
+        r = decrement(&r);
     }
-
     return false;
 }
