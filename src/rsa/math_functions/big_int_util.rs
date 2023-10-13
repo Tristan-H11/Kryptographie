@@ -1,6 +1,6 @@
 use ibig::{ubig, UBig};
-use rand::distributions::{Bernoulli, Distribution};
 use rand::thread_rng;
+use rand::distributions::{Bernoulli, Distribution};
 
 ///
 /// Gibt zurück, ob die Zahl gerade ist.
