@@ -71,11 +71,11 @@ mod tests {
     #[test]
     fn miller_rabin_test() {
         assert_eq!(
-            miller_rabin(89, 1),
+            miller_rabin(89, 100),
             true
         );
         assert_eq!(
-            miller_rabin(221, 1),
+            miller_rabin(221, 100),
             false
         );
 

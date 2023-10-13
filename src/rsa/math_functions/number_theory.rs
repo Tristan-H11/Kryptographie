@@ -44,6 +44,14 @@ pub fn fast_exponentiation(base: &UBig, exponent: &UBig, modul: &UBig) -> UBig {
 
 pub fn expanded_euclidean_algorithm() {}
 
+pub fn miller_rabin(p: u32, repeats: usize) -> bool{
+    let mut result = true;
+    for _ in 0..repeats{
+        result &= miller_rabin_single(p)
+    }
+    result
+}
+
 /// Führt den Miller-Rabin-Primzahltest auf `n` durch `repeats` Runden aus.
 ///
 /// # Argumente
@@ -52,7 +60,7 @@ pub fn expanded_euclidean_algorithm() {}
 ///
 /// # Rückgabe
 /// `true`, wenn `maybe_prime` wahrscheinlich eine Primzahl ist, andernfalls `false`.
-pub fn miller_rabin(p: u32, repeats: usize) -> bool {
+fn miller_rabin_single(p: u32) -> bool {
     let mut d = p - 1;
     let mut r = 0;
 
@@ -64,24 +72,22 @@ pub fn miller_rabin(p: u32, repeats: usize) -> bool {
     // Fun Fact:
     // Wenn man p = 221 (NICHT prim) setzt und das a manuell auf 174 setzt, kommt er
     // fälschlicherweise auf "prim" als Ergebnis.
-    let mut is_maybe_prime: bool = false; //TODO: Heile machen, das geht noch nicht.
-    for _ in 0..repeats {
-        let a: u32 = thread_rng().gen_range(2..p - 1);
-        let mut x = mod_exp(a, d, p);
+    let a: u32 = thread_rng().gen_range(2..p - 1);
+    let mut x = mod_exp(a, d, p);
 
-        if x == 1 || x == p - 1 {
-            is_maybe_prime = true;
-        }
-        while r > 1 {
-            x = (x * x) % p;
-            if x == 1 {
-                is_maybe_prime = false;
-            }
-            if x == p - 1 {
-                is_maybe_prime = false;
-            }
-            r -= 1;
-        }
+    if x == 1 || x == p - 1 {
+        return true;
     }
-    return is_maybe_prime;
+    while r > 1 {
+        x = (x * x) % p;
+        if x == 1 {
+            return false;
+        }
+        if x == p - 1 {
+            return true;
+        }
+        r -= 1;
+    }
+
+    return false;
 }
