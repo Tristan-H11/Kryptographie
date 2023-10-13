@@ -44,14 +44,20 @@ pub fn fast_exponentiation(base: &UBig, exponent: &UBig, modul: &UBig) -> UBig {
 
 pub fn expanded_euclidean_algorithm() {}
 
-/// Führt den Miller-Rabin-Primzahltest auf `n` durch `repeats` Runden aus.
+/// Führt den Miller-Rabin-Primzahltest auf `p` durch `repeats` Runden aus.
 ///
 /// # Argumente
-/// * `n` - Die zu testende Zahl >= 11.
+/// * `p` - Die zu testende Zahl >= 11.
 /// * `repeats` - Die Anzahl der Testrunden (Je mehr Runden, desto zuverlässiger).
 ///
 /// # Rückgabe
-/// `true`, wenn `maybe_prime` wahrscheinlich eine Primzahl ist, andernfalls `false`.
+/// `true`, wenn `p` wahrscheinlich eine Primzahl ist, andernfalls `false`.
+///
+/// # Beispiel
+/// ```
+/// miller_rabin(89, 40) // => true
+/// miller_rabin(221, 40) // => false
+/// ```
 pub fn miller_rabin(p: &UBig, repeats: usize) -> bool {
     for _ in 0..repeats {
         if !miller_rabin_single(p) {
@@ -61,13 +67,13 @@ pub fn miller_rabin(p: &UBig, repeats: usize) -> bool {
     true
 }
 
-/// Führt den Miller-Rabin-Primzahltest auf `n` aus.
+/// Führt den Miller-Rabin-Primzahltest auf `p` aus.
 ///
 /// # Argumente
-/// * `n` - Die zu testende Zahl >= 11.
+/// * `p` - Die zu testende Zahl >= 11.
 ///
 /// # Rückgabe
-/// `true`, wenn `maybe_prime` wahrscheinlich eine Primzahl ist, andernfalls `false`.
+/// `true`, wenn `p` wahrscheinlich eine Primzahl ist, andernfalls `false`.
 fn miller_rabin_single(p: &UBig) -> bool {
     let one = &ubig!(1);
     let two = &ubig!(2);
