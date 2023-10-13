@@ -1,2 +1,2 @@
 pub mod number_theory;
-mod big_int_util;
+pub mod big_int_util;
