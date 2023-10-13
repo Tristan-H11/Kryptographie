@@ -88,7 +88,7 @@
 
 // Mask Bob is set up exactly like that of Alice, except that here a message from Alice is received and one can be sent to Alice
 
-use crate::rsa::gui::gui_math::GuiMath;
+use crate::gui::gui_math::GuiMath;
 extern crate druid;
 use druid::widget::{Button, Flex, Label, TextBox};
 use druid::{AppLauncher, Data, Lens, LocalizedString, Widget, WidgetExt, WindowDesc};

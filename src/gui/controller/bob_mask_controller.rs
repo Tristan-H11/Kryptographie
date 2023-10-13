@@ -1,4 +1,4 @@
-use crate::rsa::gui::{model, view};
+use crate::gui::{model, view};
 
 pub struct BobMaskController {
     model: model::crypto_operations::CryptoOperations,
