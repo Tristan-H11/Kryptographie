@@ -1,6 +1,6 @@
 use ibig::{ubig, UBig};
-
-// TODO: TESTEN
+use rand::thread_rng;
+use rand::distributions::{Bernoulli, Distribution};
 
 ///
 /// Gibt zurück, ob die Zahl gerade ist.
@@ -45,4 +45,26 @@ pub fn divides(a: &UBig, b: &UBig) -> bool {
 ///
 pub fn not_divides(a: &UBig, b: &UBig) -> bool {
     return b % a != ubig!(0);
+}
+
+///
+/// Gibt eine Zufallszahl im Bereich 2..high zurück.
+///
+pub fn random_in_range(high: &UBig) -> UBig {
+    let high_len = high.bit_len();
+
+    let mut rng = thread_rng();
+    let bernoulli = Bernoulli::new(0.5).unwrap();
+    let mut random_bool_iter = bernoulli.sample_iter(&mut rng).take(high_len - 2);
+
+    let mut result = ubig!(2);
+    for i in 2..high_len {
+        if random_bool_iter.next().unwrap() {
+            result.set_bit(i);
+            if &result > high {
+                result.clear_bit(i);
+            }
+        }
+    }
+    result
 }
