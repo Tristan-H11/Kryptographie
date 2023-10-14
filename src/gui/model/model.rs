@@ -8,6 +8,8 @@ pub struct HauptMenuModel {
     pub(crate) eingabe_p2: String,
     pub(crate) eingabe_miller_rabin: String,
     pub(crate) ausgabe_oeff_schluessel: String,
+    pub(crate) open_key_alice: String,
+    pub(crate) open_key_bob: String
 }
 
 #[derive(Clone, Data, Lens)]
@@ -26,7 +28,7 @@ pub struct BobModel {
     pub(crate) anzeige_geheimer_schluessel: String,
 }
 
-// Datenmodell für die gesamte App
+// Datenmodell für die gesamte App -- quasi die ebene über den einzelnen Datenmodellen
 #[derive(Clone, Data, Lens)]
 pub struct AppState {
     pub current_view: View,
@@ -46,17 +48,20 @@ pub enum View {
 enum CustomCommand {
     SwitchToAlice,
     SwitchToBob,
+    SwitchToHauptMenu
 }
 
 impl Default for AppState {
     fn default() -> Self {
         AppState {
-            current_view: View::HauptMenu, // Legen Sie den standardmäßigen aktuellen View fest
+            current_view: View::HauptMenu, // Festlegen, dass Hauptmenü die start-view ist
             haupt_menu: HauptMenuModel {
                 eingabe_p1: String::new(),
                 eingabe_p2: String::new(),
                 eingabe_miller_rabin: String::new(),
                 ausgabe_oeff_schluessel: String::new(),
+                open_key_alice: "".to_string(),
+                open_key_bob: "".to_string(),
             },
             alice: AliceModel {
                 eingabe_klartext: String::new(),

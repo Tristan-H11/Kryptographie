@@ -13,14 +13,14 @@ impl Controller {
     }
 
     fn handle_haupt_menu_event(&mut self, event: &Event, app_state: &mut AppState, _env: &Env) {
-        // Implementieren Sie hier die Event-Logik für das Hauptmenü
+        // todo Implementiere hier event logik für hauptmenü
     }
 
     fn handle_alice_event(&mut self, event: &Event, app_state: &mut AppState, _env: &Env) {
-        // Implementieren Sie hier die Event-Logik für Alice
+        // todo Implementiere hier event logik für alice
     }
 
     fn handle_bob_event(&mut self, event: &Event, app_state: &mut AppState, _env: &Env) {
-        // Implementieren Sie hier die Event-Logik für Bob
+        // todo Implementiere hier event logik für bob
     }
 }
