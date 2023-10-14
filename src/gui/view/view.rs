@@ -1,6 +1,8 @@
 use druid::{Command, Lens, Selector, Widget, WidgetExt, widget::{Button, Flex, Label, TextBox, ViewSwitcher}, Env};
 use crate::gui::model::model::{AliceModel, BobModel, HauptMenuModel, AppState, View};
 use crate::gui::gui::{SWITCH_TO_ALICE, SWITCH_TO_BOB, SWITCH_TO_HAUPTMENU, UPDATE_PUBLIC_KEY};
+use crate::gui::gui::CALCULATE_PUBLIC_KEY;
+use crate::gui::gui::{ENCRYPT, SIGN, DECRYPT, SEND_MESSAGE, CLEAR};
 
 
 pub(crate) fn build_haupt_menu() -> impl Widget<HauptMenuModel> {
@@ -18,11 +20,8 @@ pub(crate) fn build_haupt_menu() -> impl Widget<HauptMenuModel> {
         .with_child(TextBox::new().lens(HauptMenuModel::eingabe_miller_rabin));
 
     // Button
-    let calc_open_key_button = Button::new("Berechne Öffentlichen Schlüssel").on_click(|ctx, data: &mut HauptMenuModel, _env| {
-        // TODO: Implementiere die Logik zur Berechnung der öffentlichen Schlüssel für Alice und Bob
-        // Angenommen, die berechneten öffentlichen Schlüssel sind "1234567890" für Alice und "0987654321" für Bob
-        data.open_key_alice = "1234567890".to_string();
-        data.open_key_bob = "0987654321".to_string();
+    let calc_open_key_button = Button::new("Berechne Öffentlichen Schlüssel").on_click(|ctx, _data: &mut HauptMenuModel, _env| {
+        ctx.submit_command(CALCULATE_PUBLIC_KEY);
     });
 
     let open_alice_button = Button::new("Öffne Alice Ansicht").on_click(|_ctx, _data, _env| {
@@ -88,23 +87,20 @@ pub(crate) fn build_alice_view() -> impl Widget<AliceModel> {
         );
 
     // Buttons
-    let encrypt_button = Button::new("Verschlüsseln").on_click(|_ctx, data: &mut AliceModel, _env| {
-        // todo -- Logik für Verschlüsselung
+    let encrypt_button = Button::new("Verschlüsseln").on_click(|_ctx, _data: &mut AliceModel, _env| {
+        _ctx.submit_command(ENCRYPT);
     });
-    let sign_button = Button::new("Signieren").on_click(|_ctx, data: &mut AliceModel, _env| {
-        // todo -- Logik für Signierung
+    let sign_button = Button::new("Signieren").on_click(|_ctx, _data: &mut AliceModel, _env| {
+        _ctx.submit_command(SIGN);
     });
-    let decrypt_button = Button::new("Entschlüsseln").on_click(|_ctx, data: &mut AliceModel, _env| {
-        // todo -- Logik für Entschlüsselung
+    let decrypt_button = Button::new("Entschlüsseln").on_click(|_ctx, _data: &mut AliceModel, _env| {
+        _ctx.submit_command(DECRYPT);
     });
-    let send_message_button = Button::new("Nachricht senden").on_click(|_ctx, data: &mut AliceModel, _env| {
-        // todo -- Logik zum Senden der Nachricht
+    let send_message_button = Button::new("Nachricht senden").on_click(|_ctx, _data: &mut AliceModel, _env| {
+        _ctx.submit_command(SEND_MESSAGE);
     });
-    let clear_button = Button::new("Clear").on_click(|_ctx, data: &mut AliceModel, _env| {
-        data.eingabe_klartext.clear();
-        data.anzeige_signatur.clear();
-        data.status_signatur = false;
-        // usw.
+    let clear_button = Button::new("Clear").on_click(|_ctx, _data: &mut AliceModel, _env| {
+        _ctx.submit_command(CLEAR);
     });
     let back_button = Button::new("Zurück zum Hauptmenü").on_click(|_ctx, _data: &mut AliceModel, _env| {
         _ctx.submit_command(SWITCH_TO_HAUPTMENU);
@@ -159,23 +155,20 @@ pub(crate) fn build_bob_view() -> impl Widget<BobModel> {
         );
 
     // Buttons
-    let encrypt_button = Button::new("Verschlüsseln").on_click(|_ctx, data: &mut BobModel, _env| {
-        // todo -- Logik für Verschlüsselung
+    let encrypt_button = Button::new("Verschlüsseln").on_click(|_ctx, _data: &mut BobModel, _env| {
+        _ctx.submit_command(ENCRYPT);
     });
-    let sign_button = Button::new("Signieren").on_click(|_ctx, data: &mut BobModel, _env| {
-        // todo -- Logik für Signierung
+    let sign_button = Button::new("Signieren").on_click(|_ctx, _data: &mut BobModel, _env| {
+        _ctx.submit_command(SIGN);
     });
-    let decrypt_button = Button::new("Entschlüsseln").on_click(|_ctx, data: &mut BobModel, _env| {
-        // todo -- Logik für Entschlüsselung
+    let decrypt_button = Button::new("Entschlüsseln").on_click(|_ctx, _data: &mut BobModel, _env| {
+        _ctx.submit_command(DECRYPT);
     });
-    let send_message_button = Button::new("Nachricht senden").on_click(|_ctx, data: &mut BobModel, _env| {
-        // todo -- Logik zum Senden der Nachricht
+    let send_message_button = Button::new("Nachricht senden").on_click(|_ctx, _data: &mut BobModel, _env| {
+        _ctx.submit_command(SEND_MESSAGE);
     });
-    let clear_button = Button::new("Clear").on_click(|_ctx, data: &mut BobModel, _env| {
-        data.eingabe_klartext.clear();
-        data.anzeige_signatur.clear();
-        data.status_signatur = false;
-        // usw.
+    let clear_button = Button::new("Clear").on_click(|_ctx, _data: &mut BobModel, _env| {
+        _ctx.submit_command(CLEAR);
     });
     let back_button = Button::new("Zurück zum Hauptmenü").on_click(|_ctx, _data: &mut BobModel, _env| {
         _ctx.submit_command(SWITCH_TO_HAUPTMENU);
