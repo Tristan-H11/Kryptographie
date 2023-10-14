@@ -88,17 +88,12 @@
 
 // Mask Bob is set up exactly like that of Alice, except that here a message from Alice is received and one can be sent to Alice
 
-use std::sync::{Arc, Mutex};
-use crate::gui::view::main_mask_view::MainMaskView;
-use crate::gui::model::model::AppState;
-use crate::gui::gui_math::GuiMath;
-extern crate druid;
-use druid::{AppLauncher, LocalizedString, WidgetExt, WindowDesc};
-use crate::gui::controller::main_mask_controller::MainMaskController;
 
-pub(crate) fn calculate_window_size() -> (f64, f64) {
-    GuiMath::calculate_window_size()
-}
+use crate::gui::{model, gui};
+use druid::{AppLauncher, WindowDesc, WidgetExt, lens, Widget};
+use druid::widget::{Container, Flex, ViewSwitcher};
+use crate::gui::model::model::{AliceModel, AppModel, BobModel, CurrentView, HauptMenuModel};
+use crate::gui::view::view::{build_alice_view, build_bob_view, build_haupt_menu};
 
 pub struct Gui;
 
@@ -108,29 +103,42 @@ impl Gui {
     }
 
     pub fn run(&self) {
-        let (window_width, window_height) = calculate_window_size();
-        let main_window = WindowDesc::new(|| MainMaskView::build_main_ui_mask())
-            .title(LocalizedString::new("Hauptfenster"))
-            .window_size((window_width, window_height));
-
-        let initial_state = AppState {
-            main_controller: Arc::new(Mutex::new(MainMaskController::new())),
-            miller_rabin_input: "".to_string(),
-            length_p1_input: "".to_string(),
-            length_p2_input: "".to_string(),
-            open_key_result__e_a: "".to_string(),
-            open_key_result__e_b: "".to_string(),
-            secret_key_for_alice: "".to_string(),  // bereits vorhanden
-            secret_key_for_bob: "".to_string(),  // bereits vorhanden
-        };
+        let window_size = self.calculate_window_size();
+        let main_window = WindowDesc::new(gui::model::model::build_view())
+            .title("Hauptmenü")
+            .window_size(window_size);
 
         AppLauncher::with_window(main_window)
             .use_simple_logger()
-            .launch(initial_state)
+            .launch(AppModel {
+                current_view: CurrentView::HauptMenu,
+                haupt_menu_model: HauptMenuModel {
+                    eingabe_p1: "".to_string(),
+                    eingabe_p2: "".to_string(),
+                    eingabe_miller_rabin: "".to_string(),
+                    ausgabe_oeff_schluessel: "".to_string(),
+                },
+                alice_model: AliceModel {
+                    eingabe_klartext: "".to_string(),
+                    anzeige_signatur: "".to_string(),
+                    status_signatur: false,
+                    anzeige_geheimer_schluessel: "".to_string(),
+                },
+                bob_model: BobModel {
+                    eingabe_klartext: "".to_string(),
+                    anzeige_signatur: "".to_string(),
+                    status_signatur: false,
+                    anzeige_geheimer_schluessel: "".to_string(),
+                },
+            })
             .expect("launch failed");
     }
 
+    fn calculate_window_size(&self) -> (f64, f64) {
+        let screen_size = druid::Screen::get_display_rect();
+        let width = screen_size.width();
+        let height = screen_size.height();
+        (width * 0.8, height * 0.8)
+    }
 }
-
-
 
