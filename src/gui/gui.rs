@@ -89,56 +89,110 @@
 // Mask Bob is set up exactly like that of Alice, except that here a message from Alice is received and one can be sent to Alice
 
 
-use crate::gui::{model, gui};
-use druid::{AppLauncher, WindowDesc, WidgetExt, lens, Widget};
-use druid::widget::{Container, Flex, ViewSwitcher};
-use crate::gui::model::model::{AliceModel, AppModel, BobModel, CurrentView, HauptMenuModel};
-use crate::gui::view::view::{build_alice_view, build_bob_view, build_haupt_menu};
+use druid::{Env, Widget, WidgetExt};
+use druid::widget::{Button, Flex, Label, TextBox};
+use crate::gui::model::model::{AliceModel, AppState, BobModel, HauptMenuModel, View};
 
-pub struct Gui;
-
-impl Gui {
-    pub fn new() -> Self {
-        Gui
-    }
-
-    pub fn run(&self) {
-        let window_size = self.calculate_window_size();
-        let main_window = WindowDesc::new(gui::model::model::build_view())
-            .title("Hauptmenü")
-            .window_size(window_size);
-
-        AppLauncher::with_window(main_window)
-            .use_simple_logger()
-            .launch(AppModel {
-                current_view: CurrentView::HauptMenu,
-                haupt_menu_model: HauptMenuModel {
-                    eingabe_p1: "".to_string(),
-                    eingabe_p2: "".to_string(),
-                    eingabe_miller_rabin: "".to_string(),
-                    ausgabe_oeff_schluessel: "".to_string(),
-                },
-                alice_model: AliceModel {
-                    eingabe_klartext: "".to_string(),
-                    anzeige_signatur: "".to_string(),
-                    status_signatur: false,
-                    anzeige_geheimer_schluessel: "".to_string(),
-                },
-                bob_model: BobModel {
-                    eingabe_klartext: "".to_string(),
-                    anzeige_signatur: "".to_string(),
-                    status_signatur: false,
-                    anzeige_geheimer_schluessel: "".to_string(),
-                },
-            })
-            .expect("launch failed");
-    }
-
-    fn calculate_window_size(&self) -> (f64, f64) {
-        let screen_size = druid::Screen::get_display_rect();
-        let width = screen_size.width();
-        let height = screen_size.height();
-        (width * 0.8, height * 0.8)
-    }
+pub fn build_ui() -> impl Widget<AppState> {
+    // Verwenden Sie eine ViewSwitcher, um zwischen den Ansichten zu wechseln
+    druid::widget::ViewSwitcher::new(
+        |data: &AppState, _env| data.current_view.clone(),
+        |selector, data, _env| {
+            match selector {
+                View::HauptMenu => {
+                    let haupt_menu_view = build_haupt_menu().lens(AppState::haupt_menu);
+                    Box::new(haupt_menu_view)
+                }
+                View::Alice => {
+                    let alice_view = build_alice_view().lens(AppState::alice);
+                    Box::new(alice_view)
+                }
+                View::Bob => {
+                    let bob_view = build_bob_view().lens(AppState::bob);
+                    Box::new(bob_view)
+                }
+            }
+        },
+    )
 }
+
+fn build_haupt_menu() -> impl Widget<HauptMenuModel> {
+    // Entry-Felder
+    let p1_entry = Flex::row()
+        .with_child(Label::new("Eingabe P1"))
+        .with_child(TextBox::new().lens(HauptMenuModel::eingabe_p1));
+
+    let p2_entry = Flex::row()
+        .with_child(Label::new("Eingabe P2"))
+        .with_child(TextBox::new().lens(HauptMenuModel::eingabe_p2));
+
+    let miller_rabin_entry = Flex::row()
+        .with_child(Label::new("Eingabe Miller-Rabin"))
+        .with_child(TextBox::new().lens(HauptMenuModel::eingabe_miller_rabin));
+
+
+
+    // Button
+    let calc_open_key_button = Button::new("Berechne Öffentlichen Schlüssel").on_click(|_ctx, _data, _env| {
+        // TODO: Implementieren Sie hier die Logik für die Berechnung des öffentlichen Schlüssels
+        // Nach der Berechnung können Sie das Ergebnis in HauptMenuModel::ausgabe_oeff_schluessel speichern
+        // und das Label aktualisieren.
+    });
+    let open_alice_button = Button::new("Öffne Alice Ansicht").on_click(|_ctx, _data, _env| {
+        // TODO: Implementieren Sie hier die Logik für das Öffnen der Alice-Ansicht
+    });
+    let open_bob_button = Button::new("Öffne Bob Ansicht").on_click(|_ctx, _data, _env| {
+        // TODO: Implementieren Sie hier die Logik für das Öffnen der Bob-Ansicht
+    });
+
+    // Label
+    let open_key_label = Label::new(|data: &HauptMenuModel, _env: &Env| {
+        // Hier können Sie den Inhalt des Labels dynamisch festlegen, basierend auf HauptMenuModel::ausgabe_oeff_schluessel
+        format!("Öffentlicher Schlüssel: {}", &data.ausgabe_oeff_schluessel).into()
+    });
+
+    Flex::column()
+        .with_child(p1_entry)
+        .with_default_spacer()
+        .with_child(p2_entry)
+        .with_default_spacer()
+        .with_child(miller_rabin_entry)
+        .with_default_spacer()
+        .with_child(calc_open_key_button)
+        .with_default_spacer()
+        .with_child(open_key_label)
+        .with_default_spacer()
+        .with_child(open_alice_button)
+        .with_default_spacer()
+        .with_child(open_bob_button)
+        .padding(druid::Insets::uniform(10.0))
+
+}
+
+
+
+fn build_alice_view() -> impl Widget<AliceModel> {
+    let text_box = TextBox::new().lens(AliceModel::eingabe_klartext);
+    let button = Button::new("Verschlüsseln").on_click(|_ctx, _data, _env| {
+        // Implementieren Sie hier die Logik, die beim Klicken des Verschlüsseln-Buttons ausgeführt werden soll
+    });
+
+    // Kombinieren Sie die GUI-Komponenten in einem Container oder einer Flex
+    Flex::column()
+        .with_child(text_box)
+        .with_child(button)
+}
+
+fn build_bob_view() -> impl Widget<BobModel> {
+    let text_box = TextBox::new().lens(BobModel::eingabe_klartext);
+    let button = Button::new("Entschlüsseln").on_click(|_ctx, _data, _env| {
+        // Implementieren Sie hier die Logik, die beim Klicken des Entschlüsseln-Buttons ausgeführt werden soll
+    });
+
+    // Kombinieren Sie die GUI-Komponenten in einem Container oder einer Flex
+    Flex::column()
+        .with_child(text_box)
+        .with_child(button)
+}
+
 

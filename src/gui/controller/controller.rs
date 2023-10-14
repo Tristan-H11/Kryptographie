@@ -1,32 +1,26 @@
+use druid::{Env, Event};
+use crate::gui::model::model::{AppState, View};
 
+pub struct Controller;
 
-use druid::{Event, Env, Command, Selector};
-use crate::gui::model::model::{AliceModel, AppModel, BobModel, CurrentView, HauptMenuModel};
-
-pub const SWITCH_TO_ALICE: Selector = Selector::new("switch_to_alice");
-pub const SWITCH_TO_BOB: Selector = Selector::new("switch_to_bob");
-pub const SWITCH_TO_HAUPT_MENU: Selector = Selector::new("switch_to_haupt_menu");
-pub const SOME_COMMAND: Selector = Selector::new("some_command");
-
-fn haupt_menu_controller(event: &Event, data: &mut HauptMenuModel, _env: &Env) {
-    match event {
-        Event::Command(cmd) if cmd.is(SOME_COMMAND) => {
+impl Controller {
+    pub fn handle_event(&mut self, event: &Event, app_state: &mut AppState, _env: &Env) {
+        match app_state.current_view {
+            View::HauptMenu => self.handle_haupt_menu_event(event, app_state, _env),
+            View::Alice => self.handle_alice_event(event, app_state, _env),
+            View::Bob => self.handle_bob_event(event, app_state, _env),
         }
-        _ => {}
     }
-}
 
-fn alice_controller(event: &Event, data: &mut AliceModel, _env: &Env) {
-}
+    fn handle_haupt_menu_event(&mut self, event: &Event, app_state: &mut AppState, _env: &Env) {
+        // Implementieren Sie hier die Event-Logik für das Hauptmenü
+    }
 
-fn bob_controller(event: &Event, data: &mut BobModel, _env: &Env) {
-}
+    fn handle_alice_event(&mut self, event: &Event, app_state: &mut AppState, _env: &Env) {
+        // Implementieren Sie hier die Event-Logik für Alice
+    }
 
-pub fn app_controller(event: &Event, data: &mut AppModel, _env: &Env) {
-    match event {
-        Event::Command(cmd) if cmd.is(SWITCH_TO_ALICE) => {
-            data.current_view = CurrentView::Alice;
-        }
-        _ => (),
+    fn handle_bob_event(&mut self, event: &Event, app_state: &mut AppState, _env: &Env) {
+        // Implementieren Sie hier die Event-Logik für Bob
     }
 }
