@@ -26,7 +26,6 @@ pub struct BobModel {
     pub(crate) anzeige_geheimer_schluessel: String,
 }
 
-
 // Datenmodell für die gesamte App
 #[derive(Clone, Data, Lens)]
 pub struct AppState {
@@ -42,6 +41,11 @@ pub enum View {
     HauptMenu,
     Alice,
     Bob,
+}
+
+enum CustomCommand {
+    SwitchToAlice,
+    SwitchToBob,
 }
 
 impl Default for AppState {
@@ -69,4 +73,3 @@ impl Default for AppState {
         }
     }
 }
-

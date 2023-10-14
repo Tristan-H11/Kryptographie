@@ -89,32 +89,63 @@
 // Mask Bob is set up exactly like that of Alice, except that here a message from Alice is received and one can be sent to Alice
 
 
-use druid::{Env, Widget, WidgetExt};
-use druid::widget::{Button, Flex, Label, TextBox};
+use druid::{
+    AppLauncher, Command, Data, Env, Event, EventCtx, Lens, Selector, Widget, WidgetExt,
+    widget::{Button, Flex, Label, TextBox, ViewSwitcher},
+};
+use druid::widget::Controller;
 use crate::gui::model::model::{AliceModel, AppState, BobModel, HauptMenuModel, View};
 
+// Custom Befehle und Controller Definition
+pub const SWITCH_TO_ALICE: Selector = Selector::new("switch-to-alice");
+pub const SWITCH_TO_BOB: Selector = Selector::new("switch-to-bob");
+pub const SWITCH_TO_HAUPTMENU: Selector = Selector::new("switch-to-hauptmenu");
+
+pub struct AppController;
+
+impl<W: druid::Widget<AppState>> druid::widget::Controller<AppState, W> for AppController {
+    fn event(
+        &mut self,
+        child: &mut W,
+        ctx: &mut EventCtx,
+        event: &Event,
+        data: &mut AppState,
+        env: &Env,
+    ) {
+        match event {
+            Event::Command(cmd) if cmd.is(SWITCH_TO_ALICE) => {
+                data.current_view = View::Alice;
+            }
+            Event::Command(cmd) if cmd.is(SWITCH_TO_BOB) => {
+                data.current_view = View::Bob;
+            }
+            Event::Command(cmd) if cmd.is(SWITCH_TO_HAUPTMENU) => {
+                data.current_view = View::HauptMenu;
+            }
+            _ => (),
+        }
+        child.event(ctx, event, data, env);
+    }
+}
+
+// UI Bau Funktion
 pub fn build_ui() -> impl Widget<AppState> {
-    // Verwenden Sie eine ViewSwitcher, um zwischen den Ansichten zu wechseln
-    druid::widget::ViewSwitcher::new(
+    ViewSwitcher::new(
         |data: &AppState, _env| data.current_view.clone(),
         |selector, data, _env| {
-            match selector {
-                View::HauptMenu => {
-                    let haupt_menu_view = build_haupt_menu().lens(AppState::haupt_menu);
-                    Box::new(haupt_menu_view)
-                }
-                View::Alice => {
-                    let alice_view = build_alice_view().lens(AppState::alice);
-                    Box::new(alice_view)
-                }
-                View::Bob => {
-                    let bob_view = build_bob_view().lens(AppState::bob);
-                    Box::new(bob_view)
-                }
-            }
+            let selected_widget: Box<dyn Widget<_>> = match *selector {
+                View::HauptMenu => Box::new(build_haupt_menu().lens(AppState::haupt_menu)),
+                View::Alice => Box::new(build_alice_view().lens(AppState::alice)),
+                View::Bob => Box::new(build_bob_view().lens(AppState::bob)),
+            };
+
+            selected_widget.boxed()
         },
     )
+        .controller(AppController)
+        .boxed()
 }
+
 
 fn build_haupt_menu() -> impl Widget<HauptMenuModel> {
     // Entry-Felder
@@ -130,8 +161,6 @@ fn build_haupt_menu() -> impl Widget<HauptMenuModel> {
         .with_child(Label::new("Eingabe Miller-Rabin"))
         .with_child(TextBox::new().lens(HauptMenuModel::eingabe_miller_rabin));
 
-
-
     // Button
     let calc_open_key_button = Button::new("Berechne Öffentlichen Schlüssel").on_click(|_ctx, _data, _env| {
         // TODO: Implementieren Sie hier die Logik für die Berechnung des öffentlichen Schlüssels
@@ -139,17 +168,17 @@ fn build_haupt_menu() -> impl Widget<HauptMenuModel> {
         // und das Label aktualisieren.
     });
     let open_alice_button = Button::new("Öffne Alice Ansicht").on_click(|_ctx, _data, _env| {
-        // TODO: Implementieren Sie hier die Logik für das Öffnen der Alice-Ansicht
+        _ctx.submit_command(SWITCH_TO_ALICE);
     });
     let open_bob_button = Button::new("Öffne Bob Ansicht").on_click(|_ctx, _data, _env| {
-        // TODO: Implementieren Sie hier die Logik für das Öffnen der Bob-Ansicht
+        _ctx.submit_command(SWITCH_TO_BOB);
     });
 
     // Label
-    let open_key_label = Label::new(|data: &HauptMenuModel, _env: &Env| {
-        // Hier können Sie den Inhalt des Labels dynamisch festlegen, basierend auf HauptMenuModel::ausgabe_oeff_schluessel
-        format!("Öffentlicher Schlüssel: {}", &data.ausgabe_oeff_schluessel).into()
+    let open_key_label = Label::new(|data: &HauptMenuModel, _env: &Env| -> String {
+        format!("Öffentlicher Schlüssel: {}", &data.ausgabe_oeff_schluessel)
     });
+
 
     Flex::column()
         .with_child(p1_entry)
@@ -166,10 +195,7 @@ fn build_haupt_menu() -> impl Widget<HauptMenuModel> {
         .with_default_spacer()
         .with_child(open_bob_button)
         .padding(druid::Insets::uniform(10.0))
-
 }
-
-
 
 fn build_alice_view() -> impl Widget<AliceModel> {
     let text_box = TextBox::new().lens(AliceModel::eingabe_klartext);
