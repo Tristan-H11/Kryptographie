@@ -1,1 +1,1 @@
-pub(crate) mod crypto_operations;
+pub(crate) mod model;

@@ -88,68 +88,40 @@
 
 // Mask Bob is set up exactly like that of Alice, except that here a message from Alice is received and one can be sent to Alice
 
+use std::sync::{Arc, Mutex};
+use crate::gui::view::main_mask_view::MainMaskView;
+use crate::gui::model::model::AppState;
 use crate::gui::gui_math::GuiMath;
 extern crate druid;
-use druid::widget::{Button, Flex, Label, TextBox};
-use druid::{AppLauncher, Data, Lens, LocalizedString, Widget, WidgetExt, WindowDesc};
+use druid::{AppLauncher, LocalizedString, WidgetExt, WindowDesc};
+use crate::gui::controller::main_mask_controller::MainMaskController;
 
-#[derive(Clone, Data, Lens)]
-struct AppState {
-    miller_rabin_input: String,
-    open_key_result__e_a: String,
-    length_p1_input: i64,
-    length_p2_input: i64,
-    open_key_result__e_b: String,
-}
-
-fn calculate_window_size() -> (f64, f64) {
+pub(crate) fn calculate_window_size() -> (f64, f64) {
     GuiMath::calculate_window_size()
 }
 
-fn build_main_ui_mask() -> impl Widget<AppState> {
-    let entry = TextBox::new()
-        .with_placeholder("Eingabe Schritte Miller-Rabin")
-        .lens(AppState::miller_rabin_input)
-        .padding(10.0);
-
-    let label = Label::new(|data: &AppState, _env: &_| {
-        format!("Öffentliche Schlüssel: {}", data.open_key_result__e_a)
-    }).padding(10.0);
-
-    let button = Button::new("Anzeigen")
-        .on_click(|_ctx, data: &mut AppState, _env| {
-            // Hier können Sie die Logik für die Berechnung des öffentlichen Schlüssels hinzufügen
-            data.open_key_result__e_a = format!("Berechneter Schlüssel für {}", data.miller_rabin_input);
-        })
-        .padding(10.0);
-
-    let mut flex = Flex::column();
-    flex.add_child(entry);
-    flex.add_spacer(10.0);
-    flex.add_child(button);
-    flex.add_spacer(10.0);
-    flex.add_child(label);
-    flex
-}
-
-
 pub struct Gui;
+
 impl Gui {
     pub fn new() -> Self {
         Gui
     }
+
     pub fn run(&self) {
         let (window_width, window_height) = calculate_window_size();
-        let main_window = WindowDesc::new(|| build_main_ui_mask())
+        let main_window = WindowDesc::new(|| MainMaskView::build_main_ui_mask())
             .title(LocalizedString::new("Hauptfenster"))
             .window_size((window_width, window_height));
 
         let initial_state = AppState {
+            main_controller: Arc::new(Mutex::new(MainMaskController::new())),
             miller_rabin_input: "".to_string(),
-            length_p1_input: 0,
-            length_p2_input: 0,
+            length_p1_input: "".to_string(),
+            length_p2_input: "".to_string(),
             open_key_result__e_a: "".to_string(),
             open_key_result__e_b: "".to_string(),
+            secret_key_for_alice: "".to_string(),  // bereits vorhanden
+            secret_key_for_bob: "".to_string(),  // bereits vorhanden
         };
 
         AppLauncher::with_window(main_window)
@@ -159,55 +131,6 @@ impl Gui {
     }
 
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 

@@ -1,8 +1,9 @@
 use crate::gui::{model, view};
+use crate::gui::model::model::CryptoOperations;
 
 pub struct BobMaskController {
-    model: model::crypto_operations::CryptoOperations,
-    view: view::bob_mask_view::BobMaskView
+    crypto_operations: CryptoOperations,
+    view: view::alice_mask_view::AliceMaskView,
 }
 
 impl BobMaskController {
