@@ -108,28 +108,28 @@ impl AppController {
 
         // Alice
         let rot_keygen_service_alice =
-            RotKeygenService::new(app_state.haupt_menu.eingabe_p1.clone());
+            RotKeygenService::new(app_state.haupt_menu.prime_number_one.clone());
         let (public_key_alice, private_key_alice) = rot_keygen_service_alice.generate_keypair();
 
         app_state.haupt_menu.public_key_alice = public_key_alice.clone();
-        app_state.alice.anzeige_geheimer_schluessel = private_key_alice.clone();
+        app_state.alice.private_key = private_key_alice.clone();
 
         // Bob
-        let rot_keygen_service_bob = RotKeygenService::new(app_state.haupt_menu.eingabe_p2.clone());
+        let rot_keygen_service_bob = RotKeygenService::new(app_state.haupt_menu.prime_number_two.clone());
         let (public_key_bob, private_key_bob) = rot_keygen_service_bob.generate_keypair();
 
         app_state.haupt_menu.public_key_bob = public_key_bob.clone();
-        app_state.bob.anzeige_geheimer_schluessel = private_key_bob.clone();
+        app_state.bob.private_key = private_key_bob.clone();
     }
 
     //Alice Funktion
     fn encrypt_alice(&mut self, app_state: &mut AppState) {
         let public_key = app_state.haupt_menu.public_key_alice.parse::<u8>().unwrap();
-        let klartext = app_state.alice.eingabe_klartext.clone();
+        let klartext = app_state.alice.message.clone();
         let service = RotEncryptionService::new(public_key);
 
         let encrypted = service.encrypt(&klartext);
-        app_state.alice.eingabe_klartext = encrypted;
+        app_state.alice.message = encrypted;
     }
 
     fn sign_alice(&mut self, app_state: &mut AppState) {
@@ -139,34 +139,34 @@ impl AppController {
     fn decrypt_alice(&mut self, app_state: &mut AppState) {
         let private_key = app_state
             .alice
-            .anzeige_geheimer_schluessel
+            .private_key
             .parse::<u8>()
             .unwrap();
-        let ciphertext = app_state.alice.eingabe_klartext.clone();
+        let ciphertext = app_state.alice.message.clone();
         let service = RotEncryptionService::new(private_key);
 
         let decrypted = service.decrypt(&ciphertext);
-        app_state.alice.eingabe_klartext = decrypted;
+        app_state.alice.message = decrypted;
     }
     fn send_message_alice(&mut self, app_state: &mut AppState) {
-        let message = &app_state.alice.eingabe_klartext;
-        app_state.bob.eingabe_klartext = message.clone();
+        let message = &app_state.alice.message;
+        app_state.bob.message = message.clone();
         self.clear_alice(app_state);
         // todo -- Logik zum Senden der Nachricht für Alice
     }
     fn clear_alice(&mut self, app_state: &mut AppState) {
-        app_state.alice.eingabe_klartext = String::new();
+        app_state.alice.message = String::new();
         // todo -- Logik zum Zurücksetzen der Eingabefelder und Labels für Alice
     }
 
     //Bob Funktion
     fn encrypt_bob(&mut self, app_state: &mut AppState) {
         let public_key = app_state.haupt_menu.public_key_bob.parse::<u8>().unwrap();
-        let klartext = app_state.bob.eingabe_klartext.clone();
+        let klartext = app_state.bob.message.clone();
         let service = RotEncryptionService::new(public_key);
 
         let encrypted = service.encrypt(&klartext);
-        app_state.bob.eingabe_klartext = encrypted;
+        app_state.bob.message = encrypted;
         // todo -- Logik für Verschlüsselung für Bob
     }
     fn sign_bob(&mut self, app_state: &mut AppState) {
@@ -176,23 +176,23 @@ impl AppController {
     fn decrypt_bob(&mut self, app_state: &mut AppState) {
         let private_key = app_state
             .bob
-            .anzeige_geheimer_schluessel
+            .private_key
             .parse::<u8>()
             .unwrap();
-        let ciphertext = app_state.bob.eingabe_klartext.clone();
+        let ciphertext = app_state.bob.message.clone();
         let service = RotEncryptionService::new(private_key);
 
         let decrypted = service.decrypt(&ciphertext);
-        app_state.bob.eingabe_klartext = decrypted;
+        app_state.bob.message = decrypted;
     }
     fn send_message_bob(&mut self, app_state: &mut AppState) {
-        let message = &app_state.bob.eingabe_klartext;
-        app_state.alice.eingabe_klartext = message.clone();
+        let message = &app_state.bob.message;
+        app_state.alice.message = message.clone();
         self.clear_bob(app_state);
         // todo -- Logik zum Senden der Nachricht für Bob
     }
     fn clear_bob(&mut self, app_state: &mut AppState) {
-        app_state.bob.eingabe_klartext = String::new();
+        app_state.bob.message = String::new();
         // todo -- Logik zum Zurücksetzen der Eingabefelder und Labels für Bob
     }
 }
