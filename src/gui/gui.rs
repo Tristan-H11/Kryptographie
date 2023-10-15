@@ -88,13 +88,9 @@
 
 // Mask Bob is set up exactly like that of Alice, except that here a message from Alice is received and one can be sent to Alice
 
-
-use druid::{
-    Env, Event, EventCtx, Selector, Widget, WidgetExt,
-    widget::{ViewSwitcher},
-};
 use crate::gui::model::model::{AppState, View};
-use crate::gui::view::view::{build_haupt_menu, build_alice_view, build_bob_view};
+use crate::gui::view::view::{build_alice_view, build_bob_view, build_haupt_menu};
+use druid::{widget::ViewSwitcher, Env, Event, EventCtx, Selector, Widget, WidgetExt};
 
 // Custom Befehle und Controller Definition
 pub const SWITCH_TO_ALICE: Selector = Selector::new("switch-to-alice");
@@ -107,8 +103,6 @@ pub const SIGN: Selector = Selector::new("sign");
 pub const DECRYPT: Selector = Selector::new("decrypt");
 pub const SEND_MESSAGE: Selector = Selector::new("send-message");
 pub const CLEAR: Selector = Selector::new("clear");
-
-
 
 pub struct AppController;
 
@@ -142,7 +136,6 @@ impl<W: druid::Widget<AppState>> druid::widget::Controller<AppState, W> for AppC
     }
 }
 
-
 // UI Bau Funktion
 pub fn build_ui() -> impl Widget<AppState> {
     ViewSwitcher::new(
@@ -156,6 +149,6 @@ pub fn build_ui() -> impl Widget<AppState> {
             selected_widget.boxed()
         },
     )
-        .controller(AppController)
-        .boxed()
+    .controller(AppController)
+    .boxed()
 }
