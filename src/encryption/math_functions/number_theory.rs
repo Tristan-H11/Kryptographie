@@ -1,4 +1,4 @@
-use crate::rsa::math_functions::big_int_util::{
+use crate::encryption::math_functions::big_int_util::{
     decrement, is_even, is_one, is_zero, random_in_range,
 };
 use ibig::ops::RemEuclid;

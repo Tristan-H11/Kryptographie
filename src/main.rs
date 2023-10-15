@@ -1,6 +1,6 @@
 mod gui;
-mod rsa;
 mod tests;
+mod encryption;
 
 use druid::{AppLauncher, WindowDesc};
 use gui::gui::build_ui;

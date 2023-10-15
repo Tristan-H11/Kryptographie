@@ -1,6 +1,6 @@
 #[cfg(test)]
 mod tests {
-    use crate::rsa::math_functions::number_theory::{fast_exponentiation, miller_rabin};
+    use crate::encryption::math_functions::number_theory::{fast_exponentiation, miller_rabin};
     use ibig::{ubig, UBig};
     use std::str::FromStr;
 
