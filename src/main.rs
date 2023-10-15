@@ -1,10 +1,10 @@
+mod gui;
 mod rsa;
 mod tests;
-mod gui;
 
 use druid::{AppLauncher, WindowDesc};
-use gui::model::model::AppState;
 use gui::gui::build_ui;
+use gui::model::model::AppState;
 
 fn main() {
     let main_window = WindowDesc::new(build_ui()).title("My Rust GUI App");

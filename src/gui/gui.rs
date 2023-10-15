@@ -88,17 +88,10 @@
 
 // Mask Bob is set up exactly like that of Alice, except that here a message from Alice is received and one can be sent to Alice
 
-
-use druid::{
-    Env, Event, EventCtx, Selector, Widget, WidgetExt,
-    widget::{ViewSwitcher},
-};
 use crate::gui::controller::controller::AppController;
 use crate::gui::model::model::{AppState, View};
-use crate::gui::view::view::{build_haupt_menu, build_alice_view, build_bob_view};
-
-
-
+use crate::gui::view::view::{build_alice_view, build_bob_view, build_haupt_menu};
+use druid::{widget::ViewSwitcher, Env, Event, EventCtx, Selector, Widget, WidgetExt};
 
 // UI Bau Funktion
 pub fn build_ui() -> impl Widget<AppState> {
@@ -113,6 +106,6 @@ pub fn build_ui() -> impl Widget<AppState> {
             selected_widget.boxed()
         },
     )
-        .controller(AppController)
-        .boxed()
+    .controller(AppController)
+    .boxed()
 }

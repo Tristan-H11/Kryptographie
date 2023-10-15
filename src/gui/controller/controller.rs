@@ -1,7 +1,7 @@
-use std::fmt::format;
-use druid::{Env, Event, EventCtx};
 use crate::gui::controller::commands::*;
 use crate::gui::model::model::{AliceModel, AppState, BobModel, View};
+use druid::{Env, Event, EventCtx};
+use std::fmt::format;
 
 pub struct AppController;
 
@@ -98,7 +98,6 @@ impl AppController {
         }
     }
 
-
     //Allgemeine Funktion
     fn calculate_public_key(&mut self, app_state: &mut AppState) {
         // TODO: Implementiere die Logik zur Berechnung der öffentlichen Schlüssel für Alice und Bob
@@ -129,7 +128,6 @@ impl AppController {
         alice.eingabe_klartext = String::new();
         // todo -- Logik zum Zurücksetzen der Eingabefelder und Labels für Alice
     }
-
 
     //Bob Funktion
     fn encrypt_bob(&mut self, bob: &mut BobModel) {

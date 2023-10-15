@@ -9,7 +9,7 @@ pub struct HauptMenuModel {
     pub(crate) eingabe_miller_rabin: String,
     pub(crate) ausgabe_oeff_schluessel: String,
     pub(crate) public_key_alice: String,
-    pub(crate) public_key_bob: String
+    pub(crate) public_key_bob: String,
 }
 
 #[derive(Clone, Data, Lens)]
@@ -48,7 +48,7 @@ pub enum View {
 enum CustomCommand {
     SwitchToAlice,
     SwitchToBob,
-    SwitchToHauptMenu
+    SwitchToHauptMenu,
 }
 
 impl Default for AppState {

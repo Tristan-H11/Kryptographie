@@ -1,7 +1,12 @@
-use druid::{Widget, WidgetExt, widget::{Button, Flex, Label, TextBox}, Env};
+use crate::gui::controller::commands::{
+    CALCULATE_PUBLIC_KEY, CLEAR, DECRYPT, ENCRYPT, SEND_MESSAGE, SIGN, SWITCH_TO_ALICE,
+    SWITCH_TO_BOB, SWITCH_TO_HAUPTMENU,
+};
 use crate::gui::model::model::{AliceModel, BobModel, HauptMenuModel};
-use crate::gui::controller::commands::{ENCRYPT, SIGN, DECRYPT, SEND_MESSAGE, CLEAR, CALCULATE_PUBLIC_KEY, SWITCH_TO_ALICE, SWITCH_TO_BOB, SWITCH_TO_HAUPTMENU};
-
+use druid::{
+    widget::{Button, Flex, Label, TextBox},
+    Env, Widget, WidgetExt,
+};
 
 pub(crate) fn build_haupt_menu() -> impl Widget<HauptMenuModel> {
     // Entry-Felder
@@ -18,9 +23,11 @@ pub(crate) fn build_haupt_menu() -> impl Widget<HauptMenuModel> {
         .with_child(TextBox::new().lens(HauptMenuModel::eingabe_miller_rabin));
 
     // Button
-    let calc_public_key_button = Button::new("Berechne Öffentlichen Schlüssel").on_click(|ctx, _data: &mut HauptMenuModel, _env| {
-        ctx.submit_command(CALCULATE_PUBLIC_KEY);
-    });
+    let calc_public_key_button = Button::new("Berechne Öffentlichen Schlüssel").on_click(
+        |ctx, _data: &mut HauptMenuModel, _env| {
+            ctx.submit_command(CALCULATE_PUBLIC_KEY);
+        },
+    );
 
     let open_alice_button = Button::new("Öffne Alice Ansicht").on_click(|_ctx, _data, _env| {
         _ctx.submit_command(SWITCH_TO_ALICE);
@@ -70,39 +77,44 @@ pub(crate) fn build_alice_view() -> impl Widget<AliceModel> {
 
     let signature_row = Flex::row()
         .with_child(
-            Flex::column()
-                .with_child(TextBox::new().with_placeholder("Signatur").lens(AliceModel::anzeige_signatur))
+            Flex::column().with_child(
+                TextBox::new()
+                    .with_placeholder("Signatur")
+                    .lens(AliceModel::anzeige_signatur),
+            ),
         )
         .with_default_spacer()
-        .with_child(
-            Label::new(|data: &AliceModel, _env: &Env| {
-                if data.status_signatur {
-                    "Gültig".to_string()
-                } else {
-                    "Ungültig".to_string()
-                }
-            })
-        );
+        .with_child(Label::new(|data: &AliceModel, _env: &Env| {
+            if data.status_signatur {
+                "Gültig".to_string()
+            } else {
+                "Ungültig".to_string()
+            }
+        }));
 
     // Buttons
-    let encrypt_button = Button::new("Verschlüsseln").on_click(|_ctx, _data: &mut AliceModel, _env| {
-        _ctx.submit_command(ENCRYPT);
-    });
+    let encrypt_button =
+        Button::new("Verschlüsseln").on_click(|_ctx, _data: &mut AliceModel, _env| {
+            _ctx.submit_command(ENCRYPT);
+        });
     let sign_button = Button::new("Signieren").on_click(|_ctx, _data: &mut AliceModel, _env| {
         _ctx.submit_command(SIGN);
     });
-    let decrypt_button = Button::new("Entschlüsseln").on_click(|_ctx, _data: &mut AliceModel, _env| {
-        _ctx.submit_command(DECRYPT);
-    });
-    let send_message_button = Button::new("Nachricht senden").on_click(|_ctx, _data: &mut AliceModel, _env| {
-        _ctx.submit_command(SEND_MESSAGE);
-    });
+    let decrypt_button =
+        Button::new("Entschlüsseln").on_click(|_ctx, _data: &mut AliceModel, _env| {
+            _ctx.submit_command(DECRYPT);
+        });
+    let send_message_button =
+        Button::new("Nachricht senden").on_click(|_ctx, _data: &mut AliceModel, _env| {
+            _ctx.submit_command(SEND_MESSAGE);
+        });
     let clear_button = Button::new("Clear").on_click(|_ctx, _data: &mut AliceModel, _env| {
         _ctx.submit_command(CLEAR);
     });
-    let back_button = Button::new("Zurück zum Hauptmenü").on_click(|_ctx, _data: &mut AliceModel, _env| {
-        _ctx.submit_command(SWITCH_TO_HAUPTMENU);
-    });
+    let back_button =
+        Button::new("Zurück zum Hauptmenü").on_click(|_ctx, _data: &mut AliceModel, _env| {
+            _ctx.submit_command(SWITCH_TO_HAUPTMENU);
+        });
 
     Flex::column()
         .with_child(secret_key_label)
@@ -138,39 +150,44 @@ pub(crate) fn build_bob_view() -> impl Widget<BobModel> {
 
     let signature_row = Flex::row()
         .with_child(
-            Flex::column()
-                .with_child(TextBox::new().with_placeholder("Signatur").lens(BobModel::anzeige_signatur))
+            Flex::column().with_child(
+                TextBox::new()
+                    .with_placeholder("Signatur")
+                    .lens(BobModel::anzeige_signatur),
+            ),
         )
         .with_default_spacer()
-        .with_child(
-            Label::new(|data: &BobModel, _env: &Env| {
-                if data.status_signatur {
-                    "Gültig".to_string()
-                } else {
-                    "Ungültig".to_string()
-                }
-            })
-        );
+        .with_child(Label::new(|data: &BobModel, _env: &Env| {
+            if data.status_signatur {
+                "Gültig".to_string()
+            } else {
+                "Ungültig".to_string()
+            }
+        }));
 
     // Buttons
-    let encrypt_button = Button::new("Verschlüsseln").on_click(|_ctx, _data: &mut BobModel, _env| {
-        _ctx.submit_command(ENCRYPT);
-    });
+    let encrypt_button =
+        Button::new("Verschlüsseln").on_click(|_ctx, _data: &mut BobModel, _env| {
+            _ctx.submit_command(ENCRYPT);
+        });
     let sign_button = Button::new("Signieren").on_click(|_ctx, _data: &mut BobModel, _env| {
         _ctx.submit_command(SIGN);
     });
-    let decrypt_button = Button::new("Entschlüsseln").on_click(|_ctx, _data: &mut BobModel, _env| {
-        _ctx.submit_command(DECRYPT);
-    });
-    let send_message_button = Button::new("Nachricht senden").on_click(|_ctx, _data: &mut BobModel, _env| {
-        _ctx.submit_command(SEND_MESSAGE);
-    });
+    let decrypt_button =
+        Button::new("Entschlüsseln").on_click(|_ctx, _data: &mut BobModel, _env| {
+            _ctx.submit_command(DECRYPT);
+        });
+    let send_message_button =
+        Button::new("Nachricht senden").on_click(|_ctx, _data: &mut BobModel, _env| {
+            _ctx.submit_command(SEND_MESSAGE);
+        });
     let clear_button = Button::new("Clear").on_click(|_ctx, _data: &mut BobModel, _env| {
         _ctx.submit_command(CLEAR);
     });
-    let back_button = Button::new("Zurück zum Hauptmenü").on_click(|_ctx, _data: &mut BobModel, _env| {
-        _ctx.submit_command(SWITCH_TO_HAUPTMENU);
-    });
+    let back_button =
+        Button::new("Zurück zum Hauptmenü").on_click(|_ctx, _data: &mut BobModel, _env| {
+            _ctx.submit_command(SWITCH_TO_HAUPTMENU);
+        });
 
     Flex::column()
         .with_child(secret_key_label)
