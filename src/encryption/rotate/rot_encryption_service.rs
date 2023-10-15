@@ -3,7 +3,6 @@ use crate::encryption::encryption_service::EncryptionService;
 /// Eine Implementierung des EncryptionService-Traits, welches
 /// simple Dummy Daten mit dem Rotate Chiffre verwendet.
 pub struct RotEncryptionService {
-    message: String,
     rotation: u8,
 }
 impl RotEncryptionService {
@@ -12,29 +11,27 @@ impl RotEncryptionService {
     ///
     /// # Argumente
     ///
-    /// * `input` - Der zu verschlüsselnde String.
     /// * `rotation` - Die Anzahl der zu verschiebenden Stellen.
     ///
-    pub fn new(message: String, rotation: String) -> RotEncryptionService {
-        let rotation = rotation.trim().parse::<u8>().unwrap();
-        RotEncryptionService { message, rotation }
+    pub fn new(rotation: u8) -> RotEncryptionService {
+        RotEncryptionService { rotation }
     }
 }
 
 impl EncryptionService for RotEncryptionService {
-    fn encrypt(&self) -> String {
-        rotate_forward(&self.message, &self.rotation)
+    fn encrypt(&self, message: &String) -> String {
+        rotate_forward(message, &self.rotation)
     }
 
-    fn decrypt(&self) -> String {
-        rotate_backward(&self.message, &self.rotation)
+    fn decrypt(&self, message: &String) -> String {
+        rotate_backward(message, &self.rotation)
     }
 
-    fn sign(&self) -> String {
-        format!("{} -- signiert!", &self.message)
+    fn sign(&self, message: &String) -> String {
+        panic!("Nicht implementiert!")
     }
 
-    fn verify(&self) -> String {
+    fn verify(&self, message: &String) -> String {
         panic!("Nicht implementiert!")
     }
 
