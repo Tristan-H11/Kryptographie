@@ -1,6 +1,5 @@
 /// Ein Trait, gegen welchen die kryptographische Operationen aufrufen werden können.
 pub trait EncryptionService {
-
     ///
     /// Verschlüsselt einen übergebenen String.
     ///
@@ -26,4 +25,3 @@ pub trait EncryptionService {
     ///
     fn generate_keypair(&self) -> (String, String);
 }
-
