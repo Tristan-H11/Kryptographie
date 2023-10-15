@@ -115,7 +115,8 @@ impl AppController {
         app_state.alice.private_key = private_key_alice.clone();
 
         // Bob
-        let rot_keygen_service_bob = RotKeygenService::new(app_state.haupt_menu.prime_number_two.clone());
+        let rot_keygen_service_bob =
+            RotKeygenService::new(app_state.haupt_menu.prime_number_two.clone());
         let (public_key_bob, private_key_bob) = rot_keygen_service_bob.generate_keypair();
 
         app_state.haupt_menu.public_key_bob = public_key_bob.clone();
@@ -137,11 +138,7 @@ impl AppController {
         println!("Signatur Alice");
     }
     fn decrypt_alice(&mut self, app_state: &mut AppState) {
-        let private_key = app_state
-            .alice
-            .private_key
-            .parse::<u8>()
-            .unwrap();
+        let private_key = app_state.alice.private_key.parse::<u8>().unwrap();
         let ciphertext = app_state.alice.message.clone();
         let service = RotEncryptionService::new(private_key);
 
@@ -174,11 +171,7 @@ impl AppController {
         println!("Signatur Bob");
     }
     fn decrypt_bob(&mut self, app_state: &mut AppState) {
-        let private_key = app_state
-            .bob
-            .private_key
-            .parse::<u8>()
-            .unwrap();
+        let private_key = app_state.bob.private_key.parse::<u8>().unwrap();
         let ciphertext = app_state.bob.message.clone();
         let service = RotEncryptionService::new(private_key);
 
