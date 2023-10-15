@@ -11,28 +11,29 @@ use druid::{
 pub(crate) fn build_haupt_menu() -> impl Widget<HauptMenuModel> {
     // Entry-Felder
     let p1_entry = Flex::row()
-        .with_child(Label::new("Eingabe Breite P1"))
-        .with_child(TextBox::new().lens(HauptMenuModel::eingabe_p1));
+        .with_child(Label::new("Breite von Primzahl 1: "))
+        .with_child(TextBox::new().lens(HauptMenuModel::prime_number_one));
 
     let p2_entry = Flex::row()
-        .with_child(Label::new("Eingabe Breite P2"))
-        .with_child(TextBox::new().lens(HauptMenuModel::eingabe_p2));
+        .with_child(Label::new("Breite von Primzahl 2: "))
+        .with_child(TextBox::new().lens(HauptMenuModel::prime_number_two));
 
     let miller_rabin_entry = Flex::row()
-        .with_child(Label::new("Eingabe Miller-Rabin Iterationen"))
-        .with_child(TextBox::new().lens(HauptMenuModel::eingabe_miller_rabin));
+        .with_child(Label::new("Miller-Rabin Iterationen: "))
+        .with_child(TextBox::new().lens(HauptMenuModel::miller_rabin_iterations));
 
     // Button
-    let calc_public_key_button = Button::new("Berechne Öffentlichen Schlüssel").on_click(
+    // TODO: Muss man hier aufteilen nach "Bobs/Alice Schlüsselpaar berechnen"?
+    let calc_public_key_button = Button::new("Öffentlichen Schlüssel Berechnen").on_click(
         |ctx, _data: &mut HauptMenuModel, _env| {
             ctx.submit_command(CALCULATE_PUBLIC_KEY);
         },
     );
 
-    let open_alice_button = Button::new("Öffne Alice Ansicht").on_click(|_ctx, _data, _env| {
+    let open_alice_button = Button::new("Alice-Ansicht öffnen").on_click(|_ctx, _data, _env| {
         _ctx.submit_command(SWITCH_TO_ALICE);
     });
-    let open_bob_button = Button::new("Öffne Bob Ansicht").on_click(|_ctx, _data, _env| {
+    let open_bob_button = Button::new("Bob-Ansicht öffnen").on_click(|_ctx, _data, _env| {
         _ctx.submit_command(SWITCH_TO_BOB);
     });
 
@@ -67,25 +68,25 @@ pub(crate) fn build_haupt_menu() -> impl Widget<HauptMenuModel> {
 pub(crate) fn build_alice_view() -> impl Widget<AliceModel> {
     // Label
     let secret_key_label = Label::new(|data: &AliceModel, _env: &Env| {
-        format!("Geheimschlüssel: {}", data.anzeige_geheimer_schluessel)
+        format!("Geheimschlüssel: {}", data.private_key)
     });
 
     // Entry-Felder und Labels
     let plaintext_entry = Flex::row()
-        .with_child(Label::new("Klartext: "))
-        .with_child(TextBox::new().lens(AliceModel::eingabe_klartext));
+        .with_child(Label::new("Nachricht: "))
+        .with_child(TextBox::new().lens(AliceModel::message));
 
     let signature_row = Flex::row()
         .with_child(
             Flex::column().with_child(
                 TextBox::new()
                     .with_placeholder("Signatur")
-                    .lens(AliceModel::anzeige_signatur),
+                    .lens(AliceModel::signature),
             ),
         )
         .with_default_spacer()
         .with_child(Label::new(|data: &AliceModel, _env: &Env| {
-            if data.status_signatur {
+            if data.signature_status {
                 "Gültig".to_string()
             } else {
                 "Ungültig".to_string()
@@ -140,25 +141,25 @@ pub(crate) fn build_alice_view() -> impl Widget<AliceModel> {
 pub(crate) fn build_bob_view() -> impl Widget<BobModel> {
     // Label
     let secret_key_label = Label::new(|data: &BobModel, _env: &Env| {
-        format!("Geheimschlüssel: {}", data.anzeige_geheimer_schluessel)
+        format!("Geheimschlüssel: {}", data.private_key)
     });
 
     // Entry
     let plaintext_entry = Flex::row()
-        .with_child(Label::new("Klartext: "))
-        .with_child(TextBox::new().lens(BobModel::eingabe_klartext));
+        .with_child(Label::new("Nachricht: "))
+        .with_child(TextBox::new().lens(BobModel::message));
 
     let signature_row = Flex::row()
         .with_child(
             Flex::column().with_child(
                 TextBox::new()
                     .with_placeholder("Signatur")
-                    .lens(BobModel::anzeige_signatur),
+                    .lens(BobModel::signature),
             ),
         )
         .with_default_spacer()
         .with_child(Label::new(|data: &BobModel, _env: &Env| {
-            if data.status_signatur {
+            if data.signature_status {
                 "Gültig".to_string()
             } else {
                 "Ungültig".to_string()

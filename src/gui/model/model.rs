@@ -4,28 +4,28 @@ use std::default::Default;
 // Datenmodelle für Hauptmenü, Alice und Bob
 #[derive(Clone, Data, Lens)]
 pub struct HauptMenuModel {
-    pub(crate) eingabe_p1: String,
-    pub(crate) eingabe_p2: String,
-    pub(crate) eingabe_miller_rabin: String,
-    pub(crate) ausgabe_oeff_schluessel: String,
+    pub(crate) prime_number_one: String,
+    pub(crate) prime_number_two: String,
+    pub(crate) miller_rabin_iterations: String,
+    pub(crate) ausgabe_oeff_schluessel: String, // TODO @Lucas: Braucht man das??
     pub(crate) public_key_alice: String,
     pub(crate) public_key_bob: String,
 }
 
 #[derive(Clone, Data, Lens)]
 pub struct AliceModel {
-    pub(crate) eingabe_klartext: String,
-    pub(crate) anzeige_signatur: String,
-    pub(crate) status_signatur: bool,
-    pub(crate) anzeige_geheimer_schluessel: String,
+    pub(crate) message: String,
+    pub(crate) signature: String,
+    pub(crate) signature_status: bool,
+    pub(crate) private_key: String,
 }
 
 #[derive(Clone, Data, Lens)]
 pub struct BobModel {
-    pub(crate) eingabe_klartext: String,
-    pub(crate) anzeige_signatur: String,
-    pub(crate) status_signatur: bool,
-    pub(crate) anzeige_geheimer_schluessel: String,
+    pub(crate) message: String,
+    pub(crate) signature: String,
+    pub(crate) signature_status: bool,
+    pub(crate) private_key: String,
 }
 
 // Datenmodell für die gesamte App -- quasi die ebene über den einzelnen Datenmodellen
@@ -50,24 +50,24 @@ impl Default for AppState {
         AppState {
             current_view: View::HauptMenu, // Festlegen, dass Hauptmenü die start-view ist
             haupt_menu: HauptMenuModel {
-                eingabe_p1: String::new(),
-                eingabe_p2: String::new(),
-                eingabe_miller_rabin: String::new(),
+                prime_number_one: String::new(),
+                prime_number_two: String::new(),
+                miller_rabin_iterations: String::new(),
                 ausgabe_oeff_schluessel: String::new(),
                 public_key_alice: "".to_string(),
                 public_key_bob: "".to_string(),
             },
             alice: AliceModel {
-                eingabe_klartext: String::new(),
-                anzeige_signatur: String::new(),
-                status_signatur: false,
-                anzeige_geheimer_schluessel: String::new(),
+                message: String::new(),
+                signature: String::new(),
+                signature_status: false,
+                private_key: String::new(),
             },
             bob: BobModel {
-                eingabe_klartext: String::new(),
-                anzeige_signatur: String::new(),
-                status_signatur: false,
-                anzeige_geheimer_schluessel: String::new(),
+                message: String::new(),
+                signature: String::new(),
+                signature_status: false,
+                private_key: String::new(),
             },
         }
     }
