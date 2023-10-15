@@ -20,7 +20,7 @@ pub(crate) fn build_haupt_menu() -> impl Widget<HauptMenuModel> {
         .with_child(TextBox::new().lens(HauptMenuModel::eingabe_miller_rabin));
 
     // Button
-    let calc_open_key_button = Button::new("Berechne Öffentlichen Schlüssel").on_click(|ctx, _data: &mut HauptMenuModel, _env| {
+    let calc_public_key_button = Button::new("Berechne Öffentlichen Schlüssel").on_click(|ctx, _data: &mut HauptMenuModel, _env| {
         ctx.submit_command(CALCULATE_PUBLIC_KEY);
     });
 
@@ -32,12 +32,12 @@ pub(crate) fn build_haupt_menu() -> impl Widget<HauptMenuModel> {
     });
 
     // Label
-    let open_key_alice_label = Label::new(|data: &HauptMenuModel, _env: &Env| -> String {
-        format!("Öffentlicher Schlüssel Alice: {}", &data.open_key_alice)
+    let public_key_alice_label = Label::new(|data: &HauptMenuModel, _env: &Env| -> String {
+        format!("Öffentlicher Schlüssel Alice: {}", &data.public_key_alice)
     });
 
-    let open_key_bob_label = Label::new(|data: &HauptMenuModel, _env: &Env| -> String {
-        format!("Öffentlicher Schlüssel Bob: {}", &data.open_key_bob)
+    let public_key_bob_label = Label::new(|data: &HauptMenuModel, _env: &Env| -> String {
+        format!("Öffentlicher Schlüssel Bob: {}", &data.public_key_bob)
     });
 
     Flex::column()
@@ -47,11 +47,11 @@ pub(crate) fn build_haupt_menu() -> impl Widget<HauptMenuModel> {
         .with_default_spacer()
         .with_child(miller_rabin_entry)
         .with_default_spacer()
-        .with_child(calc_open_key_button)
+        .with_child(calc_public_key_button)
         .with_default_spacer()
-        .with_child(open_key_alice_label)
+        .with_child(public_key_alice_label)
         .with_default_spacer()
-        .with_child(open_key_bob_label)
+        .with_child(public_key_bob_label)
         .with_default_spacer()
         .with_child(open_alice_button)
         .with_default_spacer()

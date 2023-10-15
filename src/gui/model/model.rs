@@ -8,8 +8,8 @@ pub struct HauptMenuModel {
     pub(crate) eingabe_p2: String,
     pub(crate) eingabe_miller_rabin: String,
     pub(crate) ausgabe_oeff_schluessel: String,
-    pub(crate) open_key_alice: String,
-    pub(crate) open_key_bob: String
+    pub(crate) public_key_alice: String,
+    pub(crate) public_key_bob: String
 }
 
 #[derive(Clone, Data, Lens)]
@@ -60,8 +60,8 @@ impl Default for AppState {
                 eingabe_p2: String::new(),
                 eingabe_miller_rabin: String::new(),
                 ausgabe_oeff_schluessel: String::new(),
-                open_key_alice: "".to_string(),
-                open_key_bob: "".to_string(),
+                public_key_alice: "".to_string(),
+                public_key_bob: "".to_string(),
             },
             alice: AliceModel {
                 eingabe_klartext: String::new(),

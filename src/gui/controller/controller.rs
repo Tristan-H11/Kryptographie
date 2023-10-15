@@ -75,8 +75,8 @@ impl Controller {
     //Allgemeine Funktion
     fn calculate_public_key(&mut self, app_state: &mut AppState) {
         // TODO: Implementiere die Logik zur Berechnung der öffentlichen Schlüssel für Alice und Bob
-        app_state.haupt_menu.open_key_alice = "1234567890".to_string();
-        app_state.haupt_menu.open_key_bob = "0987654321".to_string();
+        app_state.haupt_menu.public_key_alice = "1234567890".to_string();
+        app_state.haupt_menu.public_key_bob = "0987654321".to_string();
     }
 
     //Alice Funktion
