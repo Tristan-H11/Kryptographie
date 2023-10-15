@@ -80,37 +80,37 @@ impl Controller {
     }
 
     //Alice Funktion
-    fn encrypt_alice(&mut self, app_state: &mut AppState) {
+    fn encrypt_alice(&mut self, _app_state: &mut AppState) {
         // todo -- Logik für Verschlüsselung für Alice
     }
-    fn sign_alice(&mut self, app_state: &mut AppState) {
+    fn sign_alice(&mut self, _app_state: &mut AppState) {
         // todo -- Logik für Signierung für Alice
     }
-    fn decrypt_alice(&mut self, app_state: &mut AppState) {
+    fn decrypt_alice(&mut self, _app_state: &mut AppState) {
         // todo -- Logik für Entschlüsselung für Alice
     }
-    fn send_message_alice(&mut self, app_state: &mut AppState) {
+    fn send_message_alice(&mut self, _app_state: &mut AppState) {
         // todo -- Logik zum Senden der Nachricht für Alice
     }
-    fn clear_alice(&mut self, app_state: &mut AppState) {
+    fn clear_alice(&mut self, _app_state: &mut AppState) {
         // todo -- Logik zum Zurücksetzen der Eingabefelder und Labels für Alice
     }
 
 
     //Bob Funktion
-    fn encrypt_bob(&mut self, app_state: &mut AppState) {
+    fn encrypt_bob(&mut self, _app_state: &mut AppState) {
         // todo -- Logik für Verschlüsselung für Bob
     }
-    fn sign_bob(&mut self, app_state: &mut AppState) {
+    fn sign_bob(&mut self, _app_state: &mut AppState) {
         // todo -- Logik für Signierung für Bob
     }
-    fn decrypt_bob(&mut self, app_state: &mut AppState) {
+    fn decrypt_bob(&mut self, _app_state: &mut AppState) {
         // todo -- Logik für Entschlüsselung für Bob
     }
-    fn send_message_bob(&mut self, app_state: &mut AppState) {
+    fn send_message_bob(&mut self, _app_state: &mut AppState) {
         // todo -- Logik zum Senden der Nachricht für Bob
     }
-    fn clear_bob(&mut self, app_state: &mut AppState) {
+    fn clear_bob(&mut self, _app_state: &mut AppState) {
         // todo -- Logik zum Zurücksetzen der Eingabefelder und Labels für Bob
     }
 }

@@ -90,10 +90,10 @@
 
 
 use druid::{
-    AppLauncher, Command, Data, Env, Event, EventCtx, Lens, Selector, Widget, WidgetExt,
-    widget::{Button, Flex, Label, TextBox, ViewSwitcher},
+    Env, Event, EventCtx, Selector, Widget, WidgetExt,
+    widget::{ViewSwitcher},
 };
-use crate::gui::model::model::{AliceModel, AppState, BobModel, HauptMenuModel, View};
+use crate::gui::model::model::{AppState, View};
 use crate::gui::view::view::{build_haupt_menu, build_alice_view, build_bob_view};
 
 // Custom Befehle und Controller Definition
@@ -147,7 +147,7 @@ impl<W: druid::Widget<AppState>> druid::widget::Controller<AppState, W> for AppC
 pub fn build_ui() -> impl Widget<AppState> {
     ViewSwitcher::new(
         |data: &AppState, _env| data.current_view.clone(),
-        |selector, data, _env| {
+        |selector, _data, _env| {
             let selected_widget: Box<dyn Widget<_>> = match *selector {
                 View::HauptMenu => Box::new(build_haupt_menu().lens(AppState::haupt_menu)),
                 View::Alice => Box::new(build_alice_view().lens(AppState::alice)),

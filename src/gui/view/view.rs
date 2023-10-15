@@ -1,6 +1,6 @@
-use druid::{Command, Lens, Selector, Widget, WidgetExt, widget::{Button, Flex, Label, TextBox, ViewSwitcher}, Env};
-use crate::gui::model::model::{AliceModel, BobModel, HauptMenuModel, AppState, View};
-use crate::gui::gui::{SWITCH_TO_ALICE, SWITCH_TO_BOB, SWITCH_TO_HAUPTMENU, UPDATE_PUBLIC_KEY};
+use druid::{Widget, WidgetExt, widget::{Button, Flex, Label, TextBox}, Env};
+use crate::gui::model::model::{AliceModel, BobModel, HauptMenuModel};
+use crate::gui::gui::{SWITCH_TO_ALICE, SWITCH_TO_BOB, SWITCH_TO_HAUPTMENU};
 use crate::gui::gui::CALCULATE_PUBLIC_KEY;
 use crate::gui::gui::{ENCRYPT, SIGN, DECRYPT, SEND_MESSAGE, CLEAR};
 
