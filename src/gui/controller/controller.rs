@@ -1,10 +1,10 @@
-use crate::gui::controller::commands::*;
-use crate::gui::model::model::{ AppState, View};
-use druid::{Env, Event, EventCtx};
 use crate::encryption::encryption_service::EncryptionService;
 use crate::encryption::keygen_service::KeyGenService;
 use crate::encryption::rotate::rot_encryption_service::RotEncryptionService;
 use crate::encryption::rotate::rot_keygen_service::RotKeygenService;
+use crate::gui::controller::commands::*;
+use crate::gui::model::model::{AppState, View};
+use druid::{Env, Event, EventCtx};
 
 pub struct AppController;
 
@@ -107,16 +107,15 @@ impl AppController {
         // Das ist erstmal nur eine Dummy-Implementierung mittels Rot-Chiffre
 
         // Alice
-        let rot_keygen_service_alice = RotKeygenService::new(
-            app_state.haupt_menu.eingabe_p1.clone());
+        let rot_keygen_service_alice =
+            RotKeygenService::new(app_state.haupt_menu.eingabe_p1.clone());
         let (public_key_alice, private_key_alice) = rot_keygen_service_alice.generate_keypair();
 
         app_state.haupt_menu.public_key_alice = public_key_alice.clone();
         app_state.alice.anzeige_geheimer_schluessel = private_key_alice.clone();
 
         // Bob
-        let rot_keygen_service_bob = RotKeygenService::new(
-            app_state.haupt_menu.eingabe_p2.clone());
+        let rot_keygen_service_bob = RotKeygenService::new(app_state.haupt_menu.eingabe_p2.clone());
         let (public_key_bob, private_key_bob) = rot_keygen_service_bob.generate_keypair();
 
         app_state.haupt_menu.public_key_bob = public_key_bob.clone();
@@ -138,7 +137,11 @@ impl AppController {
         println!("Signatur Alice");
     }
     fn decrypt_alice(&mut self, app_state: &mut AppState) {
-        let private_key = app_state.alice.anzeige_geheimer_schluessel.parse::<u8>().unwrap();
+        let private_key = app_state
+            .alice
+            .anzeige_geheimer_schluessel
+            .parse::<u8>()
+            .unwrap();
         let ciphertext = app_state.alice.eingabe_klartext.clone();
         let service = RotEncryptionService::new(private_key);
 
@@ -171,7 +174,11 @@ impl AppController {
         println!("Signatur Bob");
     }
     fn decrypt_bob(&mut self, app_state: &mut AppState) {
-        let private_key = app_state.bob.anzeige_geheimer_schluessel.parse::<u8>().unwrap();
+        let private_key = app_state
+            .bob
+            .anzeige_geheimer_schluessel
+            .parse::<u8>()
+            .unwrap();
         let ciphertext = app_state.bob.eingabe_klartext.clone();
         let service = RotEncryptionService::new(private_key);
 
