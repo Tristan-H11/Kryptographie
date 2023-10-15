@@ -4,7 +4,7 @@ use crate::encryption::encryption_service::EncryptionService;
 /// simple Dummy Daten mit dem Rotate Chiffre verwendet.
 struct RotEncryptionService {
     message: String,
-    rotation: u8
+    rotation: u8,
 }
 impl RotEncryptionService {
     ///
@@ -57,4 +57,3 @@ fn rotate_backward(text: &str, shift: &u8) -> String {
         })
         .collect()
 }
-
