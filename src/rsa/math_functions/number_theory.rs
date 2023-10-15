@@ -44,7 +44,7 @@ pub fn fast_exponentiation(base: &UBig, exponent: &UBig, modul: &UBig) -> UBig {
 
 /// Berechnet das Inverse-Element in einem Restklassenring.
 ///
-/// Das Inverse-Element einer Zahl `n` im Restklassenring modulo `modul` ist 
+/// Das Inverse-Element einer Zahl `n` im Restklassenring modulo `modul` ist
 /// eine andere Zahl `x`, so dass `(n * x) % modul = 1`
 /// (das neutrale Element der Multiplikation).
 ///
@@ -96,7 +96,6 @@ fn extended_euclidean_algorithm(n: i128, modul: i128, mut xy: [i128; 3]) -> i128
         return extended_euclidean_algorithm(modul, n % modul, xy);
     }
 }
-
 
 /// Führt den Miller-Rabin-Primzahltest auf `p` durch `repeats` Runden aus.
 ///

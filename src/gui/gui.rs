@@ -35,6 +35,11 @@
 // - Wenn Nachricht von Bob empfangen wird, soll diese in diesem Feld ausgegeben werden
 // - Nach dem Dechiffrieren soll der entschlüsselte Text angezeigt werden und der ursprünglich chiffrierte empfangene Text soll gelöscht werden
 
+// - Das Feld zum Anzeigen von Signaturen soll folgende eigenschaften haben:
+// - Die Signatur wird beim drücken des entsprechenden Buttons im lable angezeigt
+// - Beim versenden der Nachricht wird das Signaturfeld geleert
+// - die Signatur einer empfangenen chifrierten nachricht in dem Feld anzeigen lassen
+
 // Maske Bob ist genauso aufgebaut wie die von Alice, nur dass hier eine Nachricht von Alice empfangen wird und eine an Alice verschickt werden kann
 
 // -------------------------------------------------------------------------------------------------
@@ -76,7 +81,31 @@
 // - When a message from Bob is received, it should be displayed in this field
 // - After decrypting, the decrypted text should be displayed and the originally encrypted received text should be erased
 
+// The field for displaying signatures should have the following properties:
+// - The signature is displayed in the label when the corresponding button is pressed
+// - When sending a message, the signature field is cleared
+// - Display the signature of a received encrypted message in the field
+
 // Mask Bob is set up exactly like that of Alice, except that here a message from Alice is received and one can be sent to Alice
 
+use crate::gui::controller::controller::AppController;
+use crate::gui::model::model::{AppState, View};
+use crate::gui::view::view::{build_alice_view, build_bob_view, build_haupt_menu};
+use druid::{widget::ViewSwitcher, Widget, WidgetExt};
 
-
+// UI Bau Funktion
+pub fn build_ui() -> impl Widget<AppState> {
+    ViewSwitcher::new(
+        |data: &AppState, _env| data.current_view.clone(),
+        |selector, _data, _env| {
+            let selected_widget: Box<dyn Widget<_>> = match *selector {
+                View::HauptMenu => Box::new(build_haupt_menu().lens(AppState::haupt_menu)),
+                View::Alice => Box::new(build_alice_view().lens(AppState::alice)),
+                View::Bob => Box::new(build_bob_view().lens(AppState::bob)),
+            };
+            selected_widget.boxed()
+        },
+    )
+    .controller(AppController)
+    .boxed()
+}
