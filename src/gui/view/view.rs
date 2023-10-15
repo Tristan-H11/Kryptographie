@@ -8,15 +8,15 @@ use crate::gui::gui::{ENCRYPT, SIGN, DECRYPT, SEND_MESSAGE, CLEAR};
 pub(crate) fn build_haupt_menu() -> impl Widget<HauptMenuModel> {
     // Entry-Felder
     let p1_entry = Flex::row()
-        .with_child(Label::new("Eingabe P1"))
+        .with_child(Label::new("Eingabe Breite P1"))
         .with_child(TextBox::new().lens(HauptMenuModel::eingabe_p1));
 
     let p2_entry = Flex::row()
-        .with_child(Label::new("Eingabe P2"))
+        .with_child(Label::new("Eingabe Breite P2"))
         .with_child(TextBox::new().lens(HauptMenuModel::eingabe_p2));
 
     let miller_rabin_entry = Flex::row()
-        .with_child(Label::new("Eingabe Miller-Rabin"))
+        .with_child(Label::new("Eingabe Miller-Rabin Iterationen"))
         .with_child(TextBox::new().lens(HauptMenuModel::eingabe_miller_rabin));
 
     // Button
