@@ -45,12 +45,6 @@ pub enum View {
     Bob,
 }
 
-enum CustomCommand {
-    SwitchToAlice,
-    SwitchToBob,
-    SwitchToHauptMenu,
-}
-
 impl Default for AppState {
     fn default() -> Self {
         AppState {

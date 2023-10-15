@@ -34,7 +34,6 @@ impl EncryptionService for RotEncryptionService {
     fn verify(&self, message: &String) -> String {
         panic!("Nicht implementiert!")
     }
-
 }
 
 fn rotate_forward(text: &str, shift: &u8) -> String {
