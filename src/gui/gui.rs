@@ -91,7 +91,7 @@
 use crate::gui::controller::controller::AppController;
 use crate::gui::model::model::{AppState, View};
 use crate::gui::view::view::{build_alice_view, build_bob_view, build_haupt_menu};
-use druid::{widget::ViewSwitcher, Env, Event, EventCtx, Selector, Widget, WidgetExt};
+use druid::{widget::ViewSwitcher, Widget, WidgetExt};
 
 // UI Bau Funktion
 pub fn build_ui() -> impl Widget<AppState> {
