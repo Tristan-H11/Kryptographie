@@ -38,8 +38,7 @@ pub fn fast_exponentiation(base: &UBig, exponent: &UBig, modul: &UBig) -> UBig {
         base_to_square.pow(2).rem_euclid(modul)
     } else {
         // Ist der Exponent ungerade, wird die Basis erneut als Faktor herangezogen.
-        (base_to_square.pow(2) * base // TODO: Muss hier base_to_square hin?
-        ).rem_euclid(modul)
+        (base_to_square.pow(2) * base_to_square).rem_euclid(modul)
     };
 }
 
