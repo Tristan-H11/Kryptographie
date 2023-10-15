@@ -38,9 +38,6 @@ impl EncryptionService for RotEncryptionService {
         panic!("Nicht implementiert!")
     }
 
-    fn generate_keypair(&self) -> (String, String) {
-        (self.rotation.to_string(), self.rotation.to_string())
-    }
 }
 
 fn rotate_forward(text: &str, shift: &u8) -> String {

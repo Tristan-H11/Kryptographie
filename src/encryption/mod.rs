@@ -1,4 +1,5 @@
-mod encryption_service;
+pub mod encryption_service;
 pub(crate) mod math_functions;
-mod rotate;
+pub mod rotate;
 pub(crate) mod rsa;
+pub mod keygen_service;

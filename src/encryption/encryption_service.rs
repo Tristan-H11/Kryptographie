@@ -19,9 +19,4 @@ pub trait EncryptionService {
     /// Überprüft die Signatur eines übergebenen Strings.
     ///
     fn verify(&self) -> String;
-
-    ///
-    /// Erstellt ein Schlüsselpaar.
-    ///
-    fn generate_keypair(&self) -> (String, String);
 }
