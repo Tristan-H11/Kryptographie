@@ -140,9 +140,8 @@ pub(crate) fn build_alice_view() -> impl Widget<AliceModel> {
 
 pub(crate) fn build_bob_view() -> impl Widget<BobModel> {
     // Label
-    let secret_key_label = Label::new(|data: &BobModel, _env: &Env| {
-        format!("Geheimschlüssel: {}", data.private_key)
-    });
+    let secret_key_label =
+        Label::new(|data: &BobModel, _env: &Env| format!("Geheimschlüssel: {}", data.private_key));
 
     // Entry
     let plaintext_entry = Flex::row()
