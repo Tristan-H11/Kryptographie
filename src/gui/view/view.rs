@@ -1,6 +1,5 @@
 use crate::gui::controller::controller;
-use crate::gui::gui::CALCULATE_PUBLIC_KEY;
-use crate::gui::gui::{CLEAR, DECRYPT, ENCRYPT, SEND_MESSAGE, SIGN};
+
 use crate::gui::gui::{SWITCH_TO_ALICE, SWITCH_TO_BOB, SWITCH_TO_HAUPTMENU};
 use crate::gui::model::model::{AliceModel, BobModel, HauptMenuModel};
 use druid::{
@@ -24,7 +23,7 @@ pub(crate) fn build_haupt_menu() -> impl Widget<HauptMenuModel> {
 
     // Button
     let calc_public_key_button = Button::new("Berechne Öffentlichen Schlüssel").on_click(
-        |ctx, _data: &mut HauptMenuModel, _env| {
+        |_ctx, _data: &mut HauptMenuModel, _env| {
             controller::Controller::calculate_public_key(_data);
         },
     );
