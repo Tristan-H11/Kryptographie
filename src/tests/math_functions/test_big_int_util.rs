@@ -1,6 +1,6 @@
 #[cfg(test)]
 mod tests {
-    use crate::rsa::math_functions::big_int_util::{
+    use crate::encryption::math_functions::big_int_util::{
         decrement, divides, increment, is_even, is_one, is_uneven, is_zero, not_divides,
         random_in_range,
     };
