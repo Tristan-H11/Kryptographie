@@ -1,6 +1,6 @@
 #[cfg(test)]
 mod tests {
-    use crate::encryption::math_functions::number_theory::{fast_exponentiation, miller_rabin};
+    use crate::encryption::math_functions::number_theory::{fast_exponentiation, miller_rabin, modulo_inverse};
     use ibig::{ubig, UBig};
     use std::str::FromStr;
 
@@ -73,6 +73,12 @@ mod tests {
         )
     }
 
+    #[test]
+    fn modulo_inverse_test() {
+        assert_eq!(modulo_inverse(315, 661643), 342374);
+        assert_eq!(modulo_inverse(5, 11), 9);
+        assert_eq!(modulo_inverse(6, 11), 2);
+    }
     #[test]
     fn miller_rabin_test() {
         assert_eq!(miller_rabin(&ubig!(11), 40), true);

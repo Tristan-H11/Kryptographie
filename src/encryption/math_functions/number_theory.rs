@@ -81,7 +81,6 @@ pub fn modulo_inverse(n: i128, modul: i128) -> i128 {
 /// Das Inverse-Element von `n` im Restklassenring modulo `modul`. Wenn keine
 /// Inverse existiert (z. B. wenn `n` und `modul` nicht teilerfremd sind), wird
 /// ein Fehler ausgelöst.
-/// TODO Simon: Ungetestet!
 fn extended_euclidean_algorithm(n: i128, modul: i128, mut xy: [i128; 3]) -> i128 {
     xy.rotate_left(1);
     if modul == 0 {
