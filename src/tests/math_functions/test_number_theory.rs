@@ -77,10 +77,11 @@ mod tests {
 
     #[test]
     fn modulo_inverse_test() {
-        assert_eq!(modulo_inverse(315, 661643), 342374);
-        assert_eq!(modulo_inverse(1, 3), 1);
-        assert_eq!(modulo_inverse(5, 11), 9);
-        assert_eq!(modulo_inverse(6, 11), 2);
+        assert_eq!(modulo_inverse(315, 661643).unwrap(), 342374);
+        assert_eq!(modulo_inverse(1, 3).unwrap(), 1);
+        assert_eq!(modulo_inverse(5, 11).unwrap(), 9);
+        assert_eq!(modulo_inverse(6, 11).unwrap(), 2);
+        assert!(modulo_inverse(78, 99).is_err());
     }
 
     #[test]
