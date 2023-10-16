@@ -49,49 +49,48 @@ pub fn fast_exponentiation(base: &UBig, exponent: &UBig, modul: &UBig) -> UBig {
 /// (das neutrale Element der Multiplikation).
 ///
 /// # Argumente
-///
 /// * `n` - Die zu invertierende Zahl.
 /// * `modul` - Die Modulo-Zahl, gegen die die Inversion durchgeführt wird.
 ///
 /// # Rückgabe
-///
 /// Das Inverse-Element von `n` im Restklassenring modulo `modul`. Wenn keine
 /// Inverse existiert (z. B. wenn `n` und `modul` nicht teilerfremd sind), wird
 /// ein Fehler ausgelöst.
 pub fn modulo_inverse(n: i128, modul: i128) -> i128 {
-    let xy = [1, 0, 1];
+    let xy = [1, 1, 1, 0, 0, 1];
+    let (ggT, x, y) = extended_euclidean_algorithm(modul, n, xy);
+    // Wenn ggT nicht 1, existiert kein Inverse. -> Error
+    if ggT != 1 {
+        panic!("n hat kein Inverses");
+    }
     // Berechnet aus den letzten Faktoren das Inverse.
-    return (modul + extended_euclidean_algorithm(modul, n, xy)) % modul;
+    return (modul+y) % modul;
 }
 
-/// Implementiert den erweiterten euklidischen Algorithmus zur Berechnung des Inversen.
+/// Implementiert den erweiterten euklidischen Algorithmus.
 ///
 /// Der erweiterte euklidische Algorithmus wird verwendet, um das Inverse-Element
 /// einer Zahl in einem Restklassenring zu finden. Er arbeitet rekursiv und berechnet
 /// die Faktoren `x` und `y` in der Bézout'schen Identität, so dass `x * n + y * modul = ggT(n, modul)`
 ///
 /// # Argumente
-///
 /// * `n` - Die zu invertierende Zahl.
 /// * `modul` - Die Modulo-Zahl, gegen die die Inversion durchgeführt wird.
 /// * `xy` - Ein rotierendes Array, das die Berechnung der Faktoren `x` und `y` speichert.
 ///
 /// # Rückgabe
-///
-/// Das Inverse-Element von `n` im Restklassenring modulo `modul`. Wenn keine
-/// Inverse existiert (z. B. wenn `n` und `modul` nicht teilerfremd sind), wird
-/// ein Fehler ausgelöst.
-fn extended_euclidean_algorithm(n: i128, modul: i128, mut xy: [i128; 3]) -> i128 {
-    xy.rotate_left(1);
+/// * (ggT(n,modul),x,y)
+/// Ein tripel aus dem groessten gemeinsamen Teiler einer Zahl `n` und dem `modul`,
+/// sowie den zwei Faktoren `x` und `y`.
+fn extended_euclidean_algorithm(n: i128, modul: i128, mut xy: [i128; 6]) -> (i128, i128, i128) {
+    xy.rotate_left(2);
     if modul == 0 {
-        if n != 1 {
-            panic!("n hat kein Inverses");
-        }
-        return xy[0];
+        return (n, xy[0], xy[1]);
     } else {
         // Berechnet die Faktoren und speichert sie in einem rotierenden Array.
         let div: i128 = n / modul;
-        xy[2] = xy[0] - (div * xy[1]);
+        xy[4] = xy[0] - (div * xy[2]);
+        xy[5] = xy[1] - (div * xy[3]);
         return extended_euclidean_algorithm(modul, n % modul, xy);
     }
 }
