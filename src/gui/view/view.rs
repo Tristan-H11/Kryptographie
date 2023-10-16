@@ -1,6 +1,6 @@
 use crate::gui::controller::commands::{
-    CALCULATE_PUBLIC_KEY, CLEAR, DECRYPT, ENCRYPT, SEND_MESSAGE, SIGN, SWITCH_TO_ALICE,
-    SWITCH_TO_BOB, SWITCH_TO_HAUPTMENU,
+    CALCULATE_KEYPAIR_ALICE, CALCULATE_KEYPAIR_BOB, CLEAR, DECRYPT, ENCRYPT, SEND_MESSAGE, SIGN,
+    SWITCH_TO_ALICE, SWITCH_TO_BOB, SWITCH_TO_HAUPTMENU,
 };
 use crate::gui::model::model::{AliceModel, BobModel, HauptMenuModel};
 use druid::{
@@ -23,10 +23,15 @@ pub(crate) fn build_haupt_menu() -> impl Widget<HauptMenuModel> {
         .with_child(TextBox::new().lens(HauptMenuModel::miller_rabin_iterations));
 
     // Button
-    // TODO: Muss man hier aufteilen nach "Bobs/Alice Schlüsselpaar berechnen"?
-    let calc_public_key_button = Button::new("Öffentlichen Schlüssel Berechnen").on_click(
+    let calculate_keypair_alice = Button::new("Schlüsselpaar Alice Berechnen").on_click(
         |ctx, _data: &mut HauptMenuModel, _env| {
-            ctx.submit_command(CALCULATE_PUBLIC_KEY);
+            ctx.submit_command(CALCULATE_KEYPAIR_ALICE);
+        },
+    );
+
+    let calculate_keypair_bob = Button::new("Schlüsselpaar Bob Berechnen").on_click(
+        |ctx, _data: &mut HauptMenuModel, _env| {
+            ctx.submit_command(CALCULATE_KEYPAIR_BOB);
         },
     );
 
@@ -53,7 +58,9 @@ pub(crate) fn build_haupt_menu() -> impl Widget<HauptMenuModel> {
         .with_default_spacer()
         .with_child(miller_rabin_entry)
         .with_default_spacer()
-        .with_child(calc_public_key_button)
+        .with_child(calculate_keypair_alice)
+        .with_default_spacer()
+        .with_child(calculate_keypair_bob)
         .with_default_spacer()
         .with_child(public_key_alice_label)
         .with_default_spacer()
@@ -94,24 +101,27 @@ pub(crate) fn build_alice_view() -> impl Widget<AliceModel> {
         }));
 
     // Buttons
-    let encrypt_button =
-        Button::new("Verschlüsseln").on_click(|_ctx, _data: &mut AliceModel, _env| {
+    let encrypt_button = Button::new("Mit Bobs PublicKey verschlüsseln").on_click(
+        |_ctx, _data: &mut AliceModel, _env| {
             _ctx.submit_command(ENCRYPT);
-        });
+        },
+    );
     let sign_button = Button::new("Signieren").on_click(|_ctx, _data: &mut AliceModel, _env| {
         _ctx.submit_command(SIGN);
     });
-    let decrypt_button =
-        Button::new("Entschlüsseln").on_click(|_ctx, _data: &mut AliceModel, _env| {
+    let decrypt_button = Button::new("Mit eigenem PrivateKey entschlüsseln").on_click(
+        |_ctx, _data: &mut AliceModel, _env| {
             _ctx.submit_command(DECRYPT);
-        });
+        },
+    );
     let send_message_button =
         Button::new("Nachricht senden").on_click(|_ctx, _data: &mut AliceModel, _env| {
             _ctx.submit_command(SEND_MESSAGE);
         });
-    let clear_button = Button::new("Clear").on_click(|_ctx, _data: &mut AliceModel, _env| {
-        _ctx.submit_command(CLEAR);
-    });
+    let clear_button =
+        Button::new("Nachricht löschen").on_click(|_ctx, _data: &mut AliceModel, _env| {
+            _ctx.submit_command(CLEAR);
+        });
     let back_button =
         Button::new("Zurück zum Hauptmenü").on_click(|_ctx, _data: &mut AliceModel, _env| {
             _ctx.submit_command(SWITCH_TO_HAUPTMENU);
@@ -166,24 +176,27 @@ pub(crate) fn build_bob_view() -> impl Widget<BobModel> {
         }));
 
     // Buttons
-    let encrypt_button =
-        Button::new("Verschlüsseln").on_click(|_ctx, _data: &mut BobModel, _env| {
+    let encrypt_button = Button::new("Mit Alice PublicKey verschlüsseln").on_click(
+        |_ctx, _data: &mut BobModel, _env| {
             _ctx.submit_command(ENCRYPT);
-        });
+        },
+    );
     let sign_button = Button::new("Signieren").on_click(|_ctx, _data: &mut BobModel, _env| {
         _ctx.submit_command(SIGN);
     });
-    let decrypt_button =
-        Button::new("Entschlüsseln").on_click(|_ctx, _data: &mut BobModel, _env| {
+    let decrypt_button = Button::new("Mit eigenem PrivateKey entschlüsseln").on_click(
+        |_ctx, _data: &mut BobModel, _env| {
             _ctx.submit_command(DECRYPT);
-        });
+        },
+    );
     let send_message_button =
         Button::new("Nachricht senden").on_click(|_ctx, _data: &mut BobModel, _env| {
             _ctx.submit_command(SEND_MESSAGE);
         });
-    let clear_button = Button::new("Clear").on_click(|_ctx, _data: &mut BobModel, _env| {
-        _ctx.submit_command(CLEAR);
-    });
+    let clear_button =
+        Button::new("Nachricht löschen").on_click(|_ctx, _data: &mut BobModel, _env| {
+            _ctx.submit_command(CLEAR);
+        });
     let back_button =
         Button::new("Zurück zum Hauptmenü").on_click(|_ctx, _data: &mut BobModel, _env| {
             _ctx.submit_command(SWITCH_TO_HAUPTMENU);

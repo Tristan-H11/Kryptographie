@@ -1,9 +1,11 @@
 use crate::encryption::encryption_service::EncryptionService;
+use druid::Data;
 
 /// Eine Implementierung des EncryptionService-Traits, welches
 /// simple Dummy Daten mit dem Rotate Chiffre verwendet.
 pub struct RotEncryptionService {
-    rotation: u8,
+    pub public_key: u8,
+    pub private_key: u8,
 }
 impl RotEncryptionService {
     ///
@@ -14,24 +16,27 @@ impl RotEncryptionService {
     /// * `rotation` - Die Anzahl der zu verschiebenden Stellen.
     ///
     pub fn new(rotation: u8) -> RotEncryptionService {
-        RotEncryptionService { rotation }
+        RotEncryptionService {
+            public_key: rotation,
+            private_key: rotation,
+        }
     }
 }
 
 impl EncryptionService for RotEncryptionService {
     fn encrypt(&self, message: &String) -> String {
-        rotate_forward(message, &self.rotation)
+        rotate_forward(message, &self.public_key)
     }
 
     fn decrypt(&self, message: &String) -> String {
-        rotate_backward(message, &self.rotation)
+        rotate_backward(message, &self.private_key)
     }
 
-    fn sign(&self, message: &String) -> String {
+    fn sign(&self, _message: &String) -> String {
         panic!("Nicht implementiert!")
     }
 
-    fn verify(&self, message: &String) -> String {
+    fn verify(&self, _message: &String) -> String {
         panic!("Nicht implementiert!")
     }
 }
@@ -54,4 +59,19 @@ fn rotate_backward(text: &str, shift: &u8) -> String {
             _ => c,
         })
         .collect()
+}
+
+impl Clone for RotEncryptionService {
+    fn clone(&self) -> Self {
+        RotEncryptionService {
+            public_key: self.public_key,
+            private_key: self.private_key,
+        }
+    }
+}
+
+impl Data for RotEncryptionService {
+    fn same(&self, other: &Self) -> bool {
+        self.public_key == other.public_key && self.private_key == other.private_key
+    }
 }

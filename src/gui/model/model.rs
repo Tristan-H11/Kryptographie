@@ -7,7 +7,6 @@ pub struct HauptMenuModel {
     pub(crate) prime_number_one: String,
     pub(crate) prime_number_two: String,
     pub(crate) miller_rabin_iterations: String,
-    pub(crate) ausgabe_oeff_schluessel: String, // TODO @Lucas: Braucht man das??
     pub(crate) public_key_alice: String,
     pub(crate) public_key_bob: String,
 }
@@ -48,14 +47,13 @@ pub enum View {
 impl Default for AppState {
     fn default() -> Self {
         AppState {
-            current_view: View::HauptMenu, // Festlegen, dass Hauptmenü die start-view ist
+            current_view: View::HauptMenu,
             haupt_menu: HauptMenuModel {
                 prime_number_one: String::new(),
                 prime_number_two: String::new(),
                 miller_rabin_iterations: String::new(),
-                ausgabe_oeff_schluessel: String::new(),
-                public_key_alice: "".to_string(),
-                public_key_bob: "".to_string(),
+                public_key_alice: String::new(),
+                public_key_bob: String::new(),
             },
             alice: AliceModel {
                 message: String::new(),
