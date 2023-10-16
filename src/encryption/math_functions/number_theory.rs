@@ -53,18 +53,23 @@ pub fn fast_exponentiation(base: &UBig, exponent: &UBig, modul: &UBig) -> UBig {
 /// * `modul` - Die Modulo-Zahl, gegen die die Inversion durchgeführt wird.
 ///
 /// # Rückgabe
-/// Das Inverse-Element von `n` im Restklassenring modulo `modul`. Wenn keine
-/// Inverse existiert (z. B. wenn `n` und `modul` nicht teilerfremd sind), wird
-/// ein Fehler ausgelöst.
-pub fn modulo_inverse(n: i128, modul: i128) -> i128 {
+/// * Result<inverse, Error>
+/// Das Inverse-Element von `n` im Restklassenring modulo `modul`.
+/// Wenn keine Inverse existiert (wenn `n` und `modul` nicht teilerfremd sind),
+/// wird ein Error zurückgegeben.
+pub fn modulo_inverse(n: i128, modul: i128) -> Result<i128, std::io::Error> {
     let xy = [1, 1, 1, 0, 0, 1];
     let (ggT, x, y) = extended_euclidean_algorithm(modul, n, xy);
     // Wenn ggT nicht 1, existiert kein Inverse. -> Error
     if ggT != 1 {
-        panic!("n hat kein Inverses");
+        let no_inverse_error = std::io::Error::new(
+            std::io::ErrorKind::InvalidInput,
+            format!("n hat keinen Inverse"),
+        );
+        return Err(no_inverse_error);
     }
     // Berechnet aus den letzten Faktoren das Inverse.
-    return (modul+y) % modul;
+    return Ok((modul + y) % modul);
 }
 
 /// Implementiert den erweiterten euklidischen Algorithmus.
