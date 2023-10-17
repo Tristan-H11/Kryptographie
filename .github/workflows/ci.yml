@@ -17,7 +17,7 @@ jobs:
     steps:
     - uses: actions/checkout@v3
     - name: Install requirements
-      run: sudo apt-get -y install librust-pango-sys-dev libgtk-4-dev
+      run: sudo apt-get -y install ibgtk-3-dev librust-pango-sys-dev
 
   build:
     runs-on: ubuntu-latest
