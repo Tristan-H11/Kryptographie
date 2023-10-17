@@ -7,6 +7,7 @@ pub struct RotEncryptionService {
     pub public_key: u8,
     pub private_key: u8,
 }
+
 impl RotEncryptionService {
     ///
     /// Erstellt eine neue Instanz des RotEncryptionService.
@@ -33,11 +34,13 @@ impl EncryptionService for RotEncryptionService {
     }
 
     fn sign(&self, _message: &String) -> String {
-        panic!("Nicht implementiert!")
+        // ACHTUNG! Nur eine Dummy-Implementierung! Nicht verwenden!
+        _message.as_bytes().iter().sum::<u8>().to_string()
     }
 
-    fn verify(&self, _message: &String) -> String {
-        panic!("Nicht implementiert!")
+    fn verify(&self, signature: &String, message: &String) -> bool {
+        // ACHTUNG! Nur eine Dummy-Implementierung! Nicht verwenden!
+        signature == &self.sign(message)
     }
 }
 

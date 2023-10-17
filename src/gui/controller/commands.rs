@@ -7,6 +7,7 @@ pub const CALCULATE_KEYPAIR_ALICE: Selector = Selector::new("calculate-keypair-a
 pub const CALCULATE_KEYPAIR_BOB: Selector = Selector::new("calculate-keypair-bob");
 pub const ENCRYPT: Selector = Selector::new("encrypt");
 pub const SIGN: Selector = Selector::new("sign");
+pub const VERIFY: Selector = Selector::new("verify");
 pub const DECRYPT: Selector = Selector::new("decrypt");
 pub const SEND_MESSAGE: Selector = Selector::new("send-message");
 pub const CLEAR: Selector = Selector::new("clear");

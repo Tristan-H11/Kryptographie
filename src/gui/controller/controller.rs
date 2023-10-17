@@ -59,6 +59,9 @@ impl AppController {
             Event::Command(cmd) if cmd.is(SIGN) => {
                 self.sign_alice(app_state);
             }
+            Event::Command(cmd) if cmd.is(VERIFY) => {
+                self.alice_verify_message_from_bob(app_state);
+            }
             Event::Command(cmd) if cmd.is(DECRYPT) => {
                 self.decrypt_alice(app_state);
             }
@@ -83,6 +86,9 @@ impl AppController {
             Event::Command(cmd) if cmd.is(SIGN) => {
                 self.sign_bob(app_state);
             }
+            Event::Command(cmd) if cmd.is(VERIFY) => {
+                self.bob_verify_message_from_alice(app_state);
+            }
             Event::Command(cmd) if cmd.is(DECRYPT) => {
                 self.decrypt_bob(app_state);
             }
@@ -103,7 +109,7 @@ impl AppController {
     /// Berechnet das Schlüsselpaar für Alice.
     ///
     fn calculate_keypair_alice(&mut self, app_state: &mut AppState) {
-        // TODO: Implementiere die Logik zur Berechnung der öffentlichen Schlüssel für Alice und Bob
+        // TODO für RSA richtig machen
         // Das ist erstmal nur eine Dummy-Implementierung mittels Rot-Chiffre
         let keygen_service = RotKeygenService::new(app_state.haupt_menu.prime_number_one.clone());
         let (public_key_alice, private_key_alice) = keygen_service.generate_keypair();
@@ -116,7 +122,7 @@ impl AppController {
     /// Berechnet das Schlüsselpaar für Bob.
     ///
     fn calculate_keypair_bob(&mut self, app_state: &mut AppState) {
-        // TODO: Implementiere die Logik zur Berechnung der öffentlichen Schlüssel für Alice und Bob
+        // TODO für RSA richtig machen
         // Das ist erstmal nur eine Dummy-Implementierung mittels Rot-Chiffre
         let keygen_service = RotKeygenService::new(app_state.haupt_menu.prime_number_two.clone());
         let (public_key_bob, private_key_bob) = keygen_service.generate_keypair();
@@ -134,28 +140,43 @@ impl AppController {
         let encrypted = self
             .get_encryption_service_bob(app_state)
             .encrypt(&klartext);
-        println!("Verschlüsselt: {}", &encrypted);
-        app_state.alice.message_klartext = encrypted;
+        app_state.alice.message_chiffre = encrypted;
     }
 
     ///
     /// Signiert die Nachricht von Alice mit ihrem privaten Schlüssel.
     ///
     fn sign_alice(&mut self, _app_state: &mut AppState) {
-        // todo -- Logik für Signierung für Alice
-        println!("Signatur Alice");
+        // TODO für RSA richtig machen
+        let message = _app_state.alice.message_klartext.clone();
+        let signed = self
+            .get_encryption_service_alice(_app_state)
+            .sign(&message);
+        _app_state.alice.signature = signed;
+    }
+
+    ///
+    /// Verifiziert die Nachricht von Bob mit seinem öffentlichen Schlüssel.
+    ///
+    fn alice_verify_message_from_bob(&mut self, _app_state: &mut AppState) {
+        // TODO für RSA richtig machen
+        let message = _app_state.alice.message_klartext.clone();
+        let signature = _app_state.alice.signature.clone();
+        let verified = self
+            .get_encryption_service_bob(_app_state)
+            .verify(&signature, &message);
+        _app_state.alice.signature_status = verified;
     }
 
     ///
     /// Entschlüsselt die Nachricht von Bob mit Alices privatem Schlüssel.
     ///
     fn decrypt_alice(&mut self, app_state: &mut AppState) {
-        let cipher_text = app_state.alice.message_klartext.clone();
+        let cipher_text = app_state.alice.message_chiffre.clone();
 
         let decrypted = self
             .get_encryption_service_alice(app_state)
             .decrypt(&cipher_text);
-        println!("Entschlüsselt: {}", &decrypted);
         app_state.alice.message_klartext = decrypted;
     }
 
@@ -163,51 +184,68 @@ impl AppController {
     /// Sendet die Nachricht von Alice an Bob und löscht das Nachrichten-Feld.
     ///
     fn send_message_alice(&mut self, app_state: &mut AppState) {
-        let message = &app_state.alice.message_klartext;
+        let message = &app_state.alice.message_chiffre;
         app_state.bob.message_chiffre = message.clone();
+        let signature = &app_state.alice.signature;
+        app_state.bob.signature = signature.clone();
         self.clear_alice(app_state);
-        // todo -- Logik zum Senden der Nachricht für Alice
     }
 
     ///
-    /// Löscht die Nachricht von Alice.
+    /// Löscht die Inhalte von Alice.
     ///
     fn clear_alice(&mut self, app_state: &mut AppState) {
         app_state.alice.message_klartext = String::new();
-        // todo -- Logik zum Zurücksetzen der Eingabefelder und Labels für Alice
+        app_state.alice.message_chiffre = String::new();
+        app_state.alice.signature = String::new();
     }
 
     ///
     /// Verschlüsselt die Nachricht von Bob mit Alice öffentlichem Schlüssel.
     ///
     fn encrypt_bob(&mut self, app_state: &mut AppState) {
-        let klartext = app_state.bob.message_chiffre.clone();
+        let klartext = app_state.bob.message_klartext.clone();
 
         let encrypted = self
             .get_encryption_service_alice(app_state)
             .encrypt(&klartext);
-        println!("Verschlüsselt: {}", &encrypted);
-        app_state.bob.message_klartext = encrypted;
+        app_state.bob.message_chiffre = encrypted;
     }
 
     ///
     /// Signiert die Nachricht von Bob mit seinem privaten Schlüssel.
     ///
     fn sign_bob(&mut self, _app_state: &mut AppState) {
-        // todo -- Logik für Signierung für Alice
-        println!("Signatur Bob");
+        // TODO für RSA richtig machen
+        let message = _app_state.bob.message_klartext.clone();
+        let signed = self
+            .get_encryption_service_bob(_app_state)
+            .sign(&message);
+        _app_state.bob.signature = signed;
+    }
+
+    ///
+    /// Verifiziert die Nachricht von Alice mit ihrem öffentlichen Schlüssel.
+    ///
+    fn bob_verify_message_from_alice(&mut self, _app_state: &mut AppState) {
+        // TODO für RSA richtig machen
+        let message = _app_state.bob.message_klartext.clone();
+        let signature = _app_state.bob.signature.clone();
+        let verified = self
+            .get_encryption_service_alice(_app_state)
+            .verify(&signature, &message);
+        _app_state.bob.signature_status = verified;
     }
 
     ///
     /// Entschlüsselt die Nachricht von Alice mit Bobs privatem Schlüssel.
     ///
     fn decrypt_bob(&mut self, app_state: &mut AppState) {
-        let cipher_text = app_state.bob.message_klartext.clone();
+        let cipher_text = app_state.bob.message_chiffre.clone();
 
         let decrypted = self
             .get_encryption_service_bob(app_state)
             .decrypt(&cipher_text);
-        println!("Entschlüsselt: {}", &decrypted);
         app_state.bob.message_klartext = decrypted;
     }
 
@@ -217,8 +255,9 @@ impl AppController {
     fn send_message_bob(&mut self, app_state: &mut AppState) {
         let message = &app_state.bob.message_chiffre;
         app_state.alice.message_chiffre = message.clone();
+        let signature = &app_state.bob.signature;
+        app_state.alice.signature = signature.clone();
         self.clear_bob(app_state);
-        // todo -- Logik zum Senden der Nachricht für Bob
     }
 
     ///
@@ -227,13 +266,14 @@ impl AppController {
     fn clear_bob(&mut self, app_state: &mut AppState) {
         app_state.bob.message_klartext = String::new();
         app_state.bob.message_chiffre = String::new();
-        // todo -- Logik zum Zurücksetzen der Eingabefelder und Labels für Bob
+        app_state.bob.signature = String::new();
     }
 
     ///
     /// Erstellt den EncryptionService für Alice und gibt ihn zurück.
     ///
     fn get_encryption_service_alice(&mut self, app_state: &mut AppState) -> RotEncryptionService {
+        // TODO für RSA richtig machen
         let public_key = app_state.haupt_menu.public_key_alice.parse::<u8>().unwrap();
         RotEncryptionService::new(public_key)
     }
@@ -242,6 +282,7 @@ impl AppController {
     /// Erstellt den EncryptionService für Bob und gibt ihn zurück.
     ///
     fn get_encryption_service_bob(&mut self, app_state: &mut AppState) -> RotEncryptionService {
+        // TODO für RSA richtig machen
         let public_key = app_state.haupt_menu.public_key_bob.parse::<u8>().unwrap();
         RotEncryptionService::new(public_key)
     }

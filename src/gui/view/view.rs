@@ -1,7 +1,4 @@
-use crate::gui::controller::commands::{
-    CALCULATE_KEYPAIR_ALICE, CALCULATE_KEYPAIR_BOB, CLEAR, DECRYPT, ENCRYPT, SEND_MESSAGE, SIGN,
-    SWITCH_TO_ALICE, SWITCH_TO_BOB, SWITCH_TO_HAUPTMENU,
-};
+use crate::gui::controller::commands::{CALCULATE_KEYPAIR_ALICE, CALCULATE_KEYPAIR_BOB, CLEAR, DECRYPT, ENCRYPT, SEND_MESSAGE, SIGN, SWITCH_TO_ALICE, SWITCH_TO_BOB, SWITCH_TO_HAUPTMENU, VERIFY};
 use crate::gui::model::model::{AliceModel, BobModel, HauptMenuModel};
 use druid::{
     widget::{Button, Flex, Label, TextBox},
@@ -77,6 +74,8 @@ use druid::{
         }).fix_width(fixed_width_label);
 
         Flex::column()
+            .with_default_spacer()
+            .with_default_spacer()
             .with_child(p1_entry)
             .with_default_spacer()
             .with_child(p2_entry)
@@ -153,7 +152,7 @@ pub(crate) fn build_alice_view() -> impl Widget<AliceModel> {
     }).fix_width(fixed_width_button);
 
     let check_sign_button = Button::new("Signatur prüfen").on_click(|_ctx, _data: &mut AliceModel, _env| {
-        _ctx.submit_command(SIGN);
+        _ctx.submit_command(VERIFY);
     }).fix_width(fixed_width_button);
 
     let decrypt_button = Button::new("Mit eigenem PrivateKey entschlüsseln").on_click(
@@ -178,6 +177,8 @@ pub(crate) fn build_alice_view() -> impl Widget<AliceModel> {
         }).fix_width(fixed_width_button);
 
     Flex::column()
+        .with_default_spacer()
+        .with_default_spacer()
         .with_child(secret_key_label)
         .with_spacer(spacer_size)
         .with_child(plaintext_entry)
@@ -259,7 +260,7 @@ pub(crate) fn build_bob_view() -> impl Widget<BobModel> {
     }).fix_width(fixed_width_button);
 
     let check_sign_button = Button::new("Signatur prüfen").on_click(|_ctx, _data: &mut BobModel, _env| {
-        _ctx.submit_command(SIGN);
+        _ctx.submit_command(VERIFY);
     }).fix_width(fixed_width_button);
 
     let decrypt_button = Button::new("Mit eigenem PrivateKey entschlüsseln").on_click(
@@ -284,6 +285,8 @@ pub(crate) fn build_bob_view() -> impl Widget<BobModel> {
         }).fix_width(fixed_width_button);
 
     Flex::column()
+        .with_default_spacer()
+        .with_default_spacer()
         .with_child(secret_key_label)
         .with_spacer(spacer_size)
         .with_child(plaintext_entry)

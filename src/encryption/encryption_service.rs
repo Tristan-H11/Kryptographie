@@ -18,5 +18,5 @@ pub trait EncryptionService {
     ///
     /// Überprüft die Signatur eines übergebenen Strings.
     ///
-    fn verify(&self, message: &String) -> String;
+    fn verify(&self, signature: &String, message: &String) -> bool;
 }
