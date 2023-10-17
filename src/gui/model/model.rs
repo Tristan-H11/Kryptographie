@@ -13,7 +13,8 @@ pub struct HauptMenuModel {
 
 #[derive(Clone, Data, Lens)]
 pub struct AliceModel {
-    pub(crate) message: String,
+    pub(crate) message_klartext: String,
+    pub(crate) message_chiffre: String,
     pub(crate) signature: String,
     pub(crate) signature_status: bool,
     pub(crate) private_key: String,
@@ -21,7 +22,8 @@ pub struct AliceModel {
 
 #[derive(Clone, Data, Lens)]
 pub struct BobModel {
-    pub(crate) message: String,
+    pub(crate) message_klartext: String,
+    pub(crate) message_chiffre: String,
     pub(crate) signature: String,
     pub(crate) signature_status: bool,
     pub(crate) private_key: String,
@@ -56,13 +58,15 @@ impl Default for AppState {
                 public_key_bob: String::new(),
             },
             alice: AliceModel {
-                message: String::new(),
+                message_klartext: String::new(),
+                message_chiffre: String::new(),
                 signature: String::new(),
                 signature_status: false,
                 private_key: String::new(),
             },
             bob: BobModel {
-                message: String::new(),
+                message_klartext: String::new(),
+                message_chiffre: String::new(),
                 signature: String::new(),
                 signature_status: false,
                 private_key: String::new(),

@@ -13,6 +13,8 @@
 // - Eingabemöglichkeit für Länge der Primzahlen p_1 und p_2
 // - Startbutton, welcher Mathefunktion aufruft, welche die beiden Feldinformationen übergeben bekommt und ein Ergebnis in ein Lable auf dieser Maske schreibt
 // - Label um den öffentlichen Schlüssel für Alice und Bob anzuzeigen (n,e_a) und (n,e_b)
+// - Label länge Klartext
+// - Label länge Chiffretext
 // - Button um Alice Maske anzeigen zu lassen
 // - Button um BOB Maske anzeigen zu lassen
 

@@ -129,13 +129,13 @@ impl AppController {
     /// Verschlüsselt die Nachricht von Alice mit Bobs öffentlichem Schlüssel.
     ///
     fn encrypt_alice(&mut self, app_state: &mut AppState) {
-        let klartext = app_state.alice.message.clone();
+        let klartext = app_state.alice.message_klartext.clone();
 
         let encrypted = self
             .get_encryption_service_bob(app_state)
             .encrypt(&klartext);
         println!("Verschlüsselt: {}", &encrypted);
-        app_state.alice.message = encrypted;
+        app_state.alice.message_klartext = encrypted;
     }
 
     ///
@@ -150,21 +150,21 @@ impl AppController {
     /// Entschlüsselt die Nachricht von Bob mit Alices privatem Schlüssel.
     ///
     fn decrypt_alice(&mut self, app_state: &mut AppState) {
-        let cipher_text = app_state.alice.message.clone();
+        let cipher_text = app_state.alice.message_klartext.clone();
 
         let decrypted = self
             .get_encryption_service_alice(app_state)
             .decrypt(&cipher_text);
         println!("Entschlüsselt: {}", &decrypted);
-        app_state.alice.message = decrypted;
+        app_state.alice.message_klartext = decrypted;
     }
 
     ///
     /// Sendet die Nachricht von Alice an Bob und löscht das Nachrichten-Feld.
     ///
     fn send_message_alice(&mut self, app_state: &mut AppState) {
-        let message = &app_state.alice.message;
-        app_state.bob.message = message.clone();
+        let message = &app_state.alice.message_klartext;
+        app_state.bob.message_chiffre = message.clone();
         self.clear_alice(app_state);
         // todo -- Logik zum Senden der Nachricht für Alice
     }
@@ -173,7 +173,7 @@ impl AppController {
     /// Löscht die Nachricht von Alice.
     ///
     fn clear_alice(&mut self, app_state: &mut AppState) {
-        app_state.alice.message = String::new();
+        app_state.alice.message_klartext = String::new();
         // todo -- Logik zum Zurücksetzen der Eingabefelder und Labels für Alice
     }
 
@@ -181,13 +181,13 @@ impl AppController {
     /// Verschlüsselt die Nachricht von Bob mit Alice öffentlichem Schlüssel.
     ///
     fn encrypt_bob(&mut self, app_state: &mut AppState) {
-        let klartext = app_state.bob.message.clone();
+        let klartext = app_state.bob.message_chiffre.clone();
 
         let encrypted = self
             .get_encryption_service_alice(app_state)
             .encrypt(&klartext);
         println!("Verschlüsselt: {}", &encrypted);
-        app_state.bob.message = encrypted;
+        app_state.bob.message_klartext = encrypted;
     }
 
     ///
@@ -202,21 +202,21 @@ impl AppController {
     /// Entschlüsselt die Nachricht von Alice mit Bobs privatem Schlüssel.
     ///
     fn decrypt_bob(&mut self, app_state: &mut AppState) {
-        let cipher_text = app_state.bob.message.clone();
+        let cipher_text = app_state.bob.message_klartext.clone();
 
         let decrypted = self
             .get_encryption_service_bob(app_state)
             .decrypt(&cipher_text);
         println!("Entschlüsselt: {}", &decrypted);
-        app_state.bob.message = decrypted;
+        app_state.bob.message_klartext = decrypted;
     }
 
     ///
     /// Sendet die Nachricht von Bob an Alice und löscht das Nachrichten-Feld.
     ///
     fn send_message_bob(&mut self, app_state: &mut AppState) {
-        let message = &app_state.bob.message;
-        app_state.alice.message = message.clone();
+        let message = &app_state.bob.message_chiffre;
+        app_state.alice.message_chiffre = message.clone();
         self.clear_bob(app_state);
         // todo -- Logik zum Senden der Nachricht für Bob
     }
@@ -225,7 +225,8 @@ impl AppController {
     /// Löscht die Nachricht von Bob.
     ///
     fn clear_bob(&mut self, app_state: &mut AppState) {
-        app_state.bob.message = String::new();
+        app_state.bob.message_klartext = String::new();
+        app_state.bob.message_chiffre = String::new();
         // todo -- Logik zum Zurücksetzen der Eingabefelder und Labels für Bob
     }
 
