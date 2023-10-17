@@ -149,9 +149,7 @@ impl AppController {
     fn sign_alice(&mut self, _app_state: &mut AppState) {
         // TODO für RSA richtig machen
         let message = _app_state.alice.message_klartext.clone();
-        let signed = self
-            .get_encryption_service_alice(_app_state)
-            .sign(&message);
+        let signed = self.get_encryption_service_alice(_app_state).sign(&message);
         _app_state.alice.signature = signed;
     }
 
@@ -218,9 +216,7 @@ impl AppController {
     fn sign_bob(&mut self, _app_state: &mut AppState) {
         // TODO für RSA richtig machen
         let message = _app_state.bob.message_klartext.clone();
-        let signed = self
-            .get_encryption_service_bob(_app_state)
-            .sign(&message);
+        let signed = self.get_encryption_service_bob(_app_state).sign(&message);
         _app_state.bob.signature = signed;
     }
 

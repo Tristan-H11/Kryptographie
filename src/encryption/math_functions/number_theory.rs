@@ -59,7 +59,7 @@ pub fn fast_exponentiation(base: &UBig, exponent: &UBig, modul: &UBig) -> UBig {
 /// wird ein Error zurückgegeben.
 pub fn modulo_inverse(n: i128, modul: i128) -> Result<i128, std::io::Error> {
     let xy = [1, 1, 1, 0, 0, 1];
-    let (ggT, x, y) = extended_euclidean_algorithm(modul, n, xy);
+    let (ggT, _x, y) = extended_euclidean_algorithm(modul, n, xy);
     // Wenn ggT nicht 1, existiert kein Inverse. -> Error
     if ggT != 1 {
         let no_inverse_error = std::io::Error::new(
