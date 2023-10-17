@@ -37,19 +37,19 @@ use druid::{
             .with_child(Label::new("Miller-Rabin Iterationen: ").fix_width(fixed_width_entryLabel))
             .with_child(
                 TextBox::new()
-                    .with_placeholder("z.B. 99, sollte max 100 sein ?")
+                    .with_placeholder("z.B. 61, sollte laut Herr Elsner mit max 100 reichen")
                     .fix_width(fixed_width_textbox)
                     .lens(HauptMenuModel::miller_rabin_iterations)
             );
 
         // Button
-        let calculate_keypair_alice = Button::new("Schlüsselpaar <public, private> Alice Berechnen")
+        let calculate_keypair_alice = Button::new("Schlüsselpaar <public, private> Alice berechnen")
             .on_click(|ctx, _data: &mut HauptMenuModel, _env| {
                 ctx.submit_command(CALCULATE_KEYPAIR_ALICE);
             })
             .fix_width(fixed_width_button);
 
-        let calculate_keypair_bob = Button::new("Schlüsselpaar <public, private> Bob Berechnen")
+        let calculate_keypair_bob = Button::new("Schlüsselpaar <public, private> Bob berechnen")
             .on_click(|ctx, _data: &mut HauptMenuModel, _env| {
                 ctx.submit_command(CALCULATE_KEYPAIR_BOB);
             })
@@ -110,14 +110,14 @@ pub(crate) fn build_alice_view() -> impl Widget<AliceModel> {
 
     // Entry-Felder und Labels
     let plaintext_entry = Flex::row()
-        .with_child(Label::new("Nachricht klartext: ").fix_width(fixed_width_entryLabel))
+        .with_child(Label::new("Nachricht Klartext: ").fix_width(fixed_width_entryLabel))
         .with_child(TextBox::new()
             .with_placeholder("z.B. Hallo wie geht es dir, mir geht es heute wunderbar, wusstest du, dass heute XXXXX")
             .fix_width(fixed_width_textbox)
             .lens(AliceModel::message_klartext));
 
     let ciffretext_entry = Flex::row()
-        .with_child(Label::new("Nachricht chiffre: ").fix_width(fixed_width_entryLabel))
+        .with_child(Label::new("Nachricht Chiffre: ").fix_width(fixed_width_entryLabel))
         .with_child(TextBox::new()
             .with_placeholder("Erzeugt durch Berechnung. Z.B.: BHFISFBNDNSVNBIEASFNDJSVNDSJIFOINFDCDSI")
             .fix_width(fixed_width_textbox)
@@ -168,7 +168,7 @@ pub(crate) fn build_alice_view() -> impl Widget<AliceModel> {
         }).fix_width(fixed_width_button);
 
     let clear_button =
-        Button::new("Nachricht löschen").on_click(|_ctx, _data: &mut AliceModel, _env| {
+        Button::new("Alles außer privaten Schlüssel löschen").on_click(|_ctx, _data: &mut AliceModel, _env| {
             _ctx.submit_command(CLEAR);
         }).fix_width(fixed_width_button);
 
@@ -216,14 +216,14 @@ pub(crate) fn build_bob_view() -> impl Widget<BobModel> {
 
     // Entry-Felder und Labels
     let plaintext_entry = Flex::row()
-        .with_child(Label::new("Nachricht klartext: ").fix_width(fixed_width_entryLabel))
+        .with_child(Label::new("Nachricht Klartext: ").fix_width(fixed_width_entryLabel))
         .with_child(TextBox::new()
             .with_placeholder("z.B. Hallo wie geht es dir, mir geht es heute wunderbar, wusstest du, dass heute XXXXX")
             .fix_width(fixed_width_textbox)
             .lens(BobModel::message_klartext));
 
     let ciffretext_entry = Flex::row()
-        .with_child(Label::new("Nachricht chiffre: ").fix_width(fixed_width_entryLabel))
+        .with_child(Label::new("Nachricht Chiffre: ").fix_width(fixed_width_entryLabel))
         .with_child(TextBox::new()
             .with_placeholder("Erzeugt durch Berechnung. Z.B.: BHFISFBNDNSVNBIEASFNDJSVNDSJIFOINFDCDSI")
             .fix_width(fixed_width_textbox)
@@ -274,7 +274,7 @@ pub(crate) fn build_bob_view() -> impl Widget<BobModel> {
         }).fix_width(fixed_width_button);
 
     let clear_button =
-        Button::new("Nachricht löschen").on_click(|_ctx, _data: &mut BobModel, _env| {
+        Button::new("Alles außer privaten Schlüssel löschen").on_click(|_ctx, _data: &mut BobModel, _env| {
             _ctx.submit_command(CLEAR);
         }).fix_width(fixed_width_button);
 
