@@ -1,6 +1,7 @@
-use ibig::{ubig, UBig};
+use std::ops::Mul;
+use ibig::{IBig, ubig, UBig};
 use rand::distributions::{Bernoulli, Distribution};
-use rand::thread_rng;
+use rand::{random, thread_rng};
 
 ///
 /// Gibt zurück, ob die Zahl gerade ist.
@@ -81,4 +82,15 @@ pub fn random_in_range(high: &UBig) -> UBig {
         }
     }
     result
+}
+
+///
+/// Gibt eine Zufallszahl im Bereich a..b zurück.
+///
+pub fn elsner_rand(a:f64,b:f64) -> f64 {
+    let m:f64 = 13.0;
+    let n:f64 = 2.0;
+    let n_sqrt_m:f64 = n.powf(1.0/m) % 1.0;
+    let s:f64 = a + (n_sqrt_m*(b-a+1.0)).floor();
+    return s;
 }
