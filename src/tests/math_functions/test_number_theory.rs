@@ -3,7 +3,7 @@ mod tests {
     use crate::encryption::math_functions::number_theory::{
         fast_exponentiation, miller_rabin, modulo_inverse,
     };
-    use ibig::{ubig, UBig};
+    use ibig::{ibig, ubig, UBig};
     use std::str::FromStr;
 
     #[test]
@@ -77,11 +77,17 @@ mod tests {
 
     #[test]
     fn modulo_inverse_test() {
-        assert_eq!(modulo_inverse(315, 661643).unwrap(), 342374);
-        assert_eq!(modulo_inverse(1, 3).unwrap(), 1);
-        assert_eq!(modulo_inverse(5, 11).unwrap(), 9);
-        assert_eq!(modulo_inverse(6, 11).unwrap(), 2);
-        assert!(modulo_inverse(78, 99).is_err());
+        assert_eq!(modulo_inverse(ibig!(1), ibig!(3)).unwrap(), ibig!(1));
+        assert_eq!(modulo_inverse(ibig!(5), ibig!(11)).unwrap(), ibig!(9));
+        assert_eq!(
+            modulo_inverse(ibig!(315), ibig!(661643)).unwrap(),
+            ibig!(342374)
+        );
+        assert_eq!(
+            modulo_inverse(ibig!(1818181817), ibig!(999999999989)).unwrap(),
+            ibig!(392801251951)
+        );
+        assert!(modulo_inverse(ibig!(78), ibig!(99)).is_err());
     }
 
     #[test]

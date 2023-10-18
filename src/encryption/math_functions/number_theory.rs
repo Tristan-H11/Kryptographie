@@ -2,7 +2,7 @@ use crate::encryption::math_functions::big_int_util::{
     decrement, is_even, is_one, is_zero, random_in_range,
 };
 use ibig::ops::RemEuclid;
-use ibig::{ibig, IBig, ubig, UBig};
+use ibig::{ibig, ubig, IBig, UBig};
 use std::ops::Div;
 
 ///
