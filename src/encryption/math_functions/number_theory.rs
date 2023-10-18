@@ -2,7 +2,7 @@ use crate::encryption::math_functions::big_int_util::{
     decrement, is_even, is_one, is_zero, random_in_range,
 };
 use ibig::ops::RemEuclid;
-use ibig::{ubig, UBig};
+use ibig::{ibig, IBig, ubig, UBig};
 use std::ops::Div;
 
 ///
@@ -57,11 +57,11 @@ pub fn fast_exponentiation(base: &UBig, exponent: &UBig, modul: &UBig) -> UBig {
 /// Das Inverse-Element von `n` im Restklassenring modulo `modul`.
 /// Wenn keine Inverse existiert (wenn `n` und `modul` nicht teilerfremd sind),
 /// wird ein Error zurückgegeben.
-pub fn modulo_inverse(n: i128, modul: i128) -> Result<i128, std::io::Error> {
-    let xy = [1, 1, 1, 0, 0, 1];
-    let (ggT, _x, y) = extended_euclidean_algorithm(modul, n, xy);
+pub fn modulo_inverse(n: IBig, modul: IBig) -> Result<IBig, std::io::Error> {
+    let xy = [ibig!(1), ibig!(1), ibig!(1), ibig!(0), ibig!(0), ibig!(1)];
+    let (ggT, x, y) = extended_euclidean_algorithm(&modul, &n, xy);
     // Wenn ggT nicht 1, existiert kein Inverse. -> Error
-    if ggT != 1 {
+    if ggT != ibig!(1) {
         let no_inverse_error = std::io::Error::new(
             std::io::ErrorKind::InvalidInput,
             format!("n hat keinen Inverse"),
@@ -69,7 +69,7 @@ pub fn modulo_inverse(n: i128, modul: i128) -> Result<i128, std::io::Error> {
         return Err(no_inverse_error);
     }
     // Berechnet aus den letzten Faktoren das Inverse.
-    return Ok((modul + y) % modul);
+    return Ok((&modul + y).rem_euclid(&modul));
 }
 
 /// Implementiert den erweiterten euklidischen Algorithmus.
@@ -87,16 +87,16 @@ pub fn modulo_inverse(n: i128, modul: i128) -> Result<i128, std::io::Error> {
 /// * (ggT(n,modul),x,y)
 /// Ein tripel aus dem groessten gemeinsamen Teiler einer Zahl `n` und dem `modul`,
 /// sowie den zwei Faktoren `x` und `y`.
-fn extended_euclidean_algorithm(n: i128, modul: i128, mut xy: [i128; 6]) -> (i128, i128, i128) {
+fn extended_euclidean_algorithm(n: &IBig, modul: &IBig, mut xy: [IBig; 6]) -> (IBig, IBig, IBig) {
     xy.rotate_left(2);
-    if modul == 0 {
-        return (n, xy[0], xy[1]);
+    if modul == &ibig!(0) {
+        return (n.clone(), xy[0].clone(), xy[1].clone());
     } else {
         // Berechnet die Faktoren und speichert sie in einem rotierenden Array.
-        let div: i128 = n / modul;
-        xy[4] = xy[0] - (div * xy[2]);
-        xy[5] = xy[1] - (div * xy[3]);
-        return extended_euclidean_algorithm(modul, n % modul, xy);
+        let div = n / modul;
+        xy[4] = &xy[0] - (&div * &xy[2]);
+        xy[5] = &xy[1] - (&div * &xy[3]);
+        return extended_euclidean_algorithm(modul, &n.rem_euclid(modul), xy);
     }
 }
 
