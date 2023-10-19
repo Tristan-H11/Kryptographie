@@ -1,8 +1,8 @@
 #[cfg(test)]
 mod tests {
     use crate::encryption::math_functions::big_int_util::{
-        decrement, divides, increment, is_even, is_one, is_uneven, is_zero, not_divides,
-        random_in_range,
+        decrement, divides, elsner_rand, increment, is_even, is_one, is_uneven, is_zero,
+        not_divides, random_in_range,
     };
     use ibig::ubig;
 
@@ -61,5 +61,13 @@ mod tests {
         let high_num = ubig!(3453).pow(564);
         let random = random_in_range(&high_num);
         assert!(random <= high_num && random >= ubig!(2))
+    }
+
+    #[test]
+    fn test_elsner_rand() {
+        let a = 1000.0;
+        let b = 10000.0;
+        let random = elsner_rand(a, b);
+        assert!(random >= a && random <= b)
     }
 }
