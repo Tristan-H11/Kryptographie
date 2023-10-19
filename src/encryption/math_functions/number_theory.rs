@@ -58,8 +58,7 @@ pub fn fast_exponentiation(base: &UBig, exponent: &UBig, modul: &UBig) -> UBig {
 /// Wenn keine Inverse existiert (wenn `n` und `modul` nicht teilerfremd sind),
 /// wird ein Error zurückgegeben.
 pub fn modulo_inverse(n: IBig, modul: IBig) -> Result<IBig, std::io::Error> {
-    let xy = [ibig!(1), ibig!(1), ibig!(1), ibig!(0), ibig!(0), ibig!(1)];
-    let (ggT, x, y) = extended_euclidean_algorithm(&modul, &n, xy);
+    let (ggT, x, y) = extended_euclid(&modul, &n);
     // Wenn ggT nicht 1, existiert kein Inverse. -> Error
     if ggT != ibig!(1) {
         let no_inverse_error = std::io::Error::new(
@@ -79,14 +78,19 @@ pub fn modulo_inverse(n: IBig, modul: IBig) -> Result<IBig, std::io::Error> {
 /// die Faktoren `x` und `y` in der Bézout'schen Identität, so dass `x * n + y * modul = ggT(n, modul)`
 ///
 /// # Argumente
-/// * `n` - Die zu invertierende Zahl.
-/// * `modul` - Die Modulo-Zahl, gegen die die Inversion durchgeführt wird.
-/// * `xy` - Ein rotierendes Array, das die Berechnung der Faktoren `x` und `y` speichert.
+/// * `n` - Die Zahl, welche mit dem Modul verechnet werden soll.
+/// * `modul` - Die Modulo-Zahl, gegen die der Algorithmus durchgeführt wird.
 ///
 /// # Rückgabe
 /// * (ggT(n,modul),x,y)
 /// Ein tripel aus dem groessten gemeinsamen Teiler einer Zahl `n` und dem `modul`,
 /// sowie den zwei Faktoren `x` und `y`.
+pub fn extended_euclid(n: &IBig, modul: &IBig) -> (IBig, IBig, IBig) {
+    //rotierendes Array, zur Berechnung und Speicherung der Faktoren `x` und `y`
+    let xy = [ibig!(1), ibig!(1), ibig!(1), ibig!(0), ibig!(0), ibig!(1)];
+    let (ggT, x, y) = extended_euclidean_algorithm(&n, &modul, xy);
+    return (ggT, x, y);
+}
 fn extended_euclidean_algorithm(n: &IBig, modul: &IBig, mut xy: [IBig; 6]) -> (IBig, IBig, IBig) {
     xy.rotate_left(2);
     if modul == &ibig!(0) {
