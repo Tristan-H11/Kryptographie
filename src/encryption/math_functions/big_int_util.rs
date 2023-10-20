@@ -82,3 +82,38 @@ pub fn random_in_range(high: &UBig) -> UBig {
     }
     result
 }
+
+///
+/// Konvertiere ein Zeichen in einen u32 Code -- z.B. für Blockchiffre
+///
+pub(crate) fn char_to_u32(c: char) -> u32 {
+    match c {
+        'a'..='z' => c as u32 - 'a' as u32,
+        'A'..='Z' => c as u32 - 'A' as u32 + 26,
+        '0'..='9' => c as u32 - '0' as u32 + 52,
+        '.' => 62,
+        ',' => 63,
+        ':' => 64,
+        ';' => 65,
+        '-' => 66,
+        '!' => 67,
+        '?' => 68,
+        '"' => 69,
+        '(' => 70,
+        ')' => 71,
+        '/' => 72,
+        '\'' => 73,
+        '*' => 74,
+        '+' => 75,
+        ' ' => 76,
+        '&' => 77,
+        '%' => 78,
+        '$' => 79,
+        '#' => 80,
+        '@' => 81,
+        '€' => 82,
+        '§' => 83,
+        '°' => 84,
+        _ => panic!("Ungültiges Zeichen: {}", c),
+    }
+}

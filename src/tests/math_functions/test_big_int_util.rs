@@ -2,7 +2,7 @@
 mod tests {
     use crate::encryption::math_functions::big_int_util::{
         decrement, divides, increment, is_even, is_one, is_uneven, is_zero, not_divides,
-        random_in_range,
+        random_in_range, char_to_u32,
     };
     use ibig::ubig;
 
@@ -62,4 +62,25 @@ mod tests {
         let random = random_in_range(&high_num);
         assert!(random <= high_num && random >= ubig!(2))
     }
+
+
+    #[test]
+    fn test_char_to_u32() {
+        assert_eq!(char_to_u32('a'), 0);
+        assert_eq!(char_to_u32('b'), 1);
+        assert_eq!(char_to_u32('z'), 25);
+        assert_eq!(char_to_u32('A'), 26);
+        assert_eq!(char_to_u32('B'), 27);
+        assert_eq!(char_to_u32('Z'), 51);
+        assert_eq!(char_to_u32('0'), 52);
+        assert_eq!(char_to_u32('1'), 53);
+        assert_eq!(char_to_u32('9'), 61);
+    }
+
+    #[test]
+    #[should_panic(expected = "Ungültiges Zeichen: ß")]
+    fn test_char_to_u32_invalid() {
+        char_to_u32('ß');
+    }
+
 }
