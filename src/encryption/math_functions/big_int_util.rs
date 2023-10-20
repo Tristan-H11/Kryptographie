@@ -117,3 +117,47 @@ pub(crate) fn char_to_u32(c: char) -> u32 {
         _ => panic!("Ungültiges Zeichen: {}", c),
     }
 }
+
+///
+/// Konvertiere ein u32 Code in ein Zeichen -- z.B. für Blockchiffre
+///
+pub(crate) fn u32_to_char(value: u32) -> char {
+    match value {
+        0..=25 => ((value + 'a' as u32) as u8) as char,
+        26..=51 => (((value - 26) + 'A' as u32) as u8) as char,
+        52..=61 => (((value - 52) + '0' as u32) as u8) as char,
+        62 => '.',
+        63 => ',',
+        64 => ':',
+        65 => ';',
+        66 => '-',
+        67 => '!',
+        68 => '?',
+        69 => '"',
+        70 => '(',
+        71 => ')',
+        72 => '/',
+        73 => '\'',
+        74 => '*',
+        75 => '+',
+        76 => ' ',
+        77 => '&',
+        78 => '%',
+        79 => '$',
+        80 => '#',
+        81 => '@',
+        82 => '€',
+        83 => '§',
+        84 => '°',
+        _ => panic!("Ungültiger Wert: {}", value),
+    }
+}
+
+///
+/// wandle eine ubig Zahl in einen u32 Wert um
+///
+pub(crate) fn ubig_to_u32(value: &UBig) -> u32 {
+    //todo -- einschränken, dass die ubig zahl nicht über den werteraum von u32 geht
+    let value_str = format!("{}", value);
+    value_str.parse::<u32>().unwrap()
+}

@@ -1,5 +1,5 @@
 use ibig::{UBig, ubig};
-use crate::encryption::math_functions::big_int_util::{char_to_u32};
+use crate::encryption::math_functions::big_int_util::{char_to_u32, u32_to_char, ubig_to_u32};
 
 
 // TODO: Öffentliche Funktionen implementieren, weil der Rest hier unten nur für interne Zwecke ist.
@@ -72,11 +72,12 @@ pub(crate) fn string_to_int_vec(message: &String) -> Vec<u32> {
 /// digits_to_sum(
 ///     vec![12,0,19,7,4,12,0,19],
 ///     47
-/// ) // 6.083.869.600.275
-pub(crate) fn digits_to_sum(digits: &Vec<u32>, g: u32) -> UBig {
+/// ) // 6083869600275
+pub(crate) fn digits_from_vec_to_sum(digits: &Vec<u32>, g: u32) -> UBig {
     let mut sum = ubig!(0);
     let base = ubig!(g);
     for &digit in digits.iter().rev() {
+        // [12, 2, 0, 5] --> 12 * 47^3 + 2 * 47^2 + 0 * 47^1 + 5 * 47^0
         sum = sum * &base + ubig!(digit);
     }
     sum
@@ -99,7 +100,16 @@ pub(crate) fn digits_to_sum(digits: &Vec<u32>, g: u32) -> UBig {
 /// ```
 ///
 pub(crate) fn sum_to_string(sum: &UBig, g: u32) -> String {
-    todo!("Implementiere diese Funktion!")
+    let mut temp_sum = sum.clone();
+    let mut result = String::new();
+    let base = ubig!(g);
+
+    while temp_sum > ubig!(0) {
+        let remainder = ubig_to_u32(&(&temp_sum % &base));
+        result.push(u32_to_char(remainder));
+        temp_sum = temp_sum / &base;
+    }
+    result.chars().rev().collect()
 }
 
 ///

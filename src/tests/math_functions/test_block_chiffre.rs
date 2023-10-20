@@ -1,11 +1,13 @@
 
 #[cfg(test)]
 mod tests {
+    use std::str::FromStr;
     use crate::encryption::math_functions::block_ciffre::{
-        split_into_blocks, string_to_int_vec, digits_to_sum, sum_to_string, string_to_sum,
+        split_into_blocks, string_to_int_vec, digits_from_vec_to_sum, sum_to_string, string_to_sum,
         sum_to_digits, int_vec_to_string
     };
-    use ibig::ubig;
+    use ibig::{ubig, UBig};
+    use num_bigint::ToBigUint;
 
     #[test]
     fn test_split_into_blocks() {
@@ -52,5 +54,40 @@ mod tests {
             .zip(expectet_chiffre_results_as_blocks_in_vec.iter()) {
             assert_eq!(string_to_int_vec(block), *expected_vec, "Fehler bei Block: {}", block);
         }
+    }
+
+    //todo -- diese testfälle funktionieren nicht ... wieso ???
+    #[test]
+    fn test_digits_from_vec_to_sum() {
+        // Testfall 1: Zahlen in umgekehrter Reihenfolge und Basis 47.
+        let digits = vec![12, 0, 19, 7, 4, 12, 0, 19];
+        let base = 47;
+        let result = digits_from_vec_to_sum(&digits, base);
+        let expected_result:UBig = ubig!(6083869600275);
+        assert_eq!(result, expected_result);
+
+
+        // Testfall 2: Basis 2 und Binärzahlen.
+        let digits = vec![1, 0, 1, 0, 1, 0];
+        let base = 2;
+        let result = digits_from_vec_to_sum(&digits, base);
+        let expected_result = UBig::from_str("42").unwrap();
+        assert_eq!(result, expected_result);
+
+        // Testfall 3: Basis 16 und Hexadezimalzahlen.
+        let digits = vec![13, 10, 15];
+        let base = 16;
+        let result = digits_from_vec_to_sum(&digits, base);
+        let expected_result = UBig::from_str("0D0AF").unwrap();
+        assert_eq!(result, expected_result);
+    }
+
+    #[test]
+    fn test_sum_to_string() {
+        let sum = UBig::from(1234567890_u64);
+        assert_eq!(sum_to_string(&sum, 10), "1234567890");
+
+        let sum = UBig::from(9876543210_u64);
+        assert_eq!(sum_to_string(&sum, 10), "9876543210");
     }
 }
