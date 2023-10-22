@@ -65,7 +65,6 @@ mod tests {
         }
     }
 
-    //todo -- diese testfälle funktionieren nicht ... wieso ???
     #[test]
     fn test_digits_from_vec_to_sum() {
         // Testfall 1: Zahlen in umgekehrter Reihenfolge und Basis 47.
@@ -92,10 +91,11 @@ mod tests {
 
     #[test]
     fn test_sum_to_string() {
-        let sum = UBig::from(1234567890_u64);
-        assert_eq!(sum_to_string(&sum, 10), "1234567890");
-
-        let sum = UBig::from(9876543210_u64);
-        assert_eq!(sum_to_string(&sum, 10), "9876543210");
+        todo!("Auf Anweisung von Margitta warten. Siehe Funktion.")
+        // let sum = UBig::from(1234567890_u64);
+        // assert_eq!(sum_to_string(&sum, 10), "1234567890");
+        //
+        // let sum = UBig::from(9876543210_u64);
+        // assert_eq!(sum_to_string(&sum, 10), "9876543210");
     }
 }

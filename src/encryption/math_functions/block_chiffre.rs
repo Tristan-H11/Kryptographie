@@ -103,6 +103,7 @@ pub(crate) fn digits_from_vec_to_sum(digits: &Vec<u64>, g_base: u16) -> UBig {
 /// TODO: Hier muss später das `g` rausgenommen werden, wenn die Margitta uns gesagt hat,
 /// welcher Buchstabe welchen Wert hat.
 pub(crate) fn sum_to_string(sum: &UBig, g: u32) -> String {
+    panic!("Muss implementiert werden, nachdem Margitta verkündet hat, welche Basis wir nutzen.");
     let mut temp_sum = sum.clone();
     let mut result = String::new();
     let base = ubig!(g);
