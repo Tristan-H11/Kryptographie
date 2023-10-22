@@ -73,12 +73,13 @@ pub(crate) fn string_to_int_vec(message: &String) -> Vec<u32> {
 ///     vec![12,0,19,7,4,12,0,19],
 ///     47
 /// ) // 6083869600275
-pub(crate) fn digits_from_vec_to_sum(digits: &Vec<u32>, g: u32) -> UBig {
+pub(crate) fn digits_from_vec_to_sum(digits: &Vec<u64>, g_base: u16) -> UBig {
     let mut sum = ubig!(0);
-    let base = ubig!(g);
+    let mut base = ubig!(1);
     for &digit in digits.iter().rev() {
         // [12, 2, 0, 5] --> 12 * 47^3 + 2 * 47^2 + 0 * 47^1 + 5 * 47^0
-        sum = sum * &base + ubig!(digit);
+        sum += &base * digit;
+        base *= g_base;
     }
     sum
 }

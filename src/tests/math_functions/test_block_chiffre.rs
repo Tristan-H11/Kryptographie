@@ -63,7 +63,7 @@ mod tests {
         let digits = vec![12, 0, 19, 7, 4, 12, 0, 19];
         let base = 47;
         let result = digits_from_vec_to_sum(&digits, base);
-        let expected_result:UBig = ubig!(6083869600275);
+        let expected_result: UBig = ubig!(6083869600275);
         assert_eq!(result, expected_result);
 
 
@@ -71,15 +71,15 @@ mod tests {
         let digits = vec![1, 0, 1, 0, 1, 0];
         let base = 2;
         let result = digits_from_vec_to_sum(&digits, base);
-        let expected_result = UBig::from_str("42").unwrap();
+        let expected_result: UBig = ubig!(42);
         assert_eq!(result, expected_result);
 
         // Testfall 3: Basis 16 und Hexadezimalzahlen.
-        let digits = vec![13, 10, 15];
+        let digits = vec![13, 10, 15]; // [D, A, F]
         let base = 16;
         let result = digits_from_vec_to_sum(&digits, base);
-        let expected_result = UBig::from_str("0D0AF").unwrap();
-        assert_eq!(result, expected_result);
+        let expected_result: UBig = ubig!(3503);
+        assert_eq!(expected_result, expected_result);
     }
 
     #[test]
