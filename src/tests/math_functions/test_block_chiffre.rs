@@ -11,7 +11,7 @@ mod tests {
 
     #[test]
     fn test_split_into_blocks() {
-        // Testfall 1: Ein einfacher String wird in Blöcke der Größe 2 aufgeteilt.
+        // Testfall 1: Ein einfacher String wird in Blöcke der Größe 4 aufgeteilt.
         let message = String::from("Das ist eine Testnachricht");
         let block_size = 4;
         let result = split_into_blocks(&message, block_size);

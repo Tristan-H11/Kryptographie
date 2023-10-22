@@ -21,7 +21,7 @@ use crate::encryption::math_functions::big_int_util::{char_to_u32, u32_to_char, 
 /// split_into_blocks("MATHEMATIK*IST*SPANNEND!", 8)
 /// // ["MATHEMAT", "IK*IST*S", "PANNEND!"]
 /// ```
-pub(crate) fn split_into_blocks(message: &String, block_size: usize) -> Vec<String> {
+pub(crate) fn split_into_blocks(message: &str, block_size: usize) -> Vec<String> {
     message
         .chars()
         .collect::<Vec<char>>() //Erstelle einen Vektor für die Blöcke bestehend aus Zeichen
@@ -51,7 +51,7 @@ pub(crate) fn split_into_blocks(message: &String, block_size: usize) -> Vec<Stri
 /// string_to_int_vec("MATHEMAT") // [12,0,19,7,4,12,0,19]
 /// ```
 ///
-pub(crate) fn string_to_int_vec(message: &String) -> Vec<u32> {
+pub(crate) fn string_to_int_vec(message: &str) -> Vec<u32> {
     message.chars().map(char_to_u32).collect()
 }
 
@@ -100,6 +100,8 @@ pub(crate) fn digits_from_vec_to_sum(digits: &Vec<u64>, g_base: u16) -> UBig {
 /// sum_to_string(ubig!(422.078.969.854.681), 47) // "R8F9BX-YO"
 /// ```
 ///
+/// TODO: Hier muss später das `g` rausgenommen werden, wenn die Margitta uns gesagt hat,
+/// welcher Buchstabe welchen Wert hat.
 pub(crate) fn sum_to_string(sum: &UBig, g: u32) -> String {
     let mut temp_sum = sum.clone();
     let mut result = String::new();
@@ -129,7 +131,7 @@ pub(crate) fn sum_to_string(sum: &UBig, g: u32) -> String {
 /// string_to_sum("R8F9BX-YO", 47) // 422.078.969.854.681
 /// ```
 ///
-pub(crate) fn string_to_sum(message: &String, g: u32) -> UBig {
+pub(crate) fn string_to_sum(message: &str, g: u32) -> UBig {
     todo!("Implementiere diese Funktion!")
 }
 
