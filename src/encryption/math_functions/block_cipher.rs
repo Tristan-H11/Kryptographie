@@ -1,5 +1,6 @@
 use ibig::UBig;
 
+
 // TODO: Öffentliche Funktionen implementieren, weil der Rest hier unten nur für interne Zwecke ist.
 
 ///
@@ -124,6 +125,7 @@ fn string_to_sum(message: &String, g: u32) -> UBig {
 fn sum_to_digits(sum: &UBig, g: u32) -> Vec<u32> {
     todo!("Implementiere diese Funktion!")
 }
+
 
 ///
 /// Methode, um einen Vektor von Integern in einen String zu überführen.
