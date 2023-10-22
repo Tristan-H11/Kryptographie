@@ -1,6 +1,5 @@
-use ibig::{UBig, ubig};
 use crate::encryption::math_functions::big_int_util::{char_to_u32, u32_to_char, ubig_to_u32};
-
+use ibig::{ubig, UBig};
 
 // TODO: Öffentliche Funktionen implementieren, weil der Rest hier unten nur für interne Zwecke ist.
 
@@ -26,10 +25,11 @@ pub(crate) fn split_into_blocks(message: &str, block_size: usize) -> Vec<String>
         .chars()
         .collect::<Vec<char>>() //Erstelle einen Vektor für die Blöcke bestehend aus Zeichen
         .chunks(block_size) //Definiert die Blockgröße im Vector
-        .map(|chunk| { // Durchlaufe alle chunks, im letzten muss du ggf. Leerzeichen auffüllen
+        .map(|chunk| {
+            // Durchlaufe alle chunks, im letzten muss du ggf. Leerzeichen auffüllen
             let mut block = chunk.iter().collect::<String>(); // .iter --> füge chars zu String zusammen
             while block.len() < block_size {
-                block.push(' ');  // Fügt Leerzeichen hinzu, um den letzten Block zu füllen
+                block.push(' '); // Fügt Leerzeichen hinzu, um den letzten Block zu füllen
             }
             block
         })
@@ -155,7 +155,6 @@ pub(crate) fn string_to_sum(message: &str, g: u32) -> UBig {
 pub(crate) fn sum_to_digits(sum: &UBig, g: u32) -> Vec<u32> {
     todo!("Implementiere diese Funktion!")
 }
-
 
 ///
 /// Methode, um einen Vektor von Integern in einen String zu überführen.

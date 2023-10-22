@@ -1,13 +1,12 @@
-
 #[cfg(test)]
 mod tests {
-    use std::str::FromStr;
-    use crate::encryption::math_functions::block_ciffre::{
-        split_into_blocks, string_to_int_vec, digits_from_vec_to_sum, sum_to_string, string_to_sum,
-        sum_to_digits, int_vec_to_string
+    use crate::encryption::math_functions::block_chiffre::{
+        digits_from_vec_to_sum, int_vec_to_string, split_into_blocks, string_to_int_vec,
+        string_to_sum, sum_to_digits, sum_to_string,
     };
     use ibig::{ubig, UBig};
     use num_bigint::ToBigUint;
+    use std::str::FromStr;
 
     #[test]
     fn test_split_into_blocks() {
@@ -15,7 +14,10 @@ mod tests {
         let message = String::from("Das ist eine Testnachricht");
         let block_size = 4;
         let result = split_into_blocks(&message, block_size);
-        assert_eq!(result, vec!["Das ", "ist ", "eine", " Tes", "tnac", "hric", "ht  "]);
+        assert_eq!(
+            result,
+            vec!["Das ", "ist ", "eine", " Tes", "tnac", "hric", "ht  "]
+        );
 
         // Testfall 2: Ein String, der bereits eine Blockgröße hat, wird nicht verändert,
         // es kommt kein neuer leerer Block dazu.
@@ -42,17 +44,24 @@ mod tests {
         let message = "abc, XYZ012".to_string();
         let block_size = 3;
         let blocks = split_into_blocks(&message, block_size); // erstellen des Vektors
-                                                                         // aus Blöcken
+                                                              // aus Blöcken
         let expectet_chiffre_results_as_blocks_in_vec: Vec<Vec<u32>> = vec![
             vec![0, 1, 2],
             vec![63, 76, 49],
             vec![50, 51, 52],
-            vec![53, 54, 76]
+            vec![53, 54, 76],
         ];
 
-        for (block, expected_vec) in blocks.iter()
-            .zip(expectet_chiffre_results_as_blocks_in_vec.iter()) {
-            assert_eq!(string_to_int_vec(block), *expected_vec, "Fehler bei Block: {}", block);
+        for (block, expected_vec) in blocks
+            .iter()
+            .zip(expectet_chiffre_results_as_blocks_in_vec.iter())
+        {
+            assert_eq!(
+                string_to_int_vec(block),
+                *expected_vec,
+                "Fehler bei Block: {}",
+                block
+            );
         }
     }
 
@@ -65,7 +74,6 @@ mod tests {
         let result = digits_from_vec_to_sum(&digits, base);
         let expected_result: UBig = ubig!(6083869600275);
         assert_eq!(result, expected_result);
-
 
         // Testfall 2: Basis 2 und Binärzahlen.
         let digits = vec![1, 0, 1, 0, 1, 0];
