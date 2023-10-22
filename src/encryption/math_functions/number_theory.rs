@@ -1,5 +1,5 @@
 use crate::encryption::math_functions::big_int_util::{
-    decrement, is_even, is_one, is_zero, random_in_range,
+    decrement, elsner_rand, increment, is_even, is_one, is_zero, random_in_range,
 };
 use ibig::ops::RemEuclid;
 use ibig::{ibig, ubig, IBig, UBig};
@@ -88,8 +88,7 @@ pub fn modulo_inverse(n: IBig, modul: IBig) -> Result<IBig, std::io::Error> {
 pub fn extended_euclid(n: &IBig, modul: &IBig) -> (IBig, IBig, IBig) {
     //rotierendes Array, zur Berechnung und Speicherung der Faktoren `x` und `y`
     let xy = [ibig!(1), ibig!(1), ibig!(1), ibig!(0), ibig!(0), ibig!(1)];
-    let (ggT, x, y) = extended_euclidean_algorithm(&n, &modul, xy);
-    return (ggT, x, y);
+    return extended_euclidean_algorithm(&n, &modul, xy);
 }
 fn extended_euclidean_algorithm(n: &IBig, modul: &IBig, mut xy: [IBig; 6]) -> (IBig, IBig, IBig) {
     xy.rotate_left(2);
@@ -104,7 +103,7 @@ fn extended_euclidean_algorithm(n: &IBig, modul: &IBig, mut xy: [IBig; 6]) -> (I
     }
 }
 
-/// Führt den Miller-Rabin-Primzahltest auf `p` durch `repeats` Runden aus.
+/// Führt den Miller-Rabin-Primzahltest auf `p` mit `repeats` Runden aus.
 ///
 /// # Argumente
 /// * `p` - Die zu testende Zahl >= 11.
@@ -113,57 +112,54 @@ fn extended_euclidean_algorithm(n: &IBig, modul: &IBig, mut xy: [IBig; 6]) -> (I
 /// # Rückgabe
 /// `true`, wenn `p` wahrscheinlich eine Primzahl ist, andernfalls `false`.
 ///
+/// Wahrscheinlichkeit: >= 1 - (1/4)^repeats
+///
 /// # Beispiel
 /// ```
-/// miller_rabin(89, 40) // => true
-/// miller_rabin(221, 40) // => false
+/// miller_rabin(11, 40) // => true
+/// miller_rabin(2211, 40) // => false
 /// ```
 pub fn miller_rabin(p: &UBig, repeats: usize) -> bool {
+    let mut d = decrement(p);
+    let mut s = ubig!(0);
+    while is_even(&d) {
+        d = d.div(ubig!(2));
+        s += ubig!(1);
+    }
     for _ in 0..repeats {
-        if !miller_rabin_single(p) {
+        if !miller_rabin_test(&p, &s, &d) {
             return false;
         }
     }
-    true
+    return true;
 }
 
-/// Führt den Miller-Rabin-Primzahltest auf `p` aus.
+/// Führt den Miller-Rabin-Test-Algorithmus auf `p` aus.
 ///
 /// # Argumente
 /// * `p` - Die zu testende Zahl >= 11.
+/// * `s` - Anzahl wie oft (p-1) durch zwei teilbar ist, bis (p-1) ungerade ist.
+/// * `d` - übrigbleibender Faktor, sodass (p-1) = d * 2^s
 ///
 /// # Rückgabe
 /// `true`, wenn `p` wahrscheinlich eine Primzahl ist, andernfalls `false`.
-fn miller_rabin_single(p: &UBig) -> bool {
-    let one = &ubig!(1);
-    let two = &ubig!(2);
-
-    let mut d = decrement(p);
-    let mut r = ubig!(0);
-
-    while is_even(&d) {
-        d = d.div(two);
-        r = r + one;
+fn miller_rabin_test(p: &UBig, s: &UBig, d: &UBig) -> bool {
+    // TODO: random_in_range() auf elsner_rand() ändern sobalt elsner_rand() UBig nimmt.
+    let mut a = random_in_range(p);
+    while is_zero(&(&a).rem_euclid(p)) {
+        a = random_in_range(p);
     }
-
-    // Fun Fact:
-    // Wenn man p = 221 (NICHT prim) setzt und das a manuell auf 174 setzt, kommt er
-    // fälschlicherweise auf "prim" als Ergebnis.
-    let a = &random_in_range(&d);
-    let mut x = fast_exponentiation(a, &d, p);
-
-    if is_one(&x) || &x == &decrement(p) {
+    let mut x = fast_exponentiation(&a, d, p);
+    if is_one(&x) || x == decrement(p) {
         return true;
     }
-    while &r > one {
-        x = fast_exponentiation(&x, two, p);
-        if is_one(&x) {
-            return false;
-        }
-        if &x == &decrement(p) {
+    let mut r = ubig!(0);
+    while &r < s {
+        x = fast_exponentiation(&x, &ubig!(2), p);
+        if x == decrement(p) {
             return true;
         }
-        r = decrement(&r);
+        r = increment(&r);
     }
     return false;
 }

@@ -99,7 +99,13 @@ mod tests {
         assert_eq!(miller_rabin(&ubig!(11), 40), true);
         assert_eq!(miller_rabin(&ubig!(8727030382015287123761), 40), false);
         assert_eq!(miller_rabin(&ubig!(2459872438590349034582), 40), false);
-        assert_eq!(miller_rabin(&ubig!(221), 40), false);
-        assert_eq!(miller_rabin(&ubig!(89), 40), true);
+        assert_eq!(miller_rabin(&ubig!(2211), 40), false);
+        assert_eq!(
+            miller_rabin(
+                &UBig::from_str("79617341660363802320192939486040130094939703771377").unwrap(),
+                40
+            ),
+            true
+        );
     }
 }
