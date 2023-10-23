@@ -1,8 +1,8 @@
 use crate::encryption::math_functions::big_int_util::{
-    decrement, is_even, is_one, is_zero, random_in_range,
+    decrement, elsner_rand, increment, is_even, is_one, is_zero, random_in_range,
 };
 use ibig::ops::RemEuclid;
-use ibig::{ubig, UBig};
+use ibig::{ibig, ubig, IBig, UBig};
 use std::ops::Div;
 
 ///
@@ -57,11 +57,10 @@ pub fn fast_exponentiation(base: &UBig, exponent: &UBig, modul: &UBig) -> UBig {
 /// Das Inverse-Element von `n` im Restklassenring modulo `modul`.
 /// Wenn keine Inverse existiert (wenn `n` und `modul` nicht teilerfremd sind),
 /// wird ein Error zurückgegeben.
-pub fn modulo_inverse(n: i128, modul: i128) -> Result<i128, std::io::Error> {
-    let xy = [1, 1, 1, 0, 0, 1];
-    let (ggT, _x, y) = extended_euclidean_algorithm(modul, n, xy);
+pub fn modulo_inverse(n: IBig, modul: IBig) -> Result<IBig, std::io::Error> {
+    let (ggT, x, y) = extended_euclid(&modul, &n);
     // Wenn ggT nicht 1, existiert kein Inverse. -> Error
-    if ggT != 1 {
+    if ggT != ibig!(1) {
         let no_inverse_error = std::io::Error::new(
             std::io::ErrorKind::InvalidInput,
             format!("n hat keinen Inverse"),
@@ -69,7 +68,7 @@ pub fn modulo_inverse(n: i128, modul: i128) -> Result<i128, std::io::Error> {
         return Err(no_inverse_error);
     }
     // Berechnet aus den letzten Faktoren das Inverse.
-    return Ok((modul + y) % modul);
+    return Ok((&modul + y).rem_euclid(&modul));
 }
 
 /// Implementiert den erweiterten euklidischen Algorithmus.
@@ -79,28 +78,32 @@ pub fn modulo_inverse(n: i128, modul: i128) -> Result<i128, std::io::Error> {
 /// die Faktoren `x` und `y` in der Bézout'schen Identität, so dass `x * n + y * modul = ggT(n, modul)`
 ///
 /// # Argumente
-/// * `n` - Die zu invertierende Zahl.
-/// * `modul` - Die Modulo-Zahl, gegen die die Inversion durchgeführt wird.
-/// * `xy` - Ein rotierendes Array, das die Berechnung der Faktoren `x` und `y` speichert.
+/// * `n` - Die Zahl, welche mit dem Modul verechnet werden soll.
+/// * `modul` - Die Modulo-Zahl, gegen die der Algorithmus durchgeführt wird.
 ///
 /// # Rückgabe
 /// * (ggT(n,modul),x,y)
 /// Ein tripel aus dem groessten gemeinsamen Teiler einer Zahl `n` und dem `modul`,
 /// sowie den zwei Faktoren `x` und `y`.
-fn extended_euclidean_algorithm(n: i128, modul: i128, mut xy: [i128; 6]) -> (i128, i128, i128) {
+pub fn extended_euclid(n: &IBig, modul: &IBig) -> (IBig, IBig, IBig) {
+    //rotierendes Array, zur Berechnung und Speicherung der Faktoren `x` und `y`
+    let xy = [ibig!(1), ibig!(1), ibig!(1), ibig!(0), ibig!(0), ibig!(1)];
+    return extended_euclidean_algorithm(&n, &modul, xy);
+}
+fn extended_euclidean_algorithm(n: &IBig, modul: &IBig, mut xy: [IBig; 6]) -> (IBig, IBig, IBig) {
     xy.rotate_left(2);
-    if modul == 0 {
-        return (n, xy[0], xy[1]);
+    if modul == &ibig!(0) {
+        return (n.clone(), xy[0].clone(), xy[1].clone());
     } else {
         // Berechnet die Faktoren und speichert sie in einem rotierenden Array.
-        let div: i128 = n / modul;
-        xy[4] = xy[0] - (div * xy[2]);
-        xy[5] = xy[1] - (div * xy[3]);
-        return extended_euclidean_algorithm(modul, n % modul, xy);
+        let div = n / modul;
+        xy[4] = &xy[0] - (&div * &xy[2]);
+        xy[5] = &xy[1] - (&div * &xy[3]);
+        return extended_euclidean_algorithm(modul, &n.rem_euclid(modul), xy);
     }
 }
 
-/// Führt den Miller-Rabin-Primzahltest auf `p` durch `repeats` Runden aus.
+/// Führt den Miller-Rabin-Primzahltest auf `p` mit `repeats` Runden aus.
 ///
 /// # Argumente
 /// * `p` - Die zu testende Zahl >= 11.
@@ -109,57 +112,54 @@ fn extended_euclidean_algorithm(n: i128, modul: i128, mut xy: [i128; 6]) -> (i12
 /// # Rückgabe
 /// `true`, wenn `p` wahrscheinlich eine Primzahl ist, andernfalls `false`.
 ///
+/// Wahrscheinlichkeit: >= 1 - (1/4)^repeats
+///
 /// # Beispiel
 /// ```
-/// miller_rabin(89, 40) // => true
-/// miller_rabin(221, 40) // => false
+/// miller_rabin(11, 40) // => true
+/// miller_rabin(2211, 40) // => false
 /// ```
 pub fn miller_rabin(p: &UBig, repeats: usize) -> bool {
+    let mut d = decrement(p);
+    let mut s = ubig!(0);
+    while is_even(&d) {
+        d = d.div(ubig!(2));
+        s += ubig!(1);
+    }
     for _ in 0..repeats {
-        if !miller_rabin_single(p) {
+        if !miller_rabin_test(&p, &s, &d) {
             return false;
         }
     }
-    true
+    return true;
 }
 
-/// Führt den Miller-Rabin-Primzahltest auf `p` aus.
+/// Führt den Miller-Rabin-Test-Algorithmus auf `p` aus.
 ///
 /// # Argumente
 /// * `p` - Die zu testende Zahl >= 11.
+/// * `s` - Anzahl wie oft (p-1) durch zwei teilbar ist, bis (p-1) ungerade ist.
+/// * `d` - übrigbleibender Faktor, sodass (p-1) = d * 2^s
 ///
 /// # Rückgabe
 /// `true`, wenn `p` wahrscheinlich eine Primzahl ist, andernfalls `false`.
-fn miller_rabin_single(p: &UBig) -> bool {
-    let one = &ubig!(1);
-    let two = &ubig!(2);
-
-    let mut d = decrement(p);
-    let mut r = ubig!(0);
-
-    while is_even(&d) {
-        d = d.div(two);
-        r = r + one;
+fn miller_rabin_test(p: &UBig, s: &UBig, d: &UBig) -> bool {
+    // TODO: random_in_range() auf elsner_rand() ändern sobalt elsner_rand() UBig nimmt.
+    let mut a = random_in_range(p);
+    while is_zero(&(&a).rem_euclid(p)) {
+        a = random_in_range(p);
     }
-
-    // Fun Fact:
-    // Wenn man p = 221 (NICHT prim) setzt und das a manuell auf 174 setzt, kommt er
-    // fälschlicherweise auf "prim" als Ergebnis.
-    let a = &random_in_range(&d);
-    let mut x = fast_exponentiation(a, &d, p);
-
-    if is_one(&x) || &x == &decrement(p) {
+    let mut x = fast_exponentiation(&a, d, p);
+    if is_one(&x) || x == decrement(p) {
         return true;
     }
-    while &r > one {
-        x = fast_exponentiation(&x, two, p);
-        if is_one(&x) {
-            return false;
-        }
-        if &x == &decrement(p) {
+    let mut r = ubig!(0);
+    while &r < s {
+        x = fast_exponentiation(&x, &ubig!(2), p);
+        if x == decrement(p) {
             return true;
         }
-        r = decrement(&r);
+        r = increment(&r);
     }
     return false;
 }
