@@ -1,6 +1,6 @@
 #[cfg(test)]
 mod tests {
-    use crate::encryption::math_functions::big_int_util::{decrement, divides, increment, is_even, is_one, is_uneven, is_zero, not_divides, random_in_range, char_to_u32, u32_to_char, ubig_to_u32};
+    use crate::encryption::math_functions::big_int_util::{decrement, divides, increment, is_even, is_one, is_uneven, is_zero, not_divides, random_in_range, char_to_u32, u32_to_char, ubig_to_u32, elsner_rand};
     use ibig::{ubig, UBig};
 
     #[test]
