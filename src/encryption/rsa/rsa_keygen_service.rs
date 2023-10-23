@@ -1,10 +1,10 @@
-use ibig::UBig;
+use bigdecimal::num_bigint::BigUint;
 use crate::encryption::keygen_service::KeyGenService;
 
 /// Implementierung des KeyGenService-Traits für RSA.
 pub struct RsaKeygenService {
-    prime_one: UBig,
-    prime_two: UBig,
+    prime_one: BigUint,
+    prime_two: BigUint,
 }
 
 impl RsaKeygenService {
@@ -16,7 +16,7 @@ impl RsaKeygenService {
     /// * `prime_one` - Die erste Primzahl.
     /// * `prime_two` - Die zweite Primzahl.
     ///
-    pub fn new(prime_one: &UBig, prime_two: &UBig) -> RsaKeygenService {
+    pub fn new(prime_one: &BigUint, prime_two: &BigUint) -> RsaKeygenService {
         RsaKeygenService {
             prime_one: prime_one.clone(),
             prime_two: prime_two.clone(),

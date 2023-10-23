@@ -1,19 +1,19 @@
-use ibig::{ubig, IBig, UBig};
-use rand::distributions::{Bernoulli, Distribution};
 use rand::{random, thread_rng};
-use std::ops::Mul;
+use bigdecimal::num_bigint::BigUint;
+use bigdecimal::{One, Zero};
+use rand::distributions::{Bernoulli, Distribution};
 
 ///
 /// Gibt zurück, ob die Zahl gerade ist.
 ///
-pub fn is_even(x: &UBig) -> bool {
+pub fn is_even(x: &BigUint) -> bool {
     !is_uneven(x)
 }
 
 ///
 /// Gibt zurück, ob die Zahl ungerade ist.
 ///
-pub fn is_uneven(x: &UBig) -> bool {
+pub fn is_uneven(x: &BigUint) -> bool {
     // Ist das letzte Bit eine 1, so ist die Zahl ungerade.
     return x.bit(0);
 }
@@ -21,73 +21,74 @@ pub fn is_uneven(x: &UBig) -> bool {
 ///
 /// Gibt zurück, ob die Zahl 0 ist.
 ///
-pub fn is_zero(x: &UBig) -> bool {
-    x == &ubig!(0)
+pub fn is_zero(x: &BigUint) -> bool {
+    x == &BigUint::zero()
 }
 
 ///
 /// Gibt zurück, ob die Zahl 1 ist.
 ///
-pub fn is_one(x: &UBig) -> bool {
-    x == &ubig!(1)
+pub fn is_one(x: &BigUint) -> bool {
+    x == &BigUint::one()
 }
 
 ///
 /// Gibt zurück, ob a teilt b.
 /// Also b % a == 0
 ///
-pub fn divides(a: &UBig, b: &UBig) -> bool {
-    return b % a == ubig!(0);
+pub fn divides(a: &BigUint, b: &BigUint) -> bool {
+    return b % a == BigUint::zero();
 }
 
 ///
 /// Gibt zurück, ob a teilt nicht b.
 /// Also b % a != 0
 ///
-pub fn not_divides(a: &UBig, b: &UBig) -> bool {
-    return b % a != ubig!(0);
+pub fn not_divides(a: &BigUint, b: &BigUint) -> bool {
+    return b % a != BigUint::zero();
 }
 
 ///
 /// Inkrementiert die übergebene Zahl.
 ///
-pub fn increment(a: &UBig) -> UBig {
-    a + ubig!(1)
+pub fn increment(a: &BigUint) -> BigUint {
+    a + BigUint::one()
 }
 
 ///
 /// Dekrementiert die übergebene Zahl.
 ///
-pub fn decrement(a: &UBig) -> UBig {
-    a - ubig!(1)
+pub fn decrement(a: &BigUint) -> BigUint {
+    a - BigUint::one()
 }
 
 ///
 /// Gibt eine Zufallszahl im Bereich 2..high zurück.
 ///
-pub fn random_in_range(high: &UBig) -> UBig {
-    let high_len = high.bit_len();
-
-    let mut rng = thread_rng();
-    let bernoulli = Bernoulli::new(0.5).unwrap();
-    let mut random_bool_iter = bernoulli.sample_iter(&mut rng).take(high_len - 2);
-
-    let mut result = ubig!(2);
-    for i in 2..high_len {
-        if random_bool_iter.next().unwrap() {
-            result.set_bit(i);
-            if &result > high {
-                result.clear_bit(i);
-            }
-        }
-    }
-    result
+pub fn random_in_range(high: &BigUint) -> BigUint {
+    // let high_len = high.bit_len();
+    //
+    // let mut rng = thread_rng();
+    // let bernoulli = Bernoulli::new(0.5).unwrap();
+    // let mut random_bool_iter = bernoulli.sample_iter(&mut rng).take(high_len - 2);
+    //
+    // let mut result = BigUint::from(2);
+    // for i in 2..high_len {
+    //     if random_bool_iter.next().unwrap() {
+    //         result.set_bit(i);
+    //         if &result > high {
+    //             result.clear_bit(i);
+    //         }
+    //     }
+    // }
+    // result
+    BigUint::from(30u8) // TODO Dummy-Wert
 }
 
 ///
 /// Gibt eine Zufallszahl im Bereich a..b zurück.
 ///
-/// TODO: auf UBig umwandeln.
+/// TODO: auf BigUint umwandeln.
 /// eventuell schwierig weil decimal Zahl mit ganzer Zahl multipliziert werden muss
 
 pub fn elsner_rand(a: f64, b: f64) -> f64 {
@@ -173,7 +174,7 @@ pub(crate) fn u32_to_char(value: u32) -> char {
 ///
 /// wandle eine ubig Zahl in einen u32 Wert um
 ///
-pub(crate) fn ubig_to_u32(value: &UBig) -> u32 {
+pub(crate) fn ubig_to_u32(value: &BigUint) -> u32 {
     //todo -- einschränken, dass die ubig zahl nicht über den werteraum von u32 geht
     let value_str = format!("{}", value);
     value_str.parse::<u32>().unwrap()

@@ -1,5 +1,6 @@
+use bigdecimal::num_bigint::BigUint;
+use bigdecimal::{One, Zero};
 use crate::encryption::math_functions::big_int_util::{char_to_u32, u32_to_char, ubig_to_u32};
-use ibig::{ubig, UBig};
 
 // TODO: Öffentliche Funktionen implementieren, weil der Rest hier unten nur für interne Zwecke ist.
 
@@ -64,7 +65,7 @@ pub(crate) fn string_to_int_vec(message: &str) -> Vec<u32> {
 /// * `g` - Die Basis des g-adischen Systems.
 ///
 /// # Rückgabe
-/// * `UBig` - Die Summe des g-adischen Systems.
+/// * `BigUint` - Die Summe des g-adischen Systems.
 ///
 /// # Beispiel
 /// Beispiel von Seite 21 IT-Sec Skript:
@@ -73,9 +74,9 @@ pub(crate) fn string_to_int_vec(message: &str) -> Vec<u32> {
 ///     vec![12,0,19,7,4,12,0,19],
 ///     47
 /// ) // 6083869600275
-pub(crate) fn digits_from_vec_to_sum(digits: &Vec<u64>, g_base: u16) -> UBig {
-    let mut sum = ubig!(0);
-    let mut base = ubig!(1);
+pub(crate) fn digits_from_vec_to_sum(digits: &Vec<u64>, g_base: u16) -> BigUint {
+    let mut sum = BigUint::zero();
+    let mut base = BigUint::one();
     for &digit in digits.iter().rev() {
         // [12, 2, 0, 5] --> 12 * 47^3 + 2 * 47^2 + 0 * 47^1 + 5 * 47^0
         sum += &base * digit;
@@ -102,13 +103,14 @@ pub(crate) fn digits_from_vec_to_sum(digits: &Vec<u64>, g_base: u16) -> UBig {
 ///
 /// TODO: Hier muss später das `g` rausgenommen werden, wenn die Margitta uns gesagt hat,
 /// welcher Buchstabe welchen Wert hat.
-pub(crate) fn sum_to_string(sum: &UBig, g: u32) -> String {
+pub(crate) fn sum_to_string(sum: &BigUint, g: u32) -> String {
     panic!("Muss implementiert werden, nachdem Margitta verkündet hat, welche Basis wir nutzen.");
     let mut temp_sum = sum.clone();
     let mut result = String::new();
-    let base = ubig!(g);
+    let base = BigUint::from(g);
 
-    while temp_sum > ubig!(0) {
+    let zero = BigUint::zero();
+    while temp_sum > zero {
         let remainder = ubig_to_u32(&(&temp_sum % &base));
         result.push(u32_to_char(remainder));
         temp_sum = temp_sum / &base;
@@ -124,7 +126,7 @@ pub(crate) fn sum_to_string(sum: &UBig, g: u32) -> String {
 /// * `g` - Die Basis des g-adischen Systems.
 ///
 /// # Rückgabe
-/// * `UBig` - Die Dezimaldarstellung des Strings.
+/// * `BigUint` - Die Dezimaldarstellung des Strings.
 ///
 /// # Beispiel
 /// Beispiel von Seite 21 IT-Sec Skript:
@@ -132,7 +134,7 @@ pub(crate) fn sum_to_string(sum: &UBig, g: u32) -> String {
 /// string_to_sum("R8F9BX-YO", 47) // 422.078.969.854.681
 /// ```
 ///
-pub(crate) fn string_to_sum(message: &str, g: u32) -> UBig {
+pub(crate) fn string_to_sum(message: &str, g: u32) -> BigUint {
     todo!("Implementiere diese Funktion!")
 }
 
@@ -153,7 +155,7 @@ pub(crate) fn string_to_sum(message: &str, g: u32) -> UBig {
 /// sum_to_digits(ubig!(422.078.969.854.681), 47) // [17,34,5,35,1,23,40,24,14]
 /// ```
 ///
-pub(crate) fn sum_to_digits(sum: &UBig, g: u32) -> Vec<u32> {
+pub(crate) fn sum_to_digits(sum: &BigUint, g: u32) -> Vec<u32> {
     todo!("Implementiere diese Funktion!")
 }
 

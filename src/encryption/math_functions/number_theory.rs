@@ -1,9 +1,8 @@
-use crate::encryption::math_functions::big_int_util::{
-    decrement, elsner_rand, increment, is_even, is_one, is_zero, random_in_range,
-};
-use ibig::ops::RemEuclid;
-use ibig::{ibig, ubig, IBig, UBig};
+use crate::encryption::math_functions::big_int_util::{decrement, elsner_rand, increment, is_even, is_one, is_zero, random_in_range};
 use std::ops::Div;
+use bigdecimal::num_bigint::{BigInt, BigUint};
+use bigdecimal::{One, Zero};
+use bigdecimal::num_traits::Euclid;
 
 ///
 /// Schnelle Exponentiation der Potenz und Reduzierung um einen Modul.
@@ -18,20 +17,20 @@ use std::ops::Div;
 /// ```
 /// fast_exponentiation(95, 130, 7) // => '4'
 /// ```
-pub fn fast_exponentiation(base: &UBig, exponent: &UBig, modul: &UBig) -> UBig {
+pub fn fast_exponentiation(base: &BigUint, exponent: &BigUint, modul: &BigUint) -> BigUint {
     // Sonderbedingungen der Exponentiation
     if is_one(&modul) {
-        return ubig!(0);
+        return BigUint::zero();
     }
     if is_zero(&exponent) {
-        return ubig!(1);
+        return BigUint::one();
     }
     if is_one(&exponent) {
         return base.rem_euclid(modul);
     }
 
     // Berechnung des Zwischenschrittes mit halbiertem Exponenten.
-    let base_to_square = fast_exponentiation(base, &exponent.div(2), modul);
+    let base_to_square = fast_exponentiation(base, &exponent.div(2u8), modul);
 
     return if is_even(&exponent) {
         // Ist der Exponent gerade, so wird nur quadriert.
@@ -57,10 +56,10 @@ pub fn fast_exponentiation(base: &UBig, exponent: &UBig, modul: &UBig) -> UBig {
 /// Das Inverse-Element von `n` im Restklassenring modulo `modul`.
 /// Wenn keine Inverse existiert (wenn `n` und `modul` nicht teilerfremd sind),
 /// wird ein Error zurückgegeben.
-pub fn modulo_inverse(n: IBig, modul: IBig) -> Result<IBig, std::io::Error> {
-    let (ggT, x, y) = extended_euclid(&modul, &n);
+pub fn modulo_inverse(n: BigInt, modul: BigInt) -> Result<BigInt, std::io::Error> {
+    let (ggt, x, y) = extended_euclid(&modul, &n);
     // Wenn ggT nicht 1, existiert kein Inverse. -> Error
-    if ggT != ibig!(1) {
+    if ggt != BigInt::one() {
         let no_inverse_error = std::io::Error::new(
             std::io::ErrorKind::InvalidInput,
             format!("n hat keinen Inverse"),
@@ -85,14 +84,14 @@ pub fn modulo_inverse(n: IBig, modul: IBig) -> Result<IBig, std::io::Error> {
 /// * (ggT(n,modul),x,y)
 /// Ein tripel aus dem groessten gemeinsamen Teiler einer Zahl `n` und dem `modul`,
 /// sowie den zwei Faktoren `x` und `y`.
-pub fn extended_euclid(n: &IBig, modul: &IBig) -> (IBig, IBig, IBig) {
+pub fn extended_euclid(n: &BigInt, modul: &BigInt) -> (BigInt, BigInt, BigInt) {
     //rotierendes Array, zur Berechnung und Speicherung der Faktoren `x` und `y`
-    let xy = [ibig!(1), ibig!(1), ibig!(1), ibig!(0), ibig!(0), ibig!(1)];
+    let xy = [BigInt::one(), BigInt::one(), BigInt::one(), BigInt::zero(), BigInt::zero(), BigInt::one()];
     return extended_euclidean_algorithm(&n, &modul, xy);
 }
-fn extended_euclidean_algorithm(n: &IBig, modul: &IBig, mut xy: [IBig; 6]) -> (IBig, IBig, IBig) {
+fn extended_euclidean_algorithm(n: &BigInt, modul: &BigInt, mut xy: [BigInt; 6]) -> (BigInt, BigInt, BigInt) {
     xy.rotate_left(2);
-    if modul == &ibig!(0) {
+    if modul == &BigInt::zero() {
         return (n.clone(), xy[0].clone(), xy[1].clone());
     } else {
         // Berechnet die Faktoren und speichert sie in einem rotierenden Array.
@@ -119,12 +118,12 @@ fn extended_euclidean_algorithm(n: &IBig, modul: &IBig, mut xy: [IBig; 6]) -> (I
 /// miller_rabin(11, 40) // => true
 /// miller_rabin(2211, 40) // => false
 /// ```
-pub fn miller_rabin(p: &UBig, repeats: usize) -> bool {
+pub fn miller_rabin(p: &BigUint, repeats: usize) -> bool {
     let mut d = decrement(p);
-    let mut s = ubig!(0);
+    let mut s = BigUint::zero();
     while is_even(&d) {
-        d = d.div(ubig!(2));
-        s += ubig!(1);
+        d = d.div(BigUint::from(2u8));
+        s += BigUint::one();
     }
     for _ in 0..repeats {
         if !miller_rabin_test(&p, &s, &d) {
@@ -143,8 +142,8 @@ pub fn miller_rabin(p: &UBig, repeats: usize) -> bool {
 ///
 /// # Rückgabe
 /// `true`, wenn `p` wahrscheinlich eine Primzahl ist, andernfalls `false`.
-fn miller_rabin_test(p: &UBig, s: &UBig, d: &UBig) -> bool {
-    // TODO: random_in_range() auf elsner_rand() ändern sobalt elsner_rand() UBig nimmt.
+fn miller_rabin_test(p: &BigUint, s: &BigUint, d: &BigUint) -> bool {
+    // TODO: random_in_range() auf elsner_rand() ändern sobalt elsner_rand() BigUint nimmt.
     let mut a = random_in_range(p);
     while is_zero(&(&a).rem_euclid(p)) {
         a = random_in_range(p);
@@ -153,9 +152,9 @@ fn miller_rabin_test(p: &UBig, s: &UBig, d: &UBig) -> bool {
     if is_one(&x) || x == decrement(p) {
         return true;
     }
-    let mut r = ubig!(0);
+    let mut r = BigUint::zero();
     while &r < s {
-        x = fast_exponentiation(&x, &ubig!(2), p);
+        x = fast_exponentiation(&x, &BigUint::from(2u8), p);
         if x == decrement(p) {
             return true;
         }
