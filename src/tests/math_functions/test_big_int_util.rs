@@ -1,10 +1,7 @@
 #[cfg(test)]
 mod tests {
-    use crate::encryption::math_functions::big_int_util::{
-        decrement, divides, elsner_rand, increment, is_even, is_one, is_uneven, is_zero,
-        not_divides, random_in_range,
-    };
-    use ibig::ubig;
+    use crate::encryption::math_functions::big_int_util::{decrement, divides, increment, is_even, is_one, is_uneven, is_zero, not_divides, random_in_range, char_to_u32, u32_to_char, ubig_to_u32};
+    use ibig::{ubig, UBig};
 
     #[test]
     fn test_is_even() {
@@ -69,5 +66,43 @@ mod tests {
         let b = 10000.0;
         let random = elsner_rand(a, b);
         assert!(random >= a && random <= b)
+    }
+
+
+    #[test]
+    fn test_char_to_u32() {
+        assert_eq!(char_to_u32('a'), 0);
+        assert_eq!(char_to_u32('b'), 1);
+        assert_eq!(char_to_u32('z'), 25);
+        assert_eq!(char_to_u32('A'), 26);
+        assert_eq!(char_to_u32('B'), 27);
+        assert_eq!(char_to_u32('Z'), 51);
+        assert_eq!(char_to_u32('0'), 52);
+        assert_eq!(char_to_u32('1'), 53);
+        assert_eq!(char_to_u32('9'), 61);
+    }
+    #[test]
+    #[should_panic(expected = "Ungültiges Zeichen: ß")]
+    fn test_char_to_u32_invalid() {
+        char_to_u32('ß');
+    }
+
+    #[test]
+    fn test_u32_to_char() {
+        assert_eq!(u32_to_char(0), 'a');
+        assert_eq!(u32_to_char(25), 'z');
+        assert_eq!(u32_to_char(26), 'A');
+        assert_eq!(u32_to_char(51), 'Z');
+        assert_eq!(u32_to_char(52), '0');
+        assert_eq!(u32_to_char(61), '9');
+        assert_eq!(u32_to_char(62), '.');
+        assert_eq!(u32_to_char(63), ',');
+    }
+
+    #[test]
+    fn test_ubig_to_u32() {
+        let value = UBig::from(12345_u64);
+        let result = ubig_to_u32(&value);
+        assert_eq!(result, 12345);
     }
 }
