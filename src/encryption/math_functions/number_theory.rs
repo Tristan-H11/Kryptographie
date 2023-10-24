@@ -1,5 +1,5 @@
 use crate::encryption::math_functions::big_int_util::{
-    decrement, elsner_rand, increment, is_even, is_one, is_zero, random_in_range,
+    decrement, increment, is_even, is_one, is_zero, random_in_range,
 };
 use bigdecimal::num_bigint::{BigInt, BigUint};
 use bigdecimal::num_traits::Euclid;
@@ -59,7 +59,7 @@ pub fn fast_exponentiation(base: &BigUint, exponent: &BigUint, modul: &BigUint) 
 /// Wenn keine Inverse existiert (wenn `n` und `modul` nicht teilerfremd sind),
 /// wird ein Error zurückgegeben.
 pub fn modulo_inverse(n: BigInt, modul: BigInt) -> Result<BigInt, std::io::Error> {
-    let (ggt, x, y) = extended_euclid(&modul, &n);
+    let (ggt, _x, y) = extended_euclid(&modul, &n);
     // Wenn ggT nicht 1, existiert kein Inverse. -> Error
     if ggt != BigInt::one() {
         let no_inverse_error = std::io::Error::new(
@@ -104,14 +104,14 @@ fn extended_euclidean_algorithm(
     mut xy: [BigInt; 6],
 ) -> (BigInt, BigInt, BigInt) {
     xy.rotate_left(2);
-    if modul == &BigInt::zero() {
-        return (n.clone(), xy[0].clone(), xy[1].clone());
+    return if modul == &BigInt::zero() {
+        (n.clone(), xy[0].clone(), xy[1].clone())
     } else {
         // Berechnet die Faktoren und speichert sie in einem rotierenden Array.
         let div = n / modul;
         xy[4] = &xy[0] - (&div * &xy[2]);
         xy[5] = &xy[1] - (&div * &xy[3]);
-        return extended_euclidean_algorithm(modul, &n.rem_euclid(modul), xy);
+        extended_euclidean_algorithm(modul, &n.rem_euclid(modul), xy)
     }
 }
 
