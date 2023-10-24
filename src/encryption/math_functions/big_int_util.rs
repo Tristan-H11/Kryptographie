@@ -3,6 +3,15 @@ use bigdecimal::{One, Zero};
 use rand::random;
 
 ///
+/// Erstellt einen BigUint aus einem unsigned Integer.
+#[macro_export]
+macro_rules! big_u {
+    ($x:expr) => {
+        BigUint::from($x)
+    };
+}
+
+///
 /// Gibt zurück, ob die Zahl gerade ist.
 ///
 pub fn is_even(x: &BigUint) -> bool {
