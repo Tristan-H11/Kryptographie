@@ -24,5 +24,15 @@ mod tests {
         assert_eq!(random.take(&a, &b), 842u32.into());
         assert_eq!(random.take(&a, &b), 449u32.into());
         assert_eq!(random.take(&a, &b), 56u32.into());
+
+        random = RandomElsner::create();
+
+        let a: BigUint = 500u32.into();
+        let b: BigUint = 6000u32.into();
+
+        for _ in 1..500 {
+            let random = random.take(&a, &b);
+            assert!(random >= a && random <= b);
+        }
     }
 }
