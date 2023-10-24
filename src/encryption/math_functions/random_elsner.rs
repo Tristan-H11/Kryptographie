@@ -16,7 +16,7 @@ impl RandomElsner {
     /// # Rückgabe
     /// * RandomElsner
     ///
-    pub fn create() -> Self {
+    pub fn new() -> Self {
         let mut m = BigDecimal::from(random::<u128>());
         while (m.sqrt().unwrap() % BigDecimal::one()) == BigDecimal::zero() {
             m = BigDecimal::from(random::<u128>());

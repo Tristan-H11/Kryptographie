@@ -139,7 +139,7 @@ pub fn miller_rabin(p: &BigUint, repeats: usize) -> bool {
         d = d.div(BigUint::from(2u8));
         s += BigUint::one();
     }
-    let mut rand = RandomElsner::create();
+    let mut rand = RandomElsner::new();
     for _ in 0..repeats {
         let mut a = rand.take(&BigUint::one(), &p);
         while divides(p, &a) {

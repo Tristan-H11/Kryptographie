@@ -25,7 +25,7 @@ mod tests {
         assert_eq!(random.take(&a, &b), 449u32.into());
         assert_eq!(random.take(&a, &b), 56u32.into());
 
-        random = RandomElsner::create();
+        random = RandomElsner::new();
 
         let a: BigUint = 500u32.into();
         let b: BigUint = 6000u32.into();
