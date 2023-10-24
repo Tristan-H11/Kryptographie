@@ -2,7 +2,7 @@ use bigdecimal::num_bigint::ToBigUint;
 use crate::gui::controller::commands::*;
 use crate::gui::model::model::{AppState, View};
 use druid::{Env, Event, EventCtx};
-use log::{debug, error};
+use log::{debug, error, info};
 use crate::encryption::encryption_services::{Decryption, Encryption, Signing, Verification};
 use crate::encryption::rsa::keys::{PrivateKey, PublicKey};
 use crate::encryption::rsa::rsa_keygen_service::RsaKeygenService;
@@ -41,6 +41,7 @@ impl Default for AppController {
     /// Erstellt eine neue Instanz des AppControllers mit 1er Werten für die Keys.
     ///
     fn default() -> Self {
+        debug!("Erstelle Default-AppController");
         AppController {
             alice_private_key: PrivateKey::new(1.to_biguint().unwrap(), 1.to_biguint().unwrap()),
             alice_public_key: PublicKey::new(1.to_biguint().unwrap(), 1.to_biguint().unwrap()),
@@ -56,6 +57,7 @@ impl AppController {
     /// Behandelt alle Events für das Hauptfenster
     ///
     fn handle_haupt_menu_event(&mut self, event: &Event, app_state: &mut AppState, _env: &Env) {
+        debug!("Handle Hauptmenü-Event");
         match event {
             Event::Command(cmd) if cmd.is(CALCULATE_KEYPAIR_ALICE) => {
                 self.calculate_keypair_alice(app_state);
@@ -74,6 +76,7 @@ impl AppController {
     }
 
     fn handle_alice_event(&mut self, event: &Event, app_state: &mut AppState, _env: &Env) {
+        debug!("Handle Alice-Event");
         match event {
             Event::Command(cmd) if cmd.is(ENCRYPT) => {
                 self.encrypt_alice(app_state);
@@ -101,6 +104,7 @@ impl AppController {
     }
 
     fn handle_bob_event(&mut self, event: &Event, app_state: &mut AppState, _env: &Env) {
+        debug!("Handle Bob-Event");
         match event {
             Event::Command(cmd) if cmd.is(ENCRYPT) => {
                 self.encrypt_bob(app_state);
@@ -131,6 +135,7 @@ impl AppController {
     /// Berechnet das Schlüsselpaar für Alice.
     ///
     fn calculate_keypair_alice(&mut self, app_state: &mut AppState) {
+        info!("Berechne Schlüsselpaar für Alice");
         let (public_key_alice, private_key_alice) = self.calculate_keypair(app_state);
 
         self.alice_private_key = private_key_alice;
@@ -144,6 +149,7 @@ impl AppController {
     /// Berechnet das Schlüsselpaar für Bob.
     ///
     fn calculate_keypair_bob(&mut self, app_state: &mut AppState) {
+        info!("Berechne Schlüsselpaar für Bob");
         let (public_key_alice, private_key_alice) = self.calculate_keypair(app_state);
 
         self.bob_private_key = private_key_alice;
@@ -157,22 +163,30 @@ impl AppController {
     /// Berechnet ein Schlüsselpaar
     ///
     fn calculate_keypair(&mut self, app_state: &mut AppState) -> (PublicKey, PrivateKey) {
-        let modul_width = app_state.main_menu.modul_width.parse::<usize>().unwrap();
+        let modul_width = match app_state.main_menu.modul_width.parse::<usize>() {
+            Ok(x) => x,
+            Err(_) => {
+                error!("Fehler beim Parsen der Modul-Breite. Es wird ein Default-Schlüssel mit 4096-bit erstellt.");
+                4096
+            },
+        };
         let keygen_service = RsaKeygenService::new(modul_width);
-        let miller_rabin_iterations = app_state.main_menu.miller_rabin_iterations.parse::<usize>();
-        if miller_rabin_iterations.is_err() {
-            error!("Fehler beim Parsen der Miller-Rabin-Iterationen: {} \n Es wird ein Default-Schlüssel mit 4096-bit erstellt.",
-                miller_rabin_iterations.err().unwrap());
-            return keygen_service.generate_keypair(4096);
-        } else {
-            return keygen_service.generate_keypair(miller_rabin_iterations.unwrap());
-        }
+        let miller_rabin_iterations = match app_state.main_menu.miller_rabin_iterations.parse::<usize>() {
+            Ok(x) => x,
+            Err(_) => {
+                error!("Fehler beim Parsen der Miller-Rabin-Iterationen. Es wird ein Default-Wert von 100 Iterationen verwendet.");
+                100
+            },
+        };
+
+        keygen_service.generate_keypair(miller_rabin_iterations)
     }
 
     ///
     /// Verschlüsselt die Nachricht von Alice mit Bobs öffentlichem Schlüssel.
     ///
     fn encrypt_alice(&mut self, app_state: &mut AppState) {
+        info!("Verschlüssle Nachricht von Alice");
         let message = app_state.alice.plaintext.clone();
         let encrypted = self.bob_public_key.encrypt(&message);
         app_state.alice.ciphertext = encrypted;
@@ -182,6 +196,7 @@ impl AppController {
     /// Signiert die Nachricht von Alice mit ihrem privaten Schlüssel.
     ///
     fn sign_alice(&mut self, _app_state: &mut AppState) {
+        info!("Signiere Nachricht von Alice");
         let message = _app_state.alice.plaintext.clone();
         let signed = self.alice_private_key.sign(&message);
         _app_state.alice.signature = signed;
@@ -191,6 +206,7 @@ impl AppController {
     /// Verifiziert die Nachricht von Bob mit seinem öffentlichen Schlüssel.
     ///
     fn alice_verify_message_from_bob(&mut self, _app_state: &mut AppState) {
+        info!("Verifiziere Nachricht von Bob");
         let message = _app_state.alice.plaintext.clone();
         let signature = _app_state.alice.signature.clone();
         let verified = self.bob_public_key.verify(&signature, &message);
@@ -201,6 +217,7 @@ impl AppController {
     /// Entschlüsselt die Nachricht von Bob mit Alices privatem Schlüssel.
     ///
     fn decrypt_alice(&mut self, app_state: &mut AppState) {
+        info!("Entschlüssle Nachricht von Bob");
         let cipher_text = app_state.alice.ciphertext.clone();
         let decrypted = self.alice_private_key.decrypt(&cipher_text);
         app_state.alice.plaintext = decrypted;
@@ -210,6 +227,7 @@ impl AppController {
     /// Sendet die Nachricht von Alice an Bob und löscht das Nachrichten-Feld.
     ///
     fn send_message_alice(&mut self, app_state: &mut AppState) {
+        info!("Sende Nachricht von Alice an Bob");
         let cipher_text = &app_state.alice.ciphertext;
         app_state.bob.ciphertext = cipher_text.clone();
         let signature = &app_state.alice.signature;
@@ -221,6 +239,7 @@ impl AppController {
     /// Löscht die Inhalte von Alice.
     ///
     fn clear_alice(&mut self, app_state: &mut AppState) {
+        info!("Lösche Felder von Alice");
         app_state.alice.plaintext = String::new();
         app_state.alice.ciphertext = String::new();
         app_state.alice.signature = String::new();
@@ -230,6 +249,7 @@ impl AppController {
     /// Verschlüsselt die Nachricht von Bob mit Alice öffentlichem Schlüssel.
     ///
     fn encrypt_bob(&mut self, app_state: &mut AppState) {
+        info!("Verschlüssle Nachricht von Bob");
         let message = app_state.bob.plaintext.clone();
         let encrypted = self.alice_public_key.encrypt(&message);
         app_state.bob.ciphertext = encrypted;
@@ -239,6 +259,7 @@ impl AppController {
     /// Signiert die Nachricht von Bob mit seinem privaten Schlüssel.
     ///
     fn sign_bob(&mut self, _app_state: &mut AppState) {
+        info!("Signiere Nachricht von Bob");
         let message = _app_state.bob.plaintext.clone();
         let signed = self.bob_private_key.sign(&message);
         _app_state.bob.signature = signed;
@@ -248,6 +269,7 @@ impl AppController {
     /// Verifiziert die Nachricht von Alice mit ihrem öffentlichen Schlüssel.
     ///
     fn bob_verify_message_from_alice(&mut self, _app_state: &mut AppState) {
+        info!("Verifiziere Nachricht von Alice");
         let message = _app_state.bob.plaintext.clone();
         let signature = _app_state.bob.signature.clone();
         let verified = self.alice_public_key.verify(&signature, &message);
@@ -258,6 +280,7 @@ impl AppController {
     /// Entschlüsselt die Nachricht von Alice mit Bobs privatem Schlüssel.
     ///
     fn decrypt_bob(&mut self, app_state: &mut AppState) {
+        info!("Entschlüssle Nachricht von Alice");
         let cipher_text = app_state.bob.ciphertext.clone();
         let decrypted = self.bob_private_key.decrypt(&cipher_text);
         app_state.bob.plaintext = decrypted;
@@ -267,6 +290,7 @@ impl AppController {
     /// Sendet die Nachricht von Bob an Alice und löscht das Nachrichten-Feld.
     ///
     fn send_message_bob(&mut self, app_state: &mut AppState) {
+        info!("Sende Nachricht von Bob an Alice");
         let cipher_text = &app_state.bob.ciphertext;
         app_state.alice.ciphertext = cipher_text.clone();
         let signature = &app_state.bob.signature;
@@ -278,6 +302,7 @@ impl AppController {
     /// Löscht die Nachricht von Bob.
     ///
     fn clear_bob(&mut self, app_state: &mut AppState) {
+        info!("Lösche Felder von Bob");
         app_state.bob.plaintext = String::new();
         app_state.bob.ciphertext = String::new();
         app_state.bob.signature = String::new();
