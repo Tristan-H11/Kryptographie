@@ -116,8 +116,8 @@ pub(crate) fn char_to_u16(c: char) -> u16 {
 ///
 pub(crate) fn u16_to_char(value: u16) -> char {
     std::char::from_u32(value as u32).expect("Invalider Unicode") // muss in u32, da char
-                                                                         // ein unicode zeichen in
-                                                                         // u32 ist
+                                                                  // ein unicode zeichen in
+                                                                  // u32 ist
 }
 
 ///

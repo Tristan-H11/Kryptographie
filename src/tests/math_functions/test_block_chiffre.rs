@@ -1,11 +1,11 @@
 #[cfg(test)]
 mod tests {
-    use bigdecimal::FromPrimitive;
+    use crate::encryption;
     use crate::encryption::math_functions::block_chiffre::{
         digits_from_vec_to_sum, split_into_blocks, string_to_int_vec, sum_to_string,
     };
     use bigdecimal::num_bigint::BigUint;
-    use crate::encryption;
+    use bigdecimal::FromPrimitive;
 
     #[test]
     fn test_split_into_blocks() {
@@ -91,8 +91,11 @@ mod tests {
     #[test]
     fn test_sum_to_string() {
         let sum = BigUint::from_u64(65537).unwrap();
-        let expected = "AA";  // Der erwartete String für den Wert 65537 in Basis 65536
+        let expected = "AA"; // Der erwartete String für den Wert 65537 in Basis 65536
         let result = sum_to_string(&sum);
-        assert_eq!(result, expected, "Die Funktion sum_to_string hat einen unerwarteten Wert zurückgegeben");
+        assert_eq!(
+            result, expected,
+            "Die Funktion sum_to_string hat einen unerwarteten Wert zurückgegeben"
+        );
     }
 }

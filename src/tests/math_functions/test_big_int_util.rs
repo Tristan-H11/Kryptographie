@@ -1,8 +1,8 @@
 #[cfg(test)]
 mod tests {
     use crate::encryption::math_functions::big_int_util::{
-        decrement, divides, elsner_rand, increment, is_even, is_one, is_uneven,
-        is_zero, not_divides, random_in_range, char_to_u16, u16_to_char, ubig_to_u16, elsner_rand
+        char_to_u16, decrement, divides, elsner_rand, elsner_rand, increment, is_even, is_one,
+        is_uneven, is_zero, not_divides, random_in_range, u16_to_char, ubig_to_u16,
     };
     use bigdecimal::num_bigint::BigUint;
     #[test]
