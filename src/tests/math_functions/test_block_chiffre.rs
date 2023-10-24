@@ -1,12 +1,10 @@
 #[cfg(test)]
 mod tests {
+    use bigdecimal::num_bigint::BigUint;
     use crate::encryption::math_functions::block_chiffre::{
         digits_from_vec_to_sum, int_vec_to_string, split_into_blocks, string_to_int_vec,
         string_to_sum, sum_to_digits, sum_to_string,
     };
-    use ibig::{ubig, UBig};
-    use num_bigint::ToBigUint;
-    use std::str::FromStr;
 
     #[test]
     fn test_split_into_blocks() {
@@ -71,21 +69,21 @@ mod tests {
         let digits = vec![12, 0, 19, 7, 4, 12, 0, 19];
         let base = 47;
         let result = digits_from_vec_to_sum(&digits, base);
-        let expected_result: UBig = ubig!(6083869600275);
+        let expected_result = BigUint::from(6083869600275u64);
         assert_eq!(result, expected_result);
 
         // Testfall 2: Basis 2 und Binärzahlen.
         let digits = vec![1, 0, 1, 0, 1, 0];
         let base = 2;
         let result = digits_from_vec_to_sum(&digits, base);
-        let expected_result: UBig = ubig!(42);
+        let expected_result = BigUint::from(42u32);
         assert_eq!(result, expected_result);
 
         // Testfall 3: Basis 16 und Hexadezimalzahlen.
         let digits = vec![13, 10, 15]; // [D, A, F]
         let base = 16;
         let result = digits_from_vec_to_sum(&digits, base);
-        let expected_result: UBig = ubig!(3503);
+        let expected_result = BigUint::from(3503u32);
         assert_eq!(expected_result, expected_result);
     }
 
