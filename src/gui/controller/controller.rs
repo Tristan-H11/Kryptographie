@@ -57,7 +57,6 @@ impl AppController {
     /// Behandelt alle Events für das Hauptfenster
     ///
     fn handle_haupt_menu_event(&mut self, event: &Event, app_state: &mut AppState, _env: &Env) {
-        debug!("Handle Hauptmenü-Event");
         match event {
             Event::Command(cmd) if cmd.is(CALCULATE_KEYPAIR_ALICE) => {
                 self.calculate_keypair_alice(app_state);
@@ -76,7 +75,6 @@ impl AppController {
     }
 
     fn handle_alice_event(&mut self, event: &Event, app_state: &mut AppState, _env: &Env) {
-        debug!("Handle Alice-Event");
         match event {
             Event::Command(cmd) if cmd.is(ENCRYPT) => {
                 self.encrypt_alice(app_state);
@@ -104,7 +102,6 @@ impl AppController {
     }
 
     fn handle_bob_event(&mut self, event: &Event, app_state: &mut AppState, _env: &Env) {
-        debug!("Handle Bob-Event");
         match event {
             Event::Command(cmd) if cmd.is(ENCRYPT) => {
                 self.encrypt_bob(app_state);
