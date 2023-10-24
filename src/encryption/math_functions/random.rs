@@ -2,7 +2,6 @@ use bigdecimal::num_bigint::{BigInt, BigUint, ToBigInt};
 use bigdecimal::{BigDecimal, One, Zero};
 use rand::random;
 
-
 #[derive(Debug)]
 pub struct Random {
     sqrt_m: BigDecimal,
@@ -21,10 +20,11 @@ impl Random {
         };
     }
 
-    pub fn take(&mut self,a: &BigUint,b:&BigUint) -> BigUint {
+    pub fn take(&mut self, a: &BigUint, b: &BigUint) -> BigUint {
         self.n += BigDecimal::one();
-        let range = b-a+BigUint::one();
-        let num = (&self.n*&self.sqrt_m)%BigDecimal::one()*BigDecimal::from(BigInt::from(range));
+        let range = b - a + BigUint::one();
+        let num =
+            (&self.n * &self.sqrt_m) % BigDecimal::one() * BigDecimal::from(BigInt::from(range));
         return a + (BigDecimal::to_bigint(&num).unwrap()).to_biguint().unwrap();
     }
 }
