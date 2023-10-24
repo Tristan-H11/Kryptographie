@@ -1,5 +1,5 @@
 use crate::encryption::keygen_service::KeyGenService;
-use crate::encryption::rsa::keys::{PrivateKey, PublicKey};
+use crate::encryption::rsa::keys::{PublicKey, PrivateKey};
 
 /// Implementierung des KeyGenService-Traits für RSA.
 pub struct RsaKeygenService {
@@ -25,7 +25,7 @@ impl RsaKeygenService {
 }
 
 impl KeyGenService for RsaKeygenService {
-    fn generate_keypair(&self) -> (PrivateKey, PublicKey) {
+    fn generate_keypair(&self) -> (PublicKey, PrivateKey) {
         todo!("Implementiere diese Funktion!")
     }
 }

@@ -1,20 +1,54 @@
 use bigdecimal::num_bigint::BigUint;
-use crate::encryption::encryption_services::{Encryption, Signing, Verification};
-
-///
-/// Ein privater Schlüssel für RSA.
-///
-pub struct PrivateKey {
-    e: BigUint,
-    n: BigUint,
-}
+use crate::encryption::encryption_services::{Decryption, Encryption, Signing, Verification};
 
 ///
 /// Ein öffentlicher Schlüssel für RSA.
 ///
 pub struct PublicKey {
+    e: BigUint,
+    n: BigUint,
+}
+
+impl PublicKey {
+    ///
+    /// Erstellt eine neue Instanz des PublicKey.
+    ///
+    /// # Argumente
+    ///
+    /// * `e` - Der öffentliche Exponent.
+    /// * `n` - Das Produkt der beiden Primzahlen.
+    ///
+    pub fn new(e: BigUint, n: BigUint) -> PublicKey {
+        PublicKey {
+            e,
+            n,
+        }
+    }
+}
+
+///
+/// Ein privater Schlüssel für RSA.
+///
+pub struct PrivateKey {
     d: BigUint,
     n: BigUint,
+}
+
+impl PrivateKey {
+    ///
+    /// Erstellt eine neue Instanz des PrivateKey.
+    ///
+    /// # Argumente
+    ///
+    /// * `d` - Der private Exponent.
+    /// * `n` - Das Produkt der beiden Primzahlen.
+    ///
+    pub fn new(d: BigUint, n: BigUint) -> PrivateKey {
+        PrivateKey {
+            d,
+            n,
+        }
+    }
 }
 
 
@@ -30,8 +64,8 @@ impl Verification for PublicKey {
     }
 }
 
-impl Encryption for PrivateKey {
-    fn encrypt(&self, message: &BigUint) -> BigUint {
+impl Decryption for PrivateKey {
+    fn decrypt(&self, message: &BigUint) -> BigUint {
         todo!("Implementiere diese Funktion!")
     }
 }
