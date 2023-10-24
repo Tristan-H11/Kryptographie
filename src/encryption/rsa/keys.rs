@@ -1,5 +1,4 @@
 use bigdecimal::num_bigint::BigUint;
-use crate::encryption::encryption_services::{Decryption, Encryption, Signing, Verification};
 
 ///
 /// Ein öffentlicher Schlüssel für RSA.
@@ -38,6 +37,15 @@ impl PublicKey {
     pub fn get_n(&self) -> String {
         self.n.to_str_radix(10)
     }
+
+    pub(crate) fn verify(&self, signature: &str, message: &str) -> bool {
+        todo!("Implementiere diese Funktion!")
+    }
+
+    pub(crate) fn encrypt(&self, message: &str) -> String {
+        todo!("Implementiere diese Funktion!")
+    }
+
 }
 
 ///
@@ -77,29 +85,13 @@ impl PrivateKey {
     pub fn get_n(&self) -> String {
         self.n.to_str_radix(10)
     }
-}
 
-
-impl Encryption for PublicKey {
-    fn encrypt(&self, message: &str) -> String {
+    pub(crate) fn decrypt(&self, message: &str) -> String {
         todo!("Implementiere diese Funktion!")
     }
-}
 
-impl Verification for PublicKey {
-    fn verify(&self, signature: &str, message: &str) -> bool {
+    pub(crate) fn sign(&self, message: &str) -> String {
         todo!("Implementiere diese Funktion!")
     }
-}
 
-impl Decryption for PrivateKey {
-    fn decrypt(&self, message: &str) -> String {
-        todo!("Implementiere diese Funktion!")
-    }
-}
-
-impl Signing for PrivateKey {
-    fn sign(&self, message: &str) -> String {
-        todo!("Implementiere diese Funktion!")
-    }
 }
