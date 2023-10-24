@@ -1,7 +1,7 @@
 use crate::encryption::math_functions::big_int_util::{
     decrement, divides, increment, is_even, is_one, is_zero,
 };
-use crate::encryption::math_functions::random::Random;
+use crate::encryption::math_functions::random_elsner::RandomElsner;
 use bigdecimal::num_bigint::{BigInt, BigUint};
 use bigdecimal::num_traits::Euclid;
 use bigdecimal::{One, Zero};
@@ -139,7 +139,7 @@ pub fn miller_rabin(p: &BigUint, repeats: usize) -> bool {
         d = d.div(BigUint::from(2u8));
         s += BigUint::one();
     }
-    let mut rand = Random::create();
+    let mut rand = RandomElsner::create();
     for _ in 0..repeats {
         let mut a = rand.take(&BigUint::one(), &p);
         while divides(p, &a) {

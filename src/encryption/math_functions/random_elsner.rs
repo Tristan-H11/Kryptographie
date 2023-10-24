@@ -3,15 +3,22 @@ use bigdecimal::{BigDecimal, One, Zero};
 use rand::random;
 
 #[derive(Debug)]
-pub struct Random {
-    sqrt_m: BigDecimal,
-    n: BigDecimal,
+pub struct RandomElsner {
+    pub(crate) sqrt_m: BigDecimal,
+    pub(crate) n: BigDecimal,
 }
 
-impl Random {
+impl RandomElsner {
+
+    ///
+    /// Erstellt eine neue Instanz von RandomElsner.
+    ///
+    /// # Rückgabe
+    /// * RandomElsner
+    ///
     pub fn create() -> Self {
         let mut m = BigDecimal::from(random::<u128>());
-        while m.sqrt().unwrap() == BigDecimal::zero() {
+        while (m.sqrt().unwrap() % BigDecimal::one()) == BigDecimal::zero() {
             m = BigDecimal::from(random::<u128>());
         }
         return Self {
@@ -20,6 +27,16 @@ impl Random {
         };
     }
 
+    ///
+    /// Gibt eine zufällige Zahl im Bereich von a bis b zurück.
+    ///
+    /// # Argumente
+    /// * `a` - Die untere Grenze des Bereichs.
+    /// * `b` - Die obere Grenze des Bereichs.
+    ///
+    /// # Rückgabe
+    /// * BigUint
+    ///
     pub fn take(&mut self, a: &BigUint, b: &BigUint) -> BigUint {
         self.n += BigDecimal::one();
         let range = b - a + BigUint::one();
