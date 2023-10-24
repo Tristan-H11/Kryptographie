@@ -7,12 +7,24 @@ use druid::{
     widget::{Button, Flex, Label, TextBox},
     Env, Widget, WidgetExt,
 };
+
+fn wrap_text(text: &str, chars_per_line: usize) -> String {
+    text.chars()
+        .enumerate()
+        .fold(String::new(), |mut acc, (i, c)| {
+            if i > 0 && i % chars_per_line == 0 {
+                acc.push('\n');
+            }
+            acc.push(c);
+            acc
+        })
+}
 pub(crate) fn build_haupt_menu() -> impl Widget<MainMenuModel> {
     let fixed_width_entry_label = 200.0;
     let fixed_width_textbox = 400.0;
     let fixed_width_button = fixed_width_entry_label + fixed_width_textbox;
-    let fixed_width_label = fixed_width_entry_label + fixed_width_textbox;
     let spacer_size = 40.0;
+    let spacer_empty_strings = "          ";
 
     // Entry-Felder
     let modul_width_entry = Flex::row()
@@ -58,16 +70,21 @@ pub(crate) fn build_haupt_menu() -> impl Widget<MainMenuModel> {
         })
         .fix_width(fixed_width_button);
 
-    // Label
+
+    // text
     let public_exponent_alice_label = Label::new(|data: &MainMenuModel, _env: &Env| -> String {
-        format!("Öffentlicher Exponent Alice: {}", &data.public_exponent_alice)
+        let wrapped_text = wrap_text(&format!("{}", &data.public_exponent_alice),
+                                     150);
+        format!("Öffentlicher Exponent Alice: \n{}", wrapped_text)
     })
-    .fix_width(fixed_width_label);
+        .expand_width();
 
     let public_exponent_bob_label = Label::new(|data: &MainMenuModel, _env: &Env| -> String {
-        format!("Öffentlicher Exponent Bob: {}", &data.public_exponent_bob)
+        let wrapped_text = wrap_text(&format!("{}", &data.public_exponent_bob),
+                                     150);
+        format!("Öffentlicher Exponent Bob: \n{}", wrapped_text)
     })
-    .fix_width(fixed_width_label);
+        .expand_width();
 
     Flex::column()
         .with_default_spacer()
