@@ -1,20 +1,21 @@
-use crate::encryption::math_functions::big_int_util::{char_to_u16, u16_to_char, ubig_to_u16};
+use crate::encryption::math_functions::big_int_util::{c_to_u16, u16_to_c, ubig_to_u16};
 use bigdecimal::num_bigint::BigUint;
 use bigdecimal::{One, Zero};
 
 
-pub(crate) fn create_chiffre(message: &str, block_size: usize) -> Vec<BigUint> {
-    let blocks = split_into_blocks(message, block_size);
-    let int_vecs = string_to_int_vec(blocks);
-    digits_from_vec_to_sum(int_vecs)
+pub(crate) fn create_chiffre(m: &str, b_size: usize) -> Vec<BigUint> {
+    let b = create_b_vec(m, b_size);
+    let i_vec = s_to_i_vec(b);
+    to_sum_vec(i_vec)
 }
 
 pub(crate) fn decode_chiffre(sums: Vec<BigUint>) -> String {
-    let strings_vec = sums_to_strings(sums);
-    join_strings(strings_vec)
+    let s_vec = sums_vec_to_s_vec(sums);
+    decode_s_vec(s_vec)
 }
 
 //todo -- alles was nicht create_chiffre und decode_chiffre ist, muss private sein
+//(dann fliegen die tests gegen die Wand)
 ///
 /// Methode, um einen String in eine Menge von gleich großen Blöcken zu unterteilen.
 /// Nicht-volle Blöcke werden mit Space (' ') aufgefüllt.
@@ -32,18 +33,18 @@ pub(crate) fn decode_chiffre(sums: Vec<BigUint>) -> String {
 /// split_into_blocks("Das ist eine Testnachricht", 4)
 /// ["Das ", "ist ", "eine", " Tes", "tnac", "hric", "ht  "]
 /// ```
-pub(crate) fn split_into_blocks(message: &str, block_size: usize) -> Vec<String> {
-    message
+pub(crate) fn create_b_vec(m: &str, b_size: usize) -> Vec<String> {
+    m
         .chars()
         .collect::<Vec<char>>() //Erstelle einen Vektor für die Blöcke bestehend aus Zeichen
-        .chunks(block_size) //Definiert die Blockgröße im Vector
-        .map(|chunk| {
+        .chunks(b_size) //Definiert die Blockgröße im Vector
+        .map(|c| {
             // Durchlaufe alle chunks, im letzten muss du ggf. Leerzeichen auffüllen
-            let mut block = chunk.iter().collect::<String>(); // .iter --> füge chars zu String zusammen
-            while block.len() < block_size {
-                block.push(' '); // Fügt Leerzeichen hinzu, um den letzten Block zu füllen
+            let mut b = c.iter().collect::<String>(); // .iter --> füge chars zu String zusammen
+            while b.len() < b_size {
+                b.push(' '); // Fügt Leerzeichen hinzu, um den letzten Block zu füllen
             }
-            block
+            b
         })
         .collect() // Fasst alle Blöcke im Vektor zusammen
 }
@@ -72,9 +73,9 @@ pub(crate) fn split_into_blocks(message: &str, block_size: usize) -> Vec<String>
 ///         ];
 /// ```
 ///
-pub(crate) fn string_to_int_vec(blocks: Vec<String>) -> Vec<Vec<u16>> {
-    blocks.into_iter().map(|block| {
-        block.chars().map(char_to_u16).collect()
+pub(crate) fn s_to_i_vec(b_vec: Vec<String>) -> Vec<Vec<u16>> {
+    b_vec.into_iter().map(|b| {
+        b.chars().map(c_to_u16).collect()
     }).collect()
 }
 
@@ -100,15 +101,15 @@ pub(crate) fn string_to_int_vec(blocks: Vec<String>) -> Vec<Vec<u16>> {
 /// # Beispiel
 /// Beispiel von Seite 21 IT-Sec Skript:
 /// ```
-pub(crate) fn digits_from_vec_to_sum(digit_vectors: Vec<Vec<u16>>) -> Vec<BigUint> {
-    digit_vectors.into_iter().map(|digits| helper_fun_sum_for_digits(&digits)).collect()
+pub(crate) fn to_sum_vec(d_vec: Vec<Vec<u16>>) -> Vec<BigUint> {
+    d_vec.into_iter().map(|d| helper_fun_sum_for_digits(&d)).collect()
 }
 
-pub(crate) fn helper_fun_sum_for_digits(digits: &Vec<u16>) -> BigUint {
+pub(crate) fn helper_fun_sum_for_digits(i_vec: &Vec<u16>) -> BigUint {
     let g_base = BigUint::from(2u32.pow(16));
     let mut sum = BigUint::zero();
     let mut base = BigUint::one();
-    for &digit in digits.iter().rev() {
+    for &digit in i_vec.iter().rev() {
         sum += &base * BigUint::from(digit);
         base *= &g_base;
     }
@@ -134,27 +135,27 @@ pub(crate) fn helper_fun_sum_for_digits(digits: &Vec<u16>) -> BigUint {
 ///         ];
 ///
 ///
-pub(crate) fn sums_to_strings(sums: Vec<BigUint>) -> Vec<String> {
+pub(crate) fn sums_vec_to_s_vec(sums: Vec<BigUint>) -> Vec<String> {
     sums.into_iter().map(|sum| helper_fun_sum_to_string(&sum)).collect()
 }
 pub(crate) fn helper_fun_sum_to_string(sum: &BigUint) -> String {
-    let mut temp_sum = sum.clone();
-    let mut result = String::new();
+    let mut t_sum = sum.clone();
+    let mut res = String::new();
     let base = BigUint::from(2u32.pow(16));
-    let zero = BigUint::zero();
+    let z = BigUint::zero();
 
-    while temp_sum > zero {
-        let remainder = ubig_to_u16(&(&temp_sum % &base));
-        result.push(u16_to_char(remainder));
-        temp_sum = temp_sum / &base;
+    while t_sum > z {
+        let remainder = ubig_to_u16(&(&t_sum % &base));
+        res.push(u16_to_c(remainder));
+        t_sum = t_sum / &base;
     }
-    result.chars().rev().collect()
+    res.chars().rev().collect()
 }
 
 ///
 /// Erzeuge einen String aus dem Vector von Strings
 ///
-pub(crate) fn join_strings(strings: Vec<String>) -> String {
-    strings.join("")
+pub(crate) fn decode_s_vec(s: Vec<String>) -> String {
+    s.join("")
 }
 

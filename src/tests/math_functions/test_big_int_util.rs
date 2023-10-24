@@ -1,8 +1,8 @@
 #[cfg(test)]
 mod tests {
     use crate::encryption::math_functions::big_int_util::{
-        char_to_u16, decrement, divides, elsner_rand, increment, is_even, is_one,
-        is_uneven, is_zero, not_divides, random_in_range, u16_to_char, ubig_to_u16,
+        c_to_u16, decrement, divides, elsner_rand, increment, is_even, is_one,
+        is_uneven, is_zero, not_divides, random_in_range, u16_to_c, ubig_to_u16,
     };
     use bigdecimal::num_bigint::BigUint;
     #[test]
@@ -87,32 +87,32 @@ mod tests {
 
     #[test]
     fn test_char_to_u32() {
-        assert_eq!(char_to_u16('a'), 0);
-        assert_eq!(char_to_u16('b'), 1);
-        assert_eq!(char_to_u16('z'), 25);
-        assert_eq!(char_to_u16('A'), 26);
-        assert_eq!(char_to_u16('B'), 27);
-        assert_eq!(char_to_u16('Z'), 51);
-        assert_eq!(char_to_u16('0'), 52);
-        assert_eq!(char_to_u16('1'), 53);
-        assert_eq!(char_to_u16('9'), 61);
+        assert_eq!(c_to_u16('a'), 0);
+        assert_eq!(c_to_u16('b'), 1);
+        assert_eq!(c_to_u16('z'), 25);
+        assert_eq!(c_to_u16('A'), 26);
+        assert_eq!(c_to_u16('B'), 27);
+        assert_eq!(c_to_u16('Z'), 51);
+        assert_eq!(c_to_u16('0'), 52);
+        assert_eq!(c_to_u16('1'), 53);
+        assert_eq!(c_to_u16('9'), 61);
     }
     #[test]
     #[should_panic(expected = "Ungültiges Zeichen: ß")]
     fn test_char_to_u32_invalid() {
-        char_to_u16('ß');
+        c_to_u16('ß');
     }
 
     #[test]
     fn test_u32_to_char() {
-        assert_eq!(u16_to_char(0), 'a');
-        assert_eq!(u16_to_char(25), 'z');
-        assert_eq!(u16_to_char(26), 'A');
-        assert_eq!(u16_to_char(51), 'Z');
-        assert_eq!(u16_to_char(52), '0');
-        assert_eq!(u16_to_char(61), '9');
-        assert_eq!(u16_to_char(62), '.');
-        assert_eq!(u16_to_char(63), ',');
+        assert_eq!(u16_to_c(0), 'a');
+        assert_eq!(u16_to_c(25), 'z');
+        assert_eq!(u16_to_c(26), 'A');
+        assert_eq!(u16_to_c(51), 'Z');
+        assert_eq!(u16_to_c(52), '0');
+        assert_eq!(u16_to_c(61), '9');
+        assert_eq!(u16_to_c(62), '.');
+        assert_eq!(u16_to_c(63), ',');
     }
 
     #[test]

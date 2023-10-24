@@ -107,14 +107,14 @@ pub fn elsner_rand(a: f64, b: f64) -> f64 {
 ///
 /// Konvertiere ein Zeichen in einen u16 Code -- z.B. für Blockchiffre
 ///
-pub(crate) fn char_to_u16(c: char) -> u16 {
+pub(crate) fn c_to_u16(c: char) -> u16 {
     c as u16
 }
 
 ///
 /// Konvertiere ein u16 Code in ein Zeichen -- z.B. für Blockchiffre
 ///
-pub(crate) fn u16_to_char(value: u16) -> char {
+pub(crate) fn u16_to_c(value: u16) -> char {
     std::char::from_u32(value as u32).expect("Invalider Unicode") // muss in u32, da char
                                                                   // ein unicode zeichen in
                                                                   // u32 ist
