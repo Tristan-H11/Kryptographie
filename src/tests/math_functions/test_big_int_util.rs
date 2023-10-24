@@ -1,6 +1,9 @@
 #[cfg(test)]
 mod tests {
-    use crate::encryption::math_functions::big_int_util::{decrement, divides, increment, is_even, is_one, is_uneven, is_zero, not_divides, random_in_range, char_to_u32, u32_to_char, ubig_to_u32, elsner_rand};
+    use crate::encryption::math_functions::big_int_util::{
+        char_to_u32, decrement, divides, elsner_rand, increment, is_even, is_one, is_uneven,
+        is_zero, not_divides, random_in_range, u32_to_char, ubig_to_u32,
+    };
     use ibig::{ubig, UBig};
 
     #[test]
@@ -67,7 +70,6 @@ mod tests {
         let random = elsner_rand(a, b);
         assert!(random >= a && random <= b)
     }
-
 
     #[test]
     fn test_char_to_u32() {
