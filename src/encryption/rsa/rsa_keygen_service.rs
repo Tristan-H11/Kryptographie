@@ -2,8 +2,9 @@ use bigdecimal::num_bigint::{BigUint, ToBigInt};
 use bigdecimal::One;
 use log::{debug, trace};
 use crate::big_u;
-use crate::encryption::math_functions::big_int_util::{is_one};
+use crate::encryption::math_functions::big_int_util::{decrement, is_one};
 use crate::encryption::math_functions::number_theory::{extended_euclid, miller_rabin, modulo_inverse};
+use crate::encryption::math_functions::random_elsner::RandomElsner;
 use crate::encryption::rsa::keys::{PublicKey, PrivateKey};
 
 ///
@@ -74,15 +75,16 @@ impl RsaKeygenService {
     ///
     fn generate_prime(&self, size: usize, miller_rabin_iterations: usize) -> BigUint {
         debug!("Generiere eine Primzahl mit size {} und Miller-Rabin-Iterations {}", size, miller_rabin_iterations);
-        let upper_bound_prime_generation = &BigUint::from(2u8).pow(size as u32);
-        let lower_bound_prime_generation = &BigUint::from(2u8).pow((size - 1) as u32);
-        let random_int = rand::random::<u32>();
-        let mut prime_candidate = BigUint::from(random_int); // TODO elsner_rand(lower_bound_prime_generation, upper_bound_prime_generation);
+        let mut random_generator = RandomElsner::new();
+
+        let upper_bound = &BigUint::from(2u8).pow(size as u32);
+        let lower_bound = &BigUint::from(2u8).pow((size - 1) as u32);
+        let mut prime_candidate = random_generator.take(lower_bound, upper_bound);
 
         //repeat random number until miller_rabin gives true
         while !miller_rabin(&prime_candidate, miller_rabin_iterations) {
             trace!("Generierter Primkandidat {} ist keine Primzahl", prime_candidate);
-            prime_candidate = BigUint::from(rand::random::<u32>()); // TODO elsner_rand(lower_bound_prime_generation, upper_bound_prime_generation);
+            prime_candidate = random_generator.take(lower_bound, upper_bound);
         }
         trace!("Generierter Primkandidat {} ist eine Primzahl", prime_candidate);
         prime_candidate
@@ -101,7 +103,9 @@ impl RsaKeygenService {
     ///
     fn generate_e(&self, phi: &BigUint) -> BigUint {
         debug!("Generiere e mit phi {}", phi);
-        let mut e = big_u!(3u8); //TODO elsner_rand(&BigUint::from(3.0u8), &(phi - 1));
+        let mut random_generator = RandomElsner::new();
+
+        let mut e = random_generator.take(&big_u!(3u8), &decrement(phi));
         while e < *phi {
             // Prüfen, ob e relativ prim zu phi ist, indem number_theory::extended_euclid() aufgerufen wird.
             //TODO Hübsch machen
