@@ -1,6 +1,6 @@
 use bigdecimal::num_bigint::BigUint;
 use bigdecimal::{One, Zero};
-use rand::{random};
+use rand::random;
 
 ///
 /// Gibt zurück, ob die Zahl gerade ist.

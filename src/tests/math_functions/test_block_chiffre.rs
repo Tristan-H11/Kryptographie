@@ -1,9 +1,9 @@
 #[cfg(test)]
 mod tests {
-    use bigdecimal::num_bigint::BigUint;
     use crate::encryption::math_functions::block_chiffre::{
         digits_from_vec_to_sum, split_into_blocks, string_to_int_vec,
     };
+    use bigdecimal::num_bigint::BigUint;
 
     #[test]
     fn test_split_into_blocks() {
@@ -41,7 +41,7 @@ mod tests {
         let message = "abc, XYZ012".to_string();
         let block_size = 3;
         let blocks = split_into_blocks(&message, block_size); // erstellen des Vektors
-        // aus Blöcken
+                                                              // aus Blöcken
         let expectet_chiffre_results_as_blocks_in_vec: Vec<Vec<u32>> = vec![
             vec![0, 1, 2],
             vec![63, 76, 49],

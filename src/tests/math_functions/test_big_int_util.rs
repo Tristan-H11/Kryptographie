@@ -1,10 +1,10 @@
 #[cfg(test)]
 mod tests {
-    use bigdecimal::num_bigint::BigUint;
     use crate::encryption::math_functions::big_int_util::{
         char_to_u32, decrement, divides, elsner_rand, increment, is_even, is_one, is_uneven,
         is_zero, not_divides, random_in_range, u32_to_char, ubig_to_u32,
     };
+    use bigdecimal::num_bigint::BigUint;
     #[test]
     fn test_is_even() {
         assert_eq!(is_even(&BigUint::from(34563u32)), false);
@@ -32,15 +32,30 @@ mod tests {
     #[test]
     fn test_divides() {
         assert_eq!(divides(&BigUint::from(4u32), &BigUint::from(8u32)), true);
-        assert_eq!(divides(&BigUint::from(1u32), &BigUint::from(89893457u32)), true);
-        assert_eq!(divides(&BigUint::from(134505u32), &BigUint::from(89893457u32)), false);
+        assert_eq!(
+            divides(&BigUint::from(1u32), &BigUint::from(89893457u32)),
+            true
+        );
+        assert_eq!(
+            divides(&BigUint::from(134505u32), &BigUint::from(89893457u32)),
+            false
+        );
     }
 
     #[test]
     fn test_not_divides() {
-        assert_eq!(not_divides(&BigUint::from(4u32), &BigUint::from(8u32)), false);
-        assert_eq!(not_divides(&BigUint::from(1u32), &BigUint::from(89893457u32)), false);
-        assert_eq!(not_divides(&BigUint::from(134505u32), &BigUint::from(89893457u32)), true);
+        assert_eq!(
+            not_divides(&BigUint::from(4u32), &BigUint::from(8u32)),
+            false
+        );
+        assert_eq!(
+            not_divides(&BigUint::from(1u32), &BigUint::from(89893457u32)),
+            false
+        );
+        assert_eq!(
+            not_divides(&BigUint::from(134505u32), &BigUint::from(89893457u32)),
+            true
+        );
     }
 
     #[test]

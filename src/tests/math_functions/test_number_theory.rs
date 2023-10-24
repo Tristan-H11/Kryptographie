@@ -3,20 +3,26 @@ mod tests {
     use crate::encryption::math_functions::number_theory::{
         fast_exponentiation, miller_rabin, modulo_inverse,
     };
-    use std::str::FromStr;
     use bigdecimal::num_bigint::{BigInt, BigUint};
+    use std::str::FromStr;
 
     #[test]
     fn fast_exponentiation_happy_flow() {
         let base = &BigUint::from(561563u32);
         let exponent = &BigUint::from(1300u32);
         let modul = &BigUint::from(564u32);
-        assert_eq!(fast_exponentiation(base, exponent, modul), BigUint::from(205u32));
+        assert_eq!(
+            fast_exponentiation(base, exponent, modul),
+            BigUint::from(205u32)
+        );
 
         let base = &BigUint::from(56156334590832345u64);
         let exponent = &BigUint::from(109458390583094852904812340u128);
         let modul = &BigUint::from(564234859u32);
-        assert_eq!(fast_exponentiation(base, exponent, modul), BigUint::from(558376785u32));
+        assert_eq!(
+            fast_exponentiation(base, exponent, modul),
+            BigUint::from(558376785u32)
+        );
     }
 
     #[test]
@@ -24,7 +30,10 @@ mod tests {
         let base = &BigUint::from(561563u32);
         let exponent = &BigUint::from(1u32);
         let modul = &BigUint::from(564u32);
-        assert_eq!(fast_exponentiation(base, exponent, modul), BigUint::from(383u32));
+        assert_eq!(
+            fast_exponentiation(base, exponent, modul),
+            BigUint::from(383u32)
+        );
     }
 
     #[test]
@@ -32,7 +41,10 @@ mod tests {
         let base = &BigUint::from(561563u32);
         let exponent = &BigUint::from(0u32);
         let modul = &BigUint::from(564u32);
-        assert_eq!(fast_exponentiation(base, exponent, modul), BigUint::from(1u32));
+        assert_eq!(
+            fast_exponentiation(base, exponent, modul),
+            BigUint::from(1u32)
+        );
     }
 
     #[test]
@@ -40,7 +52,10 @@ mod tests {
         let base = &BigUint::from(0u32);
         let exponent = &BigUint::from(561563u32);
         let modul = &BigUint::from(564u32);
-        assert_eq!(fast_exponentiation(base, exponent, modul), BigUint::from(0u32));
+        assert_eq!(
+            fast_exponentiation(base, exponent, modul),
+            BigUint::from(0u32)
+        );
     }
 
     #[test]
@@ -48,7 +63,10 @@ mod tests {
         let base = &BigUint::from(3459860u32);
         let exponent = &BigUint::from(561563u32);
         let modul = &BigUint::from(1u32);
-        assert_eq!(fast_exponentiation(base, exponent, modul), BigUint::from(0u32));
+        assert_eq!(
+            fast_exponentiation(base, exponent, modul),
+            BigUint::from(0u32)
+        );
     }
 
     #[test]
@@ -70,7 +88,11 @@ mod tests {
         );
 
         assert_eq!(
-            fast_exponentiation(&BigUint::from(37u32), &BigUint::from(2u32), &BigUint::from(89u32)),
+            fast_exponentiation(
+                &BigUint::from(37u32),
+                &BigUint::from(2u32),
+                &BigUint::from(89u32)
+            ),
             BigUint::from(34u32)
         )
     }
@@ -78,7 +100,10 @@ mod tests {
     #[test]
     fn modulo_inverse_test() {
         //assert_eq!(modulo_inverse(BigInt::from(1), BigInt::from(3)).unwrap(), BigInt::from(1));
-        assert_eq!(modulo_inverse(BigInt::from(5), BigInt::from(11)).unwrap(), BigInt::from(9));
+        assert_eq!(
+            modulo_inverse(BigInt::from(5), BigInt::from(11)).unwrap(),
+            BigInt::from(9)
+        );
         assert_eq!(
             modulo_inverse(BigInt::from(315), BigInt::from(661643)).unwrap(),
             BigInt::from(342374)
@@ -97,8 +122,14 @@ mod tests {
     #[test]
     fn miller_rabin_test() {
         assert_eq!(miller_rabin(&BigUint::from(11u32), 40), true);
-        assert_eq!(miller_rabin(&BigUint::from(8727030382015287123761u128), 40), false);
-        assert_eq!(miller_rabin(&BigUint::from(2459872438590349034582u128), 40), false);
+        assert_eq!(
+            miller_rabin(&BigUint::from(8727030382015287123761u128), 40),
+            false
+        );
+        assert_eq!(
+            miller_rabin(&BigUint::from(2459872438590349034582u128), 40),
+            false
+        );
         assert_eq!(miller_rabin(&BigUint::from(2211u32), 40), false);
         assert_eq!(
             miller_rabin(

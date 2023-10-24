@@ -112,7 +112,7 @@ fn extended_euclidean_algorithm(
         xy[4] = &xy[0] - (&div * &xy[2]);
         xy[5] = &xy[1] - (&div * &xy[3]);
         extended_euclidean_algorithm(modul, &n.rem_euclid(modul), xy)
-    }
+    };
 }
 
 /// Führt den Miller-Rabin-Primzahltest auf `p` mit `repeats` Runden aus.
