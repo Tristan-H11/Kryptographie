@@ -52,8 +52,10 @@ pub(crate) fn split_into_blocks(message: &str, block_size: usize) -> Vec<String>
 /// string_to_int_vec("MATHEMAT") // [12,0,19,7,4,12,0,19]
 /// ```
 ///
-pub(crate) fn string_to_int_vec(message: &str) -> Vec<u16> {
-    message.chars().map(char_to_u16).collect()
+pub(crate) fn string_to_int_vec(blocks: Vec<String>) -> Vec<Vec<u16>> {
+    blocks.into_iter().map(|block| {
+        block.chars().map(char_to_u16).collect()
+    }).collect()
 }
 
 ///
@@ -70,16 +72,19 @@ pub(crate) fn string_to_int_vec(message: &str) -> Vec<u16> {
 /// Beispiel von Seite 21 IT-Sec Skript:
 /// ```
 
-pub(crate) fn digits_from_vec_to_sum(digits: &Vec<u16>) -> BigUint {
-    let g_base = BigUint::from((2_u32.pow(16)));
+pub(crate) fn digits_from_vec_to_sum(digit_vectors: Vec<Vec<u16>>) -> Vec<BigUint> {
+    digit_vectors.into_iter().map(|digits| help_fun_sum_for_digits(&digits)).collect()
+}
+
+pub(crate) fn help_fun_sum_for_digits(digits: &Vec<u16>) -> BigUint {
+    let g_base = BigUint::from(2u32.pow(16));
     let mut sum = BigUint::zero();
     let mut base = BigUint::one();
     for &digit in digits.iter().rev() {
-        // [0, 2, 1] --> (0 * 2^16^2) + (2 * 2^16^1) + (1 * 2^16^0)
-        sum += &base * digit;
+        sum += &base * BigUint::from(digit);
         base *= &g_base;
     }
-    sum  // 131073
+    sum
 }
 
 ///
@@ -147,7 +152,6 @@ pub(crate) fn string_to_sum(message: &str) -> BigUint {
 ///
 /// # Argumente
 /// * `sum` - Die zu überführende Summe.
-/// * `g` - Die Basis des g-adischen Systems.
 ///
 /// # Rückgabe
 /// * `Vec<u32>` - Die Menge der Koeffizienten.
@@ -158,7 +162,7 @@ pub(crate) fn string_to_sum(message: &str) -> BigUint {
 /// sum_to_digits(ubig!(422.078.969.854.681), 47) // [17,34,5,35,1,23,40,24,14]
 /// ```
 ///
-pub(crate) fn sum_to_digits(sum: &BigUint, g: u32) -> Vec<u32> {
+pub(crate) fn sum_to_digits(sum: &BigUint) -> Vec<u32> {
     todo!("Implementiere diese Funktion!")
 }
 

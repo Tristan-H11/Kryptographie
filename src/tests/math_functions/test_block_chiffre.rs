@@ -38,30 +38,58 @@ mod tests {
 
     #[test]
     fn test_string_to_int_vec() {
-        let message = "abcXYZ012";
+        let message = "Das ist eine Testnachricht ";
+        let blocks = split_into_blocks(&message, 4);
         let expected = vec![
-            char_to_u16('a'),
-            char_to_u16('b'),
-            char_to_u16('c'),
-            char_to_u16('X'),
-            char_to_u16('Y'),
-            char_to_u16('Z'),
-            char_to_u16('0'),
-            char_to_u16('1'),
-            char_to_u16('2'),
+            vec![char_to_u16('D'), char_to_u16('a'), char_to_u16('s'), char_to_u16(' ')],
+            vec![char_to_u16('i'), char_to_u16('s'), char_to_u16('t'), char_to_u16(' ')],
+            vec![char_to_u16('e'), char_to_u16('i'), char_to_u16('n'), char_to_u16('e')],
+            vec![char_to_u16(' '), char_to_u16('T'), char_to_u16('e'), char_to_u16('s')],
+            vec![char_to_u16('t'), char_to_u16('n'), char_to_u16('a'), char_to_u16('c')],
+            vec![char_to_u16('h'), char_to_u16('r'), char_to_u16('i'), char_to_u16('c')],
+            vec![char_to_u16('h'), char_to_u16('t'), char_to_u16(' '), char_to_u16(' ')]
         ];
-        let result = string_to_int_vec(&message);
+        let result = string_to_int_vec(blocks);
         assert_eq!(result, expected);
     }
 
-    #[test]
-    fn test_digits_from_vec_to_sum() {
-        let digits = vec![41, 42, 43];
-        let result = digits_from_vec_to_sum(&digits);
-        // Angepasste Summe: 41*(2^16)^2 + 42*(2^16)^1 + 43*(2^16)^0
-        let expected_result = BigUint::from(176096411691_u64);
-        assert_eq!(result, expected_result);
+
+    #[cfg(test)]
+    mod tests {
+        use super::*;
+        use bigdecimal::num_bigint::BigUint;
+        use bigdecimal::ToPrimitive;
+        use crate::encryption::math_functions::block_chiffre::help_fun_sum_for_digits;
+
+        #[test]
+        fn test_digits_from_vec_to_sum() {
+            let digit_vectors = vec![
+                vec![char_to_u16('D'), char_to_u16('a'), char_to_u16('s'), char_to_u16(' ')],
+                vec![char_to_u16('i'), char_to_u16('s'), char_to_u16('t'), char_to_u16(' ')],
+                vec![char_to_u16('e'), char_to_u16('i'), char_to_u16('n'), char_to_u16('e')],
+                vec![char_to_u16(' '), char_to_u16('T'), char_to_u16('e'), char_to_u16('s')],
+                vec![char_to_u16('t'), char_to_u16('n'), char_to_u16('a'), char_to_u16('c')],
+                vec![char_to_u16('h'), char_to_u16('r'), char_to_u16('i'), char_to_u16('c')],
+                vec![char_to_u16('h'), char_to_u16('t'), char_to_u16(' '), char_to_u16(' ')]
+            ];
+
+            let result = digits_from_vec_to_sum(digit_vectors);
+
+            // Erwartete Summen für jeden Block berechnen
+            let expected_result = vec![
+                help_fun_sum_for_digits(&vec![char_to_u16('D'), char_to_u16('a'), char_to_u16('s'), char_to_u16(' ')]),
+                help_fun_sum_for_digits(&vec![char_to_u16('i'), char_to_u16('s'), char_to_u16('t'), char_to_u16(' ')]),
+                help_fun_sum_for_digits(&vec![char_to_u16('e'), char_to_u16('i'), char_to_u16('n'), char_to_u16('e')]),
+                help_fun_sum_for_digits(&vec![char_to_u16(' '), char_to_u16('T'), char_to_u16('e'), char_to_u16('s')]),
+                help_fun_sum_for_digits(&vec![char_to_u16('t'), char_to_u16('n'), char_to_u16('a'), char_to_u16('c')]),
+                help_fun_sum_for_digits(&vec![char_to_u16('h'), char_to_u16('r'), char_to_u16('i'), char_to_u16('c')]),
+                help_fun_sum_for_digits(&vec![char_to_u16('h'), char_to_u16('t'), char_to_u16(' '), char_to_u16(' ')])
+            ];
+
+            assert_eq!(result, expected_result);
+        }
     }
+
 
     #[test]
     fn test_sum_to_string() {
@@ -74,11 +102,11 @@ mod tests {
         );
     }
 
-    // #[test]
-    // fn test_string_to_sum() {
-    //     let message = "";
-    //     let expected_sum = BigUint::from_u64(138).unwrap();
-    //     let result_sum = string_to_sum(&message);
-    //     assert_eq!(result_sum, expected_sum);
-    // }
+    #[test]
+    fn test_string_to_sum() {
+        let message = ")*+";
+        let expected_sum = BigUint::from(176096411691_u64);
+        let result_sum = string_to_sum(&message);
+        assert_eq!(result_sum, expected_sum);
+    }
 }
