@@ -75,7 +75,7 @@ pub(crate) fn string_to_int_vec(message: &str) -> Vec<u32> {
 ///     47
 /// ) // 6083869600275
 pub(crate) fn digits_from_vec_to_sum(digits: &Vec<u64>) -> BigUint {
-    let g_base = 2.pow(16);
+    let g_base = 2.pow(16); // or     //todo -- let g_base = BigUint::from(2u32.pow(16)); ???
     let mut sum = BigUint::zero();
     let mut base = BigUint::one();
     for &digit in digits.iter().rev() {
@@ -105,7 +105,7 @@ pub(crate) fn digits_from_vec_to_sum(digits: &Vec<u64>) -> BigUint {
 pub(crate) fn sum_to_string(sum: &BigUint) -> String {
     let mut temp_sum = sum.clone();
     let mut result = String::new();
-    let base = BigUint::from(2.pow(16));
+    let base = BigUint::from(2u32.pow(16));
     let zero = BigUint::zero();
 
     while temp_sum > zero {
@@ -121,7 +121,6 @@ pub(crate) fn sum_to_string(sum: &BigUint) -> String {
 ///
 /// # Argumente
 /// * `message` - Der zu überführende String.
-/// * `g` - Die Basis des g-adischen Systems.
 ///
 /// # Rückgabe
 /// * `BigUint` - Die Dezimaldarstellung des Strings.
@@ -132,8 +131,15 @@ pub(crate) fn sum_to_string(sum: &BigUint) -> String {
 /// string_to_sum("R8F9BX-YO", 47) // 422.078.969.854.681
 /// ```
 ///
-pub(crate) fn string_to_sum(message: &str, g: u32) -> BigUint {
-    todo!("Implementiere diese Funktion!")
+pub(crate) fn string_to_sum(message: &str) -> BigUint {
+    let base = BigUint::from(2u32.pow(16));
+    let mut sum = BigUint::zero();
+
+    for char in message.chars().rev() {
+        let value = &(BigUint::from(char_to_u16(char)));
+        sum = &sum * &base + value;
+    }
+    sum
 }
 
 ///
