@@ -22,7 +22,7 @@ impl RsaKeygenService {
     /// * `key_width` - Die Breite des Moduls `n`, mit welchem die Schlüssel berechnet werden.
     ///
     pub fn new(key_size: usize) -> RsaKeygenService {
-        debug!("Creating new RsaKeygenService with key_size: {}", key_size);
+        debug!("Erstellen eines neuen RsaKeygenService mit key_size {}", key_size);
         RsaKeygenService {
             key_size,
         }
@@ -40,11 +40,12 @@ impl RsaKeygenService {
     /// Ein Tupel aus dem öffentlichen und privaten Schlüssel.
     ///
     pub(crate) fn generate_keypair(&self, miller_rabin_iterations: usize) -> (PublicKey, PrivateKey) {
-        debug!("Generating keypair with key_size: {}", self.key_size);
+        debug!("Generiere Schlüsselpaar mit key_size {} und Miller-Rabin-Iterations {}", self.key_size, miller_rabin_iterations);
         let prim_size = self.key_size / 2;
         let prime_one = self.generate_prime(prim_size, miller_rabin_iterations);
         let mut prime_two = self.generate_prime(prim_size, miller_rabin_iterations);
         while prime_one == prime_two {
+            trace!("Generierter prime_one {} ist gleich prime_two {}. Starte neuen Versuch", prime_one, prime_two);
             prime_two = self.generate_prime(prim_size, miller_rabin_iterations);
         }
 
@@ -55,7 +56,7 @@ impl RsaKeygenService {
         let d = self.generate_d(&e, &phi);
         let public_key = PublicKey::new(e, n.clone());
         let private_key = PrivateKey::new(d, n);
-        debug!("Generated keypair");
+        debug!("Schlüsselpaar generiert");
         (public_key, private_key)
     }
 
@@ -72,7 +73,7 @@ impl RsaKeygenService {
     /// Die generierte Primzahl.
     ///
     fn generate_prime(&self, size: usize, miller_rabin_iterations: usize) -> BigUint {
-        debug!("Generating prime with size {} and Miller-Rabin-Iterations {}", size, miller_rabin_iterations);
+        debug!("Generiere eine Primzahl mit size {} und Miller-Rabin-Iterations {}", size, miller_rabin_iterations);
         let upper_bound_prime_generation = &BigUint::from(2u8).pow(size as u32);
         let lower_bound_prime_generation = &BigUint::from(2u8).pow((size - 1) as u32);
         let random_int = rand::random::<u32>();
@@ -80,10 +81,10 @@ impl RsaKeygenService {
 
         //repeat random number until miller_rabin gives true
         while !miller_rabin(&prime_candidate, miller_rabin_iterations) {
-            trace!("Generated prime candidate {} is not prime", prime_candidate);
+            trace!("Generierter Primkandidat {} ist keine Primzahl", prime_candidate);
             prime_candidate = BigUint::from(rand::random::<u32>()); // TODO elsner_rand(lower_bound_prime_generation, upper_bound_prime_generation);
         }
-        debug!("Generated prime candidate {} is prime", prime_candidate);
+        trace!("Generierter Primkandidat {} ist eine Primzahl", prime_candidate);
         prime_candidate
     }
 
@@ -99,20 +100,20 @@ impl RsaKeygenService {
     /// Die generierte Zahl `e`.
     ///
     fn generate_e(&self, phi: &BigUint) -> BigUint {
-        debug!("Generating e with phi {}", phi);
+        debug!("Generiere e mit phi {}", phi);
         let mut e = big_u!(3u8); //TODO elsner_rand(&BigUint::from(3.0u8), &(phi - 1));
         while e < *phi {
             // Prüfen, ob e relativ prim zu phi ist, indem number_theory::extended_euclid() aufgerufen wird.
             //TODO Hübsch machen
             let euclid = &extended_euclid(&e.to_bigint().unwrap(), &phi.to_bigint().unwrap()).0.to_biguint().unwrap();
             if is_one(euclid)  {
-                debug!("Generated e {}", e);
+                trace!("Generierter e {} ist relativ prim zu phi {}", e, phi);
                 return e;
             }
-            trace!("Generated e {} is not relative prime to phi {}", e, phi);
+            trace!("Generierter e {} ist nicht relativ prim zu phi {}", e, phi);
             e += BigUint::one();
         }
-        panic!("No e found");
+        panic!("Kein e gefunden, das relativ prim zu phi {} ist", phi);
     }
 
     ///
@@ -129,7 +130,7 @@ impl RsaKeygenService {
     /// Die generierte Zahl `d`.
     ///
     fn generate_d(&self, e: &BigUint, phi: &BigUint) -> BigUint {
-        debug!("Generating d with e {} and phi {}", e, phi);
+        debug!("Generiere d mit e {} und phi {}", e, phi);
         //TODO Hübsch machen
         modulo_inverse(e.to_bigint().unwrap(), phi.to_bigint().unwrap()).unwrap().to_biguint().unwrap()
     }
