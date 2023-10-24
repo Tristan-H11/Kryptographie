@@ -16,8 +16,8 @@ use log::{debug, trace};
 ///
 pub(crate) fn create_blocks_from_string(m: &str, b_size: usize) -> Vec<BigUint> {
     debug!("Erstelle Chiffre mit Blockgröße {} für {}", b_size, m);
-    let b = create_b_vec(m, b_size);
-    let i_vec = s_to_i_vec(b);
+    let b = split_into_blocks(m, b_size);
+    let i_vec = string_to_int_vec(b);
     to_sum_vec(i_vec)
 }
 
@@ -32,11 +32,12 @@ pub(crate) fn create_blocks_from_string(m: &str, b_size: usize) -> Vec<BigUint> 
 ///
 pub(crate) fn create_string_from_blocks(sums: Vec<BigUint>) -> String {
     debug!("Erstelle String aus Vektor von Summen");
-    let s_vec = sums_vec_to_s_vec(sums);
-    decode_s_vec(s_vec)
+    let s_vec = sums_vec_to_string_vec(sums);
+    join_string_vec(s_vec)
 }
 
 ///
+/// # Nur zu Testzwecken öffentlich!
 /// Methode, um einen String in eine Menge von gleich großen Blöcken zu unterteilen.
 /// Nicht-volle Blöcke werden mit Space (' ') aufgefüllt.
 ///
@@ -53,7 +54,7 @@ pub(crate) fn create_string_from_blocks(sums: Vec<BigUint>) -> String {
 /// split_into_blocks("Das ist eine Testnachricht", 4)
 /// ["Das ", "ist ", "eine", " Tes", "tnac", "hric", "ht  "]
 /// ```
-pub(crate) fn create_b_vec(m: &str, b_size: usize) -> Vec<String> {
+pub(crate) fn split_into_blocks(m: &str, b_size: usize) -> Vec<String> {
     debug!("Erstelle Blöcke mit Blockgröße {} für {}", b_size, m);
     m
         .chars()
@@ -72,6 +73,7 @@ pub(crate) fn create_b_vec(m: &str, b_size: usize) -> Vec<String> {
 }
 
 ///
+/// # Nur zu Testzwecken öffentlich!
 /// Methode, um den Vector mit seinen Strings in einen Vector mit Integern zu überführen.
 ///
 /// # Argumente
@@ -95,7 +97,7 @@ pub(crate) fn create_b_vec(m: &str, b_size: usize) -> Vec<String> {
 ///         ];
 /// ```
 ///
-pub(crate) fn s_to_i_vec(b_vec: Vec<String>) -> Vec<Vec<u16>> {
+pub(crate) fn string_to_int_vec(b_vec: Vec<String>) -> Vec<Vec<u16>> {
     debug!("Erstelle Integer Vektor aus String Vektor");
     b_vec.into_iter().map(|b| {
         b.chars().map(c_to_u16).collect()
@@ -103,6 +105,7 @@ pub(crate) fn s_to_i_vec(b_vec: Vec<String>) -> Vec<Vec<u16>> {
 }
 
 ///
+/// # Nur zu Testzwecken öffentlich!
 /// Methode, um einen Vektor von Integern als g-adische Zahl zu interpretieren
 /// und in eine Dezimalzahl zu überführen.
 ///
@@ -129,7 +132,7 @@ pub(crate) fn to_sum_vec(d_vec: Vec<Vec<u16>>) -> Vec<BigUint> {
     d_vec.into_iter().map(|d| helper_fun_sum_for_digits(&d)).collect()
 }
 
-pub(crate) fn helper_fun_sum_for_digits(i_vec: &Vec<u16>) -> BigUint {
+fn helper_fun_sum_for_digits(i_vec: &Vec<u16>) -> BigUint {
     debug!("Erstelle Summe aus Integer Vektor");
     let g_base = BigUint::from(2u32.pow(16));
     let mut sum = BigUint::zero();
@@ -143,6 +146,7 @@ pub(crate) fn helper_fun_sum_for_digits(i_vec: &Vec<u16>) -> BigUint {
 }
 
 ///
+/// # Nur zu Testzwecken öffentlich!
 /// Methode, um eine Dezimalzahl in einen String (g-adisch) zu überführen.
 ///
 /// # Argumente
@@ -161,11 +165,11 @@ pub(crate) fn helper_fun_sum_for_digits(i_vec: &Vec<u16>) -> BigUint {
 ///         ];
 ///
 ///
-pub(crate) fn sums_vec_to_s_vec(sums: Vec<BigUint>) -> Vec<String> {
+pub(crate) fn sums_vec_to_string_vec(sums: Vec<BigUint>) -> Vec<String> {
     debug!("Erstelle String Vektor aus Summen Vektor");
     sums.into_iter().map(|sum| helper_fun_sum_to_string(&sum)).collect()
 }
-pub(crate) fn helper_fun_sum_to_string(sum: &BigUint) -> String {
+fn helper_fun_sum_to_string(sum: &BigUint) -> String {
     let mut t_sum = sum.clone();
     let mut res = String::new();
     let base = BigUint::from(2u32.pow(16));
@@ -180,9 +184,10 @@ pub(crate) fn helper_fun_sum_to_string(sum: &BigUint) -> String {
 }
 
 ///
+/// # Nur zu Testzwecken öffentlich!
 /// Erzeuge einen String aus dem Vector von Strings
 ///
-pub(crate) fn decode_s_vec(s: Vec<String>) -> String {
+pub(crate) fn join_string_vec(s: Vec<String>) -> String {
     s.join("")
 }
 
