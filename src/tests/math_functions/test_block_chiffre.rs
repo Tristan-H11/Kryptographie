@@ -1,18 +1,15 @@
 #[cfg(test)]
 mod tests {
-    use crate::encryption;
-    use crate::encryption::math_functions::block_chiffre::{
-        digits_from_vec_to_sum, split_into_blocks, string_to_int_vec, sum_to_string,
-    };
+    use crate::encryption::math_functions::block_chiffre::{create_chiffre, decode_chiffre, to_sum_vec, decode_s_vec, create_b_vec, s_to_i_vec, sums_vec_to_s_vec};
+    use crate::encryption::math_functions::big_int_util::{c_to_u16};
     use bigdecimal::num_bigint::BigUint;
-    use bigdecimal::FromPrimitive;
 
     #[test]
     fn test_split_into_blocks() {
         // Testfall 1: Ein einfacher String wird in Blöcke der Größe 4 aufgeteilt.
         let message = String::from("Das ist eine Testnachricht");
         let block_size = 4;
-        let result = split_into_blocks(&message, block_size);
+        let result = create_b_vec(&message, block_size);
         assert_eq!(
             result,
             vec!["Das ", "ist ", "eine", " Tes", "tnac", "hric", "ht  "]
@@ -22,80 +19,144 @@ mod tests {
         // es kommt kein neuer leerer Block dazu.
         let message = String::from("123AB");
         let block_size = 5;
-        let result = split_into_blocks(&message, block_size);
+        let result = create_b_vec(&message, block_size);
         assert_eq!(result, vec!["123AB"]);
 
         // Testfall 3: Ein leerer String wird in Blöcke der Größe 3 aufgeteilt.
         let message = String::from("   ");
         let block_size = 3;
-        let result = split_into_blocks(&message, block_size);
+        let result = create_b_vec(&message, block_size);
         assert_eq!(result, vec!["   "]);
 
         // Testfall 4: Ein String wird in Blöcke der Größe 1 aufgeteilt.
         let message = String::from("abcdef");
         let block_size = 1;
-        let result = split_into_blocks(&message, block_size);
+        let result = create_b_vec(&message, block_size);
         assert_eq!(result, vec!["a", "b", "c", "d", "e", "f"]);
     }
 
     #[test]
     fn test_string_to_int_vec() {
-        let message = "abc, XYZ012".to_string();
-        let block_size = 3;
-        let blocks = split_into_blocks(&message, block_size); // erstellen des Vektors
-                                                              // aus Blöcken
-        let expectet_chiffre_results_as_blocks_in_vec: Vec<Vec<u16>> = vec![
-            vec![0, 1, 2],
-            vec![63, 76, 49],
-            vec![50, 51, 52],
-            vec![53, 54, 76],
+        let message = "Das ist eine Testnachricht ";
+        let blocks = create_b_vec(&message, 4);
+        let expected = vec![
+            vec![c_to_u16('D'), c_to_u16('a'), c_to_u16('s'), c_to_u16(' ')],
+            vec![c_to_u16('i'), c_to_u16('s'), c_to_u16('t'), c_to_u16(' ')],
+            vec![c_to_u16('e'), c_to_u16('i'), c_to_u16('n'), c_to_u16('e')],
+            vec![c_to_u16(' '), c_to_u16('T'), c_to_u16('e'), c_to_u16('s')],
+            vec![c_to_u16('t'), c_to_u16('n'), c_to_u16('a'), c_to_u16('c')],
+            vec![c_to_u16('h'), c_to_u16('r'), c_to_u16('i'), c_to_u16('c')],
+            vec![c_to_u16('h'), c_to_u16('t'), c_to_u16(' '), c_to_u16(' ')],
         ];
-
-        for (block, expected_vec) in blocks
-            .iter()
-            .zip(expectet_chiffre_results_as_blocks_in_vec.iter())
-        {
-            assert_eq!(
-                string_to_int_vec(block),
-                *expected_vec,
-                "Fehler bei Block: {}",
-                block
-            );
-        }
+        let result = s_to_i_vec(blocks);
+        assert_eq!(result, expected);
     }
 
     #[test]
     fn test_digits_from_vec_to_sum() {
-        // Testfall 1: Zahlen in umgekehrter Reihenfolge und Basis 47.
-        let digits = vec![12, 0, 19, 7, 4, 12, 0, 19];
-        let base = 47;
-        let result = digits_from_vec_to_sum(&digits);
-        let expected_result = BigUint::from(6083869600275u64);
-        assert_eq!(result, expected_result);
+        let digit_vectors = vec![
+            vec![c_to_u16('D'), c_to_u16('a'), c_to_u16('s'), c_to_u16(' ')],
+            vec![c_to_u16('i'), c_to_u16('s'), c_to_u16('t'), c_to_u16(' ')],
+            vec![c_to_u16('e'), c_to_u16('i'), c_to_u16('n'), c_to_u16('e')],
+            vec![c_to_u16(' '), c_to_u16('T'), c_to_u16('e'), c_to_u16('s')],
+            vec![c_to_u16('t'), c_to_u16('n'), c_to_u16('a'), c_to_u16('c')],
+            vec![c_to_u16('h'), c_to_u16('r'), c_to_u16('i'), c_to_u16('c')],
+            vec![c_to_u16('h'), c_to_u16('t'), c_to_u16(' '), c_to_u16(' ')],
+        ];
 
-        // Testfall 2: Basis 2 und Binärzahlen.
-        let digits = vec![1, 0, 1, 0, 1, 0];
-        let base = 2;
-        let result = digits_from_vec_to_sum(&digits);
-        let expected_result = BigUint::from(42u32);
-        assert_eq!(result, expected_result);
+        let result = to_sum_vec(digit_vectors);
 
-        // Testfall 3: Basis 16 und Hexadezimalzahlen.
-        let digits = vec![13, 10, 15]; // [D, A, F]
-        let base = 16;
-        let result = digits_from_vec_to_sum(&digits);
-        let expected_result = BigUint::from(3503u32);
-        assert_eq!(expected_result, expected_result);
+        let expected_result = vec![
+            BigUint::from(19140715035688992u64),
+            BigUint::from(29555366483460128u64),
+            BigUint::from(28429423626551397u64),
+            BigUint::from(9007560038613107u64),
+            BigUint::from(32651569751195747u64),
+            BigUint::from(29273887211061347u64),
+            BigUint::from(29273895796211744u64),
+        ];
+        assert_eq!(result, expected_result);
+    }
+
+
+    #[test]
+    fn test_sum_to_strings() {
+        let sums = vec![
+            BigUint::from(19140715035688992u64),
+            BigUint::from(29555366483460128u64),
+            BigUint::from(28429423626551397u64),
+            BigUint::from(9007560038613107u64),
+            BigUint::from(32651569751195747u64),
+            BigUint::from(29273887211061347u64),
+            BigUint::from(29273895796211744u64),
+        ];
+
+        let result = sums_vec_to_s_vec(sums);
+
+        let expected_result = vec![
+            "Das ".to_string(),
+            "ist ".to_string(),
+            "eine".to_string(),
+            " Tes".to_string(),
+            "tnac".to_string(),
+            "hric".to_string(),
+            "ht  ".to_string(),
+        ];
+        assert_eq!(result, expected_result);
     }
 
     #[test]
-    fn test_sum_to_string() {
-        let sum = BigUint::from_u64(65537).unwrap();
-        let expected = "AA"; // Der erwartete String für den Wert 65537 in Basis 65536
-        let result = sum_to_string(&sum);
-        assert_eq!(
-            result, expected,
-            "Die Funktion sum_to_string hat einen unerwarteten Wert zurückgegeben"
-        );
+    fn test_join_strings() {
+        let input = vec![
+            "Das ".to_string(),
+            "ist ".to_string(),
+            "eine".to_string(),
+            " Tes".to_string(),
+            "tnac".to_string(),
+            "hric".to_string(),
+            "ht  ".to_string(),
+        ];
+
+        let result = decode_s_vec(input);
+
+        let expected_result = "Das ist eine Testnachricht  ".to_string();
+
+        assert_eq!(result, expected_result);
     }
+
+    #[test]
+    fn test_create_chiffre() {
+        let message = "Das ist eine Testnachricht";
+        let block_size = 4;
+        let result = create_chiffre(message, block_size);
+        let expected_result = vec![
+            BigUint::from(19140715035688992u64),
+            BigUint::from(29555366483460128u64),
+            BigUint::from(28429423626551397u64),
+            BigUint::from(9007560038613107u64),
+            BigUint::from(32651569751195747u64),
+            BigUint::from(29273887211061347u64),
+            BigUint::from(29273895796211744u64),
+        ];
+        assert_eq!(result, expected_result);
+    }
+
+    #[test]
+    fn test_decode_chiffre() {
+        let sums = vec![
+            BigUint::from(19140715035688992u64),
+            BigUint::from(29555366483460128u64),
+            BigUint::from(28429423626551397u64),
+            BigUint::from(9007560038613107u64),
+            BigUint::from(32651569751195747u64),
+            BigUint::from(29273887211061347u64),
+            BigUint::from(29273895796211744u64),
+        ];
+        let result = decode_chiffre(sums);
+        let expected_result = "Das ist eine Testnachricht  ".to_string();
+        assert_eq!(result, expected_result);
+    }
+
+
 }
+

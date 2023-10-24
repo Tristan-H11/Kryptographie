@@ -1,59 +1,82 @@
-use crate::encryption::math_functions::big_int_util::{char_to_u16, u16_to_char, ubig_to_u16};
+use crate::encryption::math_functions::big_int_util::{c_to_u16, u16_to_c, ubig_to_u16};
 use bigdecimal::num_bigint::BigUint;
 use bigdecimal::{One, Zero};
 
-// TODO: Öffentliche Funktionen implementieren, weil der Rest hier unten nur für interne Zwecke ist.
 
+pub(crate) fn create_chiffre(m: &str, b_size: usize) -> Vec<BigUint> {
+    let b = create_b_vec(m, b_size);
+    let i_vec = s_to_i_vec(b);
+    to_sum_vec(i_vec)
+}
+
+pub(crate) fn decode_chiffre(sums: Vec<BigUint>) -> String {
+    let s_vec = sums_vec_to_s_vec(sums);
+    decode_s_vec(s_vec)
+}
+
+//todo -- alles was nicht create_chiffre und decode_chiffre ist, muss private sein
+//(dann fliegen die tests gegen die Wand)
 ///
 /// Methode, um einen String in eine Menge von gleich großen Blöcken zu unterteilen.
-/// Nicht-volle Blöcke werden mit Space (\s) aufgefüllt.
+/// Nicht-volle Blöcke werden mit Space (' ') aufgefüllt.
 ///
 /// # Argumente
 /// * `message` - Der zu unterteilende String.
 /// * `block_size` - Die Größe der Blöcke.
 ///
 /// # Rückgabe
-/// * `Vec<String>` - Die Menge der Blöcke.
+/// * `Vec<String>` - Die Menge der Blöcke als Vector.
 ///
 /// # Beispiel
 /// Beispiel von Seite 20 IT-Sec Skript:
 /// ```
-/// split_into_blocks("MATHEMATIK*IST*SPANNEND!", 8)
-/// // ["MATHEMAT", "IK*IST*S", "PANNEND!"]
+/// split_into_blocks("Das ist eine Testnachricht", 4)
+/// ["Das ", "ist ", "eine", " Tes", "tnac", "hric", "ht  "]
 /// ```
-pub(crate) fn split_into_blocks(message: &str, block_size: usize) -> Vec<String> {
-    message
+pub(crate) fn create_b_vec(m: &str, b_size: usize) -> Vec<String> {
+    m
         .chars()
         .collect::<Vec<char>>() //Erstelle einen Vektor für die Blöcke bestehend aus Zeichen
-        .chunks(block_size) //Definiert die Blockgröße im Vector
-        .map(|chunk| {
+        .chunks(b_size) //Definiert die Blockgröße im Vector
+        .map(|c| {
             // Durchlaufe alle chunks, im letzten muss du ggf. Leerzeichen auffüllen
-            let mut block = chunk.iter().collect::<String>(); // .iter --> füge chars zu String zusammen
-            while block.len() < block_size {
-                block.push(' '); // Fügt Leerzeichen hinzu, um den letzten Block zu füllen
+            let mut b = c.iter().collect::<String>(); // .iter --> füge chars zu String zusammen
+            while b.len() < b_size {
+                b.push(' '); // Fügt Leerzeichen hinzu, um den letzten Block zu füllen
             }
-            block
+            b
         })
-        .collect() // Falls alle Blöcke im Vektor zusammen
+        .collect() // Fasst alle Blöcke im Vektor zusammen
 }
 
 ///
-/// Methode, um einen String in einen Vektor von Integern zu überführen.
+/// Methode, um den Vector mit seinen Strings in einen Vector mit Integern zu überführen.
 ///
 /// # Argumente
-/// * `message` - Der zu überführende String.
+/// * `message` - Der zu überführende Vector mit seinen Strings.
 ///
 /// # Rückgabe
-/// * `Vec<u32>` - Die codierte Darstellung des Strings.
+/// * `Vec<Vec<u16>>` - Die codierte Darstellung des Strings als integer.
 ///
 /// # Beispiel
 /// Beispiel von Seite 21 IT-Sec Skript:
 /// ```
-/// string_to_int_vec("MATHEMAT") // [12,0,19,7,4,12,0,19]
+/// string_to_int_vec("["Das ", "ist ", "eine", " Tes", "tnac", "hric", "ht  "]")
+/// vec![
+///             vec![char_to_u16('D'), char_to_u16('a'), char_to_u16('s'), char_to_u16(' ')],
+///             vec![char_to_u16('i'), char_to_u16('s'), char_to_u16('t'), char_to_u16(' ')],
+///             vec![char_to_u16('e'), char_to_u16('i'), char_to_u16('n'), char_to_u16('e')],
+///             vec![char_to_u16(' '), char_to_u16('T'), char_to_u16('e'), char_to_u16('s')],
+///             vec![char_to_u16('t'), char_to_u16('n'), char_to_u16('a'), char_to_u16('c')],
+///             vec![char_to_u16('h'), char_to_u16('r'), char_to_u16('i'), char_to_u16('c')],
+///             vec![char_to_u16('h'), char_to_u16('t'), char_to_u16(' '), char_to_u16(' ')],
+///         ];
 /// ```
 ///
-pub(crate) fn string_to_int_vec(message: &str) -> Vec<u16> {
-    message.chars().map(char_to_u16).collect()
+pub(crate) fn s_to_i_vec(b_vec: Vec<String>) -> Vec<Vec<u16>> {
+    b_vec.into_iter().map(|b| {
+        b.chars().map(c_to_u16).collect()
+    }).collect()
 }
 
 ///
@@ -61,26 +84,33 @@ pub(crate) fn string_to_int_vec(message: &str) -> Vec<u16> {
 /// und in eine Dezimalzahl zu überführen.
 ///
 /// # Argumente
-/// * `digits` - Der zu überführende Vektor.
-/// * `g` - Die Basis des g-adischen Systems.
+/// * `digits` - Der zu überführende Vec<Vec<u16>>.
 ///
 /// # Rückgabe
-/// * `BigUint` - Die Summe des g-adischen Systems.
+/// * `BigUint` - Die Summe des g-adischen Systems als vec<u16> der Summen.
+/// vec![
+///             BigUint::from(19140715035688992u64),
+///             BigUint::from(29555366483460128u64),
+///             BigUint::from(28429423626551397u64),
+///             BigUint::from(9007560038613107u64),
+///             BigUint::from(32651569751195747u64),
+///             BigUint::from(29273887211061347u64),
+///             BigUint::from(29273895796211744u64),
+///         ];
 ///
 /// # Beispiel
 /// Beispiel von Seite 21 IT-Sec Skript:
 /// ```
-/// digits_to_sum(
-///     vec![12,0,19,7,4,12,0,19],
-///     47
-/// ) // 6083869600275
-pub(crate) fn digits_from_vec_to_sum(digits: &Vec<u64>) -> BigUint {
-    let g_base = BigUint::from(2u8).pow(16);
+pub(crate) fn to_sum_vec(d_vec: Vec<Vec<u16>>) -> Vec<BigUint> {
+    d_vec.into_iter().map(|d| helper_fun_sum_for_digits(&d)).collect()
+}
+
+pub(crate) fn helper_fun_sum_for_digits(i_vec: &Vec<u16>) -> BigUint {
+    let g_base = BigUint::from(2u32.pow(16));
     let mut sum = BigUint::zero();
     let mut base = BigUint::one();
-    for &digit in digits.iter().rev() {
-        // [12, 2, 0, 5] --> 12 * 47^3 + 2 * 47^2 + 0 * 47^1 + 5 * 47^0
-        sum += &base * digit;
+    for &digit in i_vec.iter().rev() {
+        sum += &base * BigUint::from(digit);
         base *= &g_base;
     }
     sum
@@ -90,93 +120,42 @@ pub(crate) fn digits_from_vec_to_sum(digits: &Vec<u64>) -> BigUint {
 /// Methode, um eine Dezimalzahl in einen String (g-adisch) zu überführen.
 ///
 /// # Argumente
-/// * `sum` - Die zu überführende Summe.
+/// * `sum` - Die zu überführende Summe als vec der Summen.
 ///
 /// # Rückgabe
-/// * `String` - Der String.
+/// * `String` - Vector der Strings.
+///         let expected_result = vec![
+///             "Das ".to_string(),
+///             "ist ".to_string(),
+///             "eine".to_string(),
+///             " Tes".to_string(),
+///             "tnac".to_string(),
+///             "hric".to_string(),
+///             "ht  ".to_string(),
+///         ];
 ///
-/// # Beispiel
-/// Beispiel von Seite 21 IT-Sec Skript:
-/// ```
-/// sum_to_string(ubig!(422.078.969.854.681), 47) // "R8F9BX-YO"
-/// ```
 ///
-/// welcher Buchstabe welchen Wert hat.
-pub(crate) fn sum_to_string(sum: &BigUint) -> String {
-    let mut temp_sum = sum.clone();
-    let mut result = String::new();
+pub(crate) fn sums_vec_to_s_vec(sums: Vec<BigUint>) -> Vec<String> {
+    sums.into_iter().map(|sum| helper_fun_sum_to_string(&sum)).collect()
+}
+pub(crate) fn helper_fun_sum_to_string(sum: &BigUint) -> String {
+    let mut t_sum = sum.clone();
+    let mut res = String::new();
     let base = BigUint::from(2u32.pow(16));
-    let zero = BigUint::zero();
+    let z = BigUint::zero();
 
-    while temp_sum > zero {
-        let remainder = ubig_to_u16(&(&temp_sum % &base));
-        result.push(u16_to_char(remainder));
-        temp_sum = temp_sum / &base;
+    while t_sum > z {
+        let remainder = ubig_to_u16(&(&t_sum % &base));
+        res.push(u16_to_c(remainder));
+        t_sum = t_sum / &base;
     }
-    result.chars().rev().collect()
+    res.chars().rev().collect()
 }
 
 ///
-/// Methode, um einen String (g-adisch) in seine Dezimaldarstellung zu überführen.
+/// Erzeuge einen String aus dem Vector von Strings
 ///
-/// # Argumente
-/// * `message` - Der zu überführende String.
-///
-/// # Rückgabe
-/// * `BigUint` - Die Dezimaldarstellung des Strings.
-///
-/// # Beispiel
-/// Beispiel von Seite 21 IT-Sec Skript:
-/// ```
-/// string_to_sum("R8F9BX-YO", 47) // 422.078.969.854.681
-/// ```
-///
-pub(crate) fn string_to_sum(message: &str) -> BigUint {
-    let base = BigUint::from(2u32.pow(16));
-    let mut sum = BigUint::zero();
-
-    for char in message.chars().rev() {
-        let value = &(BigUint::from(char_to_u16(char)));
-        sum = &sum * &base + value;
-    }
-    sum
+pub(crate) fn decode_s_vec(s: Vec<String>) -> String {
+    s.join("")
 }
 
-///
-/// Methode, um eine Dezimalzahl in eine Menge von Ziffern zu überführen.
-/// Die Ziffern sind die Koeffizienten der g-adischen Darstellung der Zahl.
-///
-/// # Argumente
-/// * `sum` - Die zu überführende Summe.
-/// * `g` - Die Basis des g-adischen Systems.
-///
-/// # Rückgabe
-/// * `Vec<u32>` - Die Menge der Koeffizienten.
-///
-/// # Beispiel
-/// Beispiel von Seite 21 IT-Sec Skript:
-/// ```
-/// sum_to_digits(ubig!(422.078.969.854.681), 47) // [17,34,5,35,1,23,40,24,14]
-/// ```
-///
-pub(crate) fn sum_to_digits(sum: &BigUint, g: u32) -> Vec<u32> {
-    todo!("Implementiere diese Funktion!")
-}
-
-///
-/// Methode, um einen Vektor von Integern in einen String zu überführen.
-///
-/// # Argumente
-/// * `int_vec` - Der zu überführende Vektor.
-///
-/// # Rückgabe
-/// * `String` - Der String.
-///
-/// # Beispiel
-/// Beispiel von Seite 21 IT-Sec Skript:
-/// ```
-/// int_vec_to_string(&vec![12,0,19,7,4,12,0,19]) // "MATHEMAT"
-///
-pub(crate) fn int_vec_to_string(int_vec: &Vec<u32>) -> String {
-    todo!("Implementiere diese Funktion!")
-}
