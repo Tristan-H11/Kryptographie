@@ -1,15 +1,37 @@
 use crate::encryption::math_functions::big_int_util::{c_to_u16, u16_to_c, ubig_to_u16};
 use bigdecimal::num_bigint::BigUint;
 use bigdecimal::{One, Zero};
+use log::debug;
 
 
-pub(crate) fn create_chiffre(m: &str, b_size: usize) -> Vec<BigUint> {
+///
+/// Methode, um einen String in eine Menge von gleich großen Blöcken in Dezimalform zu unterteilen.
+///
+/// # Argumente
+/// * `message` - Der zu unterteilende String.
+/// * `block_size` - Die Größe der Blöcke.
+///
+/// # Rückgabe
+/// * `Vec<BigUint>` - Die codierte Darstellung des Strings als vec der Summen.
+///
+pub(crate) fn create_blocks_from_string(m: &str, b_size: usize) -> Vec<BigUint> {
+    debug!("Erstelle Chiffre mit Blockgröße {} für {}", b_size, m);
     let b = create_b_vec(m, b_size);
     let i_vec = s_to_i_vec(b);
     to_sum_vec(i_vec)
 }
 
-pub(crate) fn decode_chiffre(sums: Vec<BigUint>) -> String {
+///
+/// Methode, um eine Menge von gleich großen Blöcken in Dezimalform in einen String zu überführen.
+///
+/// # Argumente
+/// * `sums` - Die zu überführenden Summen.
+///
+/// # Rückgabe
+/// * `String` - Der decodierte String.
+///
+pub(crate) fn create_string_from_blocks(sums: Vec<BigUint>) -> String {
+    debug!("Erstelle String aus Vektor von Summen");
     let s_vec = sums_vec_to_s_vec(sums);
     decode_s_vec(s_vec)
 }

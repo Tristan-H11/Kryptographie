@@ -1,6 +1,6 @@
 #[cfg(test)]
 mod tests {
-    use crate::encryption::math_functions::block_chiffre::{create_chiffre, decode_chiffre, to_sum_vec, decode_s_vec, create_b_vec, s_to_i_vec, sums_vec_to_s_vec};
+    use crate::encryption::math_functions::block_chiffre::{create_blocks_from_string, create_string_from_blocks, to_sum_vec, decode_s_vec, create_b_vec, s_to_i_vec, sums_vec_to_s_vec};
     use crate::encryption::math_functions::big_int_util::{c_to_u16};
     use bigdecimal::num_bigint::BigUint;
 
@@ -128,7 +128,7 @@ mod tests {
     fn test_create_chiffre() {
         let message = "Das ist eine Testnachricht";
         let block_size = 4;
-        let result = create_chiffre(message, block_size);
+        let result = create_blocks_from_string(message, block_size);
         let expected_result = vec![
             BigUint::from(19140715035688992u64),
             BigUint::from(29555366483460128u64),
@@ -152,7 +152,7 @@ mod tests {
             BigUint::from(29273887211061347u64),
             BigUint::from(29273895796211744u64),
         ];
-        let result = decode_chiffre(sums);
+        let result = create_string_from_blocks(sums);
         let expected_result = "Das ist eine Testnachricht  ".to_string();
         assert_eq!(result, expected_result);
     }
