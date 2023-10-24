@@ -52,7 +52,7 @@ pub(crate) fn split_into_blocks(message: &str, block_size: usize) -> Vec<String>
 /// string_to_int_vec("MATHEMAT") // [12,0,19,7,4,12,0,19]
 /// ```
 ///
-pub(crate) fn string_to_int_vec(message: &str) -> Vec<u32> {
+pub(crate) fn string_to_int_vec(message: &str) -> Vec<u16> {
     message.chars().map(char_to_u16).collect()
 }
 
@@ -75,13 +75,13 @@ pub(crate) fn string_to_int_vec(message: &str) -> Vec<u32> {
 ///     47
 /// ) // 6083869600275
 pub(crate) fn digits_from_vec_to_sum(digits: &Vec<u64>) -> BigUint {
-    let g_base = &BigUint::from(2u8).pow(16);
+    let g_base = BigUint::from(2u8).pow(16);
     let mut sum = BigUint::zero();
     let mut base = BigUint::one();
     for &digit in digits.iter().rev() {
         // [12, 2, 0, 5] --> 12 * 47^3 + 2 * 47^2 + 0 * 47^1 + 5 * 47^0
         sum += &base * digit;
-        base *= g_base;
+        base *= &g_base;
     }
     sum
 }
