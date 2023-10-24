@@ -1,8 +1,6 @@
 #[cfg(test)]
 mod tests {
-    use crate::encryption::math_functions::block_chiffre::{digits_from_vec_to_sum, join_strings,
-                                                           split_into_blocks, string_to_int_vec,
-                                                           sums_to_strings};
+    use crate::encryption::math_functions::block_chiffre::{create_chiffre, decode_chiffre, digits_from_vec_to_sum, join_strings, split_into_blocks, string_to_int_vec, sums_to_strings};
     use crate::encryption::math_functions::big_int_util::{char_to_u16};
     use bigdecimal::num_bigint::BigUint;
 
@@ -53,7 +51,6 @@ mod tests {
         let result = string_to_int_vec(blocks);
         assert_eq!(result, expected);
     }
-
 
     #[test]
     fn test_digits_from_vec_to_sum() {
@@ -124,6 +121,39 @@ mod tests {
 
         let expected_result = "Das ist eine Testnachricht  ".to_string();
 
+        assert_eq!(result, expected_result);
+    }
+
+    #[test]
+    fn test_create_chiffre() {
+        let message = "Das ist eine Testnachricht";
+        let block_size = 4;
+        let result = create_chiffre(message, block_size);
+        let expected_result = vec![
+            BigUint::from(19140715035688992u64),
+            BigUint::from(29555366483460128u64),
+            BigUint::from(28429423626551397u64),
+            BigUint::from(9007560038613107u64),
+            BigUint::from(32651569751195747u64),
+            BigUint::from(29273887211061347u64),
+            BigUint::from(29273895796211744u64),
+        ];
+        assert_eq!(result, expected_result);
+    }
+
+    #[test]
+    fn test_decode_chiffre() {
+        let sums = vec![
+            BigUint::from(19140715035688992u64),
+            BigUint::from(29555366483460128u64),
+            BigUint::from(28429423626551397u64),
+            BigUint::from(9007560038613107u64),
+            BigUint::from(32651569751195747u64),
+            BigUint::from(29273887211061347u64),
+            BigUint::from(29273895796211744u64),
+        ];
+        let result = decode_chiffre(sums);
+        let expected_result = "Das ist eine Testnachricht  ".to_string();
         assert_eq!(result, expected_result);
     }
 

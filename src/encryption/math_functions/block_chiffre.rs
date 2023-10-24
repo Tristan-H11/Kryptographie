@@ -2,8 +2,19 @@ use crate::encryption::math_functions::big_int_util::{char_to_u16, u16_to_char, 
 use bigdecimal::num_bigint::BigUint;
 use bigdecimal::{One, Zero};
 
-// TODO: Öffentliche Funktionen implementieren, weil der Rest hier unten nur für interne Zwecke ist.
 
+pub(crate) fn create_chiffre(message: &str, block_size: usize) -> Vec<BigUint> {
+    let blocks = split_into_blocks(message, block_size);
+    let int_vecs = string_to_int_vec(blocks);
+    digits_from_vec_to_sum(int_vecs)
+}
+
+pub(crate) fn decode_chiffre(sums: Vec<BigUint>) -> String {
+    let strings_vec = sums_to_strings(sums);
+    join_strings(strings_vec)
+}
+
+//todo -- alles was nicht create_chiffre und decode_chiffre ist, muss private sein
 ///
 /// Methode, um einen String in eine Menge von gleich großen Blöcken zu unterteilen.
 /// Nicht-volle Blöcke werden mit Space (' ') aufgefüllt.
@@ -51,14 +62,14 @@ pub(crate) fn split_into_blocks(message: &str, block_size: usize) -> Vec<String>
 /// ```
 /// string_to_int_vec("["Das ", "ist ", "eine", " Tes", "tnac", "hric", "ht  "]")
 /// vec![
-//             vec![char_to_u16('D'), char_to_u16('a'), char_to_u16('s'), char_to_u16(' ')],
-//             vec![char_to_u16('i'), char_to_u16('s'), char_to_u16('t'), char_to_u16(' ')],
-//             vec![char_to_u16('e'), char_to_u16('i'), char_to_u16('n'), char_to_u16('e')],
-//             vec![char_to_u16(' '), char_to_u16('T'), char_to_u16('e'), char_to_u16('s')],
-//             vec![char_to_u16('t'), char_to_u16('n'), char_to_u16('a'), char_to_u16('c')],
-//             vec![char_to_u16('h'), char_to_u16('r'), char_to_u16('i'), char_to_u16('c')],
-//             vec![char_to_u16('h'), char_to_u16('t'), char_to_u16(' '), char_to_u16(' ')],
-//         ];
+///             vec![char_to_u16('D'), char_to_u16('a'), char_to_u16('s'), char_to_u16(' ')],
+///             vec![char_to_u16('i'), char_to_u16('s'), char_to_u16('t'), char_to_u16(' ')],
+///             vec![char_to_u16('e'), char_to_u16('i'), char_to_u16('n'), char_to_u16('e')],
+///             vec![char_to_u16(' '), char_to_u16('T'), char_to_u16('e'), char_to_u16('s')],
+///             vec![char_to_u16('t'), char_to_u16('n'), char_to_u16('a'), char_to_u16('c')],
+///             vec![char_to_u16('h'), char_to_u16('r'), char_to_u16('i'), char_to_u16('c')],
+///             vec![char_to_u16('h'), char_to_u16('t'), char_to_u16(' '), char_to_u16(' ')],
+///         ];
 /// ```
 ///
 pub(crate) fn string_to_int_vec(blocks: Vec<String>) -> Vec<Vec<u16>> {
@@ -77,19 +88,18 @@ pub(crate) fn string_to_int_vec(blocks: Vec<String>) -> Vec<Vec<u16>> {
 /// # Rückgabe
 /// * `BigUint` - Die Summe des g-adischen Systems als vec<u16> der Summen.
 /// vec![
-//             BigUint::from(19140715035688992u64),
-//             BigUint::from(29555366483460128u64),
-//             BigUint::from(28429423626551397u64),
-//             BigUint::from(9007560038613107u64),
-//             BigUint::from(32651569751195747u64),
-//             BigUint::from(29273887211061347u64),
-//             BigUint::from(29273895796211744u64),
-//         ];
+///             BigUint::from(19140715035688992u64),
+///             BigUint::from(29555366483460128u64),
+///             BigUint::from(28429423626551397u64),
+///             BigUint::from(9007560038613107u64),
+///             BigUint::from(32651569751195747u64),
+///             BigUint::from(29273887211061347u64),
+///             BigUint::from(29273895796211744u64),
+///         ];
 ///
 /// # Beispiel
 /// Beispiel von Seite 21 IT-Sec Skript:
 /// ```
-
 pub(crate) fn digits_from_vec_to_sum(digit_vectors: Vec<Vec<u16>>) -> Vec<BigUint> {
     digit_vectors.into_iter().map(|digits| helper_fun_sum_for_digits(&digits)).collect()
 }
@@ -114,17 +124,16 @@ pub(crate) fn helper_fun_sum_for_digits(digits: &Vec<u16>) -> BigUint {
 /// # Rückgabe
 /// * `String` - Vector der Strings.
 ///         let expected_result = vec![
-//             "Das ".to_string(),
-//             "ist ".to_string(),
-//             "eine".to_string(),
-//             " Tes".to_string(),
-//             "tnac".to_string(),
-//             "hric".to_string(),
-//             "ht  ".to_string(),
-//         ];
+///             "Das ".to_string(),
+///             "ist ".to_string(),
+///             "eine".to_string(),
+///             " Tes".to_string(),
+///             "tnac".to_string(),
+///             "hric".to_string(),
+///             "ht  ".to_string(),
+///         ];
 ///
 ///
-
 pub(crate) fn sums_to_strings(sums: Vec<BigUint>) -> Vec<String> {
     sums.into_iter().map(|sum| helper_fun_sum_to_string(&sum)).collect()
 }
@@ -142,13 +151,10 @@ pub(crate) fn helper_fun_sum_to_string(sum: &BigUint) -> String {
     result.chars().rev().collect()
 }
 
-
 ///
 /// Erzeuge einen String aus dem Vector von Strings
 ///
 pub(crate) fn join_strings(strings: Vec<String>) -> String {
     strings.join("")
 }
-
-
 
