@@ -24,7 +24,7 @@ pub(crate) fn build_haupt_menu() -> impl Widget<MainMenuModel> {
     let fixed_width_textbox = 400.0;
     let fixed_width_button = fixed_width_entry_label + fixed_width_textbox;
     let spacer_size = 40.0;
-    let spacer_empty_strings = "          ";
+    let _spacer_empty_strings = "          ";
 
     // Entry-Felder
     let modul_width_entry = Flex::row()
