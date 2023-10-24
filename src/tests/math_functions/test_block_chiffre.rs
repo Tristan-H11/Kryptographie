@@ -4,9 +4,6 @@ mod tests {
         digits_from_vec_to_sum, int_vec_to_string, split_into_blocks, string_to_int_vec,
         string_to_sum, sum_to_digits, sum_to_string,
     };
-    use ibig::{ubig, UBig};
-    use num_bigint::ToBigUint;
-    use std::str::FromStr;
 
     #[test]
     fn test_split_into_blocks() {

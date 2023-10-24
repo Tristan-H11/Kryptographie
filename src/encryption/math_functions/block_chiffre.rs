@@ -1,6 +1,6 @@
 use bigdecimal::num_bigint::BigUint;
 use bigdecimal::{One, Zero};
-use crate::encryption::math_functions::big_int_util::{char_to_u32, u32_to_char, ubig_to_u32};
+use crate::encryption::math_functions::big_int_util::{char_to_u16, u16_to_char, ubig_to_u16};
 
 // TODO: Öffentliche Funktionen implementieren, weil der Rest hier unten nur für interne Zwecke ist.
 
@@ -53,7 +53,7 @@ pub(crate) fn split_into_blocks(message: &str, block_size: usize) -> Vec<String>
 /// ```
 ///
 pub(crate) fn string_to_int_vec(message: &str) -> Vec<u32> {
-    message.chars().map(char_to_u32).collect()
+    message.chars().map(char_to_u16).collect()
 }
 
 ///
@@ -74,7 +74,8 @@ pub(crate) fn string_to_int_vec(message: &str) -> Vec<u32> {
 ///     vec![12,0,19,7,4,12,0,19],
 ///     47
 /// ) // 6083869600275
-pub(crate) fn digits_from_vec_to_sum(digits: &Vec<u64>, g_base: u16) -> BigUint {
+pub(crate) fn digits_from_vec_to_sum(digits: &Vec<u64>) -> BigUint {
+    let g_base = 2.pow(16);
     let mut sum = BigUint::zero();
     let mut base = BigUint::one();
     for &digit in digits.iter().rev() {
@@ -90,7 +91,6 @@ pub(crate) fn digits_from_vec_to_sum(digits: &Vec<u64>, g_base: u16) -> BigUint 
 ///
 /// # Argumente
 /// * `sum` - Die zu überführende Summe.
-/// * `g` - Die Basis des g-adischen Systems.
 ///
 /// # Rückgabe
 /// * `String` - Der String.
@@ -101,18 +101,16 @@ pub(crate) fn digits_from_vec_to_sum(digits: &Vec<u64>, g_base: u16) -> BigUint 
 /// sum_to_string(ubig!(422.078.969.854.681), 47) // "R8F9BX-YO"
 /// ```
 ///
-/// TODO: Hier muss später das `g` rausgenommen werden, wenn die Margitta uns gesagt hat,
 /// welcher Buchstabe welchen Wert hat.
-pub(crate) fn sum_to_string(sum: &BigUint, g: u32) -> String {
-    panic!("Muss implementiert werden, nachdem Margitta verkündet hat, welche Basis wir nutzen.");
+pub(crate) fn sum_to_string(sum: &BigUint) -> String {
     let mut temp_sum = sum.clone();
     let mut result = String::new();
-    let base = BigUint::from(g);
-
+    let base = BigUint::from(2.pow(16));
     let zero = BigUint::zero();
+
     while temp_sum > zero {
-        let remainder = ubig_to_u32(&(&temp_sum % &base));
-        result.push(u32_to_char(remainder));
+        let remainder = ubig_to_u16(&(&temp_sum % &base));
+        result.push(u16_to_char(remainder));
         temp_sum = temp_sum / &base;
     }
     result.chars().rev().collect()
