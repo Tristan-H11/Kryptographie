@@ -8,15 +8,15 @@ use druid::{
     Env, Widget, WidgetExt,
 };
 pub(crate) fn build_haupt_menu() -> impl Widget<HauptMenuModel> {
-    let fixed_width_entryLabel = 200.0;
+    let fixed_width_entry_label = 200.0;
     let fixed_width_textbox = 400.0;
-    let fixed_width_button = fixed_width_entryLabel + fixed_width_textbox;
-    let fixed_width_label = fixed_width_entryLabel + fixed_width_textbox;
+    let fixed_width_button = fixed_width_entry_label + fixed_width_textbox;
+    let fixed_width_label = fixed_width_entry_label + fixed_width_textbox;
     let spacer_size = 40.0;
 
     // Entry-Felder
     let p1_entry = Flex::row()
-        .with_child(Label::new("Breite von Primzahl 1: ").fix_width(fixed_width_entryLabel))
+        .with_child(Label::new("Breite von Primzahl 1: ").fix_width(fixed_width_entry_label))
         .with_child(
             TextBox::new()
                 .with_placeholder("z.B. 5003")
@@ -25,7 +25,7 @@ pub(crate) fn build_haupt_menu() -> impl Widget<HauptMenuModel> {
         );
 
     let p2_entry = Flex::row()
-        .with_child(Label::new("Breite von Primzahl 2: ").fix_width(fixed_width_entryLabel))
+        .with_child(Label::new("Breite von Primzahl 2: ").fix_width(fixed_width_entry_label))
         .with_child(
             TextBox::new()
                 .with_placeholder("z.B. 5009")
@@ -34,7 +34,7 @@ pub(crate) fn build_haupt_menu() -> impl Widget<HauptMenuModel> {
         );
 
     let miller_rabin_entry = Flex::row()
-        .with_child(Label::new("Miller-Rabin Iterationen: ").fix_width(fixed_width_entryLabel))
+        .with_child(Label::new("Miller-Rabin Iterationen: ").fix_width(fixed_width_entry_label))
         .with_child(
             TextBox::new()
                 .with_placeholder("z.B. 61, sollte laut Herr Elsner mit max 100 reichen")
@@ -101,10 +101,10 @@ pub(crate) fn build_haupt_menu() -> impl Widget<HauptMenuModel> {
 }
 
 pub(crate) fn build_alice_view() -> impl Widget<AliceModel> {
-    let fixed_width_entryLabel = 200.0;
+    let fixed_width_entry_label = 200.0;
     let fixed_width_textbox = 400.0;
-    let fixed_width_button = fixed_width_entryLabel + fixed_width_textbox;
-    let fixed_width_label = fixed_width_entryLabel + fixed_width_textbox;
+    let fixed_width_button = fixed_width_entry_label + fixed_width_textbox;
+    let fixed_width_label = fixed_width_entry_label + fixed_width_textbox;
     let spacer_size = 40.0;
 
     // Label
@@ -115,14 +115,14 @@ pub(crate) fn build_alice_view() -> impl Widget<AliceModel> {
 
     // Entry-Felder und Labels
     let plaintext_entry = Flex::row()
-        .with_child(Label::new("Nachricht Klartext: ").fix_width(fixed_width_entryLabel))
+        .with_child(Label::new("Nachricht Klartext: ").fix_width(fixed_width_entry_label))
         .with_child(TextBox::new()
             .with_placeholder("z.B. Hallo wie geht es dir, mir geht es heute wunderbar, wusstest du, dass heute XXXXX")
             .fix_width(fixed_width_textbox)
             .lens(AliceModel::message_klartext));
 
     let ciffretext_entry = Flex::row()
-        .with_child(Label::new("Nachricht Chiffre: ").fix_width(fixed_width_entryLabel))
+        .with_child(Label::new("Nachricht Chiffre: ").fix_width(fixed_width_entry_label))
         .with_child(
             TextBox::new()
                 .with_placeholder(
@@ -150,7 +150,7 @@ pub(crate) fn build_alice_view() -> impl Widget<AliceModel> {
                     "Ungültig".to_string()
                 }
             })
-            .fix_width(fixed_width_entryLabel),
+            .fix_width(fixed_width_entry_label),
         );
 
     // Buttons
@@ -224,10 +224,10 @@ pub(crate) fn build_alice_view() -> impl Widget<AliceModel> {
 }
 
 pub(crate) fn build_bob_view() -> impl Widget<BobModel> {
-    let fixed_width_entryLabel = 200.0;
+    let fixed_width_entry_label = 200.0;
     let fixed_width_textbox = 400.0;
-    let fixed_width_button = fixed_width_entryLabel + fixed_width_textbox;
-    let fixed_width_label = fixed_width_entryLabel + fixed_width_textbox;
+    let fixed_width_button = fixed_width_entry_label + fixed_width_textbox;
+    let fixed_width_label = fixed_width_entry_label + fixed_width_textbox;
     let spacer_size = 40.0;
 
     // Label
@@ -237,14 +237,14 @@ pub(crate) fn build_bob_view() -> impl Widget<BobModel> {
 
     // Entry-Felder und Labels
     let plaintext_entry = Flex::row()
-        .with_child(Label::new("Nachricht Klartext: ").fix_width(fixed_width_entryLabel))
+        .with_child(Label::new("Nachricht Klartext: ").fix_width(fixed_width_entry_label))
         .with_child(TextBox::new()
             .with_placeholder("z.B. Hallo wie geht es dir, mir geht es heute wunderbar, wusstest du, dass heute XXXXX")
             .fix_width(fixed_width_textbox)
             .lens(BobModel::message_klartext));
 
     let ciffretext_entry = Flex::row()
-        .with_child(Label::new("Nachricht Chiffre: ").fix_width(fixed_width_entryLabel))
+        .with_child(Label::new("Nachricht Chiffre: ").fix_width(fixed_width_entry_label))
         .with_child(
             TextBox::new()
                 .with_placeholder(
@@ -272,7 +272,7 @@ pub(crate) fn build_bob_view() -> impl Widget<BobModel> {
                     "Ungültig".to_string()
                 }
             })
-            .fix_width(fixed_width_entryLabel),
+            .fix_width(fixed_width_entry_label),
         );
 
     // Buttons

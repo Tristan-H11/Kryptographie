@@ -1,7 +1,6 @@
-use rand::{random, thread_rng};
 use bigdecimal::num_bigint::BigUint;
 use bigdecimal::{One, Zero};
-use rand::distributions::{Bernoulli, Distribution};
+use rand::random;
 
 ///
 /// Gibt zurück, ob die Zahl gerade ist.
@@ -93,6 +92,10 @@ pub fn random_in_range(high: &BigUint) -> BigUint {
 
 pub fn elsner_rand(a: f64, b: f64) -> f64 {
     let mut m: f64 = random::<u32>() as f64;
+
+    // Für m brauchen wir die doppelte Präzision
+    // Wie groß ist die Intervallbreite? Diese Anzahl von Dezimalstellen von (b-a+1) und
+    // Dezimalstellen von n addieren und das die Präzision. + 10 mehr gegen rundungsfehler
     while (m.sqrt() == 0.0) {
         m = random::<u32>() as f64;
     }
