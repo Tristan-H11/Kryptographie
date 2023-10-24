@@ -1,2 +1,2 @@
 pub mod rsa_keygen_service;
-mod keys;
+pub mod keys;

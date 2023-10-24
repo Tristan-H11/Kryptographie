@@ -24,6 +24,20 @@ impl PublicKey {
             n,
         }
     }
+
+    ///
+    /// Gibt den öffentlichen Exponenten als String zurück.
+    ///
+    pub fn get_e(&self) -> String {
+        self.e.to_str_radix(10)
+    }
+
+    ///
+    /// Gibt den Modul n zurück.
+    ///
+    pub fn get_n(&self) -> String {
+        self.n.to_str_radix(10)
+    }
 }
 
 ///
@@ -49,29 +63,43 @@ impl PrivateKey {
             n,
         }
     }
+
+    ///
+    /// Gibt den privaten Exponenten als String zurück.
+    ///
+    pub fn get_d(&self) -> String {
+        self.d.to_str_radix(10)
+    }
+
+    ///
+    /// Gibt den Modul n zurück.
+    ///
+    pub fn get_n(&self) -> String {
+        self.n.to_str_radix(10)
+    }
 }
 
 
 impl Encryption for PublicKey {
-    fn encrypt(&self, message: &BigUint) -> BigUint {
+    fn encrypt(&self, message: &str) -> String {
         todo!("Implementiere diese Funktion!")
     }
 }
 
 impl Verification for PublicKey {
-    fn verify(&self, signature: &String, message: &String) -> bool {
+    fn verify(&self, signature: &str, message: &str) -> bool {
         todo!("Implementiere diese Funktion!")
     }
 }
 
 impl Decryption for PrivateKey {
-    fn decrypt(&self, message: &BigUint) -> BigUint {
+    fn decrypt(&self, message: &str) -> String {
         todo!("Implementiere diese Funktion!")
     }
 }
 
 impl Signing for PrivateKey {
-    fn sign(&self, message: &String) -> String {
+    fn sign(&self, message: &str) -> String {
         todo!("Implementiere diese Funktion!")
     }
 }

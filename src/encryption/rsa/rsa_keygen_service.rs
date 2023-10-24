@@ -3,8 +3,7 @@ use crate::encryption::rsa::keys::{PublicKey, PrivateKey};
 
 /// Implementierung des KeyGenService-Traits für RSA.
 pub struct RsaKeygenService {
-    width_one: usize,
-    width_two: usize,
+    key_size: usize,
 }
 
 impl RsaKeygenService {
@@ -13,19 +12,18 @@ impl RsaKeygenService {
     ///
     /// # Argumente
     ///
-    /// * `prime_one` - Die Breite der ersten Primzahl.
-    /// * `prime_two` - Die Breite der zweiten Primzahl.
+    /// * `key_width` - Die Breite des Moduls `n`.
     ///
-    pub fn new(width_one: usize, width_two: usize) -> RsaKeygenService {
+    pub fn new(key_size: usize) -> RsaKeygenService {
         RsaKeygenService {
-            width_one,
-            width_two,
+            key_size,
         }
     }
 }
 
 impl KeyGenService for RsaKeygenService {
     fn generate_keypair(&self) -> (PublicKey, PrivateKey) {
+        // die primzahlen sind die hälfte der länge des moduls
         todo!("Implementiere diese Funktion!")
     }
 }
