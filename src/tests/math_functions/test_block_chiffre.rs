@@ -1,9 +1,10 @@
 #[cfg(test)]
 mod tests {
-    use crate::encryption::math_functions::block_chiffre::{digits_from_vec_to_sum, int_vec_to_string, split_into_blocks, string_to_int_vec, string_to_sum, sum_to_digits, sum_to_string};
-    use crate::encryption::math_functions::big_int_util::{char_to_u16, u16_to_char, ubig_to_u16};
+    use crate::encryption::math_functions::block_chiffre::{digits_from_vec_to_sum, join_strings,
+                                                           split_into_blocks, string_to_int_vec,
+                                                           sums_to_strings};
+    use crate::encryption::math_functions::big_int_util::{char_to_u16};
     use bigdecimal::num_bigint::BigUint;
-    use bigdecimal::FromPrimitive;
 
     #[test]
     fn test_split_into_blocks() {
@@ -82,22 +83,50 @@ mod tests {
 
 
     #[test]
-    fn test_sum_to_string() {
-        let sum = BigUint::from(176096411691_u64);
-        let expected = ")*+";
-        let result = sum_to_string(&sum);
-        assert_eq!(
-            result, expected,
-            "Die Funktion sum_to_string hat einen unerwarteten Wert zurückgegeben"
-        );
+    fn test_sum_to_strings() {
+        let sums = vec![
+            BigUint::from(19140715035688992u64),
+            BigUint::from(29555366483460128u64),
+            BigUint::from(28429423626551397u64),
+            BigUint::from(9007560038613107u64),
+            BigUint::from(32651569751195747u64),
+            BigUint::from(29273887211061347u64),
+            BigUint::from(29273895796211744u64),
+        ];
+
+        let result = sums_to_strings(sums);
+
+        let expected_result = vec![
+            "Das ".to_string(),
+            "ist ".to_string(),
+            "eine".to_string(),
+            " Tes".to_string(),
+            "tnac".to_string(),
+            "hric".to_string(),
+            "ht  ".to_string(),
+        ];
+        assert_eq!(result, expected_result);
     }
 
     #[test]
-    fn test_string_to_sum() {
-        let message = ")*+";
-        let expected_sum = BigUint::from(176096411691_u64);
-        let result_sum = string_to_sum(&message);
-        assert_eq!(result_sum, expected_sum);
+    fn test_join_strings() {
+        let input = vec![
+            "Das ".to_string(),
+            "ist ".to_string(),
+            "eine".to_string(),
+            " Tes".to_string(),
+            "tnac".to_string(),
+            "hric".to_string(),
+            "ht  ".to_string(),
+        ];
+
+        let result = join_strings(input);
+
+        let expected_result = "Das ist eine Testnachricht  ".to_string();
+
+        assert_eq!(result, expected_result);
     }
+
+
 }
 
