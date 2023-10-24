@@ -1,4 +1,4 @@
-use crate::encryption::encryption_service::EncryptionService;
+use crate::encryption::encryption_services::EncryptionService;
 use crate::encryption::keygen_service::KeyGenService;
 use crate::encryption::rotate::rot_encryption_service::RotEncryptionService;
 use crate::encryption::rotate::rot_keygen_service::RotKeygenService;

@@ -1,10 +1,10 @@
 use crate::encryption::keygen_service::KeyGenService;
-use bigdecimal::num_bigint::BigUint;
+use crate::encryption::rsa::keys::{PrivateKey, PublicKey};
 
 /// Implementierung des KeyGenService-Traits für RSA.
 pub struct RsaKeygenService {
-    prime_one: BigUint,
-    prime_two: BigUint,
+    width_one: usize,
+    width_two: usize,
 }
 
 impl RsaKeygenService {
@@ -13,19 +13,19 @@ impl RsaKeygenService {
     ///
     /// # Argumente
     ///
-    /// * `prime_one` - Die erste Primzahl.
-    /// * `prime_two` - Die zweite Primzahl.
+    /// * `prime_one` - Die Breite der ersten Primzahl.
+    /// * `prime_two` - Die Breite der zweiten Primzahl.
     ///
-    pub fn new(prime_one: &BigUint, prime_two: &BigUint) -> RsaKeygenService {
+    pub fn new(width_one: usize, width_two: usize) -> RsaKeygenService {
         RsaKeygenService {
-            prime_one: prime_one.clone(),
-            prime_two: prime_two.clone(),
+            width_one,
+            width_two,
         }
     }
 }
 
 impl KeyGenService for RsaKeygenService {
-    fn generate_keypair(&self) -> (String, String) {
+    fn generate_keypair(&self) -> (PrivateKey, PublicKey) {
         todo!("Implementiere diese Funktion!")
     }
 }
