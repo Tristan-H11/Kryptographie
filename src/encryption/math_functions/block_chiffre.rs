@@ -75,7 +75,7 @@ pub(crate) fn string_to_int_vec(message: &str) -> Vec<u32> {
 ///     47
 /// ) // 6083869600275
 pub(crate) fn digits_from_vec_to_sum(digits: &Vec<u64>) -> BigUint {
-    let g_base = 2.pow(16); // or     //todo -- let g_base = BigUint::from(2u32.pow(16)); ???
+    let g_base = &BigUint::from(2u8).pow(16);
     let mut sum = BigUint::zero();
     let mut base = BigUint::one();
     for &digit in digits.iter().rev() {
