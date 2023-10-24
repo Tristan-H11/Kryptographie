@@ -1,7 +1,7 @@
 use crate::encryption::math_functions::big_int_util::{c_to_u16, u16_to_c, ubig_to_u16};
 use bigdecimal::num_bigint::BigUint;
 use bigdecimal::{One, Zero};
-use log::debug;
+use log::{debug, trace};
 
 
 ///
@@ -56,6 +56,7 @@ pub(crate) fn create_string_from_blocks(sums: Vec<BigUint>) -> String {
 /// ["Das ", "ist ", "eine", " Tes", "tnac", "hric", "ht  "]
 /// ```
 pub(crate) fn create_b_vec(m: &str, b_size: usize) -> Vec<String> {
+    debug!("Erstelle Blöcke mit Blockgröße {} für {}", b_size, m);
     m
         .chars()
         .collect::<Vec<char>>() //Erstelle einen Vektor für die Blöcke bestehend aus Zeichen
@@ -66,6 +67,7 @@ pub(crate) fn create_b_vec(m: &str, b_size: usize) -> Vec<String> {
             while b.len() < b_size {
                 b.push(' '); // Fügt Leerzeichen hinzu, um den letzten Block zu füllen
             }
+            trace!("Erstelle Block {}", b);
             b
         })
         .collect() // Fasst alle Blöcke im Vektor zusammen
@@ -96,6 +98,7 @@ pub(crate) fn create_b_vec(m: &str, b_size: usize) -> Vec<String> {
 /// ```
 ///
 pub(crate) fn s_to_i_vec(b_vec: Vec<String>) -> Vec<Vec<u16>> {
+    debug!("Erstelle Integer Vektor aus String Vektor");
     b_vec.into_iter().map(|b| {
         b.chars().map(c_to_u16).collect()
     }).collect()
@@ -124,14 +127,17 @@ pub(crate) fn s_to_i_vec(b_vec: Vec<String>) -> Vec<Vec<u16>> {
 /// Beispiel von Seite 21 IT-Sec Skript:
 /// ```
 pub(crate) fn to_sum_vec(d_vec: Vec<Vec<u16>>) -> Vec<BigUint> {
+    debug!("Erstelle Summen Vektor aus Integer Vektor");
     d_vec.into_iter().map(|d| helper_fun_sum_for_digits(&d)).collect()
 }
 
 pub(crate) fn helper_fun_sum_for_digits(i_vec: &Vec<u16>) -> BigUint {
+    debug!("Erstelle Summe aus Integer Vektor");
     let g_base = BigUint::from(2u32.pow(16));
     let mut sum = BigUint::zero();
     let mut base = BigUint::one();
     for &digit in i_vec.iter().rev() {
+        trace!("Addiere {} * {} zu Summe", base, digit);
         sum += &base * BigUint::from(digit);
         base *= &g_base;
     }
@@ -158,6 +164,7 @@ pub(crate) fn helper_fun_sum_for_digits(i_vec: &Vec<u16>) -> BigUint {
 ///
 ///
 pub(crate) fn sums_vec_to_s_vec(sums: Vec<BigUint>) -> Vec<String> {
+    debug!("Erstelle String Vektor aus Summen Vektor");
     sums.into_iter().map(|sum| helper_fun_sum_to_string(&sum)).collect()
 }
 pub(crate) fn helper_fun_sum_to_string(sum: &BigUint) -> String {

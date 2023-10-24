@@ -81,7 +81,6 @@ impl RsaKeygenService {
         let lower_bound = &BigUint::from(2u8).pow((size - 1) as u32);
         let mut prime_candidate = random_generator.take(lower_bound, upper_bound);
 
-        //repeat random number until miller_rabin gives true
         while !miller_rabin(&prime_candidate, miller_rabin_iterations) {
             trace!("Generierter Primkandidat {} ist keine Primzahl", prime_candidate);
             prime_candidate = random_generator.take(lower_bound, upper_bound);

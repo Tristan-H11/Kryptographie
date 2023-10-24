@@ -10,10 +10,11 @@ use gui::model::model::AppState;
 
 fn main() {
 
-    // SimpleLogger::new()
-    //     .with_level(LevelFilter::Trace)
-    //     .init()
-    //     .unwrap();
+    SimpleLogger::new()
+        .with_level(LevelFilter::Debug)
+        .with_colors(true)
+        .init()
+        .unwrap();
 
     let main_window = WindowDesc::new(build_ui())
         .title("RSA-Simulator")
