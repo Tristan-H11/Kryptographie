@@ -34,7 +34,7 @@ pub(crate) fn split_into_blocks(message: &str, block_size: usize) -> Vec<String>
             }
             block
         })
-        .collect() // Falls alle Blöcke im Vektor zusammen
+        .collect() // Fasst alle Blöcke im Vektor zusammen
 }
 
 ///
@@ -62,7 +62,6 @@ pub(crate) fn string_to_int_vec(message: &str) -> Vec<u16> {
 ///
 /// # Argumente
 /// * `digits` - Der zu überführende Vektor.
-/// * `g` - Die Basis des g-adischen Systems.
 ///
 /// # Rückgabe
 /// * `BigUint` - Die Summe des g-adischen Systems.
@@ -70,16 +69,13 @@ pub(crate) fn string_to_int_vec(message: &str) -> Vec<u16> {
 /// # Beispiel
 /// Beispiel von Seite 21 IT-Sec Skript:
 /// ```
-/// digits_to_sum(
-///     vec![12,0,19,7,4,12,0,19],
-///     47
-/// ) // 6083869600275
-pub(crate) fn digits_from_vec_to_sum(digits: &Vec<u64>) -> BigUint {
-    let g_base = BigUint::from(2u8).pow(16);
+
+pub(crate) fn digits_from_vec_to_sum(digits: &Vec<u16>) -> BigUint {
+    let g_base = BigUint::from(16u16);
     let mut sum = BigUint::zero();
     let mut base = BigUint::one();
     for &digit in digits.iter().rev() {
-        // [12, 2, 0, 5] --> 12 * 47^3 + 2 * 47^2 + 0 * 47^1 + 5 * 47^0
+        // [12, 2, 0, 5] --> 12 * 16^3 + 2 * 16^2 + 0 * 16^1 + 5 * 16^0
         sum += &base * digit;
         base *= &g_base;
     }
@@ -102,19 +98,30 @@ pub(crate) fn digits_from_vec_to_sum(digits: &Vec<u64>) -> BigUint {
 /// ```
 ///
 /// welcher Buchstabe welchen Wert hat.
-pub(crate) fn sum_to_string(sum: &BigUint) -> String {
-    let mut temp_sum = sum.clone();
-    let mut result = String::new();
-    let base = BigUint::from(2u32.pow(16));
-    let zero = BigUint::zero();
+///
 
-    while temp_sum > zero {
-        let remainder = ubig_to_u16(&(&temp_sum % &base));
-        result.push(u16_to_char(remainder));
-        temp_sum = temp_sum / &base;
-    }
-    result.chars().rev().collect()
-}
+//todo -- neu implementieren
+//pub(crate) fn sum_to_string(sum: &BigUint) -> String {
+
+//}
+
+
+
+
+// pub(crate) fn sum_to_string(sum: &BigUint) -> String {
+//     let mut temp_sum = sum.clone();
+//     let mut result = String::new();
+//     let base = BigUint::from(2u32.pow(16));
+//     let zero = BigUint::zero();
+//
+//     while temp_sum > zero {
+//         let remainder = ubig_to_u16(&(&temp_sum % &base));
+//         result.push(u16_to_char(remainder));
+//         temp_sum = temp_sum / &base;
+//     }
+//     result.chars().rev().collect()
+// }
+
 
 ///
 /// Methode, um einen String (g-adisch) in seine Dezimaldarstellung zu überführen.
