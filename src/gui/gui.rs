@@ -101,13 +101,13 @@ pub fn build_ui() -> impl Widget<AppState> {
         |data: &AppState, _env| data.current_view.clone(),
         |selector, _data, _env| {
             let selected_widget: Box<dyn Widget<_>> = match *selector {
-                View::HauptMenu => Box::new(build_haupt_menu().lens(AppState::haupt_menu)),
+                View::MainMenu => Box::new(build_haupt_menu().lens(AppState::main_menu)),
                 View::Alice => Box::new(build_alice_view().lens(AppState::alice)),
                 View::Bob => Box::new(build_bob_view().lens(AppState::bob)),
             };
             selected_widget.boxed()
         },
     )
-    .controller(AppController)
+    .controller(AppController::default())
     .boxed()
 }
