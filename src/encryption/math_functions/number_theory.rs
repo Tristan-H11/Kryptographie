@@ -1,6 +1,7 @@
 use crate::encryption::math_functions::big_int_util::{
-    decrement, increment, is_even, is_one, is_zero, random_in_range,
+    decrement, divides, increment, is_even, is_one, is_zero,
 };
+use crate::encryption::math_functions::random_elsner::RandomElsner;
 use bigdecimal::num_bigint::{BigInt, BigUint};
 use bigdecimal::num_traits::Euclid;
 use bigdecimal::{One, Zero};
@@ -138,29 +139,20 @@ pub fn miller_rabin(p: &BigUint, repeats: usize) -> bool {
         d = d.div(BigUint::from(2u8));
         s += BigUint::one();
     }
+    let mut rand = RandomElsner::create();
     for _ in 0..repeats {
-        if !miller_rabin_test(&p, &s, &d) {
+        let mut a = rand.take(&BigUint::one(), &p);
+        while divides(p, &a) {
+            a = rand.take(&BigUint::one(), &p);
+        }
+        if !miller_rabin_test(&p, &s, &d, &a) {
             return false;
         }
     }
     return true;
 }
 
-/// Führt den Miller-Rabin-Test-Algorithmus auf `p` aus.
-///
-/// # Argumente
-/// * `p` - Die zu testende Zahl >= 11.
-/// * `s` - Anzahl wie oft (p-1) durch zwei teilbar ist, bis (p-1) ungerade ist.
-/// * `d` - übrigbleibender Faktor, sodass (p-1) = d * 2^s
-///
-/// # Rückgabe
-/// `true`, wenn `p` wahrscheinlich eine Primzahl ist, andernfalls `false`.
-fn miller_rabin_test(p: &BigUint, s: &BigUint, d: &BigUint) -> bool {
-    // TODO: random_in_range() auf elsner_rand() ändern sobalt elsner_rand() BigUint nimmt.
-    let mut a = random_in_range(p);
-    while is_zero(&(&a).rem_euclid(p)) {
-        a = random_in_range(p);
-    }
+fn miller_rabin_test(p: &BigUint, s: &BigUint, d: &BigUint, a: &BigUint) -> bool {
     let mut x = fast_exponentiation(&a, d, p);
     if is_one(&x) || x == decrement(p) {
         return true;
