@@ -105,80 +105,25 @@ pub fn elsner_rand(a: f64, b: f64) -> f64 {
 }
 
 ///
-/// Konvertiere ein Zeichen in einen u32 Code -- z.B. für Blockchiffre
+/// Konvertiere ein Zeichen in einen u16 Code -- z.B. für Blockchiffre
 ///
-pub(crate) fn char_to_u32(c: char) -> u32 {
-    match c {
-        'a'..='z' => c as u32 - 'a' as u32,
-        'A'..='Z' => c as u32 - 'A' as u32 + 26,
-        '0'..='9' => c as u32 - '0' as u32 + 52,
-        '.' => 62,
-        ',' => 63,
-        ':' => 64,
-        ';' => 65,
-        '-' => 66,
-        '!' => 67,
-        '?' => 68,
-        '"' => 69,
-        '(' => 70,
-        ')' => 71,
-        '/' => 72,
-        '\'' => 73,
-        '*' => 74,
-        '+' => 75,
-        ' ' => 76,
-        '&' => 77,
-        '%' => 78,
-        '$' => 79,
-        '#' => 80,
-        '@' => 81,
-        '€' => 82,
-        '§' => 83,
-        '°' => 84,
-        _ => panic!("Ungültiges Zeichen: {}", c),
-    }
+pub(crate) fn char_to_u16(c: char) -> u16 {
+    c as u16
 }
 
 ///
-/// Konvertiere ein u32 Code in ein Zeichen -- z.B. für Blockchiffre
+/// Konvertiere ein u16 Code in ein Zeichen -- z.B. für Blockchiffre
 ///
-pub(crate) fn u32_to_char(value: u32) -> char {
-    match value {
-        0..=25 => ((value + 'a' as u32) as u8) as char,
-        26..=51 => (((value - 26) + 'A' as u32) as u8) as char,
-        52..=61 => (((value - 52) + '0' as u32) as u8) as char,
-        62 => '.',
-        63 => ',',
-        64 => ':',
-        65 => ';',
-        66 => '-',
-        67 => '!',
-        68 => '?',
-        69 => '"',
-        70 => '(',
-        71 => ')',
-        72 => '/',
-        73 => '\'',
-        74 => '*',
-        75 => '+',
-        76 => ' ',
-        77 => '&',
-        78 => '%',
-        79 => '$',
-        80 => '#',
-        81 => '@',
-        82 => '€',
-        83 => '§',
-        84 => '°',
-        _ => panic!("Ungültiger Wert: {}", value),
-    }
+pub(crate) fn u16_to_char(value: u16) -> char {
+    std::char::from_u32(value as u32).expect("Invalider Unicode") // muss in u32, da char
+                                                                  // ein unicode zeichen in
+                                                                  // u32 ist
 }
 
 ///
-/// wandle eine ubig Zahl in einen u32 Wert um
+/// wandle eine ubig Zahl in einen u16 Wert um
 ///
-pub(crate) fn ubig_to_u32(value: &BigUint) -> u32 {
-    //todo -- einschränken, dass die ubig zahl nicht über den werteraum von u32 geht
+pub(crate) fn ubig_to_u16(value: &BigUint) -> u16 {
     let value_str = format!("{}", value);
-    value_str.parse::<u32>().unwrap()
+    value_str.parse::<u16>().expect("Ungültige Zahl > u16")
 }

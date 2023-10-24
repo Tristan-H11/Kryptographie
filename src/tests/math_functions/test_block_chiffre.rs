@@ -1,9 +1,11 @@
 #[cfg(test)]
 mod tests {
+    use crate::encryption;
     use crate::encryption::math_functions::block_chiffre::{
-        digits_from_vec_to_sum, split_into_blocks, string_to_int_vec,
+        digits_from_vec_to_sum, split_into_blocks, string_to_int_vec, sum_to_string,
     };
     use bigdecimal::num_bigint::BigUint;
+    use bigdecimal::FromPrimitive;
 
     #[test]
     fn test_split_into_blocks() {
@@ -42,7 +44,7 @@ mod tests {
         let block_size = 3;
         let blocks = split_into_blocks(&message, block_size); // erstellen des Vektors
                                                               // aus Blöcken
-        let expectet_chiffre_results_as_blocks_in_vec: Vec<Vec<u32>> = vec![
+        let expectet_chiffre_results_as_blocks_in_vec: Vec<Vec<u16>> = vec![
             vec![0, 1, 2],
             vec![63, 76, 49],
             vec![50, 51, 52],
@@ -67,32 +69,33 @@ mod tests {
         // Testfall 1: Zahlen in umgekehrter Reihenfolge und Basis 47.
         let digits = vec![12, 0, 19, 7, 4, 12, 0, 19];
         let base = 47;
-        let result = digits_from_vec_to_sum(&digits, base);
+        let result = digits_from_vec_to_sum(&digits);
         let expected_result = BigUint::from(6083869600275u64);
         assert_eq!(result, expected_result);
 
         // Testfall 2: Basis 2 und Binärzahlen.
         let digits = vec![1, 0, 1, 0, 1, 0];
         let base = 2;
-        let result = digits_from_vec_to_sum(&digits, base);
+        let result = digits_from_vec_to_sum(&digits);
         let expected_result = BigUint::from(42u32);
         assert_eq!(result, expected_result);
 
         // Testfall 3: Basis 16 und Hexadezimalzahlen.
         let digits = vec![13, 10, 15]; // [D, A, F]
         let base = 16;
-        let result = digits_from_vec_to_sum(&digits, base);
+        let result = digits_from_vec_to_sum(&digits);
         let expected_result = BigUint::from(3503u32);
         assert_eq!(expected_result, expected_result);
     }
 
     #[test]
     fn test_sum_to_string() {
-        todo!("Auf Anweisung von Margitta warten. Siehe Funktion.")
-        // let sum = UBig::from(1234567890_u64);
-        // assert_eq!(sum_to_string(&sum, 10), "1234567890");
-        //
-        // let sum = UBig::from(9876543210_u64);
-        // assert_eq!(sum_to_string(&sum, 10), "9876543210");
+        let sum = BigUint::from_u64(65537).unwrap();
+        let expected = "AA"; // Der erwartete String für den Wert 65537 in Basis 65536
+        let result = sum_to_string(&sum);
+        assert_eq!(
+            result, expected,
+            "Die Funktion sum_to_string hat einen unerwarteten Wert zurückgegeben"
+        );
     }
 }
