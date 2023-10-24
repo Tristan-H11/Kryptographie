@@ -36,8 +36,6 @@ pub(crate) fn create_string_from_blocks(sums: Vec<BigUint>) -> String {
     decode_s_vec(s_vec)
 }
 
-//todo -- alles was nicht create_chiffre und decode_chiffre ist, muss private sein
-//(dann fliegen die tests gegen die Wand)
 ///
 /// Methode, um einen String in eine Menge von gleich großen Blöcken zu unterteilen.
 /// Nicht-volle Blöcke werden mit Space (' ') aufgefüllt.
