@@ -2,6 +2,7 @@ use bigdecimal::num_bigint::ToBigUint;
 use crate::gui::controller::commands::*;
 use crate::gui::model::model::{AppState, View};
 use druid::{Env, Event, EventCtx};
+use log::{debug, error};
 use crate::encryption::encryption_services::{Decryption, Encryption, Signing, Verification};
 use crate::encryption::rsa::keys::{PrivateKey, PublicKey};
 use crate::encryption::rsa::rsa_keygen_service::RsaKeygenService;
@@ -158,7 +159,14 @@ impl AppController {
     fn calculate_keypair(&mut self, app_state: &mut AppState) -> (PublicKey, PrivateKey) {
         let modul_width = app_state.main_menu.modul_width.parse::<usize>().unwrap();
         let keygen_service = RsaKeygenService::new(modul_width);
-        keygen_service.generate_keypair()
+        let miller_rabin_iterations = app_state.main_menu.miller_rabin_iterations.parse::<usize>();
+        if miller_rabin_iterations.is_err() {
+            error!("Fehler beim Parsen der Miller-Rabin-Iterationen: {} \n Es wird ein Default-Schlüssel mit 4096-bit erstellt.",
+                miller_rabin_iterations.err().unwrap());
+            return keygen_service.generate_keypair(4096);
+        } else {
+            return keygen_service.generate_keypair(miller_rabin_iterations.unwrap());
+        }
     }
 
     ///
