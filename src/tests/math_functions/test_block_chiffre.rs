@@ -1,8 +1,6 @@
 #[cfg(test)]
 mod tests {
-    use crate::encryption::math_functions::block_chiffre::{digits_from_vec_to_sum, int_vec_to_string, split_into_blocks,
-        string_to_int_vec, string_to_sum, sum_to_digits,
-    };
+    use crate::encryption::math_functions::block_chiffre::{digits_from_vec_to_sum, int_vec_to_string, split_into_blocks, string_to_int_vec, string_to_sum, sum_to_digits, sum_to_string};
     use crate::encryption::math_functions::big_int_util::{char_to_u16, u16_to_char, ubig_to_u16};
     use bigdecimal::num_bigint::BigUint;
     use bigdecimal::FromPrimitive;
@@ -58,24 +56,23 @@ mod tests {
 
     #[test]
     fn test_digits_from_vec_to_sum() {
-        let digits = vec![1_u16, 4, 3];
+        let digits = vec![41, 42, 43];
         let result = digits_from_vec_to_sum(&digits);
-        // Angepasste Summe: 1*2^16^2 + 4*2^16^1 + 3*2^16^0
-        let expected_result = BigUint::from(333_u64);     //todo durch richtige zahl ersetzen
+        // Angepasste Summe: 41*(2^16)^2 + 42*(2^16)^1 + 43*(2^16)^0
+        let expected_result = BigUint::from(176096411691_u64);
         assert_eq!(result, expected_result);
     }
 
-
-    // #[test]
-    // fn test_sum_to_string() {
-    //     let sum = BigUint::from_u32(1094).unwrap();
-    //     let expected = "";
-    //     let result = sum_to_string(&sum);
-    //     assert_eq!(
-    //         result, expected,
-    //         "Die Funktion sum_to_string hat einen unerwarteten Wert zurückgegeben"
-    //     );
-    // }
+    #[test]
+    fn test_sum_to_string() {
+        let sum = BigUint::from(176096411691_u64);
+        let expected = ")*+";
+        let result = sum_to_string(&sum);
+        assert_eq!(
+            result, expected,
+            "Die Funktion sum_to_string hat einen unerwarteten Wert zurückgegeben"
+        );
+    }
 
     // #[test]
     // fn test_string_to_sum() {

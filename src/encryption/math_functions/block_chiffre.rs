@@ -71,15 +71,15 @@ pub(crate) fn string_to_int_vec(message: &str) -> Vec<u16> {
 /// ```
 
 pub(crate) fn digits_from_vec_to_sum(digits: &Vec<u16>) -> BigUint {
-    let g_base = BigUint::from((2u16).pow(16));
+    let g_base = BigUint::from((2_u32.pow(16)));
     let mut sum = BigUint::zero();
     let mut base = BigUint::one();
     for &digit in digits.iter().rev() {
-        // [12, 2, 0, 5] --> 12 * 2^16^3 + 2 * 2^16^2 + 0 * 2^16^1 + 5 * 2^16^0
+        // [0, 2, 1] --> (0 * 2^16^2) + (2 * 2^16^1) + (1 * 2^16^0)
         sum += &base * digit;
         base *= &g_base;
     }
-    sum
+    sum  // 131073
 }
 
 ///
@@ -100,27 +100,19 @@ pub(crate) fn digits_from_vec_to_sum(digits: &Vec<u16>) -> BigUint {
 /// welcher Buchstabe welchen Wert hat.
 ///
 
-//todo -- neu implementieren
-//pub(crate) fn sum_to_string(sum: &BigUint) -> String {
+pub(crate) fn sum_to_string(sum: &BigUint) -> String {
+    let mut temp_sum = sum.clone();
+    let mut result = String::new();
+    let base = BigUint::from(2u32.pow(16));
+    let zero = BigUint::zero();
 
-//}
-
-
-
-
-// pub(crate) fn sum_to_string(sum: &BigUint) -> String {
-//     let mut temp_sum = sum.clone();
-//     let mut result = String::new();
-//     let base = BigUint::from(2u32.pow(16));
-//     let zero = BigUint::zero();
-//
-//     while temp_sum > zero {
-//         let remainder = ubig_to_u16(&(&temp_sum % &base));
-//         result.push(u16_to_char(remainder));
-//         temp_sum = temp_sum / &base;
-//     }
-//     result.chars().rev().collect()
-// }
+    while temp_sum > zero {
+        let remainder = ubig_to_u16(&(&temp_sum % &base));
+        result.push(u16_to_char(remainder));
+        temp_sum = temp_sum / &base;
+    }
+    result.chars().rev().collect()
+}
 
 
 ///
