@@ -2,7 +2,7 @@ use bigdecimal::num_bigint::{BigUint, ToBigInt};
 use bigdecimal::One;
 use log::{debug, trace};
 use crate::big_u;
-use crate::encryption::math_functions::big_int_util::{elsner_rand, is_one};
+use crate::encryption::math_functions::big_int_util::{is_one};
 use crate::encryption::math_functions::number_theory::{extended_euclid, miller_rabin, modulo_inverse};
 use crate::encryption::rsa::keys::{PublicKey, PrivateKey};
 

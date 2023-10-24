@@ -1,8 +1,8 @@
 #[cfg(test)]
 mod tests {
     use crate::encryption::math_functions::big_int_util::{
-        c_to_u16, decrement, divides, elsner_rand, increment, is_even, is_one,
-        is_uneven, is_zero, not_divides, random_in_range, u16_to_c, ubig_to_u16,
+        c_to_u16, decrement, divides, increment, is_even, is_one,
+        is_uneven, is_zero, not_divides, u16_to_c, ubig_to_u16,
     };
     use bigdecimal::num_bigint::BigUint;
     #[test]
@@ -68,21 +68,6 @@ mod tests {
     fn test_decrement() {
         assert_eq!(decrement(&BigUint::from(3u32)), BigUint::from(2u32));
         assert_eq!(decrement(&BigUint::from(1u32)), BigUint::from(0u32));
-    }
-
-    #[test]
-    fn test_random_number_in_range() {
-        let high_num = BigUint::from(3453u32).pow(564);
-        let random = random_in_range(&high_num);
-        assert!(random <= high_num && random >= BigUint::from(2u32))
-    }
-
-    #[test]
-    fn test_elsner_rand() {
-        let a = 1000.0;
-        let b = 10000.0;
-        let random = elsner_rand(a, b);
-        assert!(random >= a && random <= b)
     }
 
     #[test]
