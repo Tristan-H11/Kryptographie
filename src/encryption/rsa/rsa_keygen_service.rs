@@ -51,12 +51,13 @@ impl RsaKeygenService {
         }
 
         let n = &prime_one * &prime_two;
+        debug!("n ist {}", n);
 
         let phi = (&prime_one - BigUint::one()) * (&prime_two - BigUint::one());
         let e = self.generate_e(&phi);
         let d = self.generate_d(&e, &phi);
-        let public_key = PublicKey::new(e, n.clone());
-        let private_key = PrivateKey::new(d, n);
+        let public_key = PublicKey::new(e, n.clone(), self.key_size);
+        let private_key = PrivateKey::new(d, n, self.key_size);
         debug!("Schlüsselpaar generiert");
         (public_key, private_key)
     }
@@ -86,7 +87,7 @@ impl RsaKeygenService {
             trace!("Generierter Primkandidat {} ist keine Primzahl", prime_candidate);
             prime_candidate = random_generator.take();
         }
-        trace!("Generierter Primkandidat {} ist eine Primzahl", prime_candidate);
+        debug!("Generierter Primkandidat {} ist eine Primzahl", prime_candidate);
         prime_candidate
     }
 
@@ -111,7 +112,7 @@ impl RsaKeygenService {
             //TODO Hübsch machen
             let euclid = &extended_euclid(&e.to_bigint().unwrap(), &phi.to_bigint().unwrap()).0.to_biguint().unwrap();
             if is_one(euclid)  {
-                trace!("Generierter e {} ist relativ prim zu phi {}", e, phi);
+                debug!("Generierter e {} ist relativ prim zu phi {}", e, phi);
                 return e;
             }
             trace!("Generierter e {} ist nicht relativ prim zu phi {}", e, phi);
@@ -134,8 +135,10 @@ impl RsaKeygenService {
     /// Die generierte Zahl `d`.
     ///
     fn generate_d(&self, e: &BigUint, phi: &BigUint) -> BigUint {
-        debug!("Generiere d mit e {} und phi {}", e, phi);
+        trace!("Generiere d mit e {} und phi {}", e, phi);
         //TODO Hübsch machen
-        modulo_inverse(e.to_bigint().unwrap(), phi.to_bigint().unwrap()).unwrap().to_biguint().unwrap()
+        let d = modulo_inverse(e.to_bigint().unwrap(), phi.to_bigint().unwrap()).unwrap().to_biguint().unwrap();
+        debug!("d ist {}", d);
+        d
     }
 }

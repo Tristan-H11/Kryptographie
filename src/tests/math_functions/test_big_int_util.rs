@@ -1,8 +1,8 @@
 #[cfg(test)]
 mod tests {
     use crate::encryption::math_functions::big_int_util::{
-        c_to_u16, decrement, divides, increment, is_even, is_one,
-        is_uneven, is_zero, not_divides, u16_to_c, ubig_to_u16,
+        c_to_u32, decrement, divides, increment, is_even, is_one,
+        is_uneven, is_zero, not_divides, u32_to_c, ubig_to_u32,
     };
     use bigdecimal::num_bigint::BigUint;
     #[test]
@@ -72,38 +72,38 @@ mod tests {
 
     #[test]
     fn test_char_to_u32() {
-        assert_eq!(c_to_u16('a'), 0);
-        assert_eq!(c_to_u16('b'), 1);
-        assert_eq!(c_to_u16('z'), 25);
-        assert_eq!(c_to_u16('A'), 26);
-        assert_eq!(c_to_u16('B'), 27);
-        assert_eq!(c_to_u16('Z'), 51);
-        assert_eq!(c_to_u16('0'), 52);
-        assert_eq!(c_to_u16('1'), 53);
-        assert_eq!(c_to_u16('9'), 61);
+        assert_eq!(c_to_u32('a'), 0);
+        assert_eq!(c_to_u32('b'), 1);
+        assert_eq!(c_to_u32('z'), 25);
+        assert_eq!(c_to_u32('A'), 26);
+        assert_eq!(c_to_u32('B'), 27);
+        assert_eq!(c_to_u32('Z'), 51);
+        assert_eq!(c_to_u32('0'), 52);
+        assert_eq!(c_to_u32('1'), 53);
+        assert_eq!(c_to_u32('9'), 61);
     }
     #[test]
     #[should_panic(expected = "Ungültiges Zeichen: ß")]
     fn test_char_to_u32_invalid() {
-        c_to_u16('ß');
+        c_to_u32('ß');
     }
 
     #[test]
     fn test_u32_to_char() {
-        assert_eq!(u16_to_c(0), 'a');
-        assert_eq!(u16_to_c(25), 'z');
-        assert_eq!(u16_to_c(26), 'A');
-        assert_eq!(u16_to_c(51), 'Z');
-        assert_eq!(u16_to_c(52), '0');
-        assert_eq!(u16_to_c(61), '9');
-        assert_eq!(u16_to_c(62), '.');
-        assert_eq!(u16_to_c(63), ',');
+        assert_eq!(u32_to_c(0), 'a');
+        assert_eq!(u32_to_c(25), 'z');
+        assert_eq!(u32_to_c(26), 'A');
+        assert_eq!(u32_to_c(51), 'Z');
+        assert_eq!(u32_to_c(52), '0');
+        assert_eq!(u32_to_c(61), '9');
+        assert_eq!(u32_to_c(62), '.');
+        assert_eq!(u32_to_c(63), ',');
     }
 
     #[test]
     fn test_ubig_to_u32() {
         let value = BigUint::from(12345u64);
-        let result = ubig_to_u16(&value);
+        let result = ubig_to_u32(&value);
         assert_eq!(result, 12345);
     }
 }

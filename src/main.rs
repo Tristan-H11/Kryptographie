@@ -11,7 +11,7 @@ use gui::model::model::AppState;
 fn main() {
 
     SimpleLogger::new()
-        .with_level(LevelFilter::Debug)
+        .with_level(LevelFilter::Trace)
         .with_colors(true)
         .init()
         .unwrap();
