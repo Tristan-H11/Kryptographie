@@ -42,11 +42,11 @@ impl Default for AppController {
     fn default() -> Self {
         debug!("Erstelle Default-AppController");
         AppController {
-            alice_private_key: PrivateKey::new(1.to_biguint().unwrap(), 1.to_biguint().unwrap(), 1),
-            alice_public_key: PublicKey::new(1.to_biguint().unwrap(), 1.to_biguint().unwrap(), 1),
+            alice_private_key: PrivateKey::new(1.to_biguint().unwrap(), 1.to_biguint().unwrap()),
+            alice_public_key: PublicKey::new(1.to_biguint().unwrap(), 1.to_biguint().unwrap()),
 
-            bob_private_key: PrivateKey::new(1.to_biguint().unwrap(), 1.to_biguint().unwrap(), 1),
-            bob_public_key: PublicKey::new(1.to_biguint().unwrap(), 1.to_biguint().unwrap(), 1),
+            bob_private_key: PrivateKey::new(1.to_biguint().unwrap(), 1.to_biguint().unwrap()),
+            bob_public_key: PublicKey::new(1.to_biguint().unwrap(), 1.to_biguint().unwrap()),
         }
     }
 }

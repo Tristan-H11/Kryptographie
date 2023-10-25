@@ -2,6 +2,91 @@
 mod tests {
     use crate::encryption::math_functions::block_chiffre::{create_blocks_from_string, create_string_from_blocks, to_sum_vec, join_string_vec, split_into_blocks, string_to_int_vec, sums_vec_to_string_vec, c_to_u32, u32_to_c, ubig_to_u32};
     use bigdecimal::num_bigint::BigUint;
+    use bigdecimal::num_traits::Pow;
+    use bigdecimal::One;
+    use crate::big_u;
+    use crate::encryption::math_functions::big_int_util::log_base_g;
+    use crate::encryption::math_functions::number_theory::fast_exponentiation;
+    use crate::encryption::rsa::rsa_keygen_service::RsaKeygenService;
+
+    ///
+    /// Test um zu prüfen, ob ein String aufgeteilt, manipuliert, zusammengesetzt und wieder umgekehrt werden kann.
+    /// Dafür wird der String zerlegt, die Zahl verdoppelt und ein Ciphertext darauf erstellt.
+    /// Dieser Cipher wird dann auch wieder zerlegt, die Zahl halbiert und ein Plaintext erstellt.
+    /// Dieser Plaintext wird dann wieder zusammengesetzt und sollte dem ursprünglichen String entsprechen.
+    ///
+    #[test]
+    fn test_create_mult_decode_create_div_decode() {
+
+        // TODO Flakey
+            // Erstelle ein 64 Bit Schlüsselpaar
+            let keygen_service = RsaKeygenService::new(128);
+            let (public_key, private_key) = keygen_service.generate_keypair(40);
+            let n = &public_key.n;
+            let e = &public_key.e;
+            let d = &private_key.d;
+
+            let message = "Das ist ein";
+            let g = big_u!(55296u16);
+            let block_size = log_base_g(&n, &g) as usize;
+
+            let result = create_blocks_from_string(message, public_key.block_size - 1, true)
+                .iter()
+                .map(|x| {
+                    fast_exponentiation(x, &public_key.e, &public_key.n) //verschlüsseln
+                })
+                .collect::<Vec<BigUint>>();
+            println!("\nVerschlüsselte Nachricht: {:?}\n", result);
+
+            let encrypted_string = create_string_from_blocks(result);
+            println!("Verschlüsselter String: {}\n", encrypted_string);
+
+            let result = create_blocks_from_string(
+                &encrypted_string,
+                private_key.block_size,
+                true)
+                .iter()
+                .map(|x| {
+                    fast_exponentiation(x, &private_key.d, &private_key.n) //entschlüsseln
+                })
+                .collect();
+            println!("\nEntschlüsselte Nachricht: {:?}\n", result);
+
+
+            let string = create_string_from_blocks(result);
+            assert_eq!(string.trim(), "Das ist ein".to_string());
+    }
+
+
+    ///
+    /// Prüft, ob die Funktionen zum Zerteilen und Zusammensetzen eines String das Inverse voneinander sind.
+    ///
+    #[test]
+    fn test_create_block_umkehrfunktion_create_string() {
+        let m = "Da苉 ist eine Testnachricht";
+        let block_size = 8;
+        let string = create_string_from_blocks(create_blocks_from_string(m, block_size, true));
+        let string = create_string_from_blocks(create_blocks_from_string(&string, block_size * 2, true));
+        assert_eq!(string.trim(), m);
+
+        let m = "Da苉 ist eine Testnachricht";
+        let block_size = 6;
+        let string = create_string_from_blocks(create_blocks_from_string(m, block_size, true));
+        let string = create_string_from_blocks(create_blocks_from_string(&string, block_size + 2, true));
+        assert_eq!(string.trim(), m);
+
+        let m = "Da苉 ist eine Testnachricht";
+        let block_size = 47;
+        let string = create_string_from_blocks(create_blocks_from_string(m, block_size, true));
+        let string = create_string_from_blocks(create_blocks_from_string(&string, block_size - 1, true));
+        assert_eq!(string.trim(), m);
+
+        let m = "Da苉 ist eine Testnachricht";
+        let block_size = 3;
+        let string = create_string_from_blocks(create_blocks_from_string(m, block_size, true));
+        let string = create_string_from_blocks(create_blocks_from_string(&string, block_size + 50, true));
+        assert_eq!(string.trim(), m);
+    }
 
     #[test]
     fn test_create_chiffre() {
@@ -15,7 +100,6 @@ mod tests {
             BigUint::from(3258925137110102081877384560672u128),
         ];
         assert_eq!(result, expected_result);
-
     }
 
     #[test]
@@ -165,6 +249,7 @@ mod tests {
         assert_eq!(c_to_u32('1'), 53);
         assert_eq!(c_to_u32('9'), 61);
     }
+
     #[test]
     #[should_panic(expected = "Ungültiges Zeichen: ß")]
     fn test_char_to_u32_invalid() {
@@ -189,6 +274,5 @@ mod tests {
         let result = ubig_to_u32(&value);
         assert_eq!(result, 12345);
     }
-
 }
 

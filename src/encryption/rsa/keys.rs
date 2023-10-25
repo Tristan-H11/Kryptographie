@@ -1,5 +1,7 @@
 use bigdecimal::num_bigint::BigUint;
-use log::{debug, info};
+use log::{info};
+use crate::big_u;
+use crate::encryption::math_functions::big_int_util::log_base_g;
 use crate::encryption::math_functions::block_chiffre::{create_blocks_from_string, create_string_from_blocks};
 use crate::encryption::math_functions::number_theory::fast_exponentiation;
 
@@ -7,9 +9,9 @@ use crate::encryption::math_functions::number_theory::fast_exponentiation;
 /// Ein öffentlicher Schlüssel für RSA.
 ///
 pub struct PublicKey {
-    e: BigUint,
-    n: BigUint,
-    size: usize,
+    pub e: BigUint,
+    pub n: BigUint,
+    pub block_size: usize,
 }
 
 impl PublicKey {
@@ -21,11 +23,14 @@ impl PublicKey {
     /// * `e` - Der öffentliche Exponent.
     /// * `n` - Das Produkt der beiden Primzahlen.
     ///
-    pub fn new(e: BigUint, n: BigUint, size: usize) -> PublicKey {
+    pub fn new(e: BigUint, n: BigUint) -> PublicKey {
+        // Maximale Blockbreite = log_g(n), wenn g=55296 ist.
+        let g = big_u!(55296u16);
+        let block_size = log_base_g(&n, &g) as usize;
         PublicKey {
             e,
             n,
-            size
+            block_size
         }
     }
 
@@ -36,17 +41,15 @@ impl PublicKey {
         self.e.to_str_radix(10)
     }
 
-    pub(crate) fn encrypt(&self, message: &str) -> Vec<BigUint> {
-        // self.n.bits in bytes wandeln (/8) und dann nochmal halbieren, um genug Abstand zu n zu bekommen.
-        let block_size = (self.size / (8 * 2));
-        println!("Verschlüsseln mit blockgröße {}", block_size);
+    pub(crate) fn encrypt(&self, message: &str) -> String {
+        println!("Verschlüsseln mit blockgröße {}", self.block_size);
 
-        let chunks = create_blocks_from_string(message, block_size as usize, true);
+        let chunks = create_blocks_from_string(message, self.block_size - 1, true);
         let encrypted_chunks = chunks.iter()
             .map(|chunk| fast_exponentiation(chunk, &self.e, &self.n))
             .collect();
-        encrypted_chunks
-        // create_string_from_blocks(encrypted_chunks)
+
+        create_string_from_blocks(encrypted_chunks)
     }
 
     pub(crate) fn verify(&self, signature: &str, message: &str) -> bool {
@@ -58,9 +61,9 @@ impl PublicKey {
 /// Ein privater Schlüssel für RSA.
 ///
 pub struct PrivateKey {
-    d: BigUint,
-    n: BigUint,
-    size: usize
+    pub d: BigUint,
+    pub n: BigUint,
+    pub block_size: usize
 }
 
 impl PrivateKey {
@@ -72,11 +75,14 @@ impl PrivateKey {
     /// * `d` - Der private Exponent.
     /// * `n` - Das Produkt der beiden Primzahlen.
     ///
-    pub fn new(d: BigUint, n: BigUint, size: usize) -> PrivateKey {
+    pub fn new(d: BigUint, n: BigUint) -> PrivateKey {
+        // Maximale Blockbreite = log_g(n), wenn g=55296 ist.
+        let g = big_u!(55296u16);
+        let block_size = log_base_g(&n, &g) as usize;
         PrivateKey {
             d,
             n,
-            size
+            block_size
         }
     }
 
@@ -94,11 +100,11 @@ impl PrivateKey {
         self.n.to_str_radix(10)
     }
 
-    pub(crate) fn decrypt(&self, message: &Vec<BigUint>) -> String {
-        // info!("Entschlüsseln mit blockgröße {}", block_size);
+    pub(crate) fn decrypt(&self, message: &str) -> String {
+        info!("Entschlüsseln mit blockgröße {}", self.block_size);
 
-        // let chunks = create_blocks_from_string(message, block_size as usize, false);
-        let decrypted_chunks = message.iter()
+        let chunks = create_blocks_from_string(message, self.block_size, true);
+        let decrypted_chunks = chunks.iter()
             .map(|chunk| fast_exponentiation(chunk, &self.d, &self.n))
             .collect();
 

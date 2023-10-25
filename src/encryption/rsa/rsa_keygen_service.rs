@@ -56,8 +56,8 @@ impl RsaKeygenService {
         let phi = (&prime_one - BigUint::one()) * (&prime_two - BigUint::one());
         let e = self.generate_e(&phi);
         let d = self.generate_d(&e, &phi);
-        let public_key = PublicKey::new(e, n.clone(), self.key_size);
-        let private_key = PrivateKey::new(d, n, self.key_size);
+        let public_key = PublicKey::new(e, n.clone());
+        let private_key = PrivateKey::new(d, n);
         debug!("Schlüsselpaar generiert");
         (public_key, private_key)
     }
