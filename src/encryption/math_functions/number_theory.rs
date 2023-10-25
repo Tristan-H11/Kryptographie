@@ -139,13 +139,13 @@ pub fn miller_rabin(p: &BigUint, repeats: usize) -> bool {
         d = d.div(BigUint::from(2u8));
         s += BigUint::one();
     }
-    let mut rand = RandomElsner::new();
+    let mut rand = RandomElsner::new(&BigUint::one(), p);
     for _ in 0..repeats {
-        let mut a = rand.take(&BigUint::one(), &p);
+        let mut a = rand.take();
         while divides(p, &a) {
-            a = rand.take(&BigUint::one(), &p);
+            a = rand.take();
         }
-        if !miller_rabin_test(&p, &s, &d, &a) {
+        if !miller_rabin_test(p, &s, &d, &a) {
             return false;
         }
     }
@@ -153,7 +153,7 @@ pub fn miller_rabin(p: &BigUint, repeats: usize) -> bool {
 }
 
 fn miller_rabin_test(p: &BigUint, s: &BigUint, d: &BigUint, a: &BigUint) -> bool {
-    let mut x = fast_exponentiation(&a, d, p);
+    let mut x = fast_exponentiation(a, d, p);
     if is_one(&x) || x == decrement(p) {
         return true;
     }

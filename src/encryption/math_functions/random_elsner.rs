@@ -2,10 +2,11 @@ use bigdecimal::num_bigint::{BigInt, BigUint, ToBigInt};
 use bigdecimal::{BigDecimal, One, Zero};
 use rand::random;
 
-#[derive(Debug)]
 pub struct RandomElsner {
     pub(crate) sqrt_m: BigDecimal,
     pub(crate) n: BigDecimal,
+    pub(crate) a: BigUint,
+    pub(crate) range: BigDecimal,
 }
 
 impl RandomElsner {
@@ -16,7 +17,7 @@ impl RandomElsner {
     /// # Rückgabe
     /// * RandomElsner
     ///
-    pub fn new() -> Self {
+    pub fn new(a: &BigUint, b: &BigUint) -> Self {
         let mut m = BigDecimal::from(random::<u128>());
         while (m.sqrt().unwrap() % BigDecimal::one()) == BigDecimal::zero() {
             m = BigDecimal::from(random::<u128>());
@@ -24,6 +25,8 @@ impl RandomElsner {
         return Self {
             sqrt_m: m.sqrt().unwrap(),
             n: BigDecimal::zero(),
+            a: a.clone(),
+            range: BigDecimal::from(BigInt::from(b - a + BigUint::one())),
         };
     }
 
@@ -37,11 +40,9 @@ impl RandomElsner {
     /// # Rückgabe
     /// * BigUint
     ///
-    pub fn take(&mut self, a: &BigUint, b: &BigUint) -> BigUint {
+    pub fn take(&mut self) -> BigUint {
         self.n += BigDecimal::one();
-        let range = b - a + BigUint::one();
-        let num =
-            (&self.n * &self.sqrt_m) % BigDecimal::one() * BigDecimal::from(BigInt::from(range));
-        return a + (BigDecimal::to_bigint(&num).unwrap()).to_biguint().unwrap();
+        let num = (((&self.n * &self.sqrt_m) % BigDecimal::one()) * &self.range).with_scale(0);
+        return &self.a + (BigDecimal::to_bigint(&num).unwrap()).to_biguint().unwrap();
     }
 }
