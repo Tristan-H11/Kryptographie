@@ -12,7 +12,7 @@ mod rsa_keys_test {
         let keygen_service = RsaKeygenService::new(keysize);
         let mut counter = 0;
 
-        // for i in 0..15 {
+        for i in 0..15 {
             let (public_key, private_key) = keygen_service.generate_keypair(40);
 
             let encrypted_message = public_key.encrypt(message);
@@ -24,7 +24,7 @@ mod rsa_keys_test {
                 counter += 1;
             }
             // assert_eq!(message, decrypted_message.trim_end());
-        // }
+        }
         println!("{} Fehler", counter);
         assert_eq!(counter, 0)
     }
