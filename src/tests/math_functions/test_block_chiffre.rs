@@ -38,6 +38,8 @@ mod tests {
                 .collect::<Vec<BigUint>>();
             println!("\nVerschlüsselte Nachricht: {:?}\n", result);
 
+            // TODO: Wenn man es umbaut, dass man die Vec<BigUint> direkt übergibt und die "Zwischentransformation" in den String überspringt, dann gehts.
+
             let encrypted_string = create_string_from_blocks(result);
             println!("Verschlüsselter String: {}\n", encrypted_string);
 
