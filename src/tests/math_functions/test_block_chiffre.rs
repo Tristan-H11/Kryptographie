@@ -1,8 +1,35 @@
 #[cfg(test)]
 mod tests {
-    use crate::encryption::math_functions::block_chiffre::{create_blocks_from_string, create_string_from_blocks, to_sum_vec, join_string_vec, split_into_blocks, string_to_int_vec, sums_vec_to_string_vec};
-    use crate::encryption::math_functions::big_int_util::{c_to_u32};
+    use crate::encryption::math_functions::block_chiffre::{create_blocks_from_string, create_string_from_blocks, to_sum_vec, join_string_vec, split_into_blocks, string_to_int_vec, sums_vec_to_string_vec, c_to_u32, u32_to_c, ubig_to_u32};
     use bigdecimal::num_bigint::BigUint;
+
+    #[test]
+    fn test_create_chiffre() {
+        let message = "Da苉 ist eine Testnachricht";
+        let block_size = 7;
+        let result = create_blocks_from_string(message, block_size, true);
+        let expected_result = vec![
+            BigUint::from(1943938337267550087026074257524u128),
+            BigUint::from(914822981356602019800946507860u128),
+            BigUint::from(2887304683313907978613082523752u128),
+            BigUint::from(3258925137110102081877384560672u128),
+        ];
+        assert_eq!(result, expected_result);
+
+    }
+
+    #[test]
+    fn test_decode_chiffre() {
+        let sums = vec![
+            BigUint::from(1943938337267550087026074257524u128),
+            BigUint::from(914822981356602019800946507860u128),
+            BigUint::from(2887304683313907978613082523752u128),
+            BigUint::from(3258925137110102081877384560672u128),
+        ];
+        let result = create_string_from_blocks(sums);
+        let expected_result = "Da苉 ist eine Testnachricht  ".to_string();
+        assert_eq!(result, expected_result);
+    }
 
     #[test]
     fn test_split_into_blocks() {
@@ -127,46 +154,41 @@ mod tests {
     }
 
     #[test]
-    fn test_create_chiffre() {
-        let message = "Da苉 ist eine Testnachricht";
-        let block_size = 7;
-        let result = create_blocks_from_string(message, block_size, true);
-        let expected_result = vec![
-                BigUint::from(1943938337267550087026074257524u128),
-                BigUint::from(914822981356602019800946507860u128),
-                BigUint::from(2887304683313907978613082523752u128),
-                BigUint::from(3258925137110102081877384560672u128),
-        ];
-        assert_eq!(result, expected_result);
-
-        // let message = "Þuď▼Ħìêć6¸¤ÜE+}♠ÎĨ+ËĖZd-ðóZħ☻";
-        // let block_size = 4;
-        // let result = create_blocks_from_string(message, block_size, true);
-        // let expected_result = vec![
-        // BigUint::from(11497444858239008u64),
-        // BigUint::from(17753298306195488u64),
-        // BigUint::from(17076964999090277u64),
-        // BigUint::from(5410678690363507u64),
-        // BigUint::from(19613115525224547u64),
-        // BigUint::from(17584219565365347u64),
-        // BigUint::from(17584225676623904u64),
-        // ];
-        // assert_eq!(result, expected_result);
+    fn test_char_to_u32() {
+        assert_eq!(c_to_u32('a'), 0);
+        assert_eq!(c_to_u32('b'), 1);
+        assert_eq!(c_to_u32('z'), 25);
+        assert_eq!(c_to_u32('A'), 26);
+        assert_eq!(c_to_u32('B'), 27);
+        assert_eq!(c_to_u32('Z'), 51);
+        assert_eq!(c_to_u32('0'), 52);
+        assert_eq!(c_to_u32('1'), 53);
+        assert_eq!(c_to_u32('9'), 61);
+    }
+    #[test]
+    #[should_panic(expected = "Ungültiges Zeichen: ß")]
+    fn test_char_to_u32_invalid() {
+        c_to_u32('ß');
     }
 
     #[test]
-    fn test_decode_chiffre() {
-        let sums = vec![
-            BigUint::from(1943938337267550087026074257524u128),
-            BigUint::from(914822981356602019800946507860u128),
-            BigUint::from(2887304683313907978613082523752u128),
-            BigUint::from(3258925137110102081877384560672u128),
-        ];
-        let result = create_string_from_blocks(sums);
-        let expected_result = "Da苉 ist eine Testnachricht  ".to_string();
-        assert_eq!(result, expected_result);
+    fn test_u32_to_char() {
+        assert_eq!(u32_to_c(0), 'a');
+        assert_eq!(u32_to_c(25), 'z');
+        assert_eq!(u32_to_c(26), 'A');
+        assert_eq!(u32_to_c(51), 'Z');
+        assert_eq!(u32_to_c(52), '0');
+        assert_eq!(u32_to_c(61), '9');
+        assert_eq!(u32_to_c(62), '.');
+        assert_eq!(u32_to_c(63), ',');
     }
 
+    #[test]
+    fn test_ubig_to_u32() {
+        let value = BigUint::from(12345u64);
+        let result = ubig_to_u32(&value);
+        assert_eq!(result, 12345);
+    }
 
 }
 

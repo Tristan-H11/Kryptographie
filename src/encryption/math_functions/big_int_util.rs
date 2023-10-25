@@ -69,30 +69,4 @@ pub fn decrement(a: &BigUint) -> BigUint {
     a - BigUint::one()
 }
 
-///
-/// Konvertiere ein Zeichen in einen u16 Code -- z.B. für Blockchiffre
-///
-pub(crate) fn c_to_u32(c: char) -> u32 {
-    c as u32
-}
 
-///
-/// Konvertiere ein u32 Code in ein Zeichen -- z.B. für Blockchiffre
-///
-pub(crate) fn u32_to_c(value: u32) -> char {
-    match char::from_u32(value) {
-        Some(x) => x,
-        None => panic!("oben Ungültiger u32 Wert: {}", value),
-    }
-}
-
-///
-/// wandle eine ubig Zahl in einen u32 Wert um
-///
-pub(crate) fn ubig_to_u32(value: &BigUint) -> u32 {
-    let value_str = format!("{}", value);
-    match value_str.parse::<u32>(){
-        Ok(x) => x,
-        Err(_) => panic!("unten Ungültiger u32 Wert: {}", value),
-    }
-}
