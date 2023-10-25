@@ -1,12 +1,14 @@
-use bigdecimal::num_bigint::BigUint;
-use bigdecimal::{One, Zero};
+use std::ops::{Div, MulAssign};
+use bigdecimal::num_bigint::{BigInt, BigUint};
+use bigdecimal::{BigDecimal, One, Zero};
+use bigdecimal::num_traits::real::Real;
 
 ///
 /// Erstellt einen BigUint aus einem unsigned Integer.
 #[macro_export]
 macro_rules! big_u {
     ($x:expr) => {
-        BigUint::from($x)
+        BigUint::from($x as u128)
     };
 }
 
@@ -68,5 +70,30 @@ pub fn increment(a: &BigUint) -> BigUint {
 pub fn decrement(a: &BigUint) -> BigUint {
     a - BigUint::one()
 }
+
+///
+/// Berechnet den Logarithmus zu einer Basis.
+///
+/// # Argumente
+///
+/// * `x` - Die Zahl, zu der der Logarithmus berechnet werden soll.
+/// * `base` - Die Basis des Logarithmus.
+///
+/// # Rückgabe
+///
+/// * `BigDecimal` - Der Logarithmus.
+///
+pub fn log_base_g(x: &BigUint, base: &BigUint) -> u32 {
+    let mut count = 0;
+    let mut current_value = BigUint::one();
+
+    while &current_value < x {
+        current_value.mul_assign(base);
+        count += 1;
+    }
+
+    count
+}
+
 
 
