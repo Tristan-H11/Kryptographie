@@ -1,6 +1,6 @@
 #[cfg(test)]
 mod tests {
-    use crate::encryption::math_functions::block_chiffre::{create_blocks_from_string, create_string_from_blocks, to_sum_vec, join_string_vec, split_into_blocks, string_to_int_vec, sums_vec_to_string_vec, c_to_u32, u32_to_c, ubig_to_u32};
+    use crate::encryption::math_functions::block_chiffre::{create_blocks_from_string, create_string_from_blocks, to_sum_vec, split_into_blocks, string_to_int_vec, sums_vec_to_string_vec, c_to_u32, u32_to_c, ubig_to_u32};
     use bigdecimal::num_bigint::BigUint;
     use bigdecimal::num_traits::Pow;
     use bigdecimal::One;
@@ -232,7 +232,7 @@ mod tests {
             "ht  ".to_string(),
         ];
 
-        let result = join_string_vec(input);
+        let result = input.join("");
 
         let expected_result = "Da苉 ist eine Testnachricht  ".to_string();
 
@@ -241,34 +241,29 @@ mod tests {
 
     #[test]
     fn test_char_to_u32() {
-        assert_eq!(c_to_u32('a'), 0);
-        assert_eq!(c_to_u32('b'), 1);
-        assert_eq!(c_to_u32('z'), 25);
-        assert_eq!(c_to_u32('A'), 26);
-        assert_eq!(c_to_u32('B'), 27);
-        assert_eq!(c_to_u32('Z'), 51);
-        assert_eq!(c_to_u32('0'), 52);
-        assert_eq!(c_to_u32('1'), 53);
-        assert_eq!(c_to_u32('9'), 61);
-    }
-
-    #[test]
-    #[should_panic(expected = "Ungültiges Zeichen: ß")]
-    fn test_char_to_u32_invalid() {
-        c_to_u32('ß');
+        assert_eq!(c_to_u32('a'), 97); // Unicode
+        assert_eq!(c_to_u32('b'), 98);
+        assert_eq!(c_to_u32('z'), 122);
+        assert_eq!(c_to_u32('A'), 65);
+        assert_eq!(c_to_u32('B'), 66);
+        assert_eq!(c_to_u32('Z'), 90);
+        assert_eq!(c_to_u32('0'), 48);
+        assert_eq!(c_to_u32('1'), 49);
+        assert_eq!(c_to_u32('9'), 57);
     }
 
     #[test]
     fn test_u32_to_char() {
-        assert_eq!(u32_to_c(0), 'a');
-        assert_eq!(u32_to_c(25), 'z');
-        assert_eq!(u32_to_c(26), 'A');
-        assert_eq!(u32_to_c(51), 'Z');
-        assert_eq!(u32_to_c(52), '0');
-        assert_eq!(u32_to_c(61), '9');
-        assert_eq!(u32_to_c(62), '.');
-        assert_eq!(u32_to_c(63), ',');
+        assert_eq!(u32_to_c(97), 'a');
+        assert_eq!(u32_to_c(122), 'z');
+        assert_eq!(u32_to_c(65), 'A');
+        assert_eq!(u32_to_c(90), 'Z');
+        assert_eq!(u32_to_c(48), '0');
+        assert_eq!(u32_to_c(57), '9');
+        assert_eq!(u32_to_c(46), '.');
+        assert_eq!(u32_to_c(44), ',');
     }
+
 
     #[test]
     fn test_ubig_to_u32() {

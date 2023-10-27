@@ -18,7 +18,8 @@ pub(crate) fn create_blocks_from_string(m: &str, block_size: usize, fill_blocks:
     debug!("Erstelle Chiffre mit Blockgröße {} für {}", block_size, m);
     let b = split_into_blocks(m, block_size, fill_blocks);
     let i_vec = string_to_int_vec(b);
-    let base = BigUint::from(55296u32);
+    let base = BigUint::from(55296u32); //todo -- basis auf mainview auslagern damit der
+                                        // user diese bei bedarf ändern kann (nice to have)
     to_sum_vec(i_vec, &base)
 }
 
@@ -33,7 +34,7 @@ pub(crate) fn create_blocks_from_string(m: &str, block_size: usize, fill_blocks:
 ///
 pub(crate) fn create_string_from_blocks(sums: Vec<BigUint>) -> String {
     debug!("Erstelle String aus Vektor von Summen");
-    let base = BigUint::from(55296u32);
+    let base = BigUint::from(55296u32); // todo auslagern create_blocks_from_string
     let strings = sums_vec_to_string_vec(sums, &base);
     strings.join("")
 }
@@ -198,13 +199,6 @@ fn helper_fun_sum_to_string(sum: &BigUint, base: &BigUint) -> String {
     res.chars().rev().collect()
 }
 
-///
-/// # Nur zu Testzwecken öffentlich!
-/// Erzeuge einen String aus dem Vector von Strings
-///
-pub(crate) fn join_string_vec(s: Vec<String>) -> String {
-    s.join("")
-}
 
 ///
 /// Konvertiere ein Zeichen in einen u16 Code -- z.B. für Blockchiffre
