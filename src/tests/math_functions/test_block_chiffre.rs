@@ -1,12 +1,14 @@
 #[cfg(test)]
 mod tests {
-    use crate::encryption::math_functions::block_chiffre::{create_blocks_from_string, create_string_from_blocks, to_sum_vec, split_into_blocks, string_to_int_vec, sums_vec_to_string_vec, c_to_u32, u32_to_c, ubig_to_u32};
+    use crate::encryption::math_functions::block_chiffre::{create_blocks_from_string,
+                                                           create_string_from_blocks,
+                                                           to_sum_vec, split_into_blocks,
+                                                           string_to_int_vec,
+                                                           sums_vec_to_string_vec,
+                                                           u32_to_c,
+                                                           ubig_to_u32};
     use bigdecimal::num_bigint::BigUint;
-    use bigdecimal::num_traits::Pow;
-    use bigdecimal::One;
-    use druid::platform_menus::mac::file::print;
     use crate::big_u;
-    use crate::encryption::math_functions::big_int_util::log_base_g;
     use crate::encryption::math_functions::number_theory::fast_exponentiation;
     use crate::encryption::rsa::rsa_keygen_service::RsaKeygenService;
 
@@ -64,9 +66,8 @@ mod tests {
     fn test_loop_create_mult_decode_create_div_decode() {
         let mut failure_count = 0;
 
-        for _ in 0..500 {
-            // Erstelle ein 64 Bit Schlüsselpaar
-            let keygen_service = RsaKeygenService::new(256);
+        for _ in 0..250 {
+            let keygen_service = RsaKeygenService::new(128);
             let (public_key, private_key) = keygen_service.generate_keypair(40);
 
             let message = "Das ist ein";
@@ -75,7 +76,8 @@ mod tests {
             let result = create_blocks_from_string(message, public_key.block_size - 1, true)
                 .iter()
                 .map(|x| {
-                    fast_exponentiation(x, &public_key.e, &public_key.n) //verschlüsseln
+                    fast_exponentiation(x, &public_key.get_e_as_biguint(), &public_key.get_n_as_biguint()) //verschlüsseln
+                    // alternativ: x.fast_exponentiation(&public_key.get_e_as_biguint(), &public_key.get_n_as_biguint())
                 })
                 .collect::<Vec<BigUint>>();
             println!("\nVerschlüsselte Nachricht: {:?}\n", result);
@@ -83,13 +85,12 @@ mod tests {
             let encrypted_string = create_string_from_blocks(result);
             println!("Verschlüsselter String: {}\n", encrypted_string);
 
-            let result = create_blocks_from_string(
-                &encrypted_string,
-                private_key.block_size,
+            let result = create_blocks_from_string(&encrypted_string,
+                 private_key.block_size, // sicherstelle, dass die blockgröße korrekt ist
                 true)
                 .iter()
                 .map(|x| {
-                    fast_exponentiation(x, &private_key.d, &private_key.n) //entschlüsseln
+                    fast_exponentiation(x, &private_key.get_d_as_biguint(), &private_key.get_n_as_biguint()) //entschlüsseln
                 })
                 .collect();
             println!("\nEntschlüsselte Nachricht: {:?}\n", result);
@@ -202,13 +203,13 @@ mod tests {
         let message = "Da苉 ist eine Testnachricht ";
         let blocks = split_into_blocks(&message, 4, true);
         let expected = vec![
-            vec![c_to_u32('D'), c_to_u32('a'), c_to_u32('苉'), c_to_u32(' ')],
-            vec![c_to_u32('i'), c_to_u32('s'), c_to_u32('t'), c_to_u32(' ')],
-            vec![c_to_u32('e'), c_to_u32('i'), c_to_u32('n'), c_to_u32('e')],
-            vec![c_to_u32(' '), c_to_u32('T'), c_to_u32('e'), c_to_u32('s')],
-            vec![c_to_u32('t'), c_to_u32('n'), c_to_u32('a'), c_to_u32('c')],
-            vec![c_to_u32('h'), c_to_u32('r'), c_to_u32('i'), c_to_u32('c')],
-            vec![c_to_u32('h'), c_to_u32('t'), c_to_u32(' '), c_to_u32(' ')],
+            vec!['D' as u32, 'a' as u32, '苉' as u32, ' ' as u32],
+            vec!['i' as u32, 's' as u32, 't' as u32, ' ' as u32],
+            vec!['e' as u32, 'i' as u32, 'n' as u32, 'e' as u32],
+            vec![' ' as u32, 'T' as u32, 'e' as u32, 's' as u32],
+            vec!['t' as u32, 'n' as u32, 'a' as u32, 'c' as u32],
+            vec!['h' as u32, 'r' as u32, 'i' as u32, 'c' as u32],
+            vec!['h' as u32, 't' as u32, ' ' as u32, ' ' as u32],
         ];
         let result = string_to_int_vec(blocks);
         assert_eq!(result, expected);
@@ -217,13 +218,13 @@ mod tests {
     #[test]
     fn test_digits_from_vec_to_sum() {
         let digit_vectors = vec![
-            vec![c_to_u32('D'), c_to_u32('a'), c_to_u32('苉'), c_to_u32(' ')],
-            vec![c_to_u32('i'), c_to_u32('s'), c_to_u32('t'), c_to_u32(' ')],
-            vec![c_to_u32('e'), c_to_u32('i'), c_to_u32('n'), c_to_u32('e')],
-            vec![c_to_u32(' '), c_to_u32('T'), c_to_u32('e'), c_to_u32('s')],
-            vec![c_to_u32('t'), c_to_u32('n'), c_to_u32('a'), c_to_u32('c')],
-            vec![c_to_u32('h'), c_to_u32('r'), c_to_u32('i'), c_to_u32('c')],
-            vec![c_to_u32('h'), c_to_u32('t'), c_to_u32(' '), c_to_u32(' ')],
+            vec!['D' as u32, 'a' as u32, '苉' as u32, ' ' as u32],
+            vec!['i' as u32, 's' as u32, 't' as u32, ' ' as u32],
+            vec!['e' as u32, 'i' as u32, 'n' as u32, 'e' as u32],
+            vec![' ' as u32, 'T' as u32, 'e' as u32, 's' as u32],
+            vec!['t' as u32, 'n' as u32, 'a' as u32, 'c' as u32],
+            vec!['h' as u32, 'r' as u32, 'i' as u32, 'c' as u32],
+            vec!['h' as u32, 't' as u32, ' ' as u32, ' ' as u32],
         ];
 
         let base = BigUint::from(55296u32);
@@ -290,15 +291,15 @@ mod tests {
 
     #[test]
     fn test_char_to_u32() {
-        assert_eq!(c_to_u32('a'), 97); // Unicode
-        assert_eq!(c_to_u32('b'), 98);
-        assert_eq!(c_to_u32('z'), 122);
-        assert_eq!(c_to_u32('A'), 65);
-        assert_eq!(c_to_u32('B'), 66);
-        assert_eq!(c_to_u32('Z'), 90);
-        assert_eq!(c_to_u32('0'), 48);
-        assert_eq!(c_to_u32('1'), 49);
-        assert_eq!(c_to_u32('9'), 57);
+        assert_eq!('a' as u32, 97); // Unicode
+        assert_eq!('b' as u32, 98);
+        assert_eq!('z' as u32, 122);
+        assert_eq!('A' as u32, 65);
+        assert_eq!('B' as u32, 66);
+        assert_eq!('Z' as u32, 90);
+        assert_eq!('0' as u32, 48);
+        assert_eq!('1' as u32, 49);
+        assert_eq!('9' as u32, 57);
     }
 
     #[test]

@@ -106,7 +106,7 @@ pub(crate) fn split_into_blocks(message: &str, block_size: usize, fill_block: bo
 pub(crate) fn string_to_int_vec(b_vec: Vec<String>) -> Vec<Vec<u32>> {
     println!("Erstelle Integer Vektor aus String Vektor");
     b_vec.into_iter().map(|b| {
-        let vec = b.chars().map(c_to_u32).collect();
+        let vec = b.chars().map(|b| b as u32).collect();
         println!("Erstelle Integer Vektor aus String Vektor: {:?}", vec);
         vec
     }).collect()
@@ -197,14 +197,6 @@ fn helper_fun_sum_to_string(sum: &BigUint, base: &BigUint) -> String {
     }
 
     res.chars().rev().collect()
-}
-
-
-///
-/// Konvertiere ein Zeichen in einen u16 Code -- z.B. für Blockchiffre
-///
-pub(crate) fn c_to_u32(c: char) -> u32 {
-    c as u32
 }
 
 ///
