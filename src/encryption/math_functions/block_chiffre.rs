@@ -33,7 +33,7 @@ pub(crate) fn create_blocks_from_string(m: &str, block_size: usize, fill_blocks:
 /// * `String` - Der decodierte String.
 ///
 pub(crate) fn create_string_from_blocks(sums: Vec<BigUint>) -> String {
-    debug!("Erstelle String aus Vektor von Summen");
+    debug!("Erstelle String aus Vektor von Summen   ");
     let base = BigUint::from(55296u32); // todo auslagern create_blocks_from_string
     let strings = sums_vec_to_string_vec(sums, &base);
     strings.join("")

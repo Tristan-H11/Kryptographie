@@ -4,6 +4,7 @@ mod tests {
     use bigdecimal::num_bigint::BigUint;
     use bigdecimal::num_traits::Pow;
     use bigdecimal::One;
+    use druid::platform_menus::mac::file::print;
     use crate::big_u;
     use crate::encryption::math_functions::big_int_util::log_base_g;
     use crate::encryption::math_functions::number_theory::fast_exponentiation;
@@ -28,7 +29,6 @@ mod tests {
 
             let message = "Das ist ein";
             let g = big_u!(55296u16);
-            let block_size = log_base_g(&n, &g) as usize;
 
             let result = create_blocks_from_string(message, public_key.block_size - 1, true)
                 .iter()
@@ -58,6 +58,55 @@ mod tests {
             let string = create_string_from_blocks(result);
             assert_eq!(string.trim(), "Das ist ein".to_string());
     }
+
+
+    #[test]
+    fn test_loop_create_mult_decode_create_div_decode() {
+        let mut failure_count = 0;
+
+        for _ in 0..500 {
+            // Erstelle ein 64 Bit Schlüsselpaar
+            let keygen_service = RsaKeygenService::new(256);
+            let (public_key, private_key) = keygen_service.generate_keypair(40);
+
+            let message = "Das ist ein";
+            let g = big_u!(55296u16);
+
+            let result = create_blocks_from_string(message, public_key.block_size - 1, true)
+                .iter()
+                .map(|x| {
+                    fast_exponentiation(x, &public_key.e, &public_key.n) //verschlüsseln
+                })
+                .collect::<Vec<BigUint>>();
+            println!("\nVerschlüsselte Nachricht: {:?}\n", result);
+
+            let encrypted_string = create_string_from_blocks(result);
+            println!("Verschlüsselter String: {}\n", encrypted_string);
+
+            let result = create_blocks_from_string(
+                &encrypted_string,
+                private_key.block_size,
+                true)
+                .iter()
+                .map(|x| {
+                    fast_exponentiation(x, &private_key.d, &private_key.n) //entschlüsseln
+                })
+                .collect();
+            println!("\nEntschlüsselte Nachricht: {:?}\n", result);
+
+            let string = create_string_from_blocks(result);
+
+            // Ersetze assert durch eine if-Anweisung
+            if string.trim() != "Das ist ein" {
+                failure_count += 1;
+            }
+        }
+
+        // Am Ende des Tests, prüfe, ob der Fehlerzähler 0 ist
+        assert_eq!(failure_count, 0, "Fehlgeschlagene Tests: {}", failure_count);
+        print!("{} : Tests sind fehlgeschlagen", failure_count);
+    }
+
 
 
     ///

@@ -9,8 +9,8 @@ use crate::encryption::math_functions::number_theory::fast_exponentiation;
 /// Ein öffentlicher Schlüssel für RSA.
 ///
 pub struct PublicKey {
-    pub e: BigUint,
-    pub n: BigUint,
+    pub e: BigUint, // öffentlicher Exponent for encription
+    pub n: BigUint, // modul
     pub block_size: usize,
 }
 
@@ -39,6 +39,13 @@ impl PublicKey {
     ///
     pub fn get_e(&self) -> String {
         self.e.to_str_radix(10)
+    }
+
+    pub fn get_e_as_biguint(&self) -> BigUint {
+        self.e.clone()
+    }
+    pub fn get_n_as_biguint(&self) -> BigUint {
+        self.n.clone()
     }
 
     pub(crate) fn encrypt(&self, message: &str) -> String {
@@ -98,6 +105,14 @@ impl PrivateKey {
     ///
     pub fn get_n(&self) -> String {
         self.n.to_str_radix(10)
+    }
+
+    pub fn get_d_as_biguint(&self) -> BigUint {
+        self.d.clone()
+    }
+
+    pub fn get_n_as_biguint(&self) -> BigUint {
+        self.n.clone()
     }
 
     pub(crate) fn decrypt(&self, message: &str) -> String {
