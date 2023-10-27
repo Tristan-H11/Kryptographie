@@ -2,7 +2,7 @@ use bigdecimal::num_bigint::BigUint;
 use log::{info};
 use crate::big_u;
 use crate::encryption::math_functions::big_int_util::log_base_g;
-use crate::encryption::math_functions::block_chiffre::{create_blocks_from_string, create_string_from_blocks};
+use crate::encryption::math_functions::block_chiffre::{create_blocks_from_string_enc, create_string_from_blocks};
 use crate::encryption::math_functions::number_theory::fast_exponentiation;
 
 ///
@@ -51,7 +51,7 @@ impl PublicKey {
     pub(crate) fn encrypt(&self, message: &str) -> String {
         println!("Verschlüsseln mit blockgröße {}", self.block_size);
 
-        let chunks = create_blocks_from_string(message, self.block_size - 1, true);
+        let chunks = create_blocks_from_string_enc(message, self.block_size - 1, true);
         let encrypted_chunks = chunks.iter()
             .map(|chunk| fast_exponentiation(chunk, &self.e, &self.n))
             .collect();
@@ -68,8 +68,8 @@ impl PublicKey {
 /// Ein privater Schlüssel für RSA.
 ///
 pub struct PrivateKey {
-    pub d: BigUint,
-    pub n: BigUint,
+    pub d: BigUint, // dectipter
+    pub n: BigUint, // modul -- muss vom gegenpartner geholt werden
     pub block_size: usize
 }
 
@@ -84,14 +84,16 @@ impl PrivateKey {
     ///
     pub fn new(d: BigUint, n: BigUint) -> PrivateKey {
         // Maximale Blockbreite = log_g(n), wenn g=55296 ist.
-        let g = big_u!(55296u16);
-        let block_size = log_base_g(&n, &g) as usize;
+       let g = big_u!(55296u16);
+       let block_size = log_base_g(&n, &g) as usize;
         PrivateKey {
             d,
             n,
             block_size
         }
     }
+
+
 
     ///
     /// Gibt den privaten Exponenten als String zurück.
@@ -118,7 +120,7 @@ impl PrivateKey {
     pub(crate) fn decrypt(&self, message: &str) -> String {
         info!("Entschlüsseln mit blockgröße {}", self.block_size);
 
-        let chunks = create_blocks_from_string(message, self.block_size, true);
+        let chunks = create_blocks_from_string_enc(message, self.block_size, true);
         let decrypted_chunks = chunks.iter()
             .map(|chunk| fast_exponentiation(chunk, &self.d, &self.n))
             .collect();
