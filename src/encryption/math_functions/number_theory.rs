@@ -1,11 +1,11 @@
-use crate::encryption::math_functions::big_int_util::{
-    decrement, divides, increment, is_even, is_one, is_zero,
-};
 use crate::encryption::math_functions::random_elsner::RandomElsner;
 use bigdecimal::num_bigint::{BigInt, BigUint};
 use bigdecimal::num_traits::Euclid;
 use bigdecimal::{One, Zero};
 use std::ops::Div;
+use crate::encryption::math_functions::traits::divisible::Divisible;
+use crate::encryption::math_functions::traits::increment::Increment;
+use crate::encryption::math_functions::traits::parity::Parity;
 
 ///
 /// Schnelle Exponentiation der Potenz und Reduzierung um einen Modul.
@@ -22,19 +22,19 @@ use std::ops::Div;
 /// ```
 pub fn fast_exponentiation(base: &BigUint, exponent: &BigUint, modul: &BigUint) -> BigUint {
     // Sonderbedingungen der Exponentiation
-    if is_one(&modul) {
+    if modul.is_one() {
         return BigUint::zero();
     }
-    if is_zero(&exponent) {
+    if exponent.is_zero() {
         return BigUint::one();
     }
-    if is_one(&exponent) {
+    if exponent.is_one() {
         return base.rem_euclid(modul);
     }
 
     // Berechnung des Zwischenschrittes mit halbiertem Exponenten.
     let base_to_square = fast_exponentiation(base, &exponent.div(2u32), modul);
-    return if is_even(&exponent) {
+    return if exponent.is_even() {
         // Ist der Exponent gerade, so wird nur quadriert.
         base_to_square.pow(2).rem_euclid(modul)
     } else {
@@ -132,16 +132,16 @@ fn extended_euclidean_algorithm(
 /// miller_rabin(2211, 40) // => false
 /// ```
 pub fn miller_rabin(p: &BigUint, repeats: usize) -> bool {
-    let mut d = decrement(p);
+    let mut d = p.decrement();
     let mut s = BigUint::zero();
-    while is_even(&d) {
+    while d.is_even() {
         d = d.div(BigUint::from(2u8));
         s += BigUint::one();
     }
     let mut rand = RandomElsner::new(&BigUint::one(), p);
     for _ in 0..repeats {
         let mut a = rand.take();
-        while divides(p, &a) {
+        while p.is_divisible_by(&a) {
             a = rand.take();
         }
         if !miller_rabin_test(p, &s, &d, &a) {
@@ -153,16 +153,16 @@ pub fn miller_rabin(p: &BigUint, repeats: usize) -> bool {
 
 fn miller_rabin_test(p: &BigUint, s: &BigUint, d: &BigUint, a: &BigUint) -> bool {
     let mut x = fast_exponentiation(a, d, p);
-    if is_one(&x) || x == decrement(p) {
+    if x.is_one() || x == p.decrement() {
         return true;
     }
     let mut r = BigUint::zero();
     while &r < s {
         x = fast_exponentiation(&x, &BigUint::from(2u8), p);
-        if x == decrement(p) {
+        if x == p.decrement() {
             return true;
         }
-        r = increment(&r);
+        r = r.increment();
     }
     return false;
 }

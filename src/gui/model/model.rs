@@ -1,6 +1,6 @@
-use druid::{Data, Lens};
 use std::default::Default;
-use bigdecimal::num_bigint::BigUint;
+
+use druid::{Data, Lens};
 
 // Datenmodelle für Hauptmenü, Alice und Bob
 #[derive(Clone, Data, Lens)]

@@ -1,8 +1,8 @@
 use std::str::FromStr;
-use bigdecimal::num_bigint::BigUint;
-use bigdecimal::{One, ToPrimitive, Zero};
-use log::{debug, trace};
 
+use bigdecimal::{One, ToPrimitive, Zero};
+use bigdecimal::num_bigint::BigUint;
+use log::debug;
 
 ///
 /// Methode, um einen String in eine Menge von gleich großen Blöcken in Dezimalform zu unterteilen.

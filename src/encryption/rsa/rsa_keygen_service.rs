@@ -2,9 +2,9 @@ use bigdecimal::num_bigint::{BigUint, ToBigInt};
 use bigdecimal::One;
 use log::{debug, trace};
 use crate::big_u;
-use crate::encryption::math_functions::big_int_util::{decrement, is_one};
 use crate::encryption::math_functions::number_theory::{extended_euclid, miller_rabin, modulo_inverse};
 use crate::encryption::math_functions::random_elsner::RandomElsner;
+use crate::encryption::math_functions::traits::increment::Increment;
 use crate::encryption::rsa::keys::{PublicKey, PrivateKey};
 
 ///
@@ -104,14 +104,14 @@ impl RsaKeygenService {
     ///
     fn generate_e(&self, phi: &BigUint) -> BigUint {
         debug!("Generiere e mit phi {}", phi);
-        let mut random_generator = RandomElsner::new(&big_u!(3u8), &decrement(phi));
+        let mut random_generator = RandomElsner::new(&big_u!(3u8), &phi.decrement());
 
         let mut e = random_generator.take();
         while e < *phi {
             // Prüfen, ob e relativ prim zu phi ist, indem number_theory::extended_euclid() aufgerufen wird.
             //TODO Hübsch machen
             let euclid = &extended_euclid(&e.to_bigint().unwrap(), &phi.to_bigint().unwrap()).0.to_biguint().unwrap();
-            if is_one(euclid)  {
+            if euclid.is_one()  {
                 debug!("Generierter e {} ist relativ prim zu phi {}", e, phi);
                 return e;
             }
