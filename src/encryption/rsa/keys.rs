@@ -3,7 +3,10 @@ use log::info;
 
 use crate::big_u;
 use crate::encryption::math_functions::big_int_util::log_base_g;
-use crate::encryption::math_functions::block_chiffre::{create_blocks_from_string_decrypt, create_blocks_from_string_encript, create_string_from_blocks, create_string_from_blocks_decrypt};
+use crate::encryption::math_functions::block_chiffre::{
+    create_blocks_from_string_decrypt, create_blocks_from_string_encript,
+    create_string_from_blocks, create_string_from_blocks_decrypt,
+};
 use crate::encryption::math_functions::number_theory::fast_exponentiation;
 
 ///
@@ -28,11 +31,7 @@ impl PublicKey {
         // Maximale Blockbreite = log_g(n), wenn g=55296 ist.
         let g = big_u!(55296u16);
         let block_size = log_base_g(&n, &g) as usize;
-        PublicKey {
-            e,
-            n,
-            block_size,
-        }
+        PublicKey { e, n, block_size }
     }
 
     ///
@@ -55,15 +54,17 @@ impl PublicKey {
     pub(crate) fn encrypt(&self, message: &str, base_length: u32) -> String {
         println!("Verschlüsseln mit blockgröße {}", self.block_size);
 
-        let chunks = create_blocks_from_string_encript(message, self.block_size - 1, true, base_length);
-        let encrypted_chunks = chunks.iter()
+        let chunks =
+            create_blocks_from_string_encript(message, self.block_size - 1, true, base_length);
+        let encrypted_chunks = chunks
+            .iter()
             .map(|chunk| fast_exponentiation(chunk, &self.e, &self.n))
             .collect();
 
         create_string_from_blocks(encrypted_chunks)
     }
 
-    pub(crate) fn verify(&self, signature: &str, message: &str) -> bool {
+    pub(crate) fn verify(&self, _signature: &str, _message: &str) -> bool {
         todo!("Implementiere diese Funktion!")
     }
 }
@@ -90,11 +91,7 @@ impl PrivateKey {
         // Maximale Blockbreite = log_g(n), wenn g=55296 ist.
         let g = big_u!(55296u16);
         let block_size = log_base_g(&n, &g) as usize;
-        PrivateKey {
-            d,
-            n,
-            block_size,
-        }
+        PrivateKey { d, n, block_size }
     }
 
     ///
@@ -118,14 +115,15 @@ impl PrivateKey {
         info!("Entschlüsseln mit blockgröße {}", self.block_size);
 
         let chunks = create_blocks_from_string_decrypt(message, true, base_length);
-        let decrypted_chunks = chunks.iter()
+        let decrypted_chunks = chunks
+            .iter()
             .map(|chunk| fast_exponentiation(chunk, &self.d, &self.n))
             .collect();
 
         create_string_from_blocks_decrypt(decrypted_chunks)
     }
 
-    pub(crate) fn sign(&self, message: &str) -> String {
+    pub(crate) fn sign(&self, _message: &str) -> String {
         todo!("Implementiere diese Funktion!")
     }
 }

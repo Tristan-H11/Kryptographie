@@ -1,5 +1,5 @@
-use std::ops::Rem;
 use bigdecimal::Zero;
+use std::ops::Rem;
 
 ///
 /// Trait für die Prüfung der Parität einer Zahl
@@ -16,7 +16,7 @@ pub trait Parity {
     fn is_odd(&self) -> bool;
 }
 
-impl<T: Zero + Clone + Rem<Output=T> + PartialEq + From<u8>> Parity for T {
+impl<T: Zero + Clone + Rem<Output = T> + PartialEq + From<u8>> Parity for T {
     fn is_even(&self) -> bool {
         self.clone() % T::from(2u8) == T::zero()
     }

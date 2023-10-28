@@ -1,5 +1,5 @@
-use std::ops::{Add, Sub};
 use bigdecimal::One;
+use std::ops::{Add, Sub};
 
 ///
 /// Trait für die Berechnung von imkrementellen und dekrementellen Werten.
@@ -16,7 +16,7 @@ pub trait Increment {
     fn decrement(&self) -> Self;
 }
 
-impl<T: One + Clone + Add<Output=T> + Sub<Output=T>> Increment for T {
+impl<T: One + Clone + Add<Output = T> + Sub<Output = T>> Increment for T {
     fn increment(&self) -> Self {
         self.clone() + T::one()
     }

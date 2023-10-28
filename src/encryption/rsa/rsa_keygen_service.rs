@@ -1,11 +1,13 @@
+use crate::big_u;
+use crate::encryption::math_functions::number_theory::{
+    extended_euclid, miller_rabin, modulo_inverse,
+};
+use crate::encryption::math_functions::random_elsner::RandomElsner;
+use crate::encryption::math_functions::traits::increment::Increment;
+use crate::encryption::rsa::keys::{PrivateKey, PublicKey};
 use bigdecimal::num_bigint::{BigUint, ToBigInt};
 use bigdecimal::One;
 use log::{debug, trace};
-use crate::big_u;
-use crate::encryption::math_functions::number_theory::{extended_euclid, miller_rabin, modulo_inverse};
-use crate::encryption::math_functions::random_elsner::RandomElsner;
-use crate::encryption::math_functions::traits::increment::Increment;
-use crate::encryption::rsa::keys::{PublicKey, PrivateKey};
 
 ///
 /// Ein Service zum Generieren von Schlüsselpaaren für RSA.
@@ -23,10 +25,11 @@ impl RsaKeygenService {
     /// * `key_width` - Die Breite des Moduls `n`, mit welchem die Schlüssel berechnet werden.
     ///
     pub fn new(key_size: usize) -> RsaKeygenService {
-        debug!("Erstellen eines neuen RsaKeygenService mit key_size {}", key_size);
-        RsaKeygenService {
-            key_size,
-        }
+        debug!(
+            "Erstellen eines neuen RsaKeygenService mit key_size {}",
+            key_size
+        );
+        RsaKeygenService { key_size }
     }
 
     ///
@@ -40,13 +43,23 @@ impl RsaKeygenService {
     ///
     /// Ein Tupel aus dem öffentlichen und privaten Schlüssel.
     ///
-    pub(crate) fn generate_keypair(&self, miller_rabin_iterations: usize) -> (PublicKey, PrivateKey) {
-        debug!("Generiere Schlüsselpaar mit key_size {} und Miller-Rabin-Iterations {}", self.key_size, miller_rabin_iterations);
+    pub(crate) fn generate_keypair(
+        &self,
+        miller_rabin_iterations: usize,
+    ) -> (PublicKey, PrivateKey) {
+        debug!(
+            "Generiere Schlüsselpaar mit key_size {} und Miller-Rabin-Iterations {}",
+            self.key_size, miller_rabin_iterations
+        );
         let prim_size = self.key_size / 2;
         let prime_one = self.generate_prime(prim_size, miller_rabin_iterations);
         let mut prime_two = self.generate_prime(prim_size, miller_rabin_iterations);
         while prime_one == prime_two {
-            trace!("Generierter prime_one {} ist gleich prime_two {}. Starte neuen Versuch", prime_one, prime_two);
+            trace!(
+                "Generierter prime_one {} ist gleich prime_two {}. Starte neuen Versuch",
+                prime_one,
+                prime_two
+            );
             prime_two = self.generate_prime(prim_size, miller_rabin_iterations);
         }
 
@@ -75,7 +88,10 @@ impl RsaKeygenService {
     /// Die generierte Primzahl.
     ///
     fn generate_prime(&self, size: usize, miller_rabin_iterations: usize) -> BigUint {
-        debug!("Generiere eine Primzahl mit size {} und Miller-Rabin-Iterations {}", size, miller_rabin_iterations);
+        debug!(
+            "Generiere eine Primzahl mit size {} und Miller-Rabin-Iterations {}",
+            size, miller_rabin_iterations
+        );
 
         let upper_bound = &BigUint::from(2u8).pow(size as u32);
         let lower_bound = &BigUint::from(2u8).pow((size - 1) as u32);
@@ -84,10 +100,16 @@ impl RsaKeygenService {
         let mut prime_candidate = random_generator.take() | BigUint::one();
 
         while !miller_rabin(&prime_candidate, miller_rabin_iterations) {
-            trace!("Generierter Primkandidat {} ist keine Primzahl", prime_candidate);
+            trace!(
+                "Generierter Primkandidat {} ist keine Primzahl",
+                prime_candidate
+            );
             prime_candidate = random_generator.take() | BigUint::one();
         }
-        debug!("Generierter Primkandidat {} ist eine Primzahl", prime_candidate);
+        debug!(
+            "Generierter Primkandidat {} ist eine Primzahl",
+            prime_candidate
+        );
         prime_candidate
     }
 
@@ -110,8 +132,11 @@ impl RsaKeygenService {
         while e < *phi {
             // Prüfen, ob e relativ prim zu phi ist, indem number_theory::extended_euclid() aufgerufen wird.
             //TODO Hübsch machen
-            let euclid = &extended_euclid(&e.to_bigint().unwrap(), &phi.to_bigint().unwrap()).0.to_biguint().unwrap();
-            if euclid.is_one()  {
+            let euclid = &extended_euclid(&e.to_bigint().unwrap(), &phi.to_bigint().unwrap())
+                .0
+                .to_biguint()
+                .unwrap();
+            if euclid.is_one() {
                 debug!("Generierter e {} ist relativ prim zu phi {}", e, phi);
                 return e;
             }
@@ -137,7 +162,10 @@ impl RsaKeygenService {
     fn generate_d(&self, e: &BigUint, phi: &BigUint) -> BigUint {
         trace!("Generiere d mit e {} und phi {}", e, phi);
         //TODO Hübsch machen
-        let d = modulo_inverse(e.to_bigint().unwrap(), phi.to_bigint().unwrap()).unwrap().to_biguint().unwrap();
+        let d = modulo_inverse(e.to_bigint().unwrap(), phi.to_bigint().unwrap())
+            .unwrap()
+            .to_biguint()
+            .unwrap();
         debug!("d ist {}", d);
         d
     }

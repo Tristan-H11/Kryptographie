@@ -1,10 +1,10 @@
-use bigdecimal::num_bigint::ToBigUint;
-use crate::gui::controller::commands::*;
-use crate::gui::model::model::{AppState, View};
-use druid::{Env, Event, EventCtx};
-use log::{debug, error, info};
 use crate::encryption::rsa::keys::{PrivateKey, PublicKey};
 use crate::encryption::rsa::rsa_keygen_service::RsaKeygenService;
+use crate::gui::controller::commands::*;
+use crate::gui::model::model::{AppState, View};
+use bigdecimal::num_bigint::ToBigUint;
+use druid::{Env, Event, EventCtx};
+use log::{debug, error, info};
 
 pub struct AppController {
     alice_private_key: PrivateKey,
@@ -164,15 +164,19 @@ impl AppController {
             Err(_) => {
                 error!("Fehler beim Parsen der Modul-Breite. Es wird ein Default-Schlüssel mit 4096-bit erstellt.");
                 4096
-            },
+            }
         };
         let keygen_service = RsaKeygenService::new(modul_width);
-        let miller_rabin_iterations = match app_state.main_menu.miller_rabin_iterations.parse::<usize>() {
+        let miller_rabin_iterations = match app_state
+            .main_menu
+            .miller_rabin_iterations
+            .parse::<usize>()
+        {
             Ok(x) => x,
             Err(_) => {
                 error!("Fehler beim Parsen der Miller-Rabin-Iterationen. Es wird ein Default-Wert von 100 Iterationen verwendet.");
                 100
-            },
+            }
         };
 
         keygen_service.generate_keypair(miller_rabin_iterations)
@@ -184,8 +188,11 @@ impl AppController {
     fn encrypt_alice(&mut self, app_state: &mut AppState) {
         info!("Verschlüssle Nachricht von Alice");
         let message = app_state.alice.plaintext.clone();
-        let encrypted = self.bob_public_key.encrypt(&message, app_state.main_menu.basis_length.parse::<u32>().unwrap());
-         app_state.alice.ciphertext = encrypted;
+        let encrypted = self.bob_public_key.encrypt(
+            &message,
+            app_state.main_menu.basis_length.parse::<u32>().unwrap(),
+        );
+        app_state.alice.ciphertext = encrypted;
     }
 
     ///
@@ -215,8 +222,11 @@ impl AppController {
     fn decrypt_alice(&mut self, app_state: &mut AppState) {
         info!("Entschlüssle Nachricht von Bob");
         let cipher_text = app_state.alice.ciphertext.clone();
-         let decrypted = self.alice_private_key.decrypt(&cipher_text, app_state.main_menu.basis_length.parse::<u32>().unwrap());
-         app_state.alice.plaintext = decrypted;
+        let decrypted = self.alice_private_key.decrypt(
+            &cipher_text,
+            app_state.main_menu.basis_length.parse::<u32>().unwrap(),
+        );
+        app_state.alice.plaintext = decrypted;
     }
 
     ///
@@ -247,9 +257,11 @@ impl AppController {
     fn encrypt_bob(&mut self, app_state: &mut AppState) {
         info!("Verschlüssle Nachricht von Bob");
         let message = app_state.bob.plaintext.clone();
-        let encrypted = self.alice_public_key.encrypt(&message,
-                               app_state.main_menu.basis_length.parse::<u32>().unwrap());
-         app_state.bob.ciphertext = encrypted;
+        let encrypted = self.alice_public_key.encrypt(
+            &message,
+            app_state.main_menu.basis_length.parse::<u32>().unwrap(),
+        );
+        app_state.bob.ciphertext = encrypted;
     }
 
     ///
@@ -279,8 +291,10 @@ impl AppController {
     fn decrypt_bob(&mut self, app_state: &mut AppState) {
         info!("Entschlüssle Nachricht von Alice");
         let cipher_text = app_state.bob.ciphertext.clone();
-        let decrypted = self.bob_private_key.decrypt(&cipher_text,
-                               app_state.main_menu.basis_length.parse::<u32>().unwrap());
+        let decrypted = self.bob_private_key.decrypt(
+            &cipher_text,
+            app_state.main_menu.basis_length.parse::<u32>().unwrap(),
+        );
         app_state.bob.plaintext = decrypted;
     }
 

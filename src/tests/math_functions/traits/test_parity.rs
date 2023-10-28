@@ -1,7 +1,7 @@
 #[cfg(test)]
 mod tests {
-    use bigdecimal::num_bigint::BigUint;
     use crate::encryption::math_functions::traits::parity::Parity;
+    use bigdecimal::num_bigint::BigUint;
 
     #[test]
     fn test_is_even() {
@@ -16,4 +16,3 @@ mod tests {
         assert_eq!(BigUint::from(1435099u32).is_odd(), true);
     }
 }
-

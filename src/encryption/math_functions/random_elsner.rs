@@ -10,7 +10,6 @@ pub struct RandomElsner {
 }
 
 impl RandomElsner {
-
     ///
     /// Erstellt eine neue Instanz von RandomElsner.
     ///

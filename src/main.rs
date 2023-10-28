@@ -3,13 +3,12 @@ mod gui;
 mod tests;
 
 use druid::{AppLauncher, WindowDesc};
-use log::LevelFilter;
-use simple_logger::SimpleLogger;
 use gui::gui::build_ui;
 use gui::model::model::AppState;
+use log::LevelFilter;
+use simple_logger::SimpleLogger;
 
 fn main() {
-
     SimpleLogger::new()
         .with_level(LevelFilter::Trace)
         .with_colors(true)

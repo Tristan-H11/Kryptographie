@@ -1,3 +1,3 @@
-pub mod parity;
-pub mod increment;
 pub mod divisible;
+pub mod increment;
+pub mod parity;

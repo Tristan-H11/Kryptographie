@@ -1,7 +1,7 @@
 #[cfg(test)]
 mod tests {
-    use bigdecimal::num_bigint::BigUint;
     use crate::encryption::math_functions::traits::increment::Increment;
+    use bigdecimal::num_bigint::BigUint;
 
     #[test]
     fn test_increment() {

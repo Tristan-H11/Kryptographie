@@ -1,8 +1,12 @@
 #[cfg(test)]
 mod tests {
-    use crate::encryption::math_functions::block_chiffre::{create_blocks_from_string_encript, create_string_from_blocks, to_sum_vec, split_into_blocks, string_to_int_vec, sums_vec_to_string_vec, u32_to_c, ubig_to_u32, create_blocks_from_string_decrypt, create_string_from_blocks_decrypt};
+    use crate::encryption::math_functions::block_chiffre::{
+        create_blocks_from_string_decrypt, create_blocks_from_string_encript,
+        create_string_from_blocks, create_string_from_blocks_decrypt, split_into_blocks,
+        string_to_int_vec, sums_vec_to_string_vec, to_sum_vec, u32_to_c, ubig_to_u32,
+    };
     use bigdecimal::num_bigint::BigUint;
-    use crate::big_u;
+
     use crate::encryption::math_functions::number_theory::fast_exponentiation;
     use crate::encryption::rsa::rsa_keygen_service::RsaKeygenService;
 
@@ -24,13 +28,22 @@ mod tests {
             let basis_length = 55296 as u32;
             println!("{}", message);
 
-//            let result = create_blocks_from_string(message, public_key.block_size - 1, true)
-                let result = create_blocks_from_string_encript(message, 2, true, basis_length)
+            //            let result = create_blocks_from_string(message, public_key.block_size - 1, true)
+            let result = create_blocks_from_string_encript(message, 2, true, basis_length)
                 .iter()
                 .map(|x| {
-                    let zwischenstand = fast_exponentiation(x, &public_key.get_e_for_test(), &public_key.get_n_for_test()); //verschlüsseln
-                    println!("{}^{} mod {} = {}", x, public_key.get_e_for_test(), public_key.get_n_for_test(),
-                             zwischenstand);
+                    let zwischenstand = fast_exponentiation(
+                        x,
+                        &public_key.get_e_for_test(),
+                        &public_key.get_n_for_test(),
+                    ); //verschlüsseln
+                    println!(
+                        "{}^{} mod {} = {}",
+                        x,
+                        public_key.get_e_for_test(),
+                        public_key.get_n_for_test(),
+                        zwischenstand
+                    );
                     zwischenstand
                 })
                 .collect::<Vec<BigUint>>();
@@ -40,11 +53,11 @@ mod tests {
             println!("Verschlüsselter String: {}\n", encrypted_string);
 
             // Ohne Blocklänge, da diese in der Methode aus dem String extrahiert wird
-            let result = create_blocks_from_string_decrypt(&encrypted_string,
-                true, basis_length)
+            let result = create_blocks_from_string_decrypt(&encrypted_string, true, basis_length)
                 .iter()
                 .map(|x| {
-                    fast_exponentiation(x, &private_key.get_d(), &private_key.get_n()) //entschlüsseln
+                    fast_exponentiation(x, &private_key.get_d(), &private_key.get_n())
+                    //entschlüsseln
                 })
                 .collect();
             println!("\nEntschlüsselte Nachricht: {:?}\n", result);
@@ -62,7 +75,6 @@ mod tests {
         print!("{} : Tests sind fehlgeschlagen", failure_count);
     }
 
-
     #[test]
     fn test_loop_create_mult_decode_create_div_decode_2() {
         let mut failure_count = 0;
@@ -75,16 +87,20 @@ mod tests {
             let result = create_blocks_from_string_encript(message, 8, true, basis_length)
                 .iter()
                 .map(|x| {
-                    let zwischenstand = fast_exponentiation(x, &public_key.get_e_for_test(), &public_key.get_n_for_test()); //verschlüsseln
+                    let zwischenstand = fast_exponentiation(
+                        x,
+                        &public_key.get_e_for_test(),
+                        &public_key.get_n_for_test(),
+                    ); //verschlüsseln
                     zwischenstand
                 })
                 .collect::<Vec<BigUint>>();
             let encrypted_string = create_string_from_blocks(result);
-            let result = create_blocks_from_string_decrypt(&encrypted_string,
-                                                           true, basis_length)
+            let result = create_blocks_from_string_decrypt(&encrypted_string, true, basis_length)
                 .iter()
                 .map(|x| {
-                    fast_exponentiation(x, &private_key.get_d(), &private_key.get_n()) //entschlüsseln
+                    fast_exponentiation(x, &private_key.get_d(), &private_key.get_n())
+                    //entschlüsseln
                 })
                 .collect();
             let string = create_string_from_blocks_decrypt(result);
@@ -95,8 +111,6 @@ mod tests {
         assert_eq!(failure_count, 0, "Fehlgeschlagene Tests: {}", failure_count);
         print!("{} : Tests sind fehlgeschlagen", failure_count);
     }
-
-
 
     #[test]
     fn test_loop_create_mult_decode_create_div_decode_3() {
@@ -109,16 +123,20 @@ mod tests {
             let result = create_blocks_from_string_encript(message, 13, true, basis_length)
                 .iter()
                 .map(|x| {
-                    let zwischenstand = fast_exponentiation(x, &public_key.get_e_for_test(), &public_key.get_n_for_test()); //verschlüsseln
+                    let zwischenstand = fast_exponentiation(
+                        x,
+                        &public_key.get_e_for_test(),
+                        &public_key.get_n_for_test(),
+                    ); //verschlüsseln
                     zwischenstand
                 })
                 .collect::<Vec<BigUint>>();
             let encrypted_string = create_string_from_blocks(result);
-            let result = create_blocks_from_string_decrypt(&encrypted_string,
-                                                           true, basis_length)
+            let result = create_blocks_from_string_decrypt(&encrypted_string, true, basis_length)
                 .iter()
                 .map(|x| {
-                    fast_exponentiation(x, &private_key.get_d(), &private_key.get_n()) //entschlüsseln
+                    fast_exponentiation(x, &private_key.get_d(), &private_key.get_n())
+                    //entschlüsseln
                 })
                 .collect();
             let string = create_string_from_blocks_decrypt(result);
@@ -130,8 +148,6 @@ mod tests {
         print!("{} : Tests sind fehlgeschlagen", failure_count);
     }
 
-
-
     ///
     /// Prüft, ob die Funktionen zum Zerteilen und Zusammensetzen eines String das Inverse voneinander sind.
     ///
@@ -140,26 +156,62 @@ mod tests {
         let m = "Da苉 ist eine Testnachricht";
         let block_size = 8;
         let basis_length = 55296 as u32;
-        let encoded = create_string_from_blocks(create_blocks_from_string_encript(m, block_size, true, basis_length));
-        let decoded = create_string_from_blocks_decrypt(create_blocks_from_string_decrypt(&encoded, true, basis_length));
+        let encoded = create_string_from_blocks(create_blocks_from_string_encript(
+            m,
+            block_size,
+            true,
+            basis_length,
+        ));
+        let decoded = create_string_from_blocks_decrypt(create_blocks_from_string_decrypt(
+            &encoded,
+            true,
+            basis_length,
+        ));
         assert_eq!(decoded.trim(), m);
 
         let m = "Da苉 ist eine Testnachricht";
         let block_size = 6;
-        let encoded = create_string_from_blocks(create_blocks_from_string_encript(m, block_size, true, basis_length));
-        let decoded = create_string_from_blocks_decrypt(create_blocks_from_string_decrypt(&encoded, true, basis_length));
+        let encoded = create_string_from_blocks(create_blocks_from_string_encript(
+            m,
+            block_size,
+            true,
+            basis_length,
+        ));
+        let decoded = create_string_from_blocks_decrypt(create_blocks_from_string_decrypt(
+            &encoded,
+            true,
+            basis_length,
+        ));
         assert_eq!(decoded.trim(), m);
 
         let m = "Da苉 ist eine Testnachricht";
         let block_size = 47;
-        let encoded = create_string_from_blocks(create_blocks_from_string_encript(m, block_size, true, basis_length));
-        let decoded = create_string_from_blocks_decrypt(create_blocks_from_string_decrypt(&encoded, true, basis_length));
+        let encoded = create_string_from_blocks(create_blocks_from_string_encript(
+            m,
+            block_size,
+            true,
+            basis_length,
+        ));
+        let decoded = create_string_from_blocks_decrypt(create_blocks_from_string_decrypt(
+            &encoded,
+            true,
+            basis_length,
+        ));
         assert_eq!(decoded.trim(), m);
 
         let m = "Da苉 ist eine Testnachricht";
         let block_size = 3;
-        let encoded = create_string_from_blocks(create_blocks_from_string_encript(m, block_size, true, basis_length));
-        let decoded = create_string_from_blocks_decrypt(create_blocks_from_string_decrypt(&encoded, true, basis_length));
+        let encoded = create_string_from_blocks(create_blocks_from_string_encript(
+            m,
+            block_size,
+            true,
+            basis_length,
+        ));
+        let decoded = create_string_from_blocks_decrypt(create_blocks_from_string_decrypt(
+            &encoded,
+            true,
+            basis_length,
+        ));
         assert_eq!(decoded.trim(), m);
     }
 
@@ -266,7 +318,6 @@ mod tests {
         assert_eq!(result, expected_result);
     }
 
-
     #[test]
     fn test_sum_to_strings() {
         let sums = vec![
@@ -338,7 +389,6 @@ mod tests {
         assert_eq!(u32_to_c(44), ',');
     }
 
-
     #[test]
     fn test_ubig_to_u32() {
         let value = BigUint::from(12345u64);
@@ -346,4 +396,3 @@ mod tests {
         assert_eq!(result, 12345);
     }
 }
-

@@ -10,7 +10,7 @@ mod rsa_keys_test {
         let keygen_service = RsaKeygenService::new(keysize);
         let mut counter = 0;
 
-        for i in 0..15 {
+        for _i in 0..15 {
             let (public_key, private_key) = keygen_service.generate_keypair(40);
 
             let encrypted_message = public_key.encrypt(message, 55296);

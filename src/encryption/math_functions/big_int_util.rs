@@ -1,7 +1,7 @@
 use std::ops::MulAssign;
 
-use bigdecimal::One;
 use bigdecimal::num_bigint::BigUint;
+use bigdecimal::One;
 
 ///
 /// Erstellt einen BigUint aus einem unsigned Integer.
@@ -22,8 +22,6 @@ macro_rules! big_i {
         BigInt::from($x)
     };
 }
-
-
 
 ///
 /// Berechnet den Logarithmus zu einer Basis.

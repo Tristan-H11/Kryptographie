@@ -79,21 +79,18 @@ pub(crate) fn build_haupt_menu() -> impl Widget<MainMenuModel> {
         })
         .fix_width(fixed_width_button);
 
-
     // big-text
     let public_exponent_alice_label = Label::new(|data: &MainMenuModel, _env: &Env| -> String {
-        let wrapped_text = wrap_text(&format!("{}", &data.public_exponent_alice),
-                                     150);
+        let wrapped_text = wrap_text(&format!("{}", &data.public_exponent_alice), 150);
         format!("Öffentlicher Exponent Alice: \n{}", wrapped_text)
     })
-        .expand_width();
+    .expand_width();
 
     let public_exponent_bob_label = Label::new(|data: &MainMenuModel, _env: &Env| -> String {
-        let wrapped_text = wrap_text(&format!("{}", &data.public_exponent_bob),
-                                     150);
+        let wrapped_text = wrap_text(&format!("{}", &data.public_exponent_bob), 150);
         format!("Öffentlicher Exponent Bob: \n{}", wrapped_text)
     })
-        .expand_width();
+    .expand_width();
 
     Flex::column()
         .with_default_spacer()
@@ -133,18 +130,18 @@ pub(crate) fn build_alice_view() -> impl Widget<AliceModel> {
     // Entry-Felder und Labels
     let plaintext_entry = Flex::row()
         .with_child(Label::new("Klartext: ").fix_width(fixed_width_entry_label))
-        .with_child(TextBox::new()
-            .with_placeholder("z.B. Hallo wie geht es dir?")
-            .fix_width(fixed_width_textbox)
-            .lens(AliceModel::plaintext));
+        .with_child(
+            TextBox::new()
+                .with_placeholder("z.B. Hallo wie geht es dir?")
+                .fix_width(fixed_width_textbox)
+                .lens(AliceModel::plaintext),
+        );
 
     let ciphertext_entry = Flex::row()
         .with_child(Label::new("Geheimtext: ").fix_width(fixed_width_entry_label))
         .with_child(
             TextBox::new()
-                .with_placeholder(
-                    "Erzeugt durch Berechnung.",
-                )
+                .with_placeholder("Erzeugt durch Berechnung.")
                 .fix_width(fixed_width_textbox)
                 .lens(AliceModel::ciphertext),
         );
@@ -251,23 +248,23 @@ pub(crate) fn build_bob_view() -> impl Widget<BobModel> {
         let wrapped_text = wrap_text(&format!("Geheimer Exponent: {}", data.private_exponent), 75);
         format!("Geheimer Exponent: \n{}", wrapped_text)
     })
-        .expand_width();
+    .expand_width();
 
     // Entry-Felder und Labels
     let plaintext_entry = Flex::row()
         .with_child(Label::new("Klartext: ").fix_width(fixed_width_entry_label))
-        .with_child(TextBox::new()
-            .with_placeholder("z.B. Hallo wie geht es dir?")
-            .fix_width(fixed_width_textbox)
-            .lens(BobModel::plaintext));
+        .with_child(
+            TextBox::new()
+                .with_placeholder("z.B. Hallo wie geht es dir?")
+                .fix_width(fixed_width_textbox)
+                .lens(BobModel::plaintext),
+        );
 
     let ciphertext_entry = Flex::row()
         .with_child(Label::new("Geheimtext: ").fix_width(fixed_width_entry_label))
         .with_child(
             TextBox::new()
-                .with_placeholder(
-                    "Erzeugt durch Berechnung.",
-                )
+                .with_placeholder("Erzeugt durch Berechnung.")
                 .fix_width(fixed_width_textbox)
                 .lens(BobModel::ciphertext),
         );
