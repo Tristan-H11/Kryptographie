@@ -2,12 +2,12 @@ use bigdecimal::num_bigint::BigInt;
 use log::info;
 
 use crate::big_i;
-use crate::encryption::math_functions::big_num_util::log_base_g;
 use crate::encryption::math_functions::block_chiffre::{
     create_blocks_from_string_decrypt, create_blocks_from_string_encript,
     create_string_from_blocks, create_string_from_blocks_decrypt,
 };
 use crate::encryption::math_functions::number_theory::fast_exponentiation;
+use crate::encryption::math_functions::traits::logarithm::Logarithm;
 
 ///
 /// Ein öffentlicher Schlüssel für RSA.
@@ -30,7 +30,7 @@ impl PublicKey {
     pub fn new(e: BigInt, n: BigInt) -> PublicKey {
         // Maximale Blockbreite = log_g(n), wenn g=55296 ist.
         let g = big_i!(55296u16); //TODO in GUI auslagern
-        let block_size = log_base_g(&n, &g) as usize;
+        let block_size = n.log(&g) as usize;
         PublicKey { e, n, block_size }
     }
 
@@ -90,7 +90,7 @@ impl PrivateKey {
     pub fn new(d: BigInt, n: BigInt) -> PrivateKey {
         // Maximale Blockbreite = log_g(n), wenn g=55296 ist.
         let g = big_i!(55296u16); //TODO in GUI auslagern
-        let block_size = log_base_g(&n, &g) as usize;
+        let block_size = n.log(&g) as usize;
         PrivateKey { d, n, block_size }
     }
 
