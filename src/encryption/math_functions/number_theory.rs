@@ -1,7 +1,7 @@
 use std::io::{Error, ErrorKind};
 
 
-use bigdecimal::num_bigint::{BigInt, ToBigInt};
+use bigdecimal::num_bigint::BigInt;
 use bigdecimal::num_traits::Euclid;
 use bigdecimal::{One, Zero};
 
@@ -143,7 +143,7 @@ pub fn miller_rabin(p: &BigInt, repeats: usize) -> bool {
         s.increment_assign();
     }
 
-    let mut rand = RandomElsner::new(&big_i!(2), &p.to_bigint().unwrap());
+    let mut rand = RandomElsner::new(&big_i!(2), &p);
 
     for _ in 0..repeats {
         let mut a = rand.take();

@@ -216,7 +216,7 @@ impl AppController {
     ///
     fn sign_alice(&mut self, _app_state: &mut AppState) {
         info!("Signiere Nachricht von Alice");
-        let message = _app_state.alice.plaintext.clone(); //todo -- sind hier alice und bob schlüssel richtig hinterlegt -- prüfen
+        let message = _app_state.alice.plaintext.clone();
         let signed = self.alice_private_key.sign(&message);
         _app_state.alice.signature = signed;
     }

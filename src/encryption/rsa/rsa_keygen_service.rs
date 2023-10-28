@@ -1,4 +1,4 @@
-use bigdecimal::num_bigint::{BigInt, ToBigInt};
+use bigdecimal::num_bigint::BigInt;
 use bigdecimal::One;
 use log::{debug, trace};
 
@@ -131,9 +131,7 @@ impl RsaKeygenService {
 
         let mut e = random_generator.take();
         while e < *phi {
-            // Prüfen, ob e relativ prim zu phi ist, indem number_theory::extended_euclid() aufgerufen wird.
-            //TODO Hübsch machen
-            let euclid = &extended_euclid(&e.to_bigint().unwrap(), &phi.to_bigint().unwrap()).0;
+            let euclid = &extended_euclid(&e, &phi).0;
             if euclid.is_one() {
                 debug!("Generierter e {} ist relativ prim zu phi {}", e, phi);
                 return e;
@@ -159,7 +157,6 @@ impl RsaKeygenService {
     ///
     fn generate_d(&self, e: &BigInt, phi: &BigInt) -> BigInt {
         trace!("Generiere d mit e {} und phi {}", e, phi);
-        //TODO Hübsch machen
         let d = modulo_inverse(e, phi).unwrap();
         debug!("d ist {}", d);
         d
