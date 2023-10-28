@@ -184,14 +184,29 @@ impl AppController {
     }
 
     ///
+    /// Parst die Basis-Länge aus dem GUI-String.
+    /// Falls der String nicht geparst werden kann, wird der Default-Wert 55296 verwendet.
+    ///
+    fn parse_base(app_state: &mut AppState) -> u32 {
+        let g_base = match app_state.main_menu.basis_length.parse::<u32>() {
+            Ok(x) => x,
+            Err(_) => {
+                error!("Fehler beim Parsen der Basis-Länge. Es wird der Default 55296 verwendet.");
+                55296
+            }
+        };
+        g_base
+    }
+
+    ///
     /// Verschlüsselt die Nachricht von Alice mit Bobs öffentlichem Schlüssel.
     ///
     fn encrypt_alice(&mut self, app_state: &mut AppState) {
         info!("Verschlüssle Nachricht von Alice");
-        let message = app_state.alice.plaintext.clone();
+        let plaintext = app_state.alice.plaintext.clone();
         let encrypted = self.bob_public_key.encrypt(
-            &message,
-            app_state.main_menu.basis_length.parse::<u32>().unwrap(),
+            &plaintext,
+            Self::parse_base(app_state),
         );
         app_state.alice.ciphertext = encrypted;
     }
@@ -225,7 +240,7 @@ impl AppController {
         let cipher_text = app_state.alice.ciphertext.clone();
         let decrypted = self.alice_private_key.decrypt(
             &cipher_text,
-            app_state.main_menu.basis_length.parse::<u32>().unwrap(),
+            Self::parse_base(app_state),
         );
         app_state.alice.plaintext = decrypted;
     }
@@ -257,10 +272,10 @@ impl AppController {
     ///
     fn encrypt_bob(&mut self, app_state: &mut AppState) {
         info!("Verschlüssle Nachricht von Bob");
-        let message = app_state.bob.plaintext.clone();
+        let plaintext = app_state.bob.plaintext.clone();
         let encrypted = self.alice_public_key.encrypt(
-            &message,
-            app_state.main_menu.basis_length.parse::<u32>().unwrap(),
+            &plaintext,
+            Self::parse_base(app_state),
         );
         app_state.bob.ciphertext = encrypted;
     }
@@ -294,7 +309,7 @@ impl AppController {
         let cipher_text = app_state.bob.ciphertext.clone();
         let decrypted = self.bob_private_key.decrypt(
             &cipher_text,
-            app_state.main_menu.basis_length.parse::<u32>().unwrap(),
+            Self::parse_base(app_state),
         );
         app_state.bob.plaintext = decrypted;
     }
