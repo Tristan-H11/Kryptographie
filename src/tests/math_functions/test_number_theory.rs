@@ -5,7 +5,7 @@ mod tests {
     };
     use bigdecimal::num_bigint::{BigInt, BigUint};
     use std::str::FromStr;
-    use crate::big_u;
+    use crate::{big_i, big_u};
 
     #[test]
     fn fast_exponentiation_happy_flow() {
@@ -100,14 +100,14 @@ mod tests {
 
     #[test]
     fn modulo_inverse_test() {
-        //assert_eq!(modulo_inverse(BigInt::from(1), BigInt::from(3)).unwrap(), BigInt::from(1));
+        //assert_eq!(modulo_inverse(big_i!(1), big_i!(3)).unwrap(), big_i!(1));
         assert_eq!(
-            modulo_inverse(BigInt::from(5), BigInt::from(11)).unwrap(),
-            BigInt::from(9)
+            modulo_inverse(big_i!(5), big_i!(11)).unwrap(),
+            big_i!(9)
         );
         assert_eq!(
-            modulo_inverse(BigInt::from(315), BigInt::from(661643)).unwrap(),
-            BigInt::from(342374)
+            modulo_inverse(big_i!(315), big_i!(661643)).unwrap(),
+            big_i!(342374)
         );
         assert_eq!(
             modulo_inverse(
@@ -117,7 +117,7 @@ mod tests {
             .unwrap(),
             BigInt::from_str("7173228757438794445922076835963679049602847038123").unwrap()
         );
-        assert!(modulo_inverse(BigInt::from(78), BigInt::from(99)).is_err());
+        assert!(modulo_inverse(big_i!(78), big_i!(99)).is_err());
     }
 
     #[test]
