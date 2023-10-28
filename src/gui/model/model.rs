@@ -7,6 +7,7 @@ use bigdecimal::num_bigint::BigUint;
 pub struct MainMenuModel {
     pub(crate) modul_width: String,
     pub(crate) miller_rabin_iterations: String,
+    pub(crate) basis_length: String,
     pub(crate) public_exponent_alice: String,
     pub(crate) public_exponent_bob: String,
 }
@@ -53,6 +54,7 @@ impl Default for AppState {
             main_menu: MainMenuModel {
                 modul_width: String::new(),
                 miller_rabin_iterations: String::new(),
+                basis_length: String::new(),
                 public_exponent_alice: String::new(),
                 public_exponent_bob: String::new(),
             },

@@ -146,10 +146,10 @@ impl AppController {
     ///
     fn calculate_keypair_bob(&mut self, app_state: &mut AppState) {
         info!("Berechne Schlüsselpaar für Bob");
-        let (public_key_alice, private_key_alice) = self.calculate_keypair(app_state);
+        let (public_key_bob, private_key_bob) = self.calculate_keypair(app_state);
 
-        self.bob_private_key = private_key_alice;
-        self.bob_public_key = public_key_alice;
+        self.bob_private_key = private_key_bob;
+        self.bob_public_key = public_key_bob;
 
         app_state.main_menu.public_exponent_bob = self.bob_public_key.get_e();
         app_state.bob.private_exponent = self.bob_private_key.get_d();

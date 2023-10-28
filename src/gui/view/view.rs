@@ -45,6 +45,15 @@ pub(crate) fn build_haupt_menu() -> impl Widget<MainMenuModel> {
                 .lens(MainMenuModel::miller_rabin_iterations),
         );
 
+    let basis_entry = Flex::row()
+        .with_child(Label::new("Basis für Kalkulationen: ").fix_width(fixed_width_entry_label))
+        .with_child(
+            TextBox::new()
+                .with_placeholder("default = 55296")
+                .fix_width(fixed_width_textbox)
+                .lens(MainMenuModel::basis_length),
+        );
+
     // Button
     let calculate_keypair_alice = Button::new("Schlüsselpaar <public, private> Alice berechnen")
         .on_click(|ctx, _data: &mut MainMenuModel, _env| {
@@ -92,6 +101,8 @@ pub(crate) fn build_haupt_menu() -> impl Widget<MainMenuModel> {
         .with_child(modul_width_entry)
         .with_default_spacer()
         .with_child(miller_rabin_entry)
+        .with_default_spacer()
+        .with_child(basis_entry)
         .with_spacer(spacer_size)
         .with_child(calculate_keypair_alice)
         .with_default_spacer()
