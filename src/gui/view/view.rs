@@ -80,7 +80,7 @@ pub(crate) fn build_haupt_menu() -> impl Widget<MainMenuModel> {
         .fix_width(fixed_width_button);
 
 
-    // text
+    // big-text
     let public_exponent_alice_label = Label::new(|data: &MainMenuModel, _env: &Env| -> String {
         let wrapped_text = wrap_text(&format!("{}", &data.public_exponent_alice),
                                      150);
@@ -125,10 +125,11 @@ pub(crate) fn build_alice_view() -> impl Widget<AliceModel> {
     let spacer_size = 40.0;
 
     // Label
-    let secret_exponent_label = Label::new(|data: &AliceModel, _env: &Env| {
-        format!("Geheimer Exponent: {}", data.private_exponent)
+    let secret_exponent_label = Label::new(|data: &AliceModel, _env: &Env| -> String {
+        let wrapped_text = wrap_text(&format!("Geheimer Exponent: {}", data.private_exponent), 75);
+        format!("Geheimer Exponent: \n{}", wrapped_text)
     })
-    .fix_width(fixed_width_label);
+    .expand_width();
 
     // Entry-Felder und Labels
     let plaintext_entry = Flex::row()
@@ -248,9 +249,11 @@ pub(crate) fn build_bob_view() -> impl Widget<BobModel> {
     let spacer_size = 40.0;
 
     // Label
-    let secret_exponent_label =
-        Label::new(|data: &BobModel, _env: &Env| format!("Geheimer Exponent: {}", data.private_exponent))
-            .fix_width(fixed_width_label);
+    let secret_exponent_label = Label::new(|data: &BobModel, _env: &Env| -> String {
+        let wrapped_text = wrap_text(&format!("Geheimer Exponent: {}", data.private_exponent), 75);
+        format!("Geheimer Exponent: \n{}", wrapped_text)
+    })
+        .expand_width();
 
     // Entry-Felder und Labels
     let plaintext_entry = Flex::row()
