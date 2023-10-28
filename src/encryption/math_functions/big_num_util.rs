@@ -23,6 +23,19 @@ macro_rules! big_i {
     };
 }
 
+
+///
+/// Erstellt ein BigDecimal aus einem Float.
+///
+#[macro_export]
+macro_rules! big_d {
+    ($x:expr) => {
+        BigDecimal::from($x)
+    };
+}
+
+
+
 ///
 /// Berechnet den Logarithmus zu einer Basis.
 ///

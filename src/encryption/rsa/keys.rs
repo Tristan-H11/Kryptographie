@@ -2,7 +2,7 @@ use bigdecimal::num_bigint::BigUint;
 use log::info;
 
 use crate::big_u;
-use crate::encryption::math_functions::big_int_util::log_base_g;
+use crate::encryption::math_functions::big_num_util::log_base_g;
 use crate::encryption::math_functions::block_chiffre::{
     create_blocks_from_string_decrypt, create_blocks_from_string_encript,
     create_string_from_blocks, create_string_from_blocks_decrypt,

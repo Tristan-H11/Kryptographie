@@ -2,7 +2,7 @@
 mod tests {
     use bigdecimal::num_bigint::BigUint;
 
-    use crate::encryption::math_functions::big_int_util::log_base_g;
+    use crate::encryption::math_functions::big_num_util::log_base_g;
 
     #[test]
     fn test_log_base_g() {
