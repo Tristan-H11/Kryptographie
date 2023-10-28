@@ -37,7 +37,7 @@ pub fn fast_exponentiation(base: &BigInt, exponent: &BigInt, modul: &BigInt) -> 
     }
 
     // Berechnung des Zwischenschrittes mit halbiertem Exponenten.
-    let base_to_square = fast_exponentiation(base, &exponent.div(2u32), modul);
+    let base_to_square = fast_exponentiation(base, &exponent.half(), modul);
     return if exponent.is_even() {
         // Ist der Exponent gerade, so wird nur quadriert.
         base_to_square.pow(2).rem_euclid(modul)
