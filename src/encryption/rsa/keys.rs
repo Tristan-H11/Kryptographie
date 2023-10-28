@@ -48,10 +48,10 @@ impl PublicKey {
         self.n.clone()
     }
 
-    pub(crate) fn encrypt(&self, message: &str) -> String {
+    pub(crate) fn encrypt(&self, message: &str, base_length: u32) -> String {
         println!("Verschlüsseln mit blockgröße {}", self.block_size);
 
-        let chunks = create_blocks_from_string_encript(message, self.block_size - 1, true);
+        let chunks = create_blocks_from_string_encript(message, self.block_size - 1, true, base_length);
         let encrypted_chunks = chunks.iter()
             .map(|chunk| fast_exponentiation(chunk, &self.e, &self.n))
             .collect();
@@ -117,10 +117,10 @@ impl PrivateKey {
         self.n.clone()
     }
 
-    pub(crate) fn decrypt(&self, message: &str) -> String {
+    pub(crate) fn decrypt(&self, message: &str, base_length: u32) -> String {
         info!("Entschlüsseln mit blockgröße {}", self.block_size);
 
-        let chunks = create_blocks_from_string_decrypt(message, true);
+        let chunks = create_blocks_from_string_decrypt(message, true, base_length);
         let decrypted_chunks = chunks.iter()
             .map(|chunk| fast_exponentiation(chunk, &self.d, &self.n))
             .collect();

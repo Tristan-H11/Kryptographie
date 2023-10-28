@@ -13,10 +13,10 @@ mod rsa_keys_test {
         for i in 0..15 {
             let (public_key, private_key) = keygen_service.generate_keypair(40);
 
-            let encrypted_message = public_key.encrypt(message);
+            let encrypted_message = public_key.encrypt(message, 55296);
             println!("Verschlüsselte Nachricht: {}", encrypted_message);
 
-            let decrypted_message = private_key.decrypt(&encrypted_message);
+            let decrypted_message = private_key.decrypt(&encrypted_message, 55296);
             if message != decrypted_message.trim() {
                 println!("{} != {}", message, decrypted_message.trim());
                 counter += 1;

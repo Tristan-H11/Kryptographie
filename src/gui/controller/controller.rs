@@ -184,8 +184,8 @@ impl AppController {
     fn encrypt_alice(&mut self, app_state: &mut AppState) {
         info!("Verschlüssle Nachricht von Alice");
         let message = app_state.alice.plaintext.clone();
-        let encrypted = self.bob_public_key.encrypt(&message);
-        // app_state.alice.ciphertext = encrypted; TODO
+        let encrypted = self.bob_public_key.encrypt(&message, app_state.main_menu.basis_length.parse::<u32>().unwrap());
+         app_state.alice.ciphertext = encrypted;
     }
 
     ///
@@ -193,7 +193,7 @@ impl AppController {
     ///
     fn sign_alice(&mut self, _app_state: &mut AppState) {
         info!("Signiere Nachricht von Alice");
-        let message = _app_state.alice.plaintext.clone();
+        let message = _app_state.alice.plaintext.clone(); //todo -- sind hier alice und bob schlüssel richtig hinterlegt -- prüfen
         let signed = self.alice_private_key.sign(&message);
         _app_state.alice.signature = signed;
     }
@@ -215,8 +215,8 @@ impl AppController {
     fn decrypt_alice(&mut self, app_state: &mut AppState) {
         info!("Entschlüssle Nachricht von Bob");
         let cipher_text = app_state.alice.ciphertext.clone();
-        // let decrypted = self.alice_private_key.decrypt(&cipher_text);
-        // app_state.alice.plaintext = decrypted; TODO
+         let decrypted = self.alice_private_key.decrypt(&cipher_text, app_state.main_menu.basis_length.parse::<u32>().unwrap());
+         app_state.alice.plaintext = decrypted;
     }
 
     ///
@@ -247,8 +247,9 @@ impl AppController {
     fn encrypt_bob(&mut self, app_state: &mut AppState) {
         info!("Verschlüssle Nachricht von Bob");
         let message = app_state.bob.plaintext.clone();
-        let encrypted = self.alice_public_key.encrypt(&message);
-        // app_state.bob.ciphertext = encrypted; TODO
+        let encrypted = self.alice_public_key.encrypt(&message,
+                               app_state.main_menu.basis_length.parse::<u32>().unwrap());
+         app_state.bob.ciphertext = encrypted;
     }
 
     ///
@@ -278,8 +279,9 @@ impl AppController {
     fn decrypt_bob(&mut self, app_state: &mut AppState) {
         info!("Entschlüssle Nachricht von Alice");
         let cipher_text = app_state.bob.ciphertext.clone();
-        // let decrypted = self.bob_private_key.decrypt(&cipher_text);
-        // app_state.bob.plaintext = decrypted; TODO
+        let decrypted = self.bob_private_key.decrypt(&cipher_text,
+                               app_state.main_menu.basis_length.parse::<u32>().unwrap());
+        app_state.bob.plaintext = decrypted;
     }
 
     ///

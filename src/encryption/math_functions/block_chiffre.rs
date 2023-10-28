@@ -15,12 +15,11 @@ use log::{debug, trace};
 /// # Rückgabe
 /// * `Vec<BigUint>` - Die codierte Darstellung des Strings als vec der Summen.
 ///
-pub(crate) fn create_blocks_from_string_encript(m: &str, block_size: usize, fill_blocks: bool) -> Vec<BigUint> {
+pub(crate) fn create_blocks_from_string_encript(m: &str, block_size: usize, fill_blocks: bool, base_length: u32) -> Vec<BigUint> {
     debug!("Erstelle Chiffre mit Blockgröße {} für {}", block_size, m);
     let b = split_into_blocks(m, block_size, fill_blocks);
     let i_vec = string_to_int_vec(b);
-    let base = BigUint::from(55296u32); //todo -- basis auf mainview auslagern damit der
-                                        // user diese bei bedarf ändern kann (nice to have)
+    let base = BigUint::from(base_length);
     to_sum_vec(i_vec, &base)
 }
 
@@ -36,7 +35,7 @@ pub(crate) fn create_blocks_from_string_encript(m: &str, block_size: usize, fill
 /// # Rückgabe
 /// * `Vec<BigUint>` - Die codierte Darstellung des Strings als vec der Summen.
 ///
-pub(crate) fn create_blocks_from_string_decrypt(m: &str, fill_blocks: bool) -> Vec<BigUint> {
+pub(crate) fn create_blocks_from_string_decrypt(m: &str, fill_blocks: bool, base_length: u32) -> Vec<BigUint> {
     let parts: Vec<&str> = m.splitn(2, '\u{FE8D}').collect();
     let block_size = match usize::from_str(parts[0]) {
         Ok(size) => size,
@@ -47,7 +46,7 @@ pub(crate) fn create_blocks_from_string_decrypt(m: &str, fill_blocks: bool) -> V
 
     let b = split_into_blocks(message, block_size, fill_blocks);
     let i_vec = string_to_int_vec(b);
-    let base = BigUint::from(55296u32);
+    let base = BigUint::from(base_length);
     to_sum_vec(i_vec, &base)
 }
 
