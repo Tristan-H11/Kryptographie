@@ -24,8 +24,9 @@ pub(crate) fn create_blocks_from_string_enc(m: &str, block_size: usize, fill_blo
     to_sum_vec(i_vec, &base)
 }
 
+// TODO Dokumentation schreiben
 // Neue funktion für Rückweg beim decodieren!!!
-pub(crate) fn create_blocks_from_string_dec(m: &str, fill_blocks: bool) -> Vec<BigUint> {
+pub(crate) fn create_blocks_from_string_decrypt(m: &str, fill_blocks: bool) -> Vec<BigUint> {
     let parts: Vec<&str> = m.splitn(2, '\u{FE8D}').collect();
     let block_size = match usize::from_str(parts[0]) {
         Ok(size) => size,
@@ -52,7 +53,7 @@ pub(crate) fn create_blocks_from_string_dec(m: &str, fill_blocks: bool) -> Vec<B
 pub(crate) fn create_string_from_blocks(sums: Vec<BigUint>) -> String {
     println!("Erstelle String aus Vektor von Summen: Anzahl der Vectorblöcke --> {}", sums.len());
     let base = BigUint::from(55296u32);
-    let mut strings = sums_vec_to_string_vec(sums, &base);
+    let strings = sums_vec_to_string_vec(sums, &base);
     println!("Chiffrierter Vector: {:?}", strings);
 
     // todo -- tristan --> in Zeile 55 wird 24, 25 oder 25,25 usw. als interne Zahlenwert übergeben.
@@ -60,16 +61,38 @@ pub(crate) fn create_string_from_blocks(sums: Vec<BigUint>) -> String {
     //berechnet werden. Wir brauchen eine länge wie 8 oder 10 oder so, also von dem chinesischen
     //zeichentext, damit wir es danach vernünftig splitten können.
     //wenn hier der richtige wert übergeben werden sollte, müsste das gesamte RSA funktionieren.
-    let max_length = &strings.iter()
-        .map(|s| s.len()).max().unwrap();
+    let max_length = strings.iter()
+        .map(|s| s.chars().count()).max().unwrap();
     println!("Maximale Länge eines Strings: {}", max_length);
 
-    // Füllen Sie jeden String mit dem Zeichen "\u{FE8D}", um die maximale Länge zu erreichen
+    // Füllt jeden String mit dem Zeichen "\u{FE8D}", um die maximale Länge zu erreichen
     // -- ziel ist es, eine einheitliche blocksize zu erhalten
-    strings = strings.iter()
-        .map(|s| format!("{}{}", s, "\u{FE8D}".repeat(max_length - s.len())))
+    let strings: Vec<String>= strings.iter()
+        .map(|s| format!("{}{}", s, "\u{FE8D}".repeat(max_length - s.chars().count())))
         .collect();
     format!("{}\u{FE8D}{}", max_length, &strings.join(""))
+}
+
+/// TODO Documentation anpassen
+/// Methode, um eine Menge von gleich großen Blöcken in Dezimalform in einen String zu überführen.
+///
+/// # Argumente
+/// * `sums` - Die zu überführenden Summen.
+///
+/// # Rückgabe
+/// * `String` - Der decodierte String.
+///
+pub(crate) fn create_string_from_blocks_decrypt(sums: Vec<BigUint>) -> String {
+    println!("Erstelle String aus Vektor von Summen: Anzahl der Vectorblöcke --> {}", sums.len());
+    let base = BigUint::from(55296u32);
+    let strings = sums_vec_to_string_vec(sums, &base);
+    println!("Chiffrierter Vector: {:?}", strings);
+
+    let max_length = strings.iter()
+        .map(|s| s.chars().count()).max().unwrap();
+    println!("Maximale Länge eines Strings: {}", max_length);
+
+    strings.join("")
 }
 
 ///
@@ -106,7 +129,7 @@ pub(crate) fn split_into_blocks(message: &str, block_size: usize, fill_block: bo
                 }
             }
             println!("Erstellte Block '{}'", b);
-            b
+            b.replace("\u{FE8D}", "")
         })
         .collect() // Fasst alle Blöcke im Vektor zusammen
 }

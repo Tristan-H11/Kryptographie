@@ -2,7 +2,7 @@ use bigdecimal::num_bigint::BigUint;
 use log::{info};
 use crate::big_u;
 use crate::encryption::math_functions::big_int_util::log_base_g;
-use crate::encryption::math_functions::block_chiffre::{create_blocks_from_string_enc, create_string_from_blocks};
+use crate::encryption::math_functions::block_chiffre::{create_blocks_from_string_decrypt, create_blocks_from_string_enc, create_string_from_blocks, create_string_from_blocks_decrypt};
 use crate::encryption::math_functions::number_theory::fast_exponentiation;
 
 ///
@@ -120,12 +120,12 @@ impl PrivateKey {
     pub(crate) fn decrypt(&self, message: &str) -> String {
         info!("Entschlüsseln mit blockgröße {}", self.block_size);
 
-        let chunks = create_blocks_from_string_enc(message, self.block_size, true);
+        let chunks = create_blocks_from_string_decrypt(message, true);
         let decrypted_chunks = chunks.iter()
             .map(|chunk| fast_exponentiation(chunk, &self.d, &self.n))
             .collect();
 
-        create_string_from_blocks(decrypted_chunks)
+        create_string_from_blocks_decrypt(decrypted_chunks)
     }
 
     pub(crate) fn sign(&self, message: &str) -> String {
