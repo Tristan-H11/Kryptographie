@@ -1,5 +1,5 @@
-use bigdecimal::{BigDecimal, One, Zero};
 use bigdecimal::num_bigint::{BigInt, ToBigInt};
+use bigdecimal::{BigDecimal, One, Zero};
 use rand::random;
 
 use crate::big_d;
@@ -75,6 +75,6 @@ impl RandomElsner {
         // Das unwrap() wird niemals fehlschlagen, weil die Implementation von to_bigint() nur
         // Some, aber niemals None zurückgibt. Es ist unklar, warum es überhaupt Option ist.
         let step = (factor * &self.range).to_bigint().unwrap();
-        return &self.a + step
+        &self.a + step
     }
 }

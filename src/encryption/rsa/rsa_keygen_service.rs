@@ -133,8 +133,7 @@ impl RsaKeygenService {
         while e < *phi {
             // Prüfen, ob e relativ prim zu phi ist, indem number_theory::extended_euclid() aufgerufen wird.
             //TODO Hübsch machen
-            let euclid = &extended_euclid(&e.to_bigint().unwrap(), &phi.to_bigint().unwrap())
-                .0;
+            let euclid = &extended_euclid(&e.to_bigint().unwrap(), &phi.to_bigint().unwrap()).0;
             if euclid.is_one() {
                 debug!("Generierter e {} ist relativ prim zu phi {}", e, phi);
                 return e;
@@ -161,8 +160,7 @@ impl RsaKeygenService {
     fn generate_d(&self, e: &BigInt, phi: &BigInt) -> BigInt {
         trace!("Generiere d mit e {} und phi {}", e, phi);
         //TODO Hübsch machen
-        let d = modulo_inverse(e, phi)
-            .unwrap();
+        let d = modulo_inverse(e, phi).unwrap();
         debug!("d ist {}", d);
         d
     }

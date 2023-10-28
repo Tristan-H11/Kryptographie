@@ -1,9 +1,9 @@
 use std::io::{Error, ErrorKind};
 use std::ops::Div;
 
-use bigdecimal::{One, Zero};
 use bigdecimal::num_bigint::{BigInt, ToBigInt};
 use bigdecimal::num_traits::Euclid;
+use bigdecimal::{One, Zero};
 
 use crate::big_i;
 use crate::encryption::math_functions::random_elsner::RandomElsner;
@@ -143,9 +143,7 @@ pub fn miller_rabin(p: &BigInt, repeats: usize) -> bool {
         s.increment_assign();
     }
 
-    let mut rand = RandomElsner::new(
-        &big_i!(2),
-        &p.to_bigint().unwrap());
+    let mut rand = RandomElsner::new(&big_i!(2), &p.to_bigint().unwrap());
 
     for _ in 0..repeats {
         let mut a = rand.take();

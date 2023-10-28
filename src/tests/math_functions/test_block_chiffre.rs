@@ -7,7 +7,7 @@ mod tests {
         create_blocks_from_string_decrypt, create_blocks_from_string_encript,
         create_string_from_blocks, create_string_from_blocks_decrypt, split_into_blocks,
         string_to_int_vec, sums_vec_to_string_vec, to_sum_vec, u32_to_c, ubig_to_u32,
-        };
+    };
     use crate::encryption::math_functions::number_theory::fast_exponentiation;
     use crate::encryption::rsa::rsa_keygen_service::RsaKeygenService;
 

@@ -7,17 +7,14 @@ mod tests {
     use crate::big_i;
     use crate::encryption::math_functions::number_theory::{
         fast_exponentiation, miller_rabin, modulo_inverse,
-        };
+    };
 
     #[test]
     fn fast_exponentiation_happy_flow() {
         let base = &big_i!(561563);
         let exponent = &big_i!(1300);
         let modul = &big_i!(564);
-        assert_eq!(
-            fast_exponentiation(base, exponent, modul),
-            big_i!(205)
-        );
+        assert_eq!(fast_exponentiation(base, exponent, modul), big_i!(205));
 
         let base = &big_i!(56156334590832345);
         let exponent = &big_i!(109458390583094852904812340);
@@ -33,10 +30,7 @@ mod tests {
         let base = &big_i!(561563);
         let exponent = &big_i!(1);
         let modul = &big_i!(564);
-        assert_eq!(
-            fast_exponentiation(base, exponent, modul),
-            big_i!(383)
-        );
+        assert_eq!(fast_exponentiation(base, exponent, modul), big_i!(383));
     }
 
     #[test]
@@ -44,10 +38,7 @@ mod tests {
         let base = &big_i!(561563);
         let exponent = &big_i!(0);
         let modul = &big_i!(564);
-        assert_eq!(
-            fast_exponentiation(base, exponent, modul),
-            big_i!(1)
-        );
+        assert_eq!(fast_exponentiation(base, exponent, modul), big_i!(1));
     }
 
     #[test]
@@ -55,10 +46,7 @@ mod tests {
         let base = &big_i!(0);
         let exponent = &big_i!(561563);
         let modul = &big_i!(564);
-        assert_eq!(
-            fast_exponentiation(base, exponent, modul),
-            big_i!(0)
-        );
+        assert_eq!(fast_exponentiation(base, exponent, modul), big_i!(0));
     }
 
     #[test]
@@ -66,10 +54,7 @@ mod tests {
         let base = &big_i!(3459860);
         let exponent = &big_i!(561563);
         let modul = &big_i!(1);
-        assert_eq!(
-            fast_exponentiation(base, exponent, modul),
-            big_i!(0)
-        );
+        assert_eq!(fast_exponentiation(base, exponent, modul), big_i!(0));
     }
 
     #[test]
@@ -91,11 +76,7 @@ mod tests {
         );
 
         assert_eq!(
-            fast_exponentiation(
-                &big_i!(37),
-                &big_i!(2),
-                &big_i!(89)
-            ),
+            fast_exponentiation(&big_i!(37), &big_i!(2), &big_i!(89)),
             big_i!(34)
         )
     }
@@ -103,10 +84,7 @@ mod tests {
     #[test]
     fn modulo_inverse_test() {
         //assert_eq!(modulo_inverse(big_i!(1), big_i!(3)).unwrap(), big_i!(1));
-        assert_eq!(
-            modulo_inverse(&big_i!(5), &big_i!(11)).unwrap(),
-            big_i!(9)
-        );
+        assert_eq!(modulo_inverse(&big_i!(5), &big_i!(11)).unwrap(), big_i!(9));
         assert_eq!(
             modulo_inverse(&big_i!(315), &big_i!(661643)).unwrap(),
             big_i!(342374)
@@ -125,14 +103,8 @@ mod tests {
     #[test]
     fn miller_rabin_test() {
         assert_eq!(miller_rabin(&big_i!(11), 40), true);
-        assert_eq!(
-            miller_rabin(&big_i!(8727030382015287123761), 40),
-            false
-        );
-        assert_eq!(
-            miller_rabin(&big_i!(2459872438590349034582), 40),
-            false
-        );
+        assert_eq!(miller_rabin(&big_i!(8727030382015287123761), 40), false);
+        assert_eq!(miller_rabin(&big_i!(2459872438590349034582), 40), false);
         assert_eq!(miller_rabin(&big_i!(2211), 40), false);
         assert_eq!(
             miller_rabin(

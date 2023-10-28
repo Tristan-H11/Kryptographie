@@ -35,8 +35,9 @@ pub trait Divisible {
     fn double_assign(&mut self);
 }
 
-impl<T: Zero + Rem<Output = T> + PartialEq + Clone + Div<Output = T> + Mul<Output = T> + From<u8>>
-    Divisible for T
+impl<
+        T: Zero + Rem<Output = T> + PartialEq + Clone + Div<Output = T> + Mul<Output = T> + From<u8>,
+    > Divisible for T
 {
     fn is_divisible_by(&self, divisor: &Self) -> bool {
         self.clone() % divisor.clone() == T::zero()

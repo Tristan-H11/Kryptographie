@@ -1,19 +1,13 @@
 #[cfg(test)]
 mod tests {
+    use crate::big_u;
     use crate::encryption::math_functions::traits::divisible::Divisible;
     use bigdecimal::num_bigint::BigUint;
-    use crate::big_u;
 
     #[test]
     fn test_divides() {
-        assert_eq!(
-            big_u!(8u32).is_divisible_by(&big_u!(4u32)),
-            true
-        );
-        assert_eq!(
-            big_u!(89893457u32).is_divisible_by(&big_u!(1u32)),
-            true
-        );
+        assert_eq!(big_u!(8u32).is_divisible_by(&big_u!(4u32)), true);
+        assert_eq!(big_u!(89893457u32).is_divisible_by(&big_u!(1u32)), true);
         assert_eq!(
             big_u!(89893457u32).is_divisible_by(&big_u!(657831u32)),
             false
@@ -22,10 +16,7 @@ mod tests {
 
     #[test]
     fn test_not_divides() {
-        assert_eq!(
-            big_u!(8u32).is_not_divisible_by(&big_u!(4u32)),
-            false
-        );
+        assert_eq!(big_u!(8u32).is_not_divisible_by(&big_u!(4u32)), false);
         assert_eq!(
             big_u!(89893457u32).is_not_divisible_by(&big_u!(1u32)),
             false

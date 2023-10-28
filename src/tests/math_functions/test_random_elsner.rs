@@ -1,7 +1,7 @@
 #[cfg(test)]
 mod tests {
-    use bigdecimal::BigDecimal;
     use bigdecimal::num_bigint::BigInt;
+    use bigdecimal::BigDecimal;
 
     use crate::big_d;
     use crate::encryption::math_functions::random_elsner::RandomElsner;
@@ -11,11 +11,8 @@ mod tests {
         let a: BigInt = 1u32.into();
         let b: BigInt = 997u32.into();
 
-        let mut random = RandomElsner::new_deterministic(
-            big_d!(13).sqrt().unwrap(),
-            &a.clone(),
-            &b.clone(),
-        );
+        let mut random =
+            RandomElsner::new_deterministic(big_d!(13).sqrt().unwrap(), &a.clone(), &b.clone());
 
         assert_eq!(random.take(), 604u32.into());
         assert_eq!(random.take(), 211u32.into());

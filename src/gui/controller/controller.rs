@@ -1,11 +1,11 @@
-use bigdecimal::num_bigint::BigInt;
+use crate::big_i;
 use crate::encryption::rsa::keys::{PrivateKey, PublicKey};
 use crate::encryption::rsa::rsa_keygen_service::RsaKeygenService;
 use crate::gui::controller::commands::*;
 use crate::gui::model::model::{AppState, View};
+use bigdecimal::num_bigint::BigInt;
 use druid::{Env, Event, EventCtx};
 use log::{debug, error, info};
-use crate::big_i;
 
 pub struct AppController {
     alice_private_key: PrivateKey,

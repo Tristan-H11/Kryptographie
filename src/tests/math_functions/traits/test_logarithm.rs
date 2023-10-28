@@ -1,8 +1,8 @@
 #[cfg(test)]
 mod tests {
-    use bigdecimal::num_bigint::BigInt;
     use crate::big_i;
     use crate::encryption::math_functions::traits::logarithm::Logarithm;
+    use bigdecimal::num_bigint::BigInt;
 
     #[test]
     fn test_log_base_g() {
