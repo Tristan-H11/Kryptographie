@@ -81,11 +81,11 @@ impl RsaKeygenService {
         let lower_bound = &BigUint::from(2u8).pow((size - 1) as u32);
         let mut random_generator = RandomElsner::new(lower_bound, upper_bound);
 
-        let mut prime_candidate = random_generator.take();
+        let mut prime_candidate = random_generator.take() | BigUint::one();
 
         while !miller_rabin(&prime_candidate, miller_rabin_iterations) {
             trace!("Generierter Primkandidat {} ist keine Primzahl", prime_candidate);
-            prime_candidate = random_generator.take();
+            prime_candidate = random_generator.take() | BigUint::one();
         }
         debug!("Generierter Primkandidat {} ist eine Primzahl", prime_candidate);
         prime_candidate
