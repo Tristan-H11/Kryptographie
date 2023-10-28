@@ -1,7 +1,7 @@
-use bigdecimal::num_bigint::BigUint;
+use bigdecimal::num_bigint::BigInt;
 use log::info;
 
-use crate::big_u;
+use crate::big_i;
 use crate::encryption::math_functions::big_num_util::log_base_g;
 use crate::encryption::math_functions::block_chiffre::{
     create_blocks_from_string_decrypt, create_blocks_from_string_encript,
@@ -13,8 +13,8 @@ use crate::encryption::math_functions::number_theory::fast_exponentiation;
 /// Ein öffentlicher Schlüssel für RSA.
 ///
 pub struct PublicKey {
-    e: BigUint,
-    n: BigUint,
+    e: BigInt,
+    n: BigInt,
     block_size: usize,
 }
 
@@ -27,9 +27,9 @@ impl PublicKey {
     /// * `e` - Der öffentliche Exponent.
     /// * `n` - Das Produkt der beiden Primzahlen.
     ///
-    pub fn new(e: BigUint, n: BigUint) -> PublicKey {
+    pub fn new(e: BigInt, n: BigInt) -> PublicKey {
         // Maximale Blockbreite = log_g(n), wenn g=55296 ist.
-        let g = big_u!(55296u16);
+        let g = big_i!(55296u16); //TODO in GUI auslagern
         let block_size = log_base_g(&n, &g) as usize;
         PublicKey { e, n, block_size }
     }
@@ -42,12 +42,12 @@ impl PublicKey {
     }
 
     #[cfg(test)]
-    pub fn get_e_for_test(&self) -> BigUint {
+    pub fn get_e_for_test(&self) -> BigInt {
         self.e.clone()
     }
 
     #[cfg(test)]
-    pub fn get_n_for_test(&self) -> BigUint {
+    pub fn get_n_for_test(&self) -> BigInt {
         self.n.clone()
     }
 
@@ -73,8 +73,8 @@ impl PublicKey {
 /// Ein privater Schlüssel für RSA.
 ///
 pub struct PrivateKey {
-    d: BigUint,
-    n: BigUint,
+    d: BigInt,
+    n: BigInt,
     block_size: usize,
 }
 
@@ -87,9 +87,9 @@ impl PrivateKey {
     /// * `d` - Der private Exponent.
     /// * `n` - Das Produkt der beiden Primzahlen.
     ///
-    pub fn new(d: BigUint, n: BigUint) -> PrivateKey {
+    pub fn new(d: BigInt, n: BigInt) -> PrivateKey {
         // Maximale Blockbreite = log_g(n), wenn g=55296 ist.
-        let g = big_u!(55296u16);
+        let g = big_i!(55296u16); //TODO in GUI auslagern
         let block_size = log_base_g(&n, &g) as usize;
         PrivateKey { d, n, block_size }
     }
@@ -102,12 +102,12 @@ impl PrivateKey {
     }
 
     #[cfg(test)]
-    pub fn get_d(&self) -> BigUint {
+    pub fn get_d(&self) -> BigInt {
         self.d.clone()
     }
 
     #[cfg(test)]
-    pub fn get_n(&self) -> BigUint {
+    pub fn get_n(&self) -> BigInt {
         self.n.clone()
     }
 

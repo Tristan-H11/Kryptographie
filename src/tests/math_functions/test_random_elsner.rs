@@ -1,17 +1,18 @@
 #[cfg(test)]
 mod tests {
-    use bigdecimal::num_bigint::BigUint;
     use bigdecimal::BigDecimal;
+    use bigdecimal::num_bigint::BigInt;
 
+    use crate::big_d;
     use crate::encryption::math_functions::random_elsner::RandomElsner;
 
     #[test]
     fn test_random_elsner() {
-        let a: BigUint = 1u32.into();
-        let b: BigUint = 997u32.into();
+        let a: BigInt = 1u32.into();
+        let b: BigInt = 997u32.into();
 
         let mut random = RandomElsner::new_deterministic(
-            BigDecimal::from(13u32).sqrt().unwrap(),
+            big_d!(13).sqrt().unwrap(),
             &a.clone(),
             &b.clone(),
         );
@@ -27,8 +28,8 @@ mod tests {
         assert_eq!(random.take(), 449u32.into());
         assert_eq!(random.take(), 56u32.into());
 
-        let a: BigUint = 500u32.into();
-        let b: BigUint = 6000u32.into();
+        let a: BigInt = 500u32.into();
+        let b: BigInt = 6000u32.into();
 
         random = RandomElsner::new(&a, &b);
 

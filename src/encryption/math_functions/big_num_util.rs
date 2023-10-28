@@ -1,6 +1,6 @@
 use std::ops::MulAssign;
 
-use bigdecimal::num_bigint::BigUint;
+use bigdecimal::num_bigint::BigInt;
 use bigdecimal::One;
 
 ///
@@ -19,7 +19,7 @@ macro_rules! big_u {
 #[macro_export]
 macro_rules! big_i {
     ($x:expr) => {
-        BigInt::from($x)
+        BigInt::from($x as i128)
     };
 }
 
@@ -45,9 +45,9 @@ macro_rules! big_d {
 ///
 /// * `BigDecimal` - Der Logarithmus.
 ///
-pub fn log_base_g(x: &BigUint, base: &BigUint) -> u32 {
+pub fn log_base_g(x: &BigInt, base: &BigInt) -> u32 {
     let mut count = 0;
-    let mut current_value = BigUint::one();
+    let mut current_value = BigInt::one();
 
     while &current_value < x {
         current_value.mul_assign(base);

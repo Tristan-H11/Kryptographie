@@ -1,15 +1,18 @@
-use crate::encryption::math_functions::traits::divisible::Divisible;
-use bigdecimal::num_bigint::{BigInt, BigUint, ToBigInt};
 use bigdecimal::{BigDecimal, One, Zero};
+use bigdecimal::num_bigint::{BigInt, ToBigInt};
 use rand::random;
+
+use crate::big_d;
+use crate::encryption::math_functions::traits::divisible::Divisible;
+use crate::encryption::math_functions::traits::increment::Increment;
 
 ///
 /// Iterator für einen Zufallswert nach dem Schema aus dem Skript.
 ///
 pub struct RandomElsner {
     sqrt_m: BigDecimal,
-    n: BigDecimal,
-    a: BigUint,
+    n: BigInt,
+    a: BigInt,
     range: BigDecimal,
 }
 
@@ -24,7 +27,7 @@ impl RandomElsner {
     /// # Rückgabe
     /// * RandomElsner
     ///
-    pub fn new(a: &BigUint, b: &BigUint) -> Self {
+    pub fn new(a: &BigInt, b: &BigInt) -> Self {
         let sqrt_m;
         loop {
             let m = BigDecimal::from(random::<u128>());
@@ -40,9 +43,9 @@ impl RandomElsner {
         }
         return Self {
             sqrt_m,
-            n: BigDecimal::zero(),
+            n: BigInt::zero(),
             a: a.clone(),
-            range: BigDecimal::from(BigInt::from(b - a + BigUint::one())),
+            range: big_d!(BigInt::from(b - a + BigInt::one())),
         };
     }
 
@@ -50,12 +53,12 @@ impl RandomElsner {
     /// Konstruktor für Testfälle, um deterministische Werte zu erhalten.
     ///
     #[cfg(test)]
-    pub fn new_deterministic(sqrt_m: BigDecimal, a: &BigUint, b: &BigUint) -> Self {
+    pub fn new_deterministic(sqrt_m: BigDecimal, a: &BigInt, b: &BigInt) -> Self {
         return Self {
             sqrt_m,
-            n: BigDecimal::zero(),
+            n: BigInt::zero(),
             a: a.clone(),
-            range: BigDecimal::from(BigInt::from(b - a + BigUint::one())),
+            range: big_d!(BigInt::from(b - a + BigInt::one())),
         };
     }
 
@@ -65,9 +68,13 @@ impl RandomElsner {
     /// # Rückgabe
     /// * BigUint
     ///
-    pub fn take(&mut self) -> BigUint {
-        self.n += BigDecimal::one();
-        let num = (((&self.n * &self.sqrt_m) % BigDecimal::one()) * &self.range).with_scale(0);
-        return &self.a + (BigDecimal::to_bigint(&num).unwrap()).to_biguint().unwrap();
+    pub fn take(&mut self) -> BigInt {
+        self.n.increment_assign();
+
+        let factor = (&self.n * &self.sqrt_m) % BigDecimal::one();
+        // Das unwrap() wird niemals fehlschlagen, weil die Implementation von to_bigint() nur
+        // Some, aber niemals None zurückgibt. Es ist unklar, warum es überhaupt Option ist.
+        let step = (factor * &self.range).to_bigint().unwrap();
+        return &self.a + step
     }
 }

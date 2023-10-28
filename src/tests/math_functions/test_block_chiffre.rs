@@ -1,13 +1,13 @@
 #[cfg(test)]
 mod tests {
+    use bigdecimal::num_bigint::BigInt;
+
+    use crate::big_i;
     use crate::encryption::math_functions::block_chiffre::{
         create_blocks_from_string_decrypt, create_blocks_from_string_encript,
         create_string_from_blocks, create_string_from_blocks_decrypt, split_into_blocks,
         string_to_int_vec, sums_vec_to_string_vec, to_sum_vec, u32_to_c, ubig_to_u32,
-    };
-    use bigdecimal::num_bigint::BigUint;
-    use crate::big_u;
-
+        };
     use crate::encryption::math_functions::number_theory::fast_exponentiation;
     use crate::encryption::rsa::rsa_keygen_service::RsaKeygenService;
 
@@ -47,7 +47,7 @@ mod tests {
                     );
                     zwischenstand
                 })
-                .collect::<Vec<BigUint>>();
+                .collect::<Vec<BigInt>>();
             println!("\nVerschlüsselte Nachricht als RSA Vector: {:?}\n", result);
 
             let encrypted_string = create_string_from_blocks(result);
@@ -95,7 +95,7 @@ mod tests {
                     ); //verschlüsseln
                     zwischenstand
                 })
-                .collect::<Vec<BigUint>>();
+                .collect::<Vec<BigInt>>();
             let encrypted_string = create_string_from_blocks(result);
             let result = create_blocks_from_string_decrypt(&encrypted_string, true, basis_length)
                 .iter()
@@ -131,7 +131,7 @@ mod tests {
                     ); //verschlüsseln
                     zwischenstand
                 })
-                .collect::<Vec<BigUint>>();
+                .collect::<Vec<BigInt>>();
             let encrypted_string = create_string_from_blocks(result);
             let result = create_blocks_from_string_decrypt(&encrypted_string, true, basis_length)
                 .iter()
@@ -223,10 +223,10 @@ mod tests {
         let basis_length = 55296 as u32;
         let result = create_blocks_from_string_encript(message, block_size, true, basis_length);
         let expected_result = vec![
-            big_u!(1943938337267550087026074257524u128),
-            big_u!(914822981356602019800946507860u128),
-            big_u!(2887304683313907978613082523752u128),
-            big_u!(3258925137110102081877384560672u128),
+            big_i!(1943938337267550087026074257524),
+            big_i!(914822981356602019800946507860),
+            big_i!(2887304683313907978613082523752),
+            big_i!(3258925137110102081877384560672),
         ];
         assert_eq!(result, expected_result);
     }
@@ -234,10 +234,10 @@ mod tests {
     #[test]
     fn test_decrypt_chiffre() {
         let sums = vec![
-            big_u!(1943938337267550087026074257524u128),
-            big_u!(914822981356602019800946507860u128),
-            big_u!(2887304683313907978613082523752u128),
-            big_u!(3258925137110102081877384560672u128),
+            big_i!(1943938337267550087026074257524),
+            big_i!(914822981356602019800946507860),
+            big_i!(2887304683313907978613082523752),
+            big_i!(3258925137110102081877384560672),
         ];
         let result = create_string_from_blocks_decrypt(sums);
         let expected_result = "Da苉 ist eine Testnachricht".to_string();
@@ -304,17 +304,17 @@ mod tests {
             vec!['h' as u32, 't' as u32, ' ' as u32, ' ' as u32],
         ];
 
-        let base = big_u!(55296u32);
+        let base = big_i!(55296);
         let result = to_sum_vec(digit_vectors, &base);
 
         let expected_result = vec![
-            big_u!(11497444858239008u64),
-            big_u!(17753298306195488u64),
-            big_u!(17076964999090277u64),
-            big_u!(5410678690363507u64),
-            big_u!(19613115525224547u64),
-            big_u!(17584219565365347u64),
-            big_u!(17584225676623904u64),
+            big_i!(11497444858239008),
+            big_i!(17753298306195488),
+            big_i!(17076964999090277),
+            big_i!(5410678690363507),
+            big_i!(19613115525224547),
+            big_i!(17584219565365347),
+            big_i!(17584225676623904),
         ];
         assert_eq!(result, expected_result);
     }
@@ -322,16 +322,16 @@ mod tests {
     #[test]
     fn test_sum_to_strings() {
         let sums = vec![
-            big_u!(11497444858239008u64),
-            big_u!(17753298306195488u64),
-            big_u!(17076964999090277u64),
-            big_u!(5410678690363507u64),
-            big_u!(19613115525224547u64),
-            big_u!(17584219565365347u64),
-            big_u!(17584225676623904u64),
+            big_i!(11497444858239008),
+            big_i!(17753298306195488),
+            big_i!(17076964999090277),
+            big_i!(5410678690363507),
+            big_i!(19613115525224547),
+            big_i!(17584219565365347),
+            big_i!(17584225676623904),
         ];
 
-        let base = big_u!(55296u32);
+        let base = big_i!(55296);
         let result = sums_vec_to_string_vec(sums, &base);
 
         let expected_result = vec![
@@ -392,7 +392,7 @@ mod tests {
 
     #[test]
     fn test_ubig_to_u32() {
-        let value = big_u!(12345u64);
+        let value = big_i!(12345);
         let result = ubig_to_u32(&value);
         assert_eq!(result, 12345);
     }

@@ -1,10 +1,11 @@
+use bigdecimal::num_bigint::BigInt;
 use crate::encryption::rsa::keys::{PrivateKey, PublicKey};
 use crate::encryption::rsa::rsa_keygen_service::RsaKeygenService;
 use crate::gui::controller::commands::*;
 use crate::gui::model::model::{AppState, View};
-use bigdecimal::num_bigint::ToBigUint;
 use druid::{Env, Event, EventCtx};
 use log::{debug, error, info};
+use crate::big_i;
 
 pub struct AppController {
     alice_private_key: PrivateKey,
@@ -42,11 +43,11 @@ impl Default for AppController {
     fn default() -> Self {
         debug!("Erstelle Default-AppController");
         AppController {
-            alice_private_key: PrivateKey::new(1.to_biguint().unwrap(), 1.to_biguint().unwrap()),
-            alice_public_key: PublicKey::new(1.to_biguint().unwrap(), 1.to_biguint().unwrap()),
+            alice_private_key: PrivateKey::new(big_i!(1), big_i!(1)),
+            alice_public_key: PublicKey::new(big_i!(1), big_i!(1)),
 
-            bob_private_key: PrivateKey::new(1.to_biguint().unwrap(), 1.to_biguint().unwrap()),
-            bob_public_key: PublicKey::new(1.to_biguint().unwrap(), 1.to_biguint().unwrap()),
+            bob_private_key: PrivateKey::new(big_i!(1), big_i!(1)),
+            bob_public_key: PublicKey::new(big_i!(1), big_i!(1)),
         }
     }
 }
