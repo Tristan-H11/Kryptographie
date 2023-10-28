@@ -28,8 +28,8 @@ mod tests {
                 let result = create_blocks_from_string_encript(message, 2, true, basis_length)
                 .iter()
                 .map(|x| {
-                    let zwischenstand = fast_exponentiation(x, &public_key.get_e_as_biguint(), &public_key.get_n_as_biguint()); //verschlüsseln
-                    println!("{}^{} mod {} = {}", x, public_key.get_e_as_biguint(), public_key.get_n_as_biguint(),
+                    let zwischenstand = fast_exponentiation(x, &public_key.get_e_for_test(), &public_key.get_n_for_test()); //verschlüsseln
+                    println!("{}^{} mod {} = {}", x, public_key.get_e_for_test(), public_key.get_n_for_test(),
                              zwischenstand);
                     zwischenstand
                 })
@@ -44,7 +44,7 @@ mod tests {
                 true, basis_length)
                 .iter()
                 .map(|x| {
-                    fast_exponentiation(x, &private_key.get_d_as_biguint(), &private_key.get_n_as_biguint()) //entschlüsseln
+                    fast_exponentiation(x, &private_key.get_d(), &private_key.get_n()) //entschlüsseln
                 })
                 .collect();
             println!("\nEntschlüsselte Nachricht: {:?}\n", result);
@@ -75,7 +75,7 @@ mod tests {
             let result = create_blocks_from_string_encript(message, 8, true, basis_length)
                 .iter()
                 .map(|x| {
-                    let zwischenstand = fast_exponentiation(x, &public_key.get_e_as_biguint(), &public_key.get_n_as_biguint()); //verschlüsseln
+                    let zwischenstand = fast_exponentiation(x, &public_key.get_e_for_test(), &public_key.get_n_for_test()); //verschlüsseln
                     zwischenstand
                 })
                 .collect::<Vec<BigUint>>();
@@ -84,7 +84,7 @@ mod tests {
                                                            true, basis_length)
                 .iter()
                 .map(|x| {
-                    fast_exponentiation(x, &private_key.get_d_as_biguint(), &private_key.get_n_as_biguint()) //entschlüsseln
+                    fast_exponentiation(x, &private_key.get_d(), &private_key.get_n()) //entschlüsseln
                 })
                 .collect();
             let string = create_string_from_blocks_decrypt(result);
@@ -109,7 +109,7 @@ mod tests {
             let result = create_blocks_from_string_encript(message, 13, true, basis_length)
                 .iter()
                 .map(|x| {
-                    let zwischenstand = fast_exponentiation(x, &public_key.get_e_as_biguint(), &public_key.get_n_as_biguint()); //verschlüsseln
+                    let zwischenstand = fast_exponentiation(x, &public_key.get_e_for_test(), &public_key.get_n_for_test()); //verschlüsseln
                     zwischenstand
                 })
                 .collect::<Vec<BigUint>>();
@@ -118,7 +118,7 @@ mod tests {
                                                            true, basis_length)
                 .iter()
                 .map(|x| {
-                    fast_exponentiation(x, &private_key.get_d_as_biguint(), &private_key.get_n_as_biguint()) //entschlüsseln
+                    fast_exponentiation(x, &private_key.get_d(), &private_key.get_n()) //entschlüsseln
                 })
                 .collect();
             let string = create_string_from_blocks_decrypt(result);

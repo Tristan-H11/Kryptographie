@@ -1,5 +1,6 @@
 use bigdecimal::num_bigint::BigUint;
-use log::{info};
+use log::info;
+
 use crate::big_u;
 use crate::encryption::math_functions::big_int_util::log_base_g;
 use crate::encryption::math_functions::block_chiffre::{create_blocks_from_string_decrypt, create_blocks_from_string_encript, create_string_from_blocks, create_string_from_blocks_decrypt};
@@ -9,9 +10,9 @@ use crate::encryption::math_functions::number_theory::fast_exponentiation;
 /// Ein öffentlicher Schlüssel für RSA.
 ///
 pub struct PublicKey {
-    pub e: BigUint, // öffentlicher Exponent for encription
-    pub n: BigUint, // modul
-    pub block_size: usize,
+    e: BigUint,
+    n: BigUint,
+    block_size: usize,
 }
 
 impl PublicKey {
@@ -30,21 +31,24 @@ impl PublicKey {
         PublicKey {
             e,
             n,
-            block_size
+            block_size,
         }
     }
 
     ///
     /// Gibt den öffentlichen Exponenten als String zurück.
     ///
-    pub fn get_e(&self) -> String {
+    pub fn get_e_as_str(&self) -> String {
         self.e.to_str_radix(10)
     }
 
-    pub fn get_e_as_biguint(&self) -> BigUint {
+    #[cfg(test)]
+    pub fn get_e_for_test(&self) -> BigUint {
         self.e.clone()
     }
-    pub fn get_n_as_biguint(&self) -> BigUint {
+
+    #[cfg(test)]
+    pub fn get_n_for_test(&self) -> BigUint {
         self.n.clone()
     }
 
@@ -68,9 +72,9 @@ impl PublicKey {
 /// Ein privater Schlüssel für RSA.
 ///
 pub struct PrivateKey {
-    pub d: BigUint, // dectipter
-    pub n: BigUint, // modul -- muss vom gegenpartner geholt werden
-    pub block_size: usize
+    d: BigUint,
+    n: BigUint,
+    block_size: usize,
 }
 
 impl PrivateKey {
@@ -84,36 +88,29 @@ impl PrivateKey {
     ///
     pub fn new(d: BigUint, n: BigUint) -> PrivateKey {
         // Maximale Blockbreite = log_g(n), wenn g=55296 ist.
-       let g = big_u!(55296u16);
-       let block_size = log_base_g(&n, &g) as usize;
+        let g = big_u!(55296u16);
+        let block_size = log_base_g(&n, &g) as usize;
         PrivateKey {
             d,
             n,
-            block_size
+            block_size,
         }
     }
-
-
 
     ///
     /// Gibt den privaten Exponenten als String zurück.
     ///
-    pub fn get_d(&self) -> String {
+    pub fn get_d_as_str(&self) -> String {
         self.d.to_str_radix(10)
     }
 
-    ///
-    /// Gibt den Modul n zurück.
-    ///
-    pub fn get_n(&self) -> String {
-        self.n.to_str_radix(10)
-    }
-
-    pub fn get_d_as_biguint(&self) -> BigUint {
+    #[cfg(test)]
+    pub fn get_d(&self) -> BigUint {
         self.d.clone()
     }
 
-    pub fn get_n_as_biguint(&self) -> BigUint {
+    #[cfg(test)]
+    pub fn get_n(&self) -> BigUint {
         self.n.clone()
     }
 
