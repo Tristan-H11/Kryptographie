@@ -6,6 +6,7 @@ mod tests {
         string_to_int_vec, sums_vec_to_string_vec, to_sum_vec, u32_to_c, ubig_to_u32,
     };
     use bigdecimal::num_bigint::BigUint;
+    use crate::big_u;
 
     use crate::encryption::math_functions::number_theory::fast_exponentiation;
     use crate::encryption::rsa::rsa_keygen_service::RsaKeygenService;
@@ -222,10 +223,10 @@ mod tests {
         let basis_length = 55296 as u32;
         let result = create_blocks_from_string_encript(message, block_size, true, basis_length);
         let expected_result = vec![
-            BigUint::from(1943938337267550087026074257524u128),
-            BigUint::from(914822981356602019800946507860u128),
-            BigUint::from(2887304683313907978613082523752u128),
-            BigUint::from(3258925137110102081877384560672u128),
+            big_u!(1943938337267550087026074257524u128),
+            big_u!(914822981356602019800946507860u128),
+            big_u!(2887304683313907978613082523752u128),
+            big_u!(3258925137110102081877384560672u128),
         ];
         assert_eq!(result, expected_result);
     }
@@ -233,10 +234,10 @@ mod tests {
     #[test]
     fn test_decrypt_chiffre() {
         let sums = vec![
-            BigUint::from(1943938337267550087026074257524u128),
-            BigUint::from(914822981356602019800946507860u128),
-            BigUint::from(2887304683313907978613082523752u128),
-            BigUint::from(3258925137110102081877384560672u128),
+            big_u!(1943938337267550087026074257524u128),
+            big_u!(914822981356602019800946507860u128),
+            big_u!(2887304683313907978613082523752u128),
+            big_u!(3258925137110102081877384560672u128),
         ];
         let result = create_string_from_blocks_decrypt(sums);
         let expected_result = "Da苉 ist eine Testnachricht".to_string();
@@ -303,17 +304,17 @@ mod tests {
             vec!['h' as u32, 't' as u32, ' ' as u32, ' ' as u32],
         ];
 
-        let base = BigUint::from(55296u32);
+        let base = big_u!(55296u32);
         let result = to_sum_vec(digit_vectors, &base);
 
         let expected_result = vec![
-            BigUint::from(11497444858239008u64),
-            BigUint::from(17753298306195488u64),
-            BigUint::from(17076964999090277u64),
-            BigUint::from(5410678690363507u64),
-            BigUint::from(19613115525224547u64),
-            BigUint::from(17584219565365347u64),
-            BigUint::from(17584225676623904u64),
+            big_u!(11497444858239008u64),
+            big_u!(17753298306195488u64),
+            big_u!(17076964999090277u64),
+            big_u!(5410678690363507u64),
+            big_u!(19613115525224547u64),
+            big_u!(17584219565365347u64),
+            big_u!(17584225676623904u64),
         ];
         assert_eq!(result, expected_result);
     }
@@ -321,16 +322,16 @@ mod tests {
     #[test]
     fn test_sum_to_strings() {
         let sums = vec![
-            BigUint::from(11497444858239008u64),
-            BigUint::from(17753298306195488u64),
-            BigUint::from(17076964999090277u64),
-            BigUint::from(5410678690363507u64),
-            BigUint::from(19613115525224547u64),
-            BigUint::from(17584219565365347u64),
-            BigUint::from(17584225676623904u64),
+            big_u!(11497444858239008u64),
+            big_u!(17753298306195488u64),
+            big_u!(17076964999090277u64),
+            big_u!(5410678690363507u64),
+            big_u!(19613115525224547u64),
+            big_u!(17584219565365347u64),
+            big_u!(17584225676623904u64),
         ];
 
-        let base = BigUint::from(55296u32);
+        let base = big_u!(55296u32);
         let result = sums_vec_to_string_vec(sums, &base);
 
         let expected_result = vec![
@@ -391,7 +392,7 @@ mod tests {
 
     #[test]
     fn test_ubig_to_u32() {
-        let value = BigUint::from(12345u64);
+        let value = big_u!(12345u64);
         let result = ubig_to_u32(&value);
         assert_eq!(result, 12345);
     }

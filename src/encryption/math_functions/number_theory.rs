@@ -168,7 +168,7 @@ fn miller_rabin_test(p: &BigUint, s: &BigUint, d: &BigUint, a: &BigUint) -> bool
     let mut r = BigUint::zero();
 
     while &r < s {
-        x = fast_exponentiation(&x, &BigUint::from(2u8), p);
+        x = fast_exponentiation(&x, &big_u!(2u8), p);
         if x == p.decrement() {
             return true;
         }

@@ -93,8 +93,8 @@ impl RsaKeygenService {
             size, miller_rabin_iterations
         );
 
-        let upper_bound = &BigUint::from(2u8).pow(size as u32);
-        let lower_bound = &BigUint::from(2u8).pow((size - 1) as u32);
+        let upper_bound = &big_u!(2u8).pow(size as u32);
+        let lower_bound = &big_u!(2u8).pow((size - 1) as u32);
         let mut random_generator = RandomElsner::new(lower_bound, upper_bound);
 
         let mut prime_candidate = random_generator.take() | BigUint::one();

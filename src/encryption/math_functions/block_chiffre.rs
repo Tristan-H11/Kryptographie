@@ -1,8 +1,9 @@
 use std::str::FromStr;
 
-use bigdecimal::num_bigint::BigUint;
 use bigdecimal::{One, ToPrimitive, Zero};
+use bigdecimal::num_bigint::BigUint;
 use log::debug;
+use crate::big_u;
 
 ///
 /// Methode, um einen String in eine Menge von gleich großen Blöcken in Dezimalform zu unterteilen.
@@ -76,7 +77,7 @@ pub(crate) fn create_string_from_blocks(sums: Vec<BigUint>) -> String {
         "Erstelle String aus Vektor von Summen: Anzahl der Vectorblöcke --> {}",
         sums.len()
     );
-    let base = BigUint::from(55296u32);
+    let base = big_u!(55296u32);
     let strings = sums_vec_to_string_vec(sums, &base);
     println!("Chiffrierter Vector: {:?}", strings);
 
@@ -106,7 +107,7 @@ pub(crate) fn create_string_from_blocks_decrypt(sums: Vec<BigUint>) -> String {
         "Erstelle String aus Vektor von Summen: Anzahl der Vectorblöcke --> {}",
         sums.len()
     );
-    let base = BigUint::from(55296u32);
+    let base = big_u!(55296u32);
     let strings = sums_vec_to_string_vec(sums, &base);
     println!("Chiffrierter Vector: {:?}", strings);
 
@@ -207,13 +208,13 @@ pub(crate) fn string_to_int_vec(b_vec: Vec<String>) -> Vec<Vec<u32>> {
 /// # Rückgabe
 /// * `Vec<BigUint>` - Die codierte Darstellung des Strings als vec der Summen.
 /// vec![
-///             BigUint::from(19140715035688992u64),
-///             BigUint::from(29555366483460128u64),
-///             BigUint::from(28429423626551397u64),
-///             BigUint::from(9007560038613107u64),
-///             BigUint::from(32651569751195747u64),
-///             BigUint::from(29273887211061347u64),
-///             BigUint::from(29273895796211744u64),
+///             big_u!(19140715035688992u64),
+///             big_u!(29555366483460128u64),
+///             big_u!(28429423626551397u64),
+///             big_u!(9007560038613107u64),
+///             big_u!(32651569751195747u64),
+///             big_u!(29273887211061347u64),
+///             big_u!(29273895796211744u64),
 ///         ];
 ///
 /// # Beispiel
