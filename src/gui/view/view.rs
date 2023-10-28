@@ -121,7 +121,6 @@ pub(crate) fn build_alice_view() -> impl Widget<AliceModel> {
     let fixed_width_entry_label = 200.0;
     let fixed_width_textbox = 400.0;
     let fixed_width_button = fixed_width_entry_label + fixed_width_textbox;
-    let fixed_width_label = fixed_width_entry_label + fixed_width_textbox;
     let spacer_size = 40.0;
 
     // Label
@@ -245,7 +244,6 @@ pub(crate) fn build_bob_view() -> impl Widget<BobModel> {
     let fixed_width_entry_label = 200.0;
     let fixed_width_textbox = 400.0;
     let fixed_width_button = fixed_width_entry_label + fixed_width_textbox;
-    let fixed_width_label = fixed_width_entry_label + fixed_width_textbox;
     let spacer_size = 40.0;
 
     // Label
