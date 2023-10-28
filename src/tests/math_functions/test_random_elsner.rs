@@ -1,7 +1,7 @@
 #[cfg(test)]
 mod tests {
-    use bigdecimal::BigDecimal;
     use bigdecimal::num_bigint::BigUint;
+    use bigdecimal::BigDecimal;
 
     use crate::encryption::math_functions::random_elsner::RandomElsner;
 

@@ -26,7 +26,7 @@ pub trait Increment {
     fn decrement_assign(&mut self);
 }
 
-impl<T: One + Clone + Add<Output=T> + Sub<Output=T>> Increment for T {
+impl<T: One + Clone + Add<Output = T> + Sub<Output = T>> Increment for T {
     fn increment(&self) -> Self {
         self.clone() + T::one()
     }
