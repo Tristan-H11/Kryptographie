@@ -96,7 +96,9 @@ pub(crate) fn create_string_from_blocks_decrypt(sums: Vec<BigUint>) -> String {
         .map(|s| s.chars().count()).max().unwrap();
     println!("Maximale Länge eines Strings: {}", max_length);
 
-    strings.join("")
+    let result = strings.join("");
+    result.trim_end().to_string()
+
 }
 
 ///

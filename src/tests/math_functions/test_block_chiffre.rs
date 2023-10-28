@@ -187,7 +187,7 @@ mod tests {
             BigUint::from(3258925137110102081877384560672u128),
         ];
         let result = create_string_from_blocks_decrypt(sums);
-        let expected_result = "Da苉 ist eine Testnachricht  ".to_string();
+        let expected_result = "Da苉 ist eine Testnachricht".to_string();
         assert_eq!(result, expected_result);
     }
 
