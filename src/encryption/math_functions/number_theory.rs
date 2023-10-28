@@ -1,11 +1,15 @@
+use std::io::{Error, ErrorKind};
+use std::ops::Div;
+
+use bigdecimal::num_bigint::{BigInt, BigUint};
+use bigdecimal::num_traits::Euclid;
+use bigdecimal::{One, Zero};
+
+use crate::big_u;
 use crate::encryption::math_functions::random_elsner::RandomElsner;
 use crate::encryption::math_functions::traits::divisible::Divisible;
 use crate::encryption::math_functions::traits::increment::Increment;
 use crate::encryption::math_functions::traits::parity::Parity;
-use bigdecimal::num_bigint::{BigInt, BigUint};
-use bigdecimal::num_traits::Euclid;
-use bigdecimal::{One, Zero};
-use std::ops::Div;
 
 ///
 /// Schnelle Exponentiation der Potenz und Reduzierung um einen Modul.
@@ -58,14 +62,11 @@ pub fn fast_exponentiation(base: &BigUint, exponent: &BigUint, modul: &BigUint) 
 /// Das Inverse-Element von `n` im Restklassenring modulo `modul`.
 /// Wenn keine Inverse existiert (wenn `n` und `modul` nicht teilerfremd sind),
 /// wird ein Error zurückgegeben.
-pub fn modulo_inverse(n: BigInt, modul: BigInt) -> Result<BigInt, std::io::Error> {
+pub fn modulo_inverse(n: BigInt, modul: BigInt) -> Result<BigInt, Error> {
     let (ggt, _x, y) = extended_euclid(&modul, &n);
     // Wenn ggT nicht 1, existiert kein Inverse. -> Error
-    if ggt != BigInt::one() {
-        let no_inverse_error = std::io::Error::new(
-            std::io::ErrorKind::InvalidInput,
-            format!("n hat keinen Inverse"),
-        );
+    if !ggt.is_one() {
+        let no_inverse_error = Error::new(ErrorKind::InvalidInput, format!("n hat keinen Inverse"));
         return Err(no_inverse_error);
     }
     // Berechnet aus den letzten Faktoren das Inverse.
@@ -98,13 +99,15 @@ pub fn extended_euclid(n: &BigInt, modul: &BigInt) -> (BigInt, BigInt, BigInt) {
     ];
     return extended_euclidean_algorithm(&n, &modul, xy);
 }
+
 fn extended_euclidean_algorithm(
     n: &BigInt,
     modul: &BigInt,
     mut xy: [BigInt; 6],
 ) -> (BigInt, BigInt, BigInt) {
     xy.rotate_left(2);
-    return if modul == &BigInt::zero() {
+
+    return if modul.is_zero() {
         (n.clone(), xy[0].clone(), xy[1].clone())
     } else {
         // Berechnet die Faktoren und speichert sie in einem rotierenden Array.
@@ -134,11 +137,14 @@ fn extended_euclidean_algorithm(
 pub fn miller_rabin(p: &BigUint, repeats: usize) -> bool {
     let mut d = p.decrement();
     let mut s = BigUint::zero();
+
     while d.is_even() {
-        d = d.div(BigUint::from(2u8));
-        s += BigUint::one();
+        d = d.div(big_u!(2));
+        s.increment_assign();
     }
+
     let mut rand = RandomElsner::new(&BigUint::one(), p);
+
     for _ in 0..repeats {
         let mut a = rand.take();
         while p.is_divisible_by(&a) {
@@ -148,21 +154,25 @@ pub fn miller_rabin(p: &BigUint, repeats: usize) -> bool {
             return false;
         }
     }
+
     return true;
 }
 
 fn miller_rabin_test(p: &BigUint, s: &BigUint, d: &BigUint, a: &BigUint) -> bool {
     let mut x = fast_exponentiation(a, d, p);
+
     if x.is_one() || x == p.decrement() {
         return true;
     }
+
     let mut r = BigUint::zero();
+
     while &r < s {
         x = fast_exponentiation(&x, &BigUint::from(2u8), p);
         if x == p.decrement() {
             return true;
         }
-        r = r.increment();
+        r.increment_assign();
     }
     return false;
 }
