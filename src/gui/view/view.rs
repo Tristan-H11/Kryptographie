@@ -8,6 +8,7 @@ use druid::{
     Env, Widget, WidgetExt,
 };
 
+//Global Functions
 fn wrap_text(text: &str, chars_per_line: usize) -> String {
     text.chars()
         .enumerate()
@@ -19,6 +20,26 @@ fn wrap_text(text: &str, chars_per_line: usize) -> String {
             acc
         })
 }
+
+fn wrap_entry_text_input(text: &str, chars_per_line: usize) -> String {
+    text.lines()
+        .flat_map(|line| {
+            line.chars()
+                .enumerate()
+                .fold(Vec::new(), |mut acc, (i, c)| {
+                    if i > 0 && i % chars_per_line == 0 {
+                        acc.push('\n');
+                    }
+                    acc.push(c);
+                    acc
+                })
+        })
+        .collect()
+}
+
+
+
+//View Structure and Functions
 pub(crate) fn build_haupt_menu() -> impl Widget<MainMenuModel> {
     let fixed_width_entry_label = 200.0;
     let fixed_width_textbox = 400.0;
