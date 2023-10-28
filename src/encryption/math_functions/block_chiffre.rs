@@ -15,7 +15,7 @@ use log::{debug, trace};
 /// # Rückgabe
 /// * `Vec<BigUint>` - Die codierte Darstellung des Strings als vec der Summen.
 ///
-pub(crate) fn create_blocks_from_string_enc(m: &str, block_size: usize, fill_blocks: bool) -> Vec<BigUint> {
+pub(crate) fn create_blocks_from_string_encript(m: &str, block_size: usize, fill_blocks: bool) -> Vec<BigUint> {
     debug!("Erstelle Chiffre mit Blockgröße {} für {}", block_size, m);
     let b = split_into_blocks(m, block_size, fill_blocks);
     let i_vec = string_to_int_vec(b);
@@ -24,8 +24,18 @@ pub(crate) fn create_blocks_from_string_enc(m: &str, block_size: usize, fill_blo
     to_sum_vec(i_vec, &base)
 }
 
-// TODO Dokumentation schreiben
-// Neue funktion für Rückweg beim decodieren!!!
+///
+/// Methode, um einen String in eine RSA Verschlüsselte Message in gleich große Blöcke zu splitten
+/// und dann in deren Dezimalform umzuwandeln
+///
+/// # Argumente
+/// * `m` - Der zu unterteilende String.
+/// --> das m besteht aus 2 Teilen, max_block_size und rsa_encrypted_message; getrennt durch \u{FE8D}
+/// * `fill_blocks` - Gibt an, ob die Blöcke mit Leerzeichen aufgefüllt werden sollen.
+///
+/// # Rückgabe
+/// * `Vec<BigUint>` - Die codierte Darstellung des Strings als vec der Summen.
+///
 pub(crate) fn create_blocks_from_string_decrypt(m: &str, fill_blocks: bool) -> Vec<BigUint> {
     let parts: Vec<&str> = m.splitn(2, '\u{FE8D}').collect();
     let block_size = match usize::from_str(parts[0]) {
@@ -42,7 +52,7 @@ pub(crate) fn create_blocks_from_string_decrypt(m: &str, fill_blocks: bool) -> V
 }
 
 ///
-/// Methode, um eine Menge von gleich großen Blöcken in Dezimalform in einen String zu überführen.
+/// Methode, um eine Menge von gleich großen Blöcken in Dezimalform, in einen String zu überführen.
 ///
 /// # Argumente
 /// * `sums` - Die zu überführenden Summen.
@@ -56,11 +66,6 @@ pub(crate) fn create_string_from_blocks(sums: Vec<BigUint>) -> String {
     let strings = sums_vec_to_string_vec(sums, &base);
     println!("Chiffrierter Vector: {:?}", strings);
 
-    // todo -- tristan --> in Zeile 55 wird 24, 25 oder 25,25 usw. als interne Zahlenwert übergeben.
-    // folglich bekommen wir hier nicht die richtige länge aus den "strings", da diese anders
-    //berechnet werden. Wir brauchen eine länge wie 8 oder 10 oder so, also von dem chinesischen
-    //zeichentext, damit wir es danach vernünftig splitten können.
-    //wenn hier der richtige wert übergeben werden sollte, müsste das gesamte RSA funktionieren.
     let max_length = strings.iter()
         .map(|s| s.chars().count()).max().unwrap();
     println!("Maximale Länge eines Strings: {}", max_length);

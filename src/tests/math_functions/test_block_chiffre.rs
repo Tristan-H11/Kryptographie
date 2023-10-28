@@ -1,6 +1,6 @@
 #[cfg(test)]
 mod tests {
-    use crate::encryption::math_functions::block_chiffre::{create_blocks_from_string_enc, create_string_from_blocks, to_sum_vec, split_into_blocks, string_to_int_vec, sums_vec_to_string_vec, u32_to_c, ubig_to_u32, create_blocks_from_string_decrypt, create_string_from_blocks_decrypt};
+    use crate::encryption::math_functions::block_chiffre::{create_blocks_from_string_encript, create_string_from_blocks, to_sum_vec, split_into_blocks, string_to_int_vec, sums_vec_to_string_vec, u32_to_c, ubig_to_u32, create_blocks_from_string_decrypt, create_string_from_blocks_decrypt};
     use bigdecimal::num_bigint::BigUint;
     use crate::big_u;
     use crate::encryption::math_functions::number_theory::fast_exponentiation;
@@ -13,11 +13,11 @@ mod tests {
     /// Dieser Plaintext wird dann wieder zusammengesetzt und sollte dem ursprünglichen String entsprechen.
     ///
     #[test]
-    fn test_loop_create_mult_decode_create_div_decode() {
+    fn test_loop_create_mult_decode_create_div_decode_1() {
         let mut failure_count = 0;
 
-        for _ in 0..5 {
-            let keygen_service = RsaKeygenService::new(256);
+        for _ in 0..12 {
+            let keygen_service = RsaKeygenService::new(128);
             let (public_key, private_key) = keygen_service.generate_keypair(40);
 
             let message = "Das ist ein langer Test um etwas zu prüfen. Dieser Text wird jetzt einfach mal echt wirklich lang. 0123456789";
@@ -25,7 +25,7 @@ mod tests {
             println!("{}", message);
 
 //            let result = create_blocks_from_string(message, public_key.block_size - 1, true)
-                let result = create_blocks_from_string_enc(message, 8, true)
+                let result = create_blocks_from_string_encript(message, 2, true)
                 .iter()
                 .map(|x| {
                     let zwischenstand = fast_exponentiation(x, &public_key.get_e_as_biguint(), &public_key.get_n_as_biguint()); //verschlüsseln
@@ -41,7 +41,7 @@ mod tests {
 
             // Ohne Blocklänge, da diese in der Methode aus dem String extrahiert wird
             let result = create_blocks_from_string_decrypt(&encrypted_string,
-                                                           true)
+                true)
                 .iter()
                 .map(|x| {
                     fast_exponentiation(x, &private_key.get_d_as_biguint(), &private_key.get_n_as_biguint()) //entschlüsseln
@@ -63,6 +63,75 @@ mod tests {
     }
 
 
+    #[test]
+    fn test_loop_create_mult_decode_create_div_decode_2() {
+        let mut failure_count = 0;
+
+        for _ in 0..12 {
+            let keygen_service = RsaKeygenService::new(128);
+            let (public_key, private_key) = keygen_service.generate_keypair(40);
+            let message = "Das ist ein langer Test um etwas zu prüfen. Dieser Text wird jetzt einfach mal echt wirklich lang. 0123456789";
+            let g = big_u!(55296u16);
+            let result = create_blocks_from_string_encript(message, 8, true)
+                .iter()
+                .map(|x| {
+                    let zwischenstand = fast_exponentiation(x, &public_key.get_e_as_biguint(), &public_key.get_n_as_biguint()); //verschlüsseln
+                    zwischenstand
+                })
+                .collect::<Vec<BigUint>>();
+            let encrypted_string = create_string_from_blocks(result);
+            // Ohne Blocklänge, da diese in der Methode aus dem String extrahiert wird
+            let result = create_blocks_from_string_decrypt(&encrypted_string, true)
+                .iter()
+                .map(|x| {
+                    fast_exponentiation(x, &private_key.get_d_as_biguint(), &private_key.get_n_as_biguint()) //entschlüsseln
+                })
+                .collect();
+            let string = create_string_from_blocks_decrypt(result);
+            if string.trim() != message {
+                failure_count += 1;
+            }
+        }
+        assert_eq!(failure_count, 0, "Fehlgeschlagene Tests: {}", failure_count);
+        print!("{} : Tests sind fehlgeschlagen", failure_count);
+    }
+
+
+
+    #[test]
+    fn test_loop_create_mult_decode_create_div_decode_3() {
+        let mut failure_count = 0;
+        for _ in 0..12 {
+            let keygen_service = RsaKeygenService::new(256);
+            let (public_key, private_key) = keygen_service.generate_keypair(40);
+            let message = "Das ist ein langer Test um etwas zu prüfen. Dieser Text wird jetzt einfach mal echt wirklich lang. 0123456789";
+            let g = big_u!(55296u16);
+            let result = create_blocks_from_string_encript(message, 13, true)
+                .iter()
+                .map(|x| {
+                    let zwischenstand = fast_exponentiation(x, &public_key.get_e_as_biguint(), &public_key.get_n_as_biguint()); //verschlüsseln
+                    zwischenstand
+                })
+                .collect::<Vec<BigUint>>();
+            let encrypted_string = create_string_from_blocks(result);
+            // Ohne Blocklänge, da diese in der Methode aus dem String extrahiert wird
+            let result = create_blocks_from_string_decrypt(&encrypted_string, true)
+                .iter()
+                .map(|x| {
+                    fast_exponentiation(x, &private_key.get_d_as_biguint(), &private_key.get_n_as_biguint()) //entschlüsseln
+                })
+                .collect();
+            let string = create_string_from_blocks_decrypt(result);
+            // Ersetze assert durch eine if-Anweisung
+            if string.trim() != message {
+                failure_count += 1;
+            }
+        }
+        assert_eq!(failure_count, 0, "Fehlgeschlagene Tests: {}", failure_count);
+        print!("{} : Tests sind fehlgeschlagen", failure_count);
+    }
+
+
 
     ///
     /// Prüft, ob die Funktionen zum Zerteilen und Zusammensetzen eines String das Inverse voneinander sind.
@@ -71,25 +140,25 @@ mod tests {
     fn test_create_block_umkehrfunktion_create_string() {
         let m = "Da苉 ist eine Testnachricht";
         let block_size = 8;
-        let encoded = create_string_from_blocks(create_blocks_from_string_enc(m, block_size, true));
+        let encoded = create_string_from_blocks(create_blocks_from_string_encript(m, block_size, true));
         let decoded = create_string_from_blocks_decrypt(create_blocks_from_string_decrypt(&encoded, true));
         assert_eq!(decoded.trim(), m);
 
         let m = "Da苉 ist eine Testnachricht";
         let block_size = 6;
-        let encoded = create_string_from_blocks(create_blocks_from_string_enc(m, block_size, true));
+        let encoded = create_string_from_blocks(create_blocks_from_string_encript(m, block_size, true));
         let decoded = create_string_from_blocks_decrypt(create_blocks_from_string_decrypt(&encoded, true));
         assert_eq!(decoded.trim(), m);
 
         let m = "Da苉 ist eine Testnachricht";
         let block_size = 47;
-        let encoded = create_string_from_blocks(create_blocks_from_string_enc(m, block_size, true));
+        let encoded = create_string_from_blocks(create_blocks_from_string_encript(m, block_size, true));
         let decoded = create_string_from_blocks_decrypt(create_blocks_from_string_decrypt(&encoded, true));
         assert_eq!(decoded.trim(), m);
 
         let m = "Da苉 ist eine Testnachricht";
         let block_size = 3;
-        let encoded = create_string_from_blocks(create_blocks_from_string_enc(m, block_size, true));
+        let encoded = create_string_from_blocks(create_blocks_from_string_encript(m, block_size, true));
         let decoded = create_string_from_blocks_decrypt(create_blocks_from_string_decrypt(&encoded, true));
         assert_eq!(decoded.trim(), m);
     }
@@ -98,7 +167,7 @@ mod tests {
     fn test_create_chiffre() {
         let message = "Da苉 ist eine Testnachricht";
         let block_size = 7;
-        let result = create_blocks_from_string_enc(message, block_size, true);
+        let result = create_blocks_from_string_encript(message, block_size, true);
         let expected_result = vec![
             BigUint::from(1943938337267550087026074257524u128),
             BigUint::from(914822981356602019800946507860u128),
