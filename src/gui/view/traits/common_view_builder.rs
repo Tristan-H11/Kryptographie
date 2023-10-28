@@ -38,7 +38,7 @@ impl CommonViewComponents {
         Flex::row()
             .with_child(Label::new(label_text).fix_width(self.fixed_width_entry_label))
             .with_child(
-                TextBox::new()
+                TextBox::multiline()
                     .with_placeholder(placeholder)
                     .fix_width(self.fixed_width_textbox)
                     .lens(lens),
