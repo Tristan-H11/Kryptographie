@@ -1,47 +1,80 @@
-use bigdecimal::num_bigint::{BigInt, BigUint, ToBigInt};
+use bigdecimal::num_bigint::{BigInt, ToBigInt};
 use bigdecimal::{BigDecimal, One, Zero};
 use rand::random;
 
-#[derive(Debug)]
+use crate::big_d;
+use crate::encryption::math_functions::traits::divisible::Divisible;
+use crate::encryption::math_functions::traits::increment::Increment;
+
+///
+/// Iterator für einen Zufallswert nach dem Schema aus dem Skript.
+///
 pub struct RandomElsner {
-    pub(crate) sqrt_m: BigDecimal,
-    pub(crate) n: BigDecimal,
+    sqrt_m: BigDecimal,
+    n: BigInt,
+    a: BigInt,
+    range: BigDecimal,
 }
 
 impl RandomElsner {
-
     ///
     /// Erstellt eine neue Instanz von RandomElsner.
-    ///
-    /// # Rückgabe
-    /// * RandomElsner
-    ///
-    pub fn create() -> Self {
-        let mut m = BigDecimal::from(random::<u128>());
-        while (m.sqrt().unwrap() % BigDecimal::one()) == BigDecimal::zero() {
-            m = BigDecimal::from(random::<u128>());
-        }
-        return Self {
-            sqrt_m: m.sqrt().unwrap(),
-            n: BigDecimal::zero(),
-        };
-    }
-
-    ///
-    /// Gibt eine zufällige Zahl im Bereich von a bis b zurück.
     ///
     /// # Argumente
     /// * `a` - Die untere Grenze des Bereichs.
     /// * `b` - Die obere Grenze des Bereichs.
     ///
     /// # Rückgabe
+    /// * RandomElsner
+    ///
+    pub fn new(a: &BigInt, b: &BigInt) -> Self {
+        let sqrt_m;
+        loop {
+            let m = BigDecimal::from(random::<u128>());
+            match m.sqrt() {
+                Some(sqrt) => {
+                    if sqrt.is_not_divisible_by(&BigDecimal::one()) {
+                        sqrt_m = sqrt;
+                        break;
+                    }
+                }
+                None => panic!("Wurzel m konnte nicht berechnet werden."),
+            }
+        }
+        return Self {
+            sqrt_m,
+            n: BigInt::zero(),
+            a: a.clone(),
+            range: big_d!(BigInt::from(b - a + BigInt::one())),
+        };
+    }
+
+    ///
+    /// Konstruktor für Testfälle, um deterministische Werte zu erhalten.
+    ///
+    #[cfg(test)]
+    pub fn new_deterministic(sqrt_m: BigDecimal, a: &BigInt, b: &BigInt) -> Self {
+        return Self {
+            sqrt_m,
+            n: BigInt::zero(),
+            a: a.clone(),
+            range: big_d!(BigInt::from(b - a + BigInt::one())),
+        };
+    }
+
+    ///
+    /// Gibt eine zufällige Zahl im Bereich von a bis b zurück.
+    ///
+    /// # Rückgabe
     /// * BigUint
     ///
-    pub fn take(&mut self, a: &BigUint, b: &BigUint) -> BigUint {
-        self.n += BigDecimal::one();
-        let range = b - a + BigUint::one();
-        let num =
-            (&self.n * &self.sqrt_m) % BigDecimal::one() * BigDecimal::from(BigInt::from(range));
-        return a + (BigDecimal::to_bigint(&num).unwrap()).to_biguint().unwrap();
+    pub fn take(&mut self) -> BigInt {
+        self.n.increment_assign();
+
+        let factor = (&self.n * &self.sqrt_m) % BigDecimal::one();
+        // Das unwrap() wird niemals fehlschlagen, weil die Implementation von to_bigint() nur
+        // Some, aber niemals None zurückgibt. Es ist unklar, warum es überhaupt Option ist.
+        let step = (factor * &self.range).to_bigint().unwrap();
+        &self.a + step
     }
 }

@@ -1,11 +1,15 @@
-use crate::encryption::math_functions::big_int_util::{
-    decrement, divides, increment, is_even, is_one, is_zero,
-};
-use crate::encryption::math_functions::random_elsner::RandomElsner;
-use bigdecimal::num_bigint::{BigInt, BigUint};
+use std::io::{Error, ErrorKind};
+
+
+use bigdecimal::num_bigint::BigInt;
 use bigdecimal::num_traits::Euclid;
 use bigdecimal::{One, Zero};
-use std::ops::Div;
+
+use crate::big_i;
+use crate::encryption::math_functions::random_elsner::RandomElsner;
+use crate::encryption::math_functions::traits::divisible::Divisible;
+use crate::encryption::math_functions::traits::increment::Increment;
+use crate::encryption::math_functions::traits::parity::Parity;
 
 ///
 /// Schnelle Exponentiation der Potenz und Reduzierung um einen Modul.
@@ -20,22 +24,21 @@ use std::ops::Div;
 /// ```
 /// fast_exponentiation(95, 130, 7) // => '4'
 /// ```
-pub fn fast_exponentiation(base: &BigUint, exponent: &BigUint, modul: &BigUint) -> BigUint {
+pub fn fast_exponentiation(base: &BigInt, exponent: &BigInt, modul: &BigInt) -> BigInt {
     // Sonderbedingungen der Exponentiation
-    if is_one(&modul) {
-        return BigUint::zero();
+    if modul.is_one() {
+        return BigInt::zero();
     }
-    if is_zero(&exponent) {
-        return BigUint::one();
+    if exponent.is_zero() {
+        return BigInt::one();
     }
-    if is_one(&exponent) {
+    if exponent.is_one() {
         return base.rem_euclid(modul);
     }
 
     // Berechnung des Zwischenschrittes mit halbiertem Exponenten.
-    let base_to_square = fast_exponentiation(base, &exponent.div(2u8), modul);
-
-    return if is_even(&exponent) {
+    let base_to_square = fast_exponentiation(base, &exponent.half(), modul);
+    return if exponent.is_even() {
         // Ist der Exponent gerade, so wird nur quadriert.
         base_to_square.pow(2).rem_euclid(modul)
     } else {
@@ -59,18 +62,15 @@ pub fn fast_exponentiation(base: &BigUint, exponent: &BigUint, modul: &BigUint) 
 /// Das Inverse-Element von `n` im Restklassenring modulo `modul`.
 /// Wenn keine Inverse existiert (wenn `n` und `modul` nicht teilerfremd sind),
 /// wird ein Error zurückgegeben.
-pub fn modulo_inverse(n: BigInt, modul: BigInt) -> Result<BigInt, std::io::Error> {
-    let (ggt, _x, y) = extended_euclid(&modul, &n);
+pub fn modulo_inverse(n: &BigInt, modul: &BigInt) -> Result<BigInt, Error> {
+    let (ggt, _x, y) = extended_euclid(modul, n);
     // Wenn ggT nicht 1, existiert kein Inverse. -> Error
-    if ggt != BigInt::one() {
-        let no_inverse_error = std::io::Error::new(
-            std::io::ErrorKind::InvalidInput,
-            format!("n hat keinen Inverse"),
-        );
+    if !ggt.is_one() {
+        let no_inverse_error = Error::new(ErrorKind::InvalidInput, format!("n hat keinen Inverse"));
         return Err(no_inverse_error);
     }
     // Berechnet aus den letzten Faktoren das Inverse.
-    return Ok((&modul + y).rem_euclid(&modul));
+    return Ok((modul + y).rem_euclid(modul));
 }
 
 /// Implementiert den erweiterten euklidischen Algorithmus.
@@ -99,13 +99,15 @@ pub fn extended_euclid(n: &BigInt, modul: &BigInt) -> (BigInt, BigInt, BigInt) {
     ];
     return extended_euclidean_algorithm(&n, &modul, xy);
 }
+
 fn extended_euclidean_algorithm(
     n: &BigInt,
     modul: &BigInt,
     mut xy: [BigInt; 6],
 ) -> (BigInt, BigInt, BigInt) {
     xy.rotate_left(2);
-    return if modul == &BigInt::zero() {
+
+    return if modul.is_zero() {
         (n.clone(), xy[0].clone(), xy[1].clone())
     } else {
         // Berechnet die Faktoren und speichert sie in einem rotierenden Array.
@@ -132,38 +134,45 @@ fn extended_euclidean_algorithm(
 /// miller_rabin(11, 40) // => true
 /// miller_rabin(2211, 40) // => false
 /// ```
-pub fn miller_rabin(p: &BigUint, repeats: usize) -> bool {
-    let mut d = decrement(p);
-    let mut s = BigUint::zero();
-    while is_even(&d) {
-        d = d.div(BigUint::from(2u8));
-        s += BigUint::one();
+pub fn miller_rabin(p: &BigInt, repeats: usize) -> bool {
+    let mut d = p.decrement();
+    let mut s = BigInt::zero();
+
+    while d.is_even() {
+        d.half_assign();
+        s.increment_assign();
     }
-    let mut rand = RandomElsner::create();
+
+    let mut rand = RandomElsner::new(&big_i!(2), &p);
+
     for _ in 0..repeats {
-        let mut a = rand.take(&BigUint::one(), &p);
-        while divides(p, &a) {
-            a = rand.take(&BigUint::one(), &p);
+        let mut a = rand.take();
+        while p.is_divisible_by(&a) {
+            a = rand.take();
         }
-        if !miller_rabin_test(&p, &s, &d, &a) {
+        if !miller_rabin_test(p, &s, &d, &a) {
             return false;
         }
     }
+
     return true;
 }
 
-fn miller_rabin_test(p: &BigUint, s: &BigUint, d: &BigUint, a: &BigUint) -> bool {
-    let mut x = fast_exponentiation(&a, d, p);
-    if is_one(&x) || x == decrement(p) {
+fn miller_rabin_test(p: &BigInt, s: &BigInt, d: &BigInt, a: &BigInt) -> bool {
+    let mut x = fast_exponentiation(a, d, p);
+
+    if x.is_one() || x == p.decrement() {
         return true;
     }
-    let mut r = BigUint::zero();
+
+    let mut r = BigInt::zero();
+
     while &r < s {
-        x = fast_exponentiation(&x, &BigUint::from(2u8), p);
-        if x == decrement(p) {
+        x = fast_exponentiation(&x, &big_i!(2u8), p);
+        if x == p.decrement() {
             return true;
         }
-        r = increment(&r);
+        r.increment_assign();
     }
     return false;
 }

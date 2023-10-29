@@ -1,37 +1,37 @@
 #[cfg(test)]
 mod tests {
+    use bigdecimal::num_bigint::BigInt;
     use bigdecimal::BigDecimal;
+
+    use crate::big_d;
     use crate::encryption::math_functions::random_elsner::RandomElsner;
-    use bigdecimal::num_bigint::BigUint;
 
     #[test]
     fn test_random_elsner() {
-        let mut random = RandomElsner {
-            sqrt_m: BigDecimal::from(13u32).sqrt().unwrap(),
-            n: 0u32.into(),
-        };
+        let a: BigInt = 1u32.into();
+        let b: BigInt = 997u32.into();
 
-        let a: BigUint = 1u32.into();
-        let b: BigUint = 997u32.into();
+        let mut random =
+            RandomElsner::new_deterministic(big_d!(13).sqrt().unwrap(), &a.clone(), &b.clone());
 
-        assert_eq!(random.take(&a, &b), 604u32.into());
-        assert_eq!(random.take(&a, &b), 211u32.into());
-        assert_eq!(random.take(&a, &b), 815u32.into());
-        assert_eq!(random.take(&a, &b), 421u32.into());
-        assert_eq!(random.take(&a, &b), 28u32.into());
-        assert_eq!(random.take(&a, &b), 632u32.into());
-        assert_eq!(random.take(&a, &b), 239u32.into());
-        assert_eq!(random.take(&a, &b), 842u32.into());
-        assert_eq!(random.take(&a, &b), 449u32.into());
-        assert_eq!(random.take(&a, &b), 56u32.into());
+        assert_eq!(random.take(), 604u32.into());
+        assert_eq!(random.take(), 211u32.into());
+        assert_eq!(random.take(), 815u32.into());
+        assert_eq!(random.take(), 421u32.into());
+        assert_eq!(random.take(), 28u32.into());
+        assert_eq!(random.take(), 632u32.into());
+        assert_eq!(random.take(), 239u32.into());
+        assert_eq!(random.take(), 842u32.into());
+        assert_eq!(random.take(), 449u32.into());
+        assert_eq!(random.take(), 56u32.into());
 
-        random = RandomElsner::create();
+        let a: BigInt = 500u32.into();
+        let b: BigInt = 6000u32.into();
 
-        let a: BigUint = 500u32.into();
-        let b: BigUint = 6000u32.into();
+        random = RandomElsner::new(&a, &b);
 
         for _ in 1..500 {
-            let random = random.take(&a, &b);
+            let random = random.take();
             assert!(random >= a && random <= b);
         }
     }
