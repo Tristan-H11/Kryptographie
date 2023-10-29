@@ -1,29 +1,25 @@
 #[cfg(test)]
 mod rsa_keys_test {
+    use rayon::prelude::{IntoParallelIterator, ParallelIterator};
     use crate::encryption::rsa::rsa_keygen_service::RsaKeygenService;
 
     #[test]
-    fn test_happy_flow_128() {
+    fn test_happy_flow_1024() {
         // Intensiver Test, der die Verschlüsselung und Entschlüsselung wiederholt testet.
         let message = "bbbbbbbbbbbbbbb  äääääääääääääää";
-        let keysize = 128;
-        let keygen_service = RsaKeygenService::new(keysize);
-        let mut counter = 0;
+        let range = 200;
 
-        for _i in 0..15 {
+        let result = (0..range).into_par_iter().all(|_| {
+            let keygen_service = RsaKeygenService::new(1024);
             let (public_key, private_key) = keygen_service.generate_keypair(40);
 
             let encrypted_message = public_key.encrypt(message, 55296);
             println!("Verschlüsselte Nachricht: {}", encrypted_message);
 
             let decrypted_message = private_key.decrypt(&encrypted_message, 55296);
-            if message != decrypted_message.trim() {
-                println!("{} != {}", message, decrypted_message.trim());
-                counter += 1;
-            }
-            // assert_eq!(message, decrypted_message.trim_end());
+            message == decrypted_message.trim()
         }
-        println!("{} Fehler", counter);
-        assert_eq!(counter, 0)
+        );
+        assert!(result);
     }
 }
