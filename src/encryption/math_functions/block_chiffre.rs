@@ -17,7 +17,7 @@ use crate::big_i;
 /// # Rückgabe
 /// * `Vec<BigUint>` - Die codierte Darstellung des Strings als vec der Summen.
 ///
-pub(crate) fn create_blocks_from_string_encript(
+pub(crate) fn create_blocks_from_string_encrypt(
     m: &str,
     block_size: usize,
     fill_blocks: bool,
