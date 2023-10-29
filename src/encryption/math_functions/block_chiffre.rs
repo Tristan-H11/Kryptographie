@@ -225,13 +225,14 @@ pub(crate) fn to_sum_vec(d_vec: Vec<Vec<u32>>, base: &BigInt) -> Vec<BigInt> {
 
 fn helper_fun_sum_for_digits(i_vec: &Vec<u32>, g_base: &BigInt) -> BigInt {
     debug!("Erstelle Summe aus Integer Vektor");
-    let mut sum = BigInt::zero();
-    let mut base = BigInt::one();
-    for &digit in i_vec.iter().rev() {
-        trace!("Addiere {} * {} zu Summe", base, digit);
-        sum += &base * BigInt::from(digit);
-        base *= g_base;
-    }
+
+    let (sum, _) = i_vec.iter()
+        .rev()
+        .fold((BigInt::zero(), BigInt::one()), |(acc_sum, acc_base), &digit| {
+            trace!("Addiere {} * {} zu Summe", acc_base, digit);
+            (&acc_sum + &acc_base * big_i!(digit), acc_base * g_base)
+        });
+
     debug!("Summe: {}", sum);
     sum
 }
