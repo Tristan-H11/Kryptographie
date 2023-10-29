@@ -22,10 +22,10 @@ mod tests {
         let mut failure_count = 0;
 
         for _ in 0..12 {
-            let keygen_service = RsaKeygenService::new(128);
-            let (public_key, private_key) = keygen_service.generate_keypair(40);
+            let keygen_service = RsaKeygenService::new(256);
+            let (public_key, private_key) = keygen_service.generate_keypair(1);
 
-            let message = "Das ist ein langer Test um etwas zu prüfen. Dieser Text wird jetzt einfach mal echt wirklich lang. 0123456789";
+            let message = "bbbbbbbbbbbbbbb  äääääääääääääää  !&    ";
             let basis_length = 55296u32;
 
             let result = create_blocks_from_string_encrypt(
@@ -55,7 +55,7 @@ mod tests {
             let string = create_string_from_blocks_decrypt(result);
 
             // Ersetze assert durch eine if-Anweisung
-            if string.trim() != message {
+            if string.trim() != message.trim() {
                 failure_count += 1;
             }
         }

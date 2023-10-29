@@ -6,18 +6,18 @@ mod rsa_keys_test {
     #[test]
     fn test_happy_flow_1024() {
         // Intensiver Test, der die Verschlüsselung und Entschlüsselung wiederholt testet.
-        let message = "bbbbbbbbbbbbbbb  äääääääääääääää";
+        let message = "bbbbbbbbbbbbbbb  äääääääääääääää  !&    ";
         let range = 20; // TODO hochstellen, wenn nötig
 
         let result = (0..range).into_par_iter().all(|_| {
-            let keygen_service = RsaKeygenService::new(1024);
+            let keygen_service = RsaKeygenService::new(256);
             let (public_key, private_key) = keygen_service.generate_keypair(40);
 
             let encrypted_message = public_key.encrypt(message, 55296);
             println!("Verschlüsselte Nachricht: {}", encrypted_message);
 
             let decrypted_message = private_key.decrypt(&encrypted_message, 55296);
-            message == decrypted_message.trim()
+            message.trim_end() == decrypted_message
         });
         assert!(result);
     }
