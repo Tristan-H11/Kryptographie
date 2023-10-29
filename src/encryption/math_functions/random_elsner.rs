@@ -9,6 +9,7 @@ use crate::encryption::math_functions::traits::increment::Increment;
 ///
 /// Iterator für einen Zufallswert nach dem Schema aus dem Skript.
 ///
+#[derive(Clone)]
 pub struct RandomElsner {
     sqrt_m: BigDecimal,
     n: BigInt,

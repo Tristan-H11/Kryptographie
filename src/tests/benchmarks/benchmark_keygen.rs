@@ -9,7 +9,7 @@ mod tests {
         let key_size = 1024;
         let keygen_service = RsaKeygenService::new(key_size);
         let mut times = Vec::new();
-        let n = 5;
+        let n = 1; //TODO für Test hochsetzen
 
         for _i in 0..n {
             let start = Instant::now();
