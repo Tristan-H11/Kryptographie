@@ -59,7 +59,7 @@ impl PublicKey {
     pub(crate) fn encrypt(&self, message: &str, base_length: u32) -> String {
         info!("Verschlüsseln mit blockgröße {}", self.block_size);
 
-        let chunks = create_blocks_from_string_encrypt(message, self.block_size, true, base_length);
+        let chunks = create_blocks_from_string_encrypt(message.trim_end(), self.block_size, true, base_length);
         let encrypted_chunks = chunks
             .iter()
             .map(|chunk| fast_exponentiation(chunk, &self.e, &self.n))
