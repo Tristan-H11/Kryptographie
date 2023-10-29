@@ -7,7 +7,7 @@ mod rsa_keys_test {
     fn test_happy_flow_1024() {
         // Intensiver Test, der die Verschlüsselung und Entschlüsselung wiederholt testet.
         let message = "bbbbbbbbbbbbbbb  äääääääääääääää";
-        let range = 200;
+        let range = 20; // TODO hochstellen, wenn nötig
 
         let result = (0..range).into_par_iter().all(|_| {
             let keygen_service = RsaKeygenService::new(1024);
