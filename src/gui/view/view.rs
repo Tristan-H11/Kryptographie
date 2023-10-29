@@ -1,8 +1,8 @@
-use crate::gui::view::traits::common_view_builder::{ ViewBuilder};
+use crate::gui::model::model::{AliceModel, BobModel, MainMenuModel};
 use crate::gui::view::traits::alice_view::AliceViewBuilder;
 use crate::gui::view::traits::bob_view::BobViewBuilder;
+use crate::gui::view::traits::common_view_builder::ViewBuilder;
 use crate::gui::view::traits::main_menu_view::MainMenuViewBuilder;
-use crate::gui::model::model::{AliceModel, BobModel, MainMenuModel};
 use druid::Widget;
 
 // Stellen Sie Wrapper-Funktionen bereit, um die Methoden der View-Builder aufzurufen

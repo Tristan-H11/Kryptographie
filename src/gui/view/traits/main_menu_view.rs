@@ -1,23 +1,20 @@
-
+use crate::gui::controller::commands::{
+    CALCULATE_KEYPAIR_ALICE, CALCULATE_KEYPAIR_BOB, SWITCH_TO_ALICE, SWITCH_TO_BOB,
+};
+use crate::gui::model::model::MainMenuModel;
+use crate::gui::view::traits::common_view_builder::{CommonViewComponents, ViewBuilder};
+use crate::gui::view::traits::key_text_wrapper::{KeyTextWrapper, TextWrapper};
 use druid::{
     widget::{Flex, Label},
     Env, Widget, WidgetExt,
 };
-use crate::gui::controller::commands::{
-    CALCULATE_KEYPAIR_ALICE, CALCULATE_KEYPAIR_BOB,
-    SWITCH_TO_ALICE, SWITCH_TO_BOB,
-};
-use crate::gui::model::model::{MainMenuModel};
-use crate::gui::view::traits::key_text_wrapper::{KeyTextWrapper, TextWrapper};
-use crate::gui::view::traits::common_view_builder::{CommonViewComponents, ViewBuilder};
-
 
 // trait für Hauptmenü
 pub struct MainMenuViewBuilder;
 
 impl ViewBuilder<MainMenuModel> for MainMenuViewBuilder {
     fn build_view() -> Box<dyn Widget<MainMenuModel>> {
-        let common_components = CommonViewComponents::new();  // Gemeinsame Komponenten instanziieren
+        let common_components = CommonViewComponents::new(); // Gemeinsame Komponenten instanziieren
 
         // Entry-Felder
         let modul_width_entry = common_components.create_text_entry(
@@ -49,32 +46,33 @@ impl ViewBuilder<MainMenuModel> for MainMenuViewBuilder {
             CALCULATE_KEYPAIR_BOB,
         );
 
-        let open_alice_button = common_components.create_button(
-            "Alice-Ansicht öffnen",
-            SWITCH_TO_ALICE,
-        );
+        let open_alice_button =
+            common_components.create_button("Alice-Ansicht öffnen", SWITCH_TO_ALICE);
 
-        let open_bob_button = common_components.create_button(
-            "Bob-Ansicht öffnen",
-            SWITCH_TO_BOB,
-        );
+        let open_bob_button = common_components.create_button("Bob-Ansicht öffnen", SWITCH_TO_BOB);
 
         // big-text
-        let public_exponent_alice_label = Label::new(|data: &MainMenuModel, _env: &Env| -> String {
-            let wrapper = KeyTextWrapper;
-            let key_text_wrapper = wrapper.key_text_wrapper(
-                &format!("Öffentlicher Exponent Alice:{}",
-                         &data.public_exponent_alice), 150);
-            key_text_wrapper
-        })
+        let public_exponent_alice_label =
+            Label::new(|data: &MainMenuModel, _env: &Env| -> String {
+                let wrapper = KeyTextWrapper;
+                let key_text_wrapper = wrapper.key_text_wrapper(
+                    &format!(
+                        "Öffentlicher Exponent Alice:{}",
+                        &data.public_exponent_alice
+                    ),
+                    150,
+                );
+                key_text_wrapper
+            })
             .expand_width();
 
         let public_exponent_bob_label = Label::new(|data: &MainMenuModel, _env: &Env| -> String {
             let wrapper = KeyTextWrapper;
-            let wrapped_text = wrapper.key_text_wrapper(&format!("{}", &data.public_exponent_bob), 150);
+            let wrapped_text =
+                wrapper.key_text_wrapper(&format!("{}", &data.public_exponent_bob), 150);
             format!("Öffentlicher Exponent Bob: \n{}", wrapped_text)
         })
-            .expand_width();
+        .expand_width();
 
         // UI Struktur
         Box::new(
@@ -97,6 +95,7 @@ impl ViewBuilder<MainMenuModel> for MainMenuViewBuilder {
                 .with_spacer(common_components.spacer_size)
                 .with_child(open_alice_button)
                 .with_default_spacer()
-                .with_child(open_bob_button))
+                .with_child(open_bob_button),
+        )
     }
 }

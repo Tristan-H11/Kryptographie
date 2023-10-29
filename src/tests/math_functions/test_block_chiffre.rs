@@ -5,7 +5,7 @@ mod tests {
     use crate::big_i;
     use crate::encryption::math_functions::block_chiffre::{
         create_blocks_from_string_decrypt, create_blocks_from_string_encrypt,
-        create_string_from_blocks_encrypt, create_string_from_blocks_decrypt, split_into_blocks,
+        create_string_from_blocks_decrypt, create_string_from_blocks_encrypt, split_into_blocks,
         string_to_int_vec, sums_vec_to_string_vec, to_sum_vec, u32_to_c, ubig_to_u32,
     };
     use crate::encryption::math_functions::number_theory::fast_exponentiation;
@@ -32,27 +32,24 @@ mod tests {
                 message,
                 public_key.get_block_size(),
                 true,
-                basis_length
-            ).iter()
-            .map(|x| {
-                fast_exponentiation(x, &public_key.get_e(), &public_key.get_n())
-            })
+                basis_length,
+            )
+            .iter()
+            .map(|x| fast_exponentiation(x, &public_key.get_e(), &public_key.get_n()))
             .collect::<Vec<BigInt>>();
 
-            let encrypted_string = create_string_from_blocks_encrypt(
-                result,
-            public_key.get_block_size() + 1);
+            let encrypted_string =
+                create_string_from_blocks_encrypt(result, public_key.get_block_size() + 1);
 
             // Ohne Blocklänge, da diese in der Methode aus dem String extrahiert wird
             let result = create_blocks_from_string_decrypt(
                 &encrypted_string,
                 true,
                 basis_length,
-                private_key.get_block_size()
-            ).iter()
-            .map(|x| {
-                fast_exponentiation(x, &private_key.get_d(), &private_key.get_n())
-            })
+                private_key.get_block_size(),
+            )
+            .iter()
+            .map(|x| fast_exponentiation(x, &private_key.get_d(), &private_key.get_n()))
             .collect();
 
             let string = create_string_from_blocks_decrypt(result);
@@ -74,65 +71,57 @@ mod tests {
         let m = "Da苉 ist eine Testnachricht";
         let block_size = 8;
         let basis_length = 55296 as u32;
-        let encoded = create_string_from_blocks_encrypt(create_blocks_from_string_encrypt(
-            m,
-            block_size,
-            true,
-            basis_length,
-        ), block_size + 1);
+        let encoded = create_string_from_blocks_encrypt(
+            create_blocks_from_string_encrypt(m, block_size, true, basis_length),
+            block_size + 1,
+        );
         let decoded = create_string_from_blocks_decrypt(create_blocks_from_string_decrypt(
             &encoded,
             true,
             basis_length,
-            block_size + 1
+            block_size + 1,
         ));
         assert_eq!(decoded.trim(), m);
 
         let m = "Da苉 ist eine Testnachricht";
         let block_size = 6;
-        let encoded = create_string_from_blocks_encrypt(create_blocks_from_string_encrypt(
-            m,
-            block_size,
-            true,
-            basis_length,
-        ), block_size + 1);
+        let encoded = create_string_from_blocks_encrypt(
+            create_blocks_from_string_encrypt(m, block_size, true, basis_length),
+            block_size + 1,
+        );
         let decoded = create_string_from_blocks_decrypt(create_blocks_from_string_decrypt(
             &encoded,
             true,
             basis_length,
-            block_size + 1
+            block_size + 1,
         ));
         assert_eq!(decoded.trim(), m);
 
         let m = "Da苉 ist eine Testnachricht";
         let block_size = 47;
-        let encoded = create_string_from_blocks_encrypt(create_blocks_from_string_encrypt(
-            m,
-            block_size,
-            true,
-            basis_length,
-        ), block_size + 1);
+        let encoded = create_string_from_blocks_encrypt(
+            create_blocks_from_string_encrypt(m, block_size, true, basis_length),
+            block_size + 1,
+        );
         let decoded = create_string_from_blocks_decrypt(create_blocks_from_string_decrypt(
             &encoded,
             true,
             basis_length,
-            block_size + 1
+            block_size + 1,
         ));
         assert_eq!(decoded.trim(), m);
 
         let m = "Da苉 ist eine Testnachricht";
         let block_size = 3;
-        let encoded = create_string_from_blocks_encrypt(create_blocks_from_string_encrypt(
-            m,
-            block_size,
-            true,
-            basis_length,
-        ), block_size + 1);
+        let encoded = create_string_from_blocks_encrypt(
+            create_blocks_from_string_encrypt(m, block_size, true, basis_length),
+            block_size + 1,
+        );
         let decoded = create_string_from_blocks_decrypt(create_blocks_from_string_decrypt(
             &encoded,
             true,
             basis_length,
-            block_size + 1
+            block_size + 1,
         ));
         assert_eq!(decoded.trim(), m);
     }

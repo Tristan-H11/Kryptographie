@@ -1,7 +1,7 @@
 #[cfg(test)]
 mod rsa_keys_test {
-    use rayon::prelude::{IntoParallelIterator, ParallelIterator};
     use crate::encryption::rsa::rsa_keygen_service::RsaKeygenService;
+    use rayon::prelude::{IntoParallelIterator, ParallelIterator};
 
     #[test]
     fn test_happy_flow_1024() {
@@ -18,8 +18,7 @@ mod rsa_keys_test {
 
             let decrypted_message = private_key.decrypt(&encrypted_message, 55296);
             message == decrypted_message.trim()
-        }
-        );
+        });
         assert!(result);
     }
 }

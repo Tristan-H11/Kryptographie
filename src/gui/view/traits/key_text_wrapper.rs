@@ -1,4 +1,3 @@
-
 pub trait TextWrapper {
     fn key_text_wrapper(&self, text: &str, chars_per_line: usize) -> String;
 }
@@ -18,5 +17,3 @@ impl TextWrapper for KeyTextWrapper {
             })
     }
 }
-
-

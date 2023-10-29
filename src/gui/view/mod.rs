@@ -1,2 +1,2 @@
-pub(crate) mod view;
 mod traits;
+pub(crate) mod view;

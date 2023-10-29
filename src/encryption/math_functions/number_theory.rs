@@ -1,6 +1,5 @@
 use std::io::{Error, ErrorKind};
 
-
 use bigdecimal::num_bigint::BigInt;
 use bigdecimal::num_traits::Euclid;
 use bigdecimal::{One, Zero};

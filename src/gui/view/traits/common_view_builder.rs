@@ -1,11 +1,7 @@
-
 use druid::{
     widget::{Button, Flex, Label, TextBox},
     Widget, WidgetExt,
 };
-
-use crate::gui::view::traits::key_text_wrapper::{TextWrapper};
-
 
 // trait für gemeinsame Merkmale von Ansichten
 pub trait ViewBuilder<Model> {
