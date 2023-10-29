@@ -3,6 +3,7 @@ use std::io::{Error, ErrorKind};
 use bigdecimal::num_bigint::BigInt;
 use bigdecimal::num_traits::Euclid;
 use bigdecimal::{One, Zero};
+use rayon::prelude::{IntoParallelIterator, ParallelIterator};
 
 use crate::big_i;
 use crate::encryption::math_functions::random_elsner::RandomElsner;
@@ -142,19 +143,16 @@ pub fn miller_rabin(p: &BigInt, repeats: usize) -> bool {
         s.increment_assign();
     }
 
-    let mut rand = RandomElsner::new(&big_i!(2), &p);
+    let rand = RandomElsner::new(&big_i!(2), &p);
 
-    for _ in 0..repeats {
-        let mut a = rand.take();
+    (0..repeats).into_par_iter().all(|_| {
+        let mut local_rand = rand.clone();
+        let mut a = local_rand.take();
         while p.is_divisible_by(&a) {
-            a = rand.take();
+            a = local_rand.take();
         }
-        if !miller_rabin_test(p, &s, &d, &a) {
-            return false;
-        }
-    }
-
-    return true;
+        miller_rabin_test(p, &s, &d, &a)
+    })
 }
 
 fn miller_rabin_test(p: &BigInt, s: &BigInt, d: &BigInt, a: &BigInt) -> bool {
