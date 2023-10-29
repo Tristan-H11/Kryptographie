@@ -56,6 +56,18 @@ impl PublicKey {
         self.block_size.clone()
     }
 
+    ///
+    /// Verschlüsselt eine Nachricht mit dem öffentlichen Schlüssel.
+    ///
+    /// # Argumente
+    ///
+    /// * `message` - Die zu verschlüsselnde Nachricht. **ACHTUNG**: Leerzeichen am Ende werden entfernt!
+    /// * `base_length` - Die Basis, in der die Nachricht verschlüsselt werden soll.
+    ///
+    /// # Rückgabe
+    ///
+    /// * `String` - Die verschlüsselte Nachricht.
+    ///
     pub(crate) fn encrypt(&self, message: &str, base_length: u32) -> String {
         info!("Verschlüsseln mit blockgröße {}", self.block_size);
 
@@ -122,6 +134,18 @@ impl PrivateKey {
         self.block_size.clone()
     }
 
+    ///
+    /// Entschlüsselt eine Nachricht mit dem privaten Schlüssel.
+    ///
+    /// # Argumente
+    ///
+    /// * `message` - Die zu entschlüsselnde Nachricht.
+    /// * `base_length` - Die Basis, in der die Nachricht verschlüsselt wurde.
+    ///
+    /// # Rückgabe
+    ///
+    /// * `String` - Die entschlüsselte Nachricht.
+    ///
     pub(crate) fn decrypt(&self, message: &str, base_length: u32) -> String {
         info!("Entschlüsseln mit blockgröße {}", self.block_size);
 
