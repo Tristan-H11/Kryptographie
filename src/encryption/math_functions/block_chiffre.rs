@@ -46,13 +46,9 @@ pub(crate) fn create_blocks_from_string_decrypt(
     m: &str,
     fill_blocks: bool,
     base_length: u32,
+    block_size: usize
 ) -> Vec<BigInt> {
-    let parts: Vec<&str> = m.splitn(2, '\u{FE8D}').collect();
-    let block_size = match usize::from_str(parts[0]) {
-        Ok(size) => size,
-        Err(_) => panic!("Ungültige Blockgröße im Eingabestring"),
-    };
-    let message = parts[1];
+    let message = m;
     debug!(
         "Erstelle Chiffre mit Blockgröße {} für {}",
         block_size, message
@@ -73,7 +69,7 @@ pub(crate) fn create_blocks_from_string_decrypt(
 /// # Rückgabe
 /// * `String` - Der decodierte String.
 ///
-pub(crate) fn create_string_from_blocks(sums: Vec<BigInt>) -> String {
+pub(crate) fn create_string_from_blocks_encrypt(sums: Vec<BigInt>, target_size: usize) -> String {
     println!(
         "Erstelle String aus Vektor von Summen: Anzahl der Vectorblöcke --> {}",
         sums.len()
@@ -82,16 +78,13 @@ pub(crate) fn create_string_from_blocks(sums: Vec<BigInt>) -> String {
     let strings = sums_vec_to_string_vec(sums, &base);
     println!("Chiffrierter Vector: {:?}", strings);
 
-    let max_length = strings.iter().map(|s| s.chars().count()).max().unwrap();
-    println!("Maximale Länge eines Strings: {}", max_length);
-
     // Füllt jeden String mit dem Zeichen "\u{FE8D}", um die maximale Länge zu erreichen
     // -- ziel ist es, eine einheitliche blocksize zu erhalten
     let strings: Vec<String> = strings
         .iter()
-        .map(|s| format!("{}{}", s, "\u{FE8D}".repeat(max_length - s.chars().count())))
+        .map(|s| format!("{}{}", s, "\u{FE8D}".repeat(target_size - s.chars().count())))
         .collect();
-    format!("{}\u{FE8D}{}", max_length, &strings.join(""))
+    strings.join("")
 }
 
 /// TODO Documentation anpassen
