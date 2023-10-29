@@ -42,17 +42,17 @@ impl PublicKey {
     }
 
     #[cfg(test)]
-    pub fn get_e_for_test(&self) -> BigInt {
+    pub fn get_e(&self) -> BigInt {
         self.e.clone()
     }
 
     #[cfg(test)]
-    pub fn get_n_for_test(&self) -> BigInt {
+    pub fn get_n(&self) -> BigInt {
         self.n.clone()
     }
 
     #[cfg(test)]
-    pub fn get_block_size_for_test(&self) -> usize {
+    pub fn get_block_size(&self) -> usize {
         self.block_size.clone()
     }
 
@@ -66,6 +66,7 @@ impl PublicKey {
             .map(|chunk| fast_exponentiation(chunk, &self.e, &self.n))
             .collect();
 
+        // Die Größe der verschlüsselten Blöcke ist immer um 1 größer als die Klartextgröße.
         create_string_from_blocks_encrypt(encrypted_chunks, self.block_size + 1)
     }
 
@@ -80,7 +81,7 @@ impl PublicKey {
 pub struct PrivateKey {
     d: BigInt,
     n: BigInt,
-    pub block_size: usize,
+    block_size: usize,
 }
 
 impl PrivateKey {
@@ -93,8 +94,9 @@ impl PrivateKey {
     /// * `n` - Das Produkt der beiden Primzahlen.
     ///
     pub fn new(d: BigInt, n: BigInt) -> PrivateKey {
-        // Maximale Blockbreite = log_g(n), wenn g=55296 ist.
         let g = big_i!(55296u16); //TODO in GUI auslagern
+
+        // Die Größe der verschlüsselten Blöcke ist immer um 1 größer als die Klartextgröße.
         let block_size = (n.log(&g) + 1) as usize;
         PrivateKey { d, n, block_size }
     }
@@ -117,7 +119,7 @@ impl PrivateKey {
     }
 
     #[cfg(test)]
-    pub fn get_block_size_for_test(&self) -> usize {
+    pub fn get_block_size(&self) -> usize {
         self.block_size.clone()
     }
 
