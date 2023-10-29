@@ -204,10 +204,9 @@ impl AppController {
     fn encrypt_alice(&mut self, app_state: &mut AppState) {
         info!("Verschlüssle Nachricht von Alice");
         let plaintext = app_state.alice.plaintext.clone();
-        let encrypted = self.bob_public_key.encrypt(
-            &plaintext,
-            Self::parse_base(app_state),
-        );
+        let encrypted = self
+            .bob_public_key
+            .encrypt(&plaintext, Self::parse_base(app_state));
         app_state.alice.ciphertext = encrypted;
     }
 
@@ -238,10 +237,9 @@ impl AppController {
     fn decrypt_alice(&mut self, app_state: &mut AppState) {
         info!("Entschlüssle Nachricht von Bob");
         let cipher_text = app_state.alice.ciphertext.clone();
-        let decrypted = self.alice_private_key.decrypt(
-            &cipher_text,
-            Self::parse_base(app_state),
-        );
+        let decrypted = self
+            .alice_private_key
+            .decrypt(&cipher_text, Self::parse_base(app_state));
         app_state.alice.plaintext = decrypted;
     }
 
@@ -273,10 +271,9 @@ impl AppController {
     fn encrypt_bob(&mut self, app_state: &mut AppState) {
         info!("Verschlüssle Nachricht von Bob");
         let plaintext = app_state.bob.plaintext.clone();
-        let encrypted = self.alice_public_key.encrypt(
-            &plaintext,
-            Self::parse_base(app_state),
-        );
+        let encrypted = self
+            .alice_public_key
+            .encrypt(&plaintext, Self::parse_base(app_state));
         app_state.bob.ciphertext = encrypted;
     }
 
@@ -307,10 +304,9 @@ impl AppController {
     fn decrypt_bob(&mut self, app_state: &mut AppState) {
         info!("Entschlüssle Nachricht von Alice");
         let cipher_text = app_state.bob.ciphertext.clone();
-        let decrypted = self.bob_private_key.decrypt(
-            &cipher_text,
-            Self::parse_base(app_state),
-        );
+        let decrypted = self
+            .bob_private_key
+            .decrypt(&cipher_text, Self::parse_base(app_state));
         app_state.bob.plaintext = decrypted;
     }
 

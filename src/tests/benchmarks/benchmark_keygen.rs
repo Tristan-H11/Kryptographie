@@ -1,7 +1,7 @@
 #[cfg(test)]
 mod tests {
-    use std::time::Instant;
     use crate::encryption::rsa::rsa_keygen_service::RsaKeygenService;
+    use std::time::Instant;
 
     #[test]
     fn key_gen_timing_test() {

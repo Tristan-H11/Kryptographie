@@ -1,5 +1,3 @@
-use std::str::FromStr;
-
 use bigdecimal::num_bigint::BigInt;
 use bigdecimal::{One, ToPrimitive, Zero};
 use log::debug;
@@ -46,7 +44,7 @@ pub(crate) fn create_blocks_from_string_decrypt(
     m: &str,
     fill_blocks: bool,
     base_length: u32,
-    block_size: usize
+    block_size: usize,
 ) -> Vec<BigInt> {
     let message = m;
     debug!(
@@ -82,7 +80,13 @@ pub(crate) fn create_string_from_blocks_encrypt(sums: Vec<BigInt>, target_size: 
     // -- ziel ist es, eine einheitliche blocksize zu erhalten
     let strings: Vec<String> = strings
         .iter()
-        .map(|s| format!("{}{}", s, "\u{FE8D}".repeat(target_size - s.chars().count())))
+        .map(|s| {
+            format!(
+                "{}{}",
+                s,
+                "\u{FE8D}".repeat(target_size - s.chars().count())
+            )
+        })
         .collect();
     strings.join("")
 }
