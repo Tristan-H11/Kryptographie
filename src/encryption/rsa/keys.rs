@@ -3,7 +3,7 @@ use log::info;
 
 use crate::big_i;
 use crate::encryption::math_functions::block_chiffre::{
-    create_blocks_from_string_decrypt, create_blocks_from_string_encript,
+    create_blocks_from_string_decrypt, create_blocks_from_string_encrypt,
     create_string_from_blocks_encrypt, create_string_from_blocks_decrypt,
 };
 use crate::encryption::math_functions::number_theory::fast_exponentiation;
@@ -60,7 +60,7 @@ impl PublicKey {
         println!("Verschlüsseln mit blockgröße {}", self.block_size);
 
         let chunks =
-            create_blocks_from_string_encript(message, self.block_size, true, base_length);
+            create_blocks_from_string_encrypt(message, self.block_size, true, base_length);
         let encrypted_chunks = chunks
             .iter()
             .map(|chunk| fast_exponentiation(chunk, &self.e, &self.n))
