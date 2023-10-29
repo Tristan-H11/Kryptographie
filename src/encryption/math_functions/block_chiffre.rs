@@ -1,6 +1,6 @@
 use bigdecimal::num_bigint::BigInt;
 use bigdecimal::{One, ToPrimitive, Zero};
-use log::debug;
+use log::{debug, trace};
 
 use crate::big_i;
 
@@ -68,13 +68,13 @@ pub(crate) fn create_blocks_from_string_decrypt(
 /// * `String` - Der decodierte String.
 ///
 pub(crate) fn create_string_from_blocks_encrypt(sums: Vec<BigInt>, target_size: usize) -> String {
-    println!(
+    debug!(
         "Erstelle String aus Vektor von Summen: Anzahl der Vectorblöcke --> {}",
         sums.len()
     );
     let base = big_i!(55296u32); //TODO in GUI auslagern
     let strings = sums_vec_to_string_vec(sums, &base);
-    println!("Chiffrierter Vector: {:?}", strings);
+    debug!("Chiffrierter Vector: {:?}", strings);
 
     // Füllt jeden String mit dem Zeichen "\u{FE8D}", um die maximale Länge zu erreichen
     // -- ziel ist es, eine einheitliche blocksize zu erhalten
@@ -101,16 +101,13 @@ pub(crate) fn create_string_from_blocks_encrypt(sums: Vec<BigInt>, target_size: 
 /// * `String` - Der decodierte String.
 ///
 pub(crate) fn create_string_from_blocks_decrypt(sums: Vec<BigInt>) -> String {
-    println!(
+    debug!(
         "Erstelle String aus Vektor von Summen: Anzahl der Vectorblöcke --> {}",
         sums.len()
     );
     let base = big_i!(55296u32); //TODO in GUI auslagern
     let strings = sums_vec_to_string_vec(sums, &base);
-    println!("Chiffrierter Vector: {:?}", strings);
-
-    let max_length = strings.iter().map(|s| s.chars().count()).max().unwrap();
-    println!("Maximale Länge eines Strings: {}", max_length);
+    debug!("Chiffrierter Vector: {:?}", strings);
 
     let result = strings.join("");
     result.trim_end().to_string()
@@ -136,7 +133,7 @@ pub(crate) fn create_string_from_blocks_decrypt(sums: Vec<BigInt>) -> String {
 /// ["Das ", "ist ", "eine", " Tes", "tnac", "hric", "ht  "]
 /// ```
 pub(crate) fn split_into_blocks(message: &str, block_size: usize, fill_block: bool) -> Vec<String> {
-    println!(
+    debug!(
         "Erstelle Blöcke mit Blockgröße {} für '{}'",
         block_size, message
     );
@@ -152,7 +149,7 @@ pub(crate) fn split_into_blocks(message: &str, block_size: usize, fill_block: bo
                     b.push(' '); // Fügt Leerzeichen hinzu, um den letzten Block zu füllen
                 }
             }
-            println!("Erstellte Block '{}'", b);
+            trace!("Erstellte Block '{}'", b);
             b.replace("\u{FE8D}", "")
         })
         .collect() // Fasst alle Blöcke im Vektor zusammen
@@ -184,12 +181,12 @@ pub(crate) fn split_into_blocks(message: &str, block_size: usize, fill_block: bo
 /// ```
 ///
 pub(crate) fn string_to_int_vec(b_vec: Vec<String>) -> Vec<Vec<u32>> {
-    println!("Erstelle Integer Vektor aus String Vektor");
+    debug!("Erstelle Integer Vektor aus String Vektor");
     b_vec
         .into_iter()
         .map(|b| {
             let vec = b.chars().map(|b| b as u32).collect();
-            println!("Erstelle Integer Vektor aus String Vektor: {:?}", vec);
+            trace!("Erstelle Integer Vektor aus String Vektor: {:?}", vec);
             vec
         })
         .collect()
@@ -219,7 +216,7 @@ pub(crate) fn string_to_int_vec(b_vec: Vec<String>) -> Vec<Vec<u32>> {
 /// Beispiel von Seite 21 IT-Sec Skript:
 /// ```
 pub(crate) fn to_sum_vec(d_vec: Vec<Vec<u32>>, base: &BigInt) -> Vec<BigInt> {
-    println!("Erstelle Summen Vektor aus Integer Vektor");
+    debug!("Erstelle Summen Vektor aus Integer Vektor");
     d_vec
         .into_iter()
         .map(|d| helper_fun_sum_for_digits(&d, base))
@@ -227,15 +224,15 @@ pub(crate) fn to_sum_vec(d_vec: Vec<Vec<u32>>, base: &BigInt) -> Vec<BigInt> {
 }
 
 fn helper_fun_sum_for_digits(i_vec: &Vec<u32>, g_base: &BigInt) -> BigInt {
-    println!("Erstelle Summe aus Integer Vektor");
+    debug!("Erstelle Summe aus Integer Vektor");
     let mut sum = BigInt::zero();
     let mut base = BigInt::one();
     for &digit in i_vec.iter().rev() {
-        println!("Addiere {} * {} zu Summe", base, digit);
+        trace!("Addiere {} * {} zu Summe", base, digit);
         sum += &base * BigInt::from(digit);
         base *= g_base;
     }
-    println!("Summe: {}", sum);
+    debug!("Summe: {}", sum);
     sum
 }
 
@@ -274,8 +271,8 @@ fn helper_fun_sum_to_string(sum: &BigInt, base: &BigInt) -> String {
     // Konvertiere die Summe in ein g-adisches System zu Basis base
     while t_sum > zero {
         let digit = &t_sum % base;
-        println!("{} % {} = {} ", t_sum, base, digit);
-        println!("--> {}\n", char::from_u32(digit.to_u32().unwrap()).unwrap());
+        trace!("{} % {} = {} ", t_sum, base, digit);
+        trace!("--> {}\n", char::from_u32(digit.to_u32().unwrap()).unwrap());
         t_sum = &t_sum / base;
         res.push(u32_to_c(ubig_to_u32(&digit)));
     }
