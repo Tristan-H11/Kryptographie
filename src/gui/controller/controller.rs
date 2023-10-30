@@ -139,6 +139,7 @@ impl AppController {
         self.alice_public_key = public_key_alice;
 
         app_state.main_menu.public_exponent_alice = self.alice_public_key.get_e_as_str();
+        app_state.main_menu.modul_alice = self.alice_public_key.get_n_as_str();
         app_state.alice.private_exponent = self.alice_private_key.get_d_as_str();
     }
 
@@ -153,6 +154,7 @@ impl AppController {
         self.bob_public_key = public_key_bob;
 
         app_state.main_menu.public_exponent_bob = self.bob_public_key.get_e_as_str();
+        app_state.main_menu.modul_bob = self.bob_public_key.get_n_as_str();
         app_state.bob.private_exponent = self.bob_private_key.get_d_as_str();
     }
 

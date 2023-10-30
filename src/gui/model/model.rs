@@ -9,7 +9,9 @@ pub struct MainMenuModel {
     pub(crate) miller_rabin_iterations: String,
     pub(crate) basis_length: String,
     pub(crate) public_exponent_alice: String,
+    pub(crate) modul_alice: String,
     pub(crate) public_exponent_bob: String,
+    pub(crate) modul_bob: String,
 }
 
 #[derive(Clone, Data, Lens)]
@@ -56,7 +58,9 @@ impl Default for AppState {
                 miller_rabin_iterations: String::new(),
                 basis_length: String::new(),
                 public_exponent_alice: String::new(),
+                modul_alice: String::new(),
                 public_exponent_bob: String::new(),
+                modul_bob: String::new(),
             },
             alice: AliceModel {
                 plaintext: String::new(),

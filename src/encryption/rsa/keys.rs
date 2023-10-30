@@ -41,6 +41,13 @@ impl PublicKey {
         self.e.to_str_radix(10)
     }
 
+    ///
+    /// Gibt den Modul als String zurück.
+    ///
+    pub fn get_n_as_str(&self) -> String {
+        self.n.to_str_radix(10)
+    }
+
     #[cfg(test)]
     pub fn get_e(&self) -> BigInt {
         self.e.clone()

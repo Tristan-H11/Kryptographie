@@ -51,28 +51,30 @@ impl ViewBuilder<MainMenuModel> for MainMenuViewBuilder {
 
         let open_bob_button = common_components.create_button("Bob-Ansicht öffnen", SWITCH_TO_BOB);
 
-        // big-text
-        let public_exponent_alice_label =
-            Label::new(|data: &MainMenuModel, _env: &Env| -> String {
-                let wrapper = KeyTextWrapper;
-                let key_text_wrapper = wrapper.key_text_wrapper(
-                    &format!(
-                        "Öffentlicher Exponent Alice:{}",
-                        &data.public_exponent_alice
-                    ),
-                    150,
-                );
-                key_text_wrapper
-            })
-            .expand_width();
+        let public_exponent_bob_entry = common_components.create_text_entry(
+            "Öffentlicher Exponent Bob: ",
+            "wird automatisch berechnet",
+            MainMenuModel::public_exponent_bob,
+        );
 
-        let public_exponent_bob_label = Label::new(|data: &MainMenuModel, _env: &Env| -> String {
-            let wrapper = KeyTextWrapper;
-            let wrapped_text =
-                wrapper.key_text_wrapper(&format!("{}", &data.public_exponent_bob), 150);
-            format!("Öffentlicher Exponent Bob: \n{}", wrapped_text)
-        })
-        .expand_width();
+        let public_exponent_alice_entry = common_components.create_text_entry(
+            "Öffentlicher Exponent Alice: ",
+            "wird automatisch berechnet",
+            MainMenuModel::public_exponent_alice,
+        );
+
+        let modul_alice_entry = common_components.create_text_entry(
+            "Modul Alice: ",
+            "wird automatisch berechnet",
+            MainMenuModel::modul_alice,
+        );
+
+        let modul_bob_entry = common_components.create_text_entry(
+            "Modul Bob: ",
+            "wird automatisch berechnet",
+            MainMenuModel::modul_bob,
+        );
+
 
         // UI Struktur
         Box::new(
@@ -89,9 +91,13 @@ impl ViewBuilder<MainMenuModel> for MainMenuViewBuilder {
                 .with_default_spacer()
                 .with_child(calculate_keypair_bob)
                 .with_spacer(common_components.spacer_size)
-                .with_child(public_exponent_alice_label)
+                .with_child(public_exponent_alice_entry)
                 .with_default_spacer()
-                .with_child(public_exponent_bob_label)
+                .with_child(modul_alice_entry)
+                .with_default_spacer()
+                .with_child(public_exponent_bob_entry)
+                .with_default_spacer()
+                .with_child(modul_bob_entry)
                 .with_spacer(common_components.spacer_size)
                 .with_child(open_alice_button)
                 .with_default_spacer()
