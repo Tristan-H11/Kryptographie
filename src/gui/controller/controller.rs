@@ -166,6 +166,7 @@ impl AppController {
             Ok(x) => x,
             Err(_) => {
                 error!("Fehler beim Parsen der Modul-Breite. Es wird ein Default-Schlüssel mit 4096-bit erstellt.");
+                app_state.main_menu.modul_width = String::from("4096");
                 4096
             }
         };
@@ -178,6 +179,7 @@ impl AppController {
             Ok(x) => x,
             Err(_) => {
                 error!("Fehler beim Parsen der Miller-Rabin-Iterationen. Es wird ein Default-Wert von 100 Iterationen verwendet.");
+                app_state.main_menu.miller_rabin_iterations = String::from("100");
                 100
             }
         };
@@ -194,6 +196,7 @@ impl AppController {
             Ok(x) => x,
             Err(_) => {
                 error!("Fehler beim Parsen der Basis-Länge. Es wird der Default 55296 verwendet.");
+                app_state.main_menu.basis_length = String::from("55296");
                 55296
             }
         };
