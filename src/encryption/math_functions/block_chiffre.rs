@@ -1,5 +1,5 @@
 use bigdecimal::num_bigint::BigInt;
-use bigdecimal::{One, ToPrimitive, Zero};
+use bigdecimal::{One, Zero};
 use log::{debug, trace};
 
 use crate::big_i;
@@ -91,7 +91,7 @@ pub(crate) fn create_string_from_blocks_encrypt(sums: Vec<BigInt>, target_size: 
     strings.join("")
 }
 
-/// TODO Documentation anpassen
+///
 /// Methode, um eine Menge von gleich großen Blöcken in Dezimalform in einen String zu überführen.
 ///
 /// # Argumente
@@ -137,13 +137,11 @@ pub(crate) fn split_into_blocks(message: &str, block_size: usize, fill_block: bo
         "Erstelle Blöcke mit Blockgröße {} für '{}'",
         block_size, message
     );
-    message
-        .chars()
+    message.chars()
         .collect::<Vec<char>>()
-        .chunks(block_size) //Definiert die Blockgröße im Vector
+        .chunks(block_size)
         .map(|c| {
-            // Durchlaufe alle chunks, im letzten muss du ggf. Leerzeichen auffüllen
-            let mut b = c.iter().collect::<String>(); // .iter --> füge chars zu String zusammen
+            let mut b = c.iter().collect::<String>();
             if fill_block {
                 while b.len() < block_size {
                     b.push(' '); // Fügt Leerzeichen hinzu, um den letzten Block zu füllen
@@ -152,7 +150,7 @@ pub(crate) fn split_into_blocks(message: &str, block_size: usize, fill_block: bo
             trace!("Erstellte Block '{}'", b);
             b.replace("\u{FE8D}", "")
         })
-        .collect() // Fasst alle Blöcke im Vektor zusammen
+        .collect()
 }
 
 ///
@@ -273,9 +271,10 @@ fn helper_fun_sum_to_string(sum: &BigInt, base: &BigInt) -> String {
     while t_sum > zero {
         let digit = &t_sum % base;
         trace!("{} % {} = {} ", t_sum, base, digit);
-        trace!("--> {}\n", char::from_u32(digit.to_u32().unwrap()).unwrap());
         t_sum = &t_sum / base;
-        res.push(u32_to_c(ubig_to_u32(&digit)));
+        let char = u32_to_c(big_int_to_u32(&digit));
+        trace!("--> {}\n", char);
+        res.push(char);
     }
     res.chars().rev().collect()
 }
@@ -293,7 +292,7 @@ pub(crate) fn u32_to_c(value: u32) -> char {
 ///
 /// wandle eine ubig Zahl in einen u32 Wert um
 ///
-pub(crate) fn ubig_to_u32(value: &BigInt) -> u32 {
+pub(crate) fn big_int_to_u32(value: &BigInt) -> u32 {
     let value_str = format!("{}", value);
     match value_str.parse::<u32>() {
         Ok(x) => x,

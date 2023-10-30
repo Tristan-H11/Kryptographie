@@ -169,7 +169,10 @@ impl RsaKeygenService {
     ///
     fn generate_d(&self, e: &BigInt, phi: &BigInt) -> BigInt {
         trace!("Generiere d mit e {} und phi {}", e, phi);
-        let d = modulo_inverse(e, phi).unwrap();
+        let d = match modulo_inverse(e, phi) {
+            Ok(d) => d,
+            Err(_) => panic!("Kein d gefunden, das e * d = 1 mod phi erfüllt"),
+        };
         debug!("d ist {}", d);
         d
     }

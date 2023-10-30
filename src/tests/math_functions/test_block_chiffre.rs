@@ -6,7 +6,7 @@ mod tests {
     use crate::encryption::math_functions::block_chiffre::{
         create_blocks_from_string_decrypt, create_blocks_from_string_encrypt,
         create_string_from_blocks_decrypt, create_string_from_blocks_encrypt, split_into_blocks,
-        string_to_int_vec, sums_vec_to_string_vec, to_sum_vec, u32_to_c, ubig_to_u32,
+        string_to_int_vec, sums_vec_to_string_vec, to_sum_vec, u32_to_c, big_int_to_u32,
     };
     use crate::encryption::math_functions::number_theory::fast_exponentiation;
     use crate::encryption::rsa::rsa_keygen_service::RsaKeygenService;
@@ -303,7 +303,7 @@ mod tests {
     #[test]
     fn test_ubig_to_u32() {
         let value = big_i!(12345);
-        let result = ubig_to_u32(&value);
+        let result = big_int_to_u32(&value);
         assert_eq!(result, 12345);
     }
 }
