@@ -2,6 +2,7 @@ use druid::{
     Widget,
     widget::Flex, WidgetExt,
 };
+use druid::widget::SizedBox;
 
 use crate::gui::controller::commands::{
     CLEAR, DECRYPT, ENCRYPT, SEND_MESSAGE, SIGN, SWITCH_TO_MAIN_MENU, VERIFY,
@@ -9,11 +10,10 @@ use crate::gui::controller::commands::{
 use crate::gui::model::model::AliceModel;
 use crate::gui::view::traits::common_view_builder::{CommonViewComponents, ViewBuilder};
 
-// trait für Alice View
 pub struct AliceViewBuilder;
 
 impl ViewBuilder<AliceModel> for AliceViewBuilder {
-    fn build_view() -> Box<dyn Widget<AliceModel>> {
+    fn build_view() -> SizedBox<AliceModel> {
         //verwende gemeinsame Komponenten s.o.
         let common_components = CommonViewComponents::new();
 
@@ -50,32 +50,19 @@ impl ViewBuilder<AliceModel> for AliceViewBuilder {
         let back_button =
             common_components.create_button("Zurück zum Hauptmenü", SWITCH_TO_MAIN_MENU);
 
-        Box::new(
-            Flex::column()
-                .with_default_spacer()
-                .with_default_spacer()
-                .with_child(plaintext_entry)
-                .with_default_spacer()
-                .with_child(ciphertext_entry)
-                .with_spacer(common_components.spacer_size)
-                .with_child(encrypt_button)
-                .with_default_spacer()
-                .with_child(decrypt_button)
-                .with_spacer(common_components.spacer_size)
-                .with_child(secret_exponent_entry)
-                .with_spacer(common_components.spacer_size)
-                .with_child(calc_sign_button)
-                .with_default_spacer()
-                .with_child(check_sign_button)
-                .with_default_spacer()
-                .with_child(signature_row)
-                .with_spacer(common_components.spacer_size)
-                .with_child(send_message_button)
-                .with_spacer(common_components.spacer_size)
-                .with_child(clear_button)
-                .with_spacer(common_components.spacer_size)
-                .with_child(back_button)
-                .padding(druid::Insets::uniform(10.0)),
-        )
+        Flex::column()
+            .with_flex_spacer(common_components.flex_space)
+            .with_flex_child(plaintext_entry, 0.2)
+            .with_flex_child(ciphertext_entry, 0.2)
+            .with_flex_child(encrypt_button, 0.1)
+            .with_flex_child(decrypt_button, 0.1)
+            .with_flex_child(secret_exponent_entry, 0.2)
+            .with_flex_child(calc_sign_button, 0.1)
+            .with_flex_child(check_sign_button, 0.1)
+            .with_flex_child(signature_row, 0.2)
+            .with_flex_child(send_message_button, 0.1)
+            .with_flex_child(clear_button, 0.1)
+            .with_flex_child(back_button, 0.1)
+            .expand_height()
     }
 }

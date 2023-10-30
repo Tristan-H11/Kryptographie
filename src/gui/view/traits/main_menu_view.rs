@@ -1,7 +1,5 @@
-use druid::{
-    Widget,
-    widget::Flex,
-};
+use druid::{Widget, widget::Flex, WidgetExt};
+use druid::widget::SizedBox;
 
 use crate::gui::controller::commands::{
     CALCULATE_KEYPAIR_ALICE, CALCULATE_KEYPAIR_BOB, SWITCH_TO_ALICE, SWITCH_TO_BOB,
@@ -13,7 +11,7 @@ use crate::gui::view::traits::common_view_builder::{CommonViewComponents, ViewBu
 pub struct MainMenuViewBuilder;
 
 impl ViewBuilder<MainMenuModel> for MainMenuViewBuilder {
-    fn build_view() -> Box<dyn Widget<MainMenuModel>> {
+    fn build_view() -> SizedBox<MainMenuModel> {
         let common_components = CommonViewComponents::new(); // Gemeinsame Komponenten instanziieren
 
         // Entry-Felder
@@ -77,31 +75,19 @@ impl ViewBuilder<MainMenuModel> for MainMenuViewBuilder {
 
 
         // UI Struktur
-        Box::new(
-            Flex::column()
-                .with_default_spacer()
-                .with_default_spacer()
-                .with_child(modul_width_entry)
-                .with_default_spacer()
-                .with_child(miller_rabin_entry)
-                .with_default_spacer()
-                .with_child(basis_entry)
-                .with_spacer(common_components.spacer_size)
-                .with_child(calculate_keypair_alice)
-                .with_default_spacer()
-                .with_child(calculate_keypair_bob)
-                .with_spacer(common_components.spacer_size)
-                .with_child(public_exponent_alice_entry)
-                .with_default_spacer()
-                .with_child(modul_alice_entry)
-                .with_default_spacer()
-                .with_child(public_exponent_bob_entry)
-                .with_default_spacer()
-                .with_child(modul_bob_entry)
-                .with_spacer(common_components.spacer_size)
-                .with_child(open_alice_button)
-                .with_default_spacer()
-                .with_child(open_bob_button),
-        )
+        Flex::column()
+            .with_flex_spacer(common_components.flex_space)
+            .with_flex_child(modul_width_entry, 0.2)
+            .with_flex_child(miller_rabin_entry, 0.2)
+            .with_flex_child(basis_entry, 0.2)
+            .with_flex_child(calculate_keypair_alice, 0.1)
+            .with_flex_child(calculate_keypair_bob, 0.1)
+            .with_flex_child(public_exponent_alice_entry, 0.2)
+            .with_flex_child(modul_alice_entry, 0.2)
+            .with_flex_child(public_exponent_bob_entry, 0.2)
+            .with_flex_child(modul_bob_entry, 0.2)
+            .with_flex_child(open_alice_button, 0.1)
+            .with_flex_child(open_bob_button, 0.1)
+            .expand()
     }
 }
