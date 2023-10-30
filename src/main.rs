@@ -10,7 +10,7 @@ use simple_logger::SimpleLogger;
 
 fn main() {
     SimpleLogger::new()
-        .with_level(LevelFilter::Trace)
+        .with_level(LevelFilter::Info)
         .with_colors(true)
         .init()
         .unwrap();
