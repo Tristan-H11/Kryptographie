@@ -52,17 +52,8 @@ impl RsaKeygenService {
             "Generiere Schlüsselpaar mit key_size {} und Miller-Rabin-Iterations {}",
             self.key_size, miller_rabin_iterations
         );
-        let prim_size = self.key_size / 2;
-        let prime_one = self.generate_prime(prim_size, miller_rabin_iterations);
-        let mut prime_two = self.generate_prime(prim_size, miller_rabin_iterations);
-        while prime_one == prime_two {
-            trace!(
-                "Generierter prime_one {} ist gleich prime_two {}. Starte neuen Versuch",
-                prime_one,
-                prime_two
-            );
-            prime_two = self.generate_prime(prim_size, miller_rabin_iterations);
-        }
+
+        let (prime_one, prime_two) = self.get_distinct_primes(miller_rabin_iterations);
 
         let n = &prime_one * &prime_two;
         debug!("n ist {}", n);
@@ -74,6 +65,27 @@ impl RsaKeygenService {
         let private_key = PrivateKey::new(d, n);
         debug!("Schlüsselpaar generiert");
         (public_key, private_key)
+    }
+
+    ///
+    /// Generiert zwei verschiedene Primzahlen mit der angegebenen Breite.
+    ///
+    fn get_distinct_primes(&self, miller_rabin_iterations: usize) -> (BigInt, BigInt) {
+        let prim_size = self.key_size / 2;
+
+        let (prime_one, mut prime_two) = rayon::join(
+            || self.generate_prime(prim_size, miller_rabin_iterations),
+            || self.generate_prime(prim_size, miller_rabin_iterations),
+        );
+        while prime_one == prime_two {
+            trace!(
+                "Generierter prime_one {} ist gleich prime_two {}. Starte neuen Versuch",
+                prime_one,
+                prime_two
+            );
+            prime_two = self.generate_prime(prim_size, miller_rabin_iterations);
+        }
+        (prime_one, prime_two)
     }
 
     ///
