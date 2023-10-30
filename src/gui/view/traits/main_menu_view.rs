@@ -18,18 +18,21 @@ impl ViewBuilder<MainMenuModel> for MainMenuViewBuilder {
         let modul_width_entry = common_components.create_text_entry(
             "Breite des Moduls n: ",
             "z.B. 4096",
+            false,
             MainMenuModel::modul_width,
         );
 
         let miller_rabin_entry = common_components.create_text_entry(
             "Miller-Rabin Iterationen: ",
             "z.B. 100",
+            false,
             MainMenuModel::miller_rabin_iterations,
         );
 
         let basis_entry = common_components.create_text_entry(
             "Basis für Kalkulationen: ",
             "default = 55296",
+            false,
             MainMenuModel::basis_length,
         );
 
@@ -52,24 +55,28 @@ impl ViewBuilder<MainMenuModel> for MainMenuViewBuilder {
         let public_exponent_bob_entry = common_components.create_text_entry(
             "Öffentlicher Exponent Bob: ",
             "wird automatisch berechnet",
+            true,
             MainMenuModel::public_exponent_bob,
         );
 
         let public_exponent_alice_entry = common_components.create_text_entry(
             "Öffentlicher Exponent Alice: ",
             "wird automatisch berechnet",
+            true,
             MainMenuModel::public_exponent_alice,
         );
 
         let modul_alice_entry = common_components.create_text_entry(
             "Modul Alice: ",
             "wird automatisch berechnet",
+            true,
             MainMenuModel::modul_alice,
         );
 
         let modul_bob_entry = common_components.create_text_entry(
             "Modul Bob: ",
             "wird automatisch berechnet",
+            true,
             MainMenuModel::modul_bob,
         );
 

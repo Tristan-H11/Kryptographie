@@ -20,23 +20,26 @@ impl ViewBuilder<AliceModel> for AliceViewBuilder {
         let plaintext_entry = common_components.create_text_entry(
             "Klartext: ",
             "z.B. Hallo wie geht es dir?",
+            false,
             AliceModel::plaintext,
         );
 
         let ciphertext_entry = common_components.create_text_entry(
             "Geheimtext: ",
             "Erzeugt durch Berechnung.",
+            false,
             AliceModel::ciphertext,
         );
 
         let secret_exponent_entry = common_components.create_text_entry(
             "Geheimer Exponent: ",
             "wird automatisch berechnet",
+            true,
             AliceModel::private_exponent,
         );
 
         let signature_row =
-            common_components.create_text_entry("Signatur: ", "", AliceModel::signature);
+            common_components.create_text_entry("Signatur: ", "", true,AliceModel::signature);
 
         let encrypt_button =
             common_components.create_button("Mit Bobs PublicKey verschlüsseln", ENCRYPT);

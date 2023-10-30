@@ -33,6 +33,7 @@ impl CommonViewComponents {
         &self,
         label_text: &str,
         placeholder: &str,
+        disable_editing: bool,
         lens: impl druid::Lens<Model, String> + 'static,
     ) -> impl Widget<Model> {
         Flex::row()
@@ -46,6 +47,11 @@ impl CommonViewComponents {
                 TextBox::multiline()
                     .with_placeholder(placeholder)
                     .expand()
+                    // Deaktiviert die Textbox, wenn disable_editing true ist
+                    .disabled_if({
+                        let disable = disable_editing.clone();
+                        move |_, _| disable
+                    })
                     .lens(lens),
                 (1.0 - self.flex_space) * self.right_space,
             )

@@ -19,23 +19,26 @@ impl ViewBuilder<BobModel> for BobViewBuilder {
         let plaintext_entry = common_components.create_text_entry(
             "Klartext: ",
             "z.B. Hallo wie geht es dir?",
+            false,
             BobModel::plaintext,
         );
 
         let ciphertext_entry = common_components.create_text_entry(
             "Geheimtext: ",
             "Erzeugt durch Berechnung.",
+            false,
             BobModel::ciphertext,
         );
 
         let secret_exponent_entry = common_components.create_text_entry(
             "Geheimer Exponent: ",
             "wird automatisch berechnet",
+            true,
             BobModel::private_exponent,
         );
 
         let signature_row =
-            common_components.create_text_entry("Signatur: ", "Signatur", BobModel::signature);
+            common_components.create_text_entry("Signatur: ", "Signatur", true, BobModel::signature);
 
         // Buttons
         let encrypt_button =
