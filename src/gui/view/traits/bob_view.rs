@@ -1,13 +1,12 @@
+use druid::{
+    Widget, widget::Flex, WidgetExt,
+};
+
 use crate::gui::controller::commands::{
     CLEAR, DECRYPT, ENCRYPT, SEND_MESSAGE, SIGN, SWITCH_TO_MAIN_MENU, VERIFY,
 };
 use crate::gui::model::model::BobModel;
 use crate::gui::view::traits::common_view_builder::{CommonViewComponents, ViewBuilder};
-use crate::gui::view::traits::key_text_wrapper::{KeyTextWrapper, TextWrapper};
-use druid::{
-    widget::{Flex, Label},
-    Env, Widget, WidgetExt,
-};
 
 // Trait für Bob View
 pub struct BobViewBuilder;
@@ -15,15 +14,6 @@ pub struct BobViewBuilder;
 impl ViewBuilder<BobModel> for BobViewBuilder {
     fn build_view() -> Box<dyn Widget<BobModel>> {
         let common_components = CommonViewComponents::new();
-
-        // Label
-        let secret_exponent_label = Label::new(|data: &BobModel, _env: &Env| -> String {
-            let wrapper = KeyTextWrapper;
-            let wrapped_text = wrapper
-                .key_text_wrapper(&format!("Geheimer Exponent: {}", data.private_exponent), 75);
-            format!("Geheimer Exponent: \n{}", wrapped_text)
-        })
-        .expand_width();
 
         // Entry-Felder und Labels
         let plaintext_entry = common_components.create_text_entry(
@@ -36,6 +26,12 @@ impl ViewBuilder<BobModel> for BobViewBuilder {
             "Geheimtext: ",
             "Erzeugt durch Berechnung.",
             BobModel::ciphertext,
+        );
+
+        let secret_exponent_entry = common_components.create_text_entry(
+            "Geheimer Exponent: ",
+            "wird automatisch berechnet",
+            BobModel::private_exponent,
         );
 
         let signature_row =
@@ -59,8 +55,6 @@ impl ViewBuilder<BobModel> for BobViewBuilder {
             Flex::column()
                 .with_default_spacer()
                 .with_default_spacer()
-                .with_child(secret_exponent_label)
-                .with_spacer(common_components.spacer_size)
                 .with_child(plaintext_entry)
                 .with_default_spacer()
                 .with_child(ciphertext_entry)
@@ -68,6 +62,8 @@ impl ViewBuilder<BobModel> for BobViewBuilder {
                 .with_child(encrypt_button)
                 .with_default_spacer()
                 .with_child(decrypt_button)
+                .with_spacer(common_components.spacer_size)
+                .with_child(secret_exponent_entry)
                 .with_spacer(common_components.spacer_size)
                 .with_child(calc_sign_button)
                 .with_default_spacer()
