@@ -26,14 +26,14 @@ impl ViewBuilder<AliceModel> for AliceViewBuilder {
 
         let ciphertext_entry = common_components.create_text_entry(
             "Geheimtext: ",
-            "Erzeugt durch Berechnung.",
+            "Wird automatisch berechnet",
             false,
             AliceModel::ciphertext,
         );
 
         let secret_exponent_entry = common_components.create_text_entry(
             "Geheimer Exponent: ",
-            "wird automatisch berechnet",
+            "Wird automatisch berechnet",
             true,
             AliceModel::private_exponent,
         );

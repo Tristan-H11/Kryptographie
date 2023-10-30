@@ -25,14 +25,14 @@ impl ViewBuilder<BobModel> for BobViewBuilder {
 
         let ciphertext_entry = common_components.create_text_entry(
             "Geheimtext: ",
-            "Erzeugt durch Berechnung.",
+            "Wird automatisch berechnet",
             false,
             BobModel::ciphertext,
         );
 
         let secret_exponent_entry = common_components.create_text_entry(
             "Geheimer Exponent: ",
-            "wird automatisch berechnet",
+            "Wird automatisch berechnet",
             true,
             BobModel::private_exponent,
         );

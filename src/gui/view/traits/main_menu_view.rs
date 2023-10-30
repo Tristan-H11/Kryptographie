@@ -31,7 +31,7 @@ impl ViewBuilder<MainMenuModel> for MainMenuViewBuilder {
 
         let basis_entry = common_components.create_text_entry(
             "Basis für Kalkulationen: ",
-            "default = 55296",
+            "Der Wert des höchsten Unicode-Zeichens exklusive, z.B. 55926",
             false,
             MainMenuModel::basis_length,
         );
@@ -54,28 +54,28 @@ impl ViewBuilder<MainMenuModel> for MainMenuViewBuilder {
 
         let public_exponent_bob_entry = common_components.create_text_entry(
             "Öffentlicher Exponent Bob: ",
-            "wird automatisch berechnet",
+            "Wird automatisch berechnet",
             true,
             MainMenuModel::public_exponent_bob,
         );
 
         let public_exponent_alice_entry = common_components.create_text_entry(
             "Öffentlicher Exponent Alice: ",
-            "wird automatisch berechnet",
+            "Wird automatisch berechnet",
             true,
             MainMenuModel::public_exponent_alice,
         );
 
         let modul_alice_entry = common_components.create_text_entry(
             "Modul Alice: ",
-            "wird automatisch berechnet",
+            "Wird automatisch berechnet",
             true,
             MainMenuModel::modul_alice,
         );
 
         let modul_bob_entry = common_components.create_text_entry(
             "Modul Bob: ",
-            "wird automatisch berechnet",
+            "Wird automatisch berechnet",
             true,
             MainMenuModel::modul_bob,
         );
