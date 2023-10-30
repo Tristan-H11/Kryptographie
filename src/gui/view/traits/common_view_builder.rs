@@ -17,11 +17,15 @@ pub struct CommonViewComponents {
 }
 impl CommonViewComponents {
     pub fn new() -> Self {
+        let width_entry_label = 200.0;
+        let width_textbox = 550.0;
+        let width_button = width_entry_label + width_textbox;
+        let spacer_size = 40.0;
         Self {
-            fixed_width_entry_label: 200.0,
-            fixed_width_textbox: 400.0,
-            fixed_width_button: 200.0 + 400.0,
-            spacer_size: 40.0,
+            fixed_width_entry_label: width_entry_label,
+            fixed_width_textbox: width_textbox,
+            fixed_width_button: width_button,
+            spacer_size,
         }
     }
 
