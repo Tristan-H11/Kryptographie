@@ -1,13 +1,13 @@
+use druid::{
+    Widget,
+    widget::Flex,
+};
+
 use crate::gui::controller::commands::{
     CALCULATE_KEYPAIR_ALICE, CALCULATE_KEYPAIR_BOB, SWITCH_TO_ALICE, SWITCH_TO_BOB,
 };
 use crate::gui::model::model::MainMenuModel;
 use crate::gui::view::traits::common_view_builder::{CommonViewComponents, ViewBuilder};
-use crate::gui::view::traits::key_text_wrapper::{KeyTextWrapper, TextWrapper};
-use druid::{
-    widget::{Flex, Label},
-    Env, Widget, WidgetExt,
-};
 
 // trait für Hauptmenü
 pub struct MainMenuViewBuilder;
