@@ -78,4 +78,13 @@ impl RandomElsner {
         let step = (factor * &self.range).to_bigint().unwrap();
         &self.a + step
     }
+
+    ///
+    /// Gibt eine zufällige ungerade Zahl im Bereich von a bis b zurück.
+    ///
+    /// # Rückgabe
+    /// * BigUint
+    pub fn take_uneven(&mut self) -> BigInt {
+        self.take() | BigInt::one()
+    }
 }
