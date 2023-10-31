@@ -8,28 +8,28 @@ pub trait ViewBuilder<Model> {
     fn build_view() -> SizedBox<Model>;
 }
 
-pub struct CommonViewComponents {
-    pub padding: f64,
-    pub flex_space: f64,
-    pub left_space: f64,
-    pub right_space: f64,
+pub struct CommonViewComponentsDefault {
+    pub padding_default: f64,
+    pub flex_space_default: f64,
+    pub left_space_default: f64,
+    pub right_space_default: f64,
 }
 
-impl CommonViewComponents {
+impl CommonViewComponentsDefault {
     pub fn new() -> Self {
         let flex_space = 0.025;
-        let left_space = 0.2;
+        let left_space = 0.1;
         let right_space = 0.8;
         let padding = 10.0;
         Self {
-            flex_space,
-            padding,
-            left_space,
-            right_space,
+            flex_space_default: flex_space,
+            padding_default: padding,
+            left_space_default: left_space,
+            right_space_default: right_space,
         }
     }
 
-    pub fn create_text_entry<Model: druid::Data>(
+    pub fn create_text_entry_default<Model: druid::Data>(
         &self,
         label_text: &str,
         placeholder: &str,
@@ -37,11 +37,11 @@ impl CommonViewComponents {
         lens: impl druid::Lens<Model, String> + 'static,
     ) -> impl Widget<Model> {
         Flex::row()
-            .with_flex_spacer(self.flex_space)
+            .with_flex_spacer(self.flex_space_default)
             .with_flex_child(
                 Label::new(label_text)
                     .expand(),
-                (1.0 - self.flex_space) * self.left_space,
+                (1.0 - self.flex_space_default) * self.left_space_default,
             )
             .with_flex_child(
                 TextBox::multiline()
@@ -53,30 +53,30 @@ impl CommonViewComponents {
                         move |_, _| disable
                     })
                     .lens(lens),
-                (1.0 - self.flex_space) * self.right_space,
+                (1.0 - self.flex_space_default) * self.right_space_default,
             )
-            .with_flex_spacer(self.flex_space)
-            .padding(self.padding)
+            .with_flex_spacer(self.flex_space_default)
+            .padding(self.padding_default)
     }
 
-    pub fn create_button<Model: druid::Data>(
+    pub fn create_button_default<Model: druid::Data>(
         &self,
         label_text: &str,
         command: impl Into<druid::Command> + Clone + 'static,
     ) -> impl Widget<Model> {
         let command_clone = command.clone();
         Flex::row()
-            .with_flex_spacer(self.flex_space)
-            .with_flex_spacer( (1.0 - self.flex_space) * self.left_space)
+            .with_flex_spacer(self.flex_space_default)
+            .with_flex_spacer( (1.0 - self.flex_space_default) * self.left_space_default)
             .with_flex_child(
                 Button::new(label_text)
                     .on_click(move |ctx, _data: &mut Model, _env| {
                         ctx.submit_command(command_clone.clone().into());
                     })
                     .expand(),
-                (1.0 - self.flex_space) * self.right_space,
+                (1.0 - self.flex_space_default) * self.right_space_default,
             )
-            .with_flex_spacer(self.flex_space)
-            .padding(self.padding)
+            .with_flex_spacer(self.flex_space_default)
+            .padding(self.padding_default)
     }
 }
