@@ -94,8 +94,36 @@ use crate::gui::controller::controller::AppController;
 use crate::gui::model::model::{AppState, View};
 use crate::gui::view::view::{build_alice_view, build_bob_view, build_haupt_menu};
 use druid::{widget::ViewSwitcher, Widget, WidgetExt};
+use druid::{AppLauncher, Color, FontDescriptor, theme, WindowDesc};
 
-// UI Bau Funktion
+pub fn start_gui() {
+    let main_window = WindowDesc::new(build_ui())
+        .title("RSA-Simulator")
+        .resizable(true);
+    let initial_state = AppState::default();
+    AppLauncher::with_window(main_window)
+        .configure_env(|env, _| {
+            let background_color = Color::from_hex_str("#2a2a2a").unwrap();
+            let button_color = Color::from_hex_str("#607d8b").unwrap();
+            let button_color_pressed = Color::from_hex_str("#2b3f49").unwrap();
+            let text_color = Color::from_hex_str("#FFFFFF").unwrap();
+
+            env.set(theme::TEXTBOX_BORDER_RADIUS, 0.0);
+            env.set(theme::TEXTBOX_BORDER_WIDTH, 0.0);
+
+            env.set(theme::WINDOW_BACKGROUND_COLOR, background_color);
+            env.set(theme::TEXT_COLOR, text_color);
+            env.set(theme::BUTTON_LIGHT, button_color);
+            env.set(theme::BUTTON_DARK, button_color_pressed);
+            env.set(theme::BUTTON_BORDER_RADIUS, 0.0);
+            env.set(theme::BUTTON_BORDER_WIDTH, 0.0);
+
+            env.set(theme::UI_FONT, FontDescriptor::default().with_size(14.0));
+        })
+        .launch(initial_state)
+        .expect("Failed to launch application");
+}
+
 pub fn build_ui() -> impl Widget<AppState> {
     ViewSwitcher::new(
         |data: &AppState, _env| data.current_view.clone(),
