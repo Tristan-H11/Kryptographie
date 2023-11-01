@@ -83,7 +83,7 @@ mod tests {
 
     #[test]
     fn modulo_inverse_test() {
-        //assert_eq!(modulo_inverse(big_i!(1), big_i!(3)).unwrap(), big_i!(1));
+        //assert_eq!(modulo_inverse(&big_i!(1), &big_i!(3)).unwrap(), big_i!(1));
         assert_eq!(modulo_inverse(&big_i!(5), &big_i!(11)).unwrap(), big_i!(9));
         assert_eq!(
             modulo_inverse(&big_i!(315), &big_i!(661643)).unwrap(),
@@ -113,6 +113,21 @@ mod tests {
         assert_eq!(
             extended_euclid(&big_i!(315), &big_i!(661643)),
             (big_i!(1), big_i!(-319269), big_i!(152))
+        );
+        assert_eq!(
+            extended_euclid(&big_i!(315), &big_i!(661643)),
+            (big_i!(1), big_i!(-319269), big_i!(152))
+        );
+        assert_eq!(
+            extended_euclid(
+                &BigInt::from_str("485398853520739824211578869461").unwrap(),
+                &BigInt::from_str("79617341660363802320192939486040130094939703771377").unwrap()
+            ),
+            (
+                big_i!(1),
+                BigInt::from_str("7173228757438794445922076835963679049602847038123").unwrap(),
+                big_i!(-43732645957409398462249346726)
+            )
         );
     }
 
