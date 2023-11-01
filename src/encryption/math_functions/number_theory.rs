@@ -29,13 +29,6 @@ pub fn fast_exponentiation(base: &BigInt, exponent: &BigInt, modul: &BigInt) -> 
     if modul.is_one() {
         return BigInt::zero();
     }
-    if exponent.is_zero() {
-        return BigInt::one();
-    }
-    if exponent.is_one() {
-        return base.rem_euclid(modul);
-    }
-
     let mut result = BigInt::one();
     let mut base = base.clone();
     let mut exp = exponent.clone();
