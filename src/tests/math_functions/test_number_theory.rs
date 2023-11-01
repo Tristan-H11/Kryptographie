@@ -6,7 +6,7 @@ mod tests {
 
     use crate::big_i;
     use crate::encryption::math_functions::number_theory::{
-        fast_exponentiation, miller_rabin, modulo_inverse,
+        extended_euclid, fast_exponentiation, miller_rabin, modulo_inverse,
     };
 
     #[test]
@@ -98,6 +98,22 @@ mod tests {
             BigInt::from_str("7173228757438794445922076835963679049602847038123").unwrap()
         );
         assert!(modulo_inverse(&big_i!(78), &big_i!(99)).is_err());
+    }
+
+    #[test]
+    fn extended_euclid_test() {
+        assert_eq!(
+            extended_euclid(&big_i!(6), &big_i!(11)),
+            (big_i!(1), big_i!(2), big_i!(-1))
+        );
+        assert_eq!(
+            extended_euclid(&big_i!(78), &big_i!(99)),
+            (big_i!(3), big_i!(14), big_i!(-11))
+        );
+        assert_eq!(
+            extended_euclid(&big_i!(315), &big_i!(661643)),
+            (big_i!(1), big_i!(-319269), big_i!(152))
+        );
     }
 
     #[test]
