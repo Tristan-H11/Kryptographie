@@ -36,15 +36,18 @@ pub fn fast_exponentiation(base: &BigInt, exponent: &BigInt, modul: &BigInt) -> 
         return base.rem_euclid(modul);
     }
 
-    // Berechnung des Zwischenschrittes mit halbiertem Exponenten.
-    let base_to_square = fast_exponentiation(base, &exponent.half(), modul);
-    return if exponent.is_even() {
-        // Ist der Exponent gerade, so wird nur quadriert.
-        base_to_square.pow(2).rem_euclid(modul)
-    } else {
-        // Ist der Exponent ungerade, wird die Basis erneut als Faktor herangezogen.
-        (base_to_square.pow(2) * base).rem_euclid(modul)
-    };
+    let mut result = BigInt::one();
+    let mut base = base.clone();
+    let mut exp = exponent.clone();
+
+    while !exp.is_zero() {
+        if exp.is_odd() {
+            result = (result * &base).rem_euclid(modul);
+        }
+        base = (&base * &base).rem_euclid(modul);
+        exp.half_assign();
+    }
+    result
 }
 
 /// Berechnet das Inverse-Element in einem Restklassenring.
