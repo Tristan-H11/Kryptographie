@@ -1,7 +1,7 @@
 use druid::{
     Widget, widget::Flex, WidgetExt,
 };
-use druid::widget::SizedBox;
+use druid::widget::{Label, SizedBox};
 
 use crate::gui::controller::commands::{
     CLEAR, DECRYPT, ENCRYPT, SEND_MESSAGE, SIGN, SWITCH_TO_MAIN_MENU, VERIFY,
@@ -37,8 +37,26 @@ impl ViewBuilder<BobModel> for BobViewBuilder {
             BobModel::private_exponent,
         );
 
-        let signature_row =
-            common_components.create_text_entry_default("Signatur: ", "Signatur", true, BobModel::signature_msg);
+        //todo -- wenn gui auf neue structs gezogen wird, den status bereich hier schick machen
+
+        let signature_label = Label::new("Signatur: ");
+        let signature_entry = common_components.create_text_entry_default(
+            "",
+            "",
+            true,
+            BobModel::signature_msg,
+        );
+        let signature_status_label = Label::dynamic(|data: &BobModel, _| {
+            if data.signature_status {
+                "Status: Gültig".to_string()
+            } else {
+                "Status: Ungültig".to_string()
+            }
+        });
+        let signature_row = Flex::row()
+            .with_child(signature_label)
+            .with_flex_child(signature_entry, 1.0)
+            .with_child(signature_status_label);
 
         // Buttons
         let encrypt_button =
