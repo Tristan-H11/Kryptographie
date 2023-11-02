@@ -28,11 +28,10 @@ impl RandomElsner {
     /// # Rückgabe
     /// * RandomElsner
     ///
-    pub fn new(a: &BigInt, b: &BigInt) -> Self {
+    pub fn new(a: &BigInt, b: &BigInt, m: &BigInt) -> Self {
         let sqrt_m;
         loop {
-            let m = BigDecimal::from(random::<u128>());
-            match m.sqrt() {
+            match big_d!(m.clone()).sqrt() {
                 Some(sqrt) => {
                     if sqrt.is_not_divisible_by(&BigDecimal::one()) {
                         sqrt_m = sqrt;
@@ -50,18 +49,6 @@ impl RandomElsner {
         };
     }
 
-    ///
-    /// Konstruktor für Testfälle, um deterministische Werte zu erhalten.
-    ///
-    #[cfg(test)]
-    pub fn new_deterministic(sqrt_m: BigDecimal, a: &BigInt, b: &BigInt) -> Self {
-        return Self {
-            sqrt_m,
-            n: BigInt::zero(),
-            a: a.clone(),
-            range: big_d!(BigInt::from(b - a + BigInt::one())),
-        };
-    }
 
     ///
     /// Gibt eine zufällige Zahl im Bereich von a bis b zurück.
