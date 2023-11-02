@@ -16,18 +16,20 @@ pub struct MainMenuModel {
 
 #[derive(Clone, Data, Lens)]
 pub struct AliceModel {
-    pub(crate) plaintext: String,
-    pub(crate) ciphertext: String,
-    pub(crate) signature: String,
+    pub(crate) plaintext_msg: String,
+    pub(crate) ciphre_msg: String,
+    pub(crate) hold_msg_for_sig: String, //just in backend
+    pub(crate) signature_msg: String,
     pub(crate) signature_status: bool,
     pub(crate) private_exponent: String,
 }
 
 #[derive(Clone, Data, Lens)]
 pub struct BobModel {
-    pub(crate) plaintext: String,
-    pub(crate) ciphertext: String,
-    pub(crate) signature: String,
+    pub(crate) plaintext_msg: String,
+    pub(crate) ciphre_msg: String,
+    pub(crate) hold_msg_for_sig: String, //just in backend
+    pub(crate) signature_msg: String,
     pub(crate) signature_status: bool,
     pub(crate) private_exponent: String,
 }
@@ -63,16 +65,18 @@ impl Default for AppState {
                 modul_bob: String::new(),
             },
             alice: AliceModel {
-                plaintext: String::new(),
-                ciphertext: String::new(),
-                signature: String::new(),
+                plaintext_msg: String::new(),
+                ciphre_msg: String::new(),
+                hold_msg_for_sig: String::new(),
+                signature_msg: String::new(),
                 signature_status: false,
                 private_exponent: String::new(),
             },
             bob: BobModel {
-                plaintext: String::new(),
-                ciphertext: String::new(),
-                signature: String::new(),
+                plaintext_msg: String::new(),
+                ciphre_msg: String::new(),
+                hold_msg_for_sig: String::new(),
+                signature_msg: String::new(),
                 signature_status: false,
                 private_exponent: String::new(),
             },
