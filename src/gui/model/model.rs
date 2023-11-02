@@ -18,7 +18,6 @@ pub struct MainMenuModel {
 pub struct AliceModel {
     pub(crate) plaintext_msg: String,
     pub(crate) ciphre_msg: String,
-    pub(crate) hold_msg_for_sig: String, //just in backend
     pub(crate) signature_msg: String,
     pub(crate) signature_status: bool,
     pub(crate) private_exponent: String,
@@ -28,7 +27,6 @@ pub struct AliceModel {
 pub struct BobModel {
     pub(crate) plaintext_msg: String,
     pub(crate) ciphre_msg: String,
-    pub(crate) hold_msg_for_sig: String, //just in backend
     pub(crate) signature_msg: String,
     pub(crate) signature_status: bool,
     pub(crate) private_exponent: String,
@@ -67,7 +65,6 @@ impl Default for AppState {
             alice: AliceModel {
                 plaintext_msg: String::new(),
                 ciphre_msg: String::new(),
-                hold_msg_for_sig: String::new(),
                 signature_msg: String::new(),
                 signature_status: false,
                 private_exponent: String::new(),
@@ -75,7 +72,6 @@ impl Default for AppState {
             bob: BobModel {
                 plaintext_msg: String::new(),
                 ciphre_msg: String::new(),
-                hold_msg_for_sig: String::new(),
                 signature_msg: String::new(),
                 signature_status: false,
                 private_exponent: String::new(),
