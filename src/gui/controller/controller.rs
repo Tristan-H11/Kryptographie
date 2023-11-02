@@ -40,7 +40,7 @@ impl Default for AppController {
     ///
     /// Erstellt eine neue Instanz des AppControllers mit 1er Werten für die Keys.
     ///
-    fn default() -> Self {
+    fn default() -> Self { //todo -- auf realistische kleine Schlüssel umstellen und nicht auf 1
         debug!("Erstelle Default-AppController");
         AppController {
             alice_private_key: PrivateKey::new(big_i!(1), big_i!(1)),
@@ -208,11 +208,11 @@ impl AppController {
     ///
     fn encrypt_alice(&mut self, app_state: &mut AppState) {
         info!("Verschlüssle Nachricht von Alice");
-        let plaintext = app_state.alice.plaintext.clone();
+        let plaintext = app_state.alice.plaintext_msg.clone();
         let encrypted = self
             .bob_public_key
             .encrypt(&plaintext, Self::parse_base(app_state));
-        app_state.alice.ciphertext = encrypted;
+        app_state.alice.ciphre_msg = encrypted;
     }
 
     ///
@@ -220,9 +220,9 @@ impl AppController {
     ///
     fn sign_alice(&mut self, _app_state: &mut AppState) {
         info!("Signiere Nachricht von Alice");
-        let message = _app_state.alice.plaintext.clone();
+        let message = _app_state.alice.plaintext_msg.clone();
         let signed = self.alice_private_key.sign(&message);
-        _app_state.alice.signature = signed;
+        _app_state.alice.signature_msg = signed;
     }
 
     ///
@@ -230,8 +230,8 @@ impl AppController {
     ///
     fn alice_verify_message_from_bob(&mut self, _app_state: &mut AppState) {
         info!("Verifiziere Nachricht von Bob");
-        let message = _app_state.alice.plaintext.clone();
-        let signature = _app_state.alice.signature.clone();
+        let message = _app_state.alice.plaintext_msg.clone();
+        let signature = _app_state.alice.signature_msg.clone();
         let verified = self.bob_public_key.verify(&signature, &message);
         _app_state.alice.signature_status = verified;
     }
@@ -241,11 +241,11 @@ impl AppController {
     ///
     fn decrypt_alice(&mut self, app_state: &mut AppState) {
         info!("Entschlüssle Nachricht von Bob");
-        let cipher_text = app_state.alice.ciphertext.clone();
+        let cipher_text = app_state.alice.ciphre_msg.clone();
         let decrypted = self
             .alice_private_key
             .decrypt(&cipher_text, Self::parse_base(app_state));
-        app_state.alice.plaintext = decrypted;
+        app_state.alice.plaintext_msg = decrypted;
     }
 
     ///
@@ -253,10 +253,10 @@ impl AppController {
     ///
     fn send_message_alice(&mut self, app_state: &mut AppState) {
         info!("Sende Nachricht von Alice an Bob");
-        let cipher_text = &app_state.alice.ciphertext;
-        app_state.bob.ciphertext = cipher_text.clone();
-        let signature = &app_state.alice.signature;
-        app_state.bob.signature = signature.clone();
+        let cipher_text = &app_state.alice.ciphre_msg;
+        app_state.bob.ciphre_msg = cipher_text.clone();
+        let signature = &app_state.alice.signature_msg;
+        app_state.bob.signature_msg = signature.clone();
         self.clear_alice(app_state);
     }
 
@@ -265,9 +265,9 @@ impl AppController {
     ///
     fn clear_alice(&mut self, app_state: &mut AppState) {
         info!("Lösche Felder von Alice");
-        app_state.alice.plaintext = String::new();
-        app_state.alice.ciphertext = String::new();
-        app_state.alice.signature = String::new();
+        app_state.alice.plaintext_msg = String::new();
+        app_state.alice.ciphre_msg = String::new();
+        app_state.alice.signature_msg = String::new();
     }
 
     ///
@@ -275,11 +275,11 @@ impl AppController {
     ///
     fn encrypt_bob(&mut self, app_state: &mut AppState) {
         info!("Verschlüssle Nachricht von Bob");
-        let plaintext = app_state.bob.plaintext.clone();
+        let plaintext = app_state.bob.plaintext_msg.clone();
         let encrypted = self
             .alice_public_key
             .encrypt(&plaintext, Self::parse_base(app_state));
-        app_state.bob.ciphertext = encrypted;
+        app_state.bob.ciphre_msg = encrypted;
     }
 
     ///
@@ -287,9 +287,9 @@ impl AppController {
     ///
     fn sign_bob(&mut self, _app_state: &mut AppState) {
         info!("Signiere Nachricht von Bob");
-        let message = _app_state.bob.plaintext.clone();
+        let message = _app_state.bob.plaintext_msg.clone();
         let signed = self.bob_private_key.sign(&message);
-        _app_state.bob.signature = signed;
+        _app_state.bob.signature_msg = signed;
     }
 
     ///
@@ -297,8 +297,8 @@ impl AppController {
     ///
     fn bob_verify_message_from_alice(&mut self, _app_state: &mut AppState) {
         info!("Verifiziere Nachricht von Alice");
-        let message = _app_state.bob.plaintext.clone();
-        let signature = _app_state.bob.signature.clone();
+        let message = _app_state.bob.plaintext_msg.clone();
+        let signature = _app_state.bob.signature_msg.clone();
         let verified = self.alice_public_key.verify(&signature, &message);
         _app_state.bob.signature_status = verified;
     }
@@ -308,11 +308,11 @@ impl AppController {
     ///
     fn decrypt_bob(&mut self, app_state: &mut AppState) {
         info!("Entschlüssle Nachricht von Alice");
-        let cipher_text = app_state.bob.ciphertext.clone();
+        let cipher_text = app_state.bob.ciphre_msg.clone();
         let decrypted = self
             .bob_private_key
             .decrypt(&cipher_text, Self::parse_base(app_state));
-        app_state.bob.plaintext = decrypted;
+        app_state.bob.plaintext_msg = decrypted;
     }
 
     ///
@@ -320,10 +320,10 @@ impl AppController {
     ///
     fn send_message_bob(&mut self, app_state: &mut AppState) {
         info!("Sende Nachricht von Bob an Alice");
-        let cipher_text = &app_state.bob.ciphertext;
-        app_state.alice.ciphertext = cipher_text.clone();
-        let signature = &app_state.bob.signature;
-        app_state.alice.signature = signature.clone();
+        let cipher_text = &app_state.bob.ciphre_msg;
+        app_state.alice.ciphre_msg = cipher_text.clone();
+        let signature = &app_state.bob.signature_msg;
+        app_state.alice.signature_msg = signature.clone();
         self.clear_bob(app_state);
     }
 
@@ -332,8 +332,8 @@ impl AppController {
     ///
     fn clear_bob(&mut self, app_state: &mut AppState) {
         info!("Lösche Felder von Bob");
-        app_state.bob.plaintext = String::new();
-        app_state.bob.ciphertext = String::new();
-        app_state.bob.signature = String::new();
+        app_state.bob.plaintext_msg = String::new();
+        app_state.bob.ciphre_msg = String::new();
+        app_state.bob.signature_msg = String::new();
     }
 }
