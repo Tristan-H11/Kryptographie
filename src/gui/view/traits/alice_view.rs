@@ -21,14 +21,14 @@ impl ViewBuilder<AliceModel> for AliceViewBuilder {
             "Klartext: ",
             "z.B. Hallo wie geht es dir?",
             false,
-            AliceModel::plaintext,
+            AliceModel::plaintext_msg,
         );
 
         let ciphertext_entry = common_components.create_text_entry_default(
             "Geheimtext: ",
             "Wird automatisch berechnet",
             false,
-            AliceModel::ciphertext,
+            AliceModel::ciphre_msg,
         );
 
         let secret_exponent_entry = common_components.create_text_entry_default(
@@ -39,7 +39,7 @@ impl ViewBuilder<AliceModel> for AliceViewBuilder {
         );
 
         let signature_row =
-            common_components.create_text_entry_default("Signatur: ", "", true, AliceModel::signature);
+            common_components.create_text_entry_default("Signatur: ", "", true, AliceModel::signature_msg);
 
         let encrypt_button =
             common_components.create_button_default("Mit Bobs PublicKey verschlüsseln", ENCRYPT);
