@@ -1,4 +1,6 @@
+use bigdecimal::Num;
 use bigdecimal::num_bigint::BigInt;
+use sha2::{Sha256, Digest};
 use log::info;
 
 use crate::big_i;
@@ -89,7 +91,18 @@ impl PublicKey {
     }
 
     pub(crate) fn verify(&self, _signature: &str, _message: &str) -> bool {
-        todo!("Implementiere diese Funktion!")
+        // Signatur vom Partner in BigInt umwandeln
+        let signature_big_int = BigInt::parse_bytes(_signature.as_bytes(), 10) //todo -- basis 10 auslagern
+            .expect("Die Signatur konnte nicht in einen BigInt umgewandelt werden");
+        // Unsignierte Nachricht vom Partner in BigInt umwandeln
+        let message_big_int = BigInt::parse_bytes(_message.as_bytes(), 10)
+            .expect("Die Nachricht konnte nicht in einen BigInt umgewandelt werden");
+
+        // Verifizierung durchführen: verifizierung = signatur ^ (öffentlicher key vom partner) mod n
+        let verification = fast_exponentiation(&signature_big_int, &self.e, &self.n);
+
+        // Überprüfen, ob die Verifizierung mit der originalen Nachricht übereinstimmt
+        verification == message_big_int
     }
 }
 
@@ -166,6 +179,14 @@ impl PrivateKey {
     }
 
     pub(crate) fn sign(&self, _message: &str) -> String {
-        todo!("Implementiere diese Funktion!")
+        // Nachricht in einen BigInt umwandeln
+        let message_big_int = BigInt::parse_bytes(_message.as_bytes(), 10)
+            .expect("Fehler beim Parsen der Nachricht");
+
+        // Signatur berechnen: signatur = message^(eigener privater key) mod n
+        let signature = fast_exponentiation(&message_big_int, &self.d,
+                                                                             &self.n);
+        // Signatur als String zurückgeben
+        signature.to_str_radix(10)
     }
 }
