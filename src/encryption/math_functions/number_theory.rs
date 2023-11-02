@@ -106,6 +106,7 @@ pub fn extended_euclid(n: &BigInt, modul: &BigInt) -> (BigInt, BigInt, BigInt) {
 /// # Argumente
 /// * `p` - Die zu testende Zahl >= 11.
 /// * `repeats` - Die Anzahl der Testrunden (Je mehr Runden, desto zuverlässiger).
+/// * `m` - RNG-Seed.
 ///
 /// # Rückgabe
 /// `true`, wenn `p` wahrscheinlich eine Primzahl ist, andernfalls `false`.
@@ -117,7 +118,7 @@ pub fn extended_euclid(n: &BigInt, modul: &BigInt) -> (BigInt, BigInt, BigInt) {
 /// miller_rabin(11, 40) // => true
 /// miller_rabin(2211, 40) // => false
 /// ```
-pub fn miller_rabin(p: &BigInt, repeats: usize) -> bool {
+pub fn miller_rabin(p: &BigInt, repeats: usize,m: &BigInt) -> bool {
     let mut d = p.decrement();
     let mut s = BigInt::zero();
 
@@ -126,13 +127,12 @@ pub fn miller_rabin(p: &BigInt, repeats: usize) -> bool {
         s.increment_assign();
     }
 
-    let rand = RandomElsner::new(&big_i!(2), &p);
+    let mut rand = RandomElsner::new(&big_i!(2), &p,m);
 
     (0..repeats).into_par_iter().all(|_| {
-        let mut local_rand = rand.clone();
-        let mut a = local_rand.take();
+        let mut a = rand.take();
         while p.is_divisible_by(&a) {
-            a = local_rand.take();
+            a = rand.take();
         }
         miller_rabin_test(p, &s, &d, &a)
     })

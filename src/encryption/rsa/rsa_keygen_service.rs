@@ -95,12 +95,13 @@ impl RsaKeygenService {
     ///
     /// * `size` - Die Breite der Primzahl.
     /// * `miller_rabin_iterations` - Die Anzahl der Iterationen für den Miller-Rabin-Test.
+    /// * `m` - RNG-Seed.
     ///
     /// # Rückgabe
     ///
     /// Die generierte Primzahl.
     ///
-    fn generate_prime(&self, size: usize, miller_rabin_iterations: usize) -> BigInt {
+    fn generate_prime(&self, size: usize, miller_rabin_iterations: usize,m: &BigInt) -> BigInt {
         debug!(
             "Generiere eine Primzahl mit size {} und Miller-Rabin-Iterations {}",
             size, miller_rabin_iterations
@@ -108,11 +109,11 @@ impl RsaKeygenService {
 
         let upper_bound = &big_i!(2).pow(size as u32);
         let lower_bound = &big_i!(2).pow((size - 1) as u32);
-        let mut random_generator = RandomElsner::new(lower_bound, upper_bound);
+        let mut random_generator = RandomElsner::new(lower_bound, upper_bound,m);
 
         let mut prime_candidate = random_generator.take_uneven();
 
-        while !miller_rabin(&prime_candidate, miller_rabin_iterations) {
+        while !miller_rabin(&prime_candidate, miller_rabin_iterations,m) {
             trace!(
                 "Generierter Primkandidat {} ist keine Primzahl",
                 prime_candidate
@@ -130,16 +131,16 @@ impl RsaKeygenService {
     /// Generiert eine Zahl `e` mit `1 < e < phi` und `ggT(e, phi) = 1`.
     ///
     /// # Argumente
-    ///
     /// * `phi` - Die Zahl `phi`.
+    /// * `m` - RNG-Seed.
     ///
     /// # Rückgabe
     ///
     /// Die generierte Zahl `e`.
     ///
-    fn generate_e(&self, phi: &BigInt) -> BigInt {
+    fn generate_e(&self, phi: &BigInt,m: &BigInt) -> BigInt {
         debug!("Generiere e mit phi {}", phi);
-        let mut random_generator = RandomElsner::new(&big_i!(3u8), &phi.decrement());
+        let mut random_generator = RandomElsner::new(&big_i!(3u8), &phi.decrement(),m);
 
         let mut e = random_generator.take();
         while e < *phi {
