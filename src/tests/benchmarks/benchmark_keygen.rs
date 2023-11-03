@@ -2,6 +2,8 @@
 mod tests {
     use crate::encryption::rsa::rsa_keygen_service::RsaKeygenService;
     use std::time::Instant;
+    use bigdecimal::num_bigint::BigInt;
+    use crate::big_i;
 
     #[test]
     fn key_gen_timing_test() {
@@ -13,7 +15,7 @@ mod tests {
 
         for _i in 0..n {
             let start = Instant::now();
-            keygen_service.generate_keypair(100);
+            keygen_service.generate_keypair(100, &big_i!(13));
             let end = Instant::now();
             times.push(end.duration_since(start).as_millis());
         }
