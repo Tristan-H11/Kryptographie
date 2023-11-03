@@ -184,7 +184,16 @@ impl AppController {
             }
         };
 
-        keygen_service.generate_keypair(miller_rabin_iterations)
+        let random_seed = match app_state.main_menu.random_seed.parse::<i32>(){
+            Ok(x) => x,
+            Err(_) => {
+                error!("Fehler beim Parsen des Random-Seeds. Es wird ein Default-Wert von 13 verwendet.");
+                app_state.main_menu.random_seed = String::from("13");
+                13
+            }
+        };
+
+        keygen_service.generate_keypair(miller_rabin_iterations, &big_i!(random_seed))
     }
 
     ///

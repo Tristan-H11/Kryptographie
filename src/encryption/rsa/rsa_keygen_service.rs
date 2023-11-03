@@ -39,6 +39,7 @@ impl RsaKeygenService {
     /// # Argumente
     ///
     /// * `miller_rabin_iterations` - Die Anzahl der Iterationen für den Miller-Rabin-Test.
+    /// * `random_seed`- Seed für die gleichverteilte Zufallszahlerzeugung.
     ///
     /// # Rückgabe
     ///
@@ -47,19 +48,23 @@ impl RsaKeygenService {
     pub(crate) fn generate_keypair(
         &self,
         miller_rabin_iterations: usize,
+        random_seed: &BigInt
     ) -> (PublicKey, PrivateKey) {
         debug!(
             "Generiere Schlüsselpaar mit key_size {} und Miller-Rabin-Iterations {}",
             self.key_size, miller_rabin_iterations
         );
 
-        let (prime_one, prime_two) = self.get_distinct_primes(miller_rabin_iterations);
+        let (prime_one, prime_two) = self.get_distinct_primes(
+            miller_rabin_iterations,
+            random_seed
+        );
 
         let n = &prime_one * &prime_two;
         debug!("n ist {}", n);
 
         let phi = (&prime_one - BigInt::one()) * (&prime_two - BigInt::one());
-        let e = self.generate_e(&phi);
+        let e = self.generate_e(&phi, random_seed);
         let d = self.generate_d(&e, &phi);
         let public_key = PublicKey::new(e, n.clone());
         let private_key = PrivateKey::new(d, n);
@@ -70,12 +75,12 @@ impl RsaKeygenService {
     ///
     /// Generiert zwei verschiedene Primzahlen mit der angegebenen Breite.
     ///
-    fn get_distinct_primes(&self, miller_rabin_iterations: usize) -> (BigInt, BigInt) {
+    fn get_distinct_primes(&self, miller_rabin_iterations: usize, random_seed: &BigInt) -> (BigInt, BigInt) {
         let prim_size = self.key_size / 2;
 
         let (prime_one, mut prime_two) = rayon::join(
-            || self.generate_prime(prim_size, miller_rabin_iterations),
-            || self.generate_prime(prim_size, miller_rabin_iterations),
+            || self.generate_prime(prim_size, miller_rabin_iterations, random_seed),
+            || self.generate_prime(prim_size, miller_rabin_iterations, random_seed),
         );
         while prime_one == prime_two {
             trace!(
@@ -83,7 +88,7 @@ impl RsaKeygenService {
                 prime_one,
                 prime_two
             );
-            prime_two = self.generate_prime(prim_size, miller_rabin_iterations);
+            prime_two = self.generate_prime(prim_size, miller_rabin_iterations, random_seed);
         }
         (prime_one, prime_two)
     }
@@ -95,13 +100,13 @@ impl RsaKeygenService {
     ///
     /// * `size` - Die Breite der Primzahl.
     /// * `miller_rabin_iterations` - Die Anzahl der Iterationen für den Miller-Rabin-Test.
-    /// * `m` - RNG-Seed.
+    /// * `random_seed` - Der Seed für die gleichverteilte Zufallszahlerzeugung.
     ///
     /// # Rückgabe
     ///
     /// Die generierte Primzahl.
     ///
-    fn generate_prime(&self, size: usize, miller_rabin_iterations: usize,m: &BigInt) -> BigInt {
+    fn generate_prime(&self, size: usize, miller_rabin_iterations: usize, random_seed: &BigInt) -> BigInt {
         debug!(
             "Generiere eine Primzahl mit size {} und Miller-Rabin-Iterations {}",
             size, miller_rabin_iterations
@@ -109,11 +114,11 @@ impl RsaKeygenService {
 
         let upper_bound = &big_i!(2).pow(size as u32);
         let lower_bound = &big_i!(2).pow((size - 1) as u32);
-        let mut random_generator = RandomElsner::new(lower_bound, upper_bound,m);
+        let mut random_generator = RandomElsner::new(lower_bound, upper_bound, random_seed);
 
         let mut prime_candidate = random_generator.take_uneven();
 
-        while !miller_rabin(&prime_candidate, miller_rabin_iterations,m) {
+        while !miller_rabin(&prime_candidate, miller_rabin_iterations, random_seed) {
             trace!(
                 "Generierter Primkandidat {} ist keine Primzahl",
                 prime_candidate
@@ -132,15 +137,15 @@ impl RsaKeygenService {
     ///
     /// # Argumente
     /// * `phi` - Die Zahl `phi`.
-    /// * `m` - RNG-Seed.
+    /// * `random_seed` - Seed für die gleichverteilte Zufallszahlerzeugung.
     ///
     /// # Rückgabe
     ///
     /// Die generierte Zahl `e`.
     ///
-    fn generate_e(&self, phi: &BigInt,m: &BigInt) -> BigInt {
+    fn generate_e(&self, phi: &BigInt, random_seed: &BigInt) -> BigInt {
         debug!("Generiere e mit phi {}", phi);
-        let mut random_generator = RandomElsner::new(&big_i!(3u8), &phi.decrement(),m);
+        let mut random_generator = RandomElsner::new(&big_i!(3u8), &phi.decrement(), random_seed);
 
         let mut e = random_generator.take();
         while e < *phi {
