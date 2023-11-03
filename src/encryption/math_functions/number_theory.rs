@@ -138,6 +138,10 @@ pub fn miller_rabin(p: &BigInt, repeats: usize, random_seed: &BigInt) -> bool {
     })
 }
 
+///
+/// Führt eine Iteration des Miller-Rabin-Tests aus. Gibt zurück, ob die Zahl vermutlich
+/// eine Primzahl ist.
+///
 fn miller_rabin_test(p: &BigInt, s: &BigInt, d: &BigInt, a: &BigInt) -> bool {
     let mut x = fast_exponentiation(a, d, p);
 
