@@ -79,9 +79,9 @@ impl RsaKeygenService {
     ) -> (BigInt, BigInt) {
         let prim_size = self.key_size / 2;
 
-        let (prime_one, mut prime_two) = rayon::join(
-            || self.generate_prime(prim_size, miller_rabin_iterations, random_seed),
-            || self.generate_prime(prim_size, miller_rabin_iterations, random_seed),
+        let (prime_one, mut prime_two) = ( //rayon::join( TODO Tristan: wieder einbauen
+            self.generate_prime(prim_size, miller_rabin_iterations, random_seed),
+            self.generate_prime(prim_size, miller_rabin_iterations, random_seed),
         );
         while prime_one == prime_two {
             trace!(
