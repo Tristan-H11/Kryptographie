@@ -1,4 +1,6 @@
-use bigdecimal::num_bigint::BigInt;
+use bigdecimal::Num;
+use bigdecimal::num_bigint::{BigInt, Sign};
+use sha2::{Sha256, Digest};
 use log::info;
 
 use crate::big_i;
@@ -78,7 +80,8 @@ impl PublicKey {
     pub(crate) fn encrypt(&self, message: &str, base_length: u32) -> String {
         info!("Verschlüsseln mit blockgröße {}", self.block_size);
 
-        let chunks = create_blocks_from_string_encrypt(message.trim_end(), self.block_size, true, base_length);
+        let chunks = create_blocks_from_string_encrypt(message.trim_end(),
+                                                       self.block_size, true, base_length);
         let encrypted_chunks = chunks
             .iter()
             .map(|chunk| fast_exponentiation(chunk, &self.e, &self.n))
@@ -89,7 +92,23 @@ impl PublicKey {
     }
 
     pub(crate) fn verify(&self, _signature: &str, _message: &str) -> bool {
-        todo!("Implementiere diese Funktion!")
+        // Nicht Signierte aber optional verschlüsselte Nachricht hashen
+        let mut hasher = Sha256::new();
+        hasher.update(_message.as_bytes());
+        let hashed_message = hasher.finalize();
+
+        // Hash in einen BigInt umwandeln
+        let message_big_int = BigInt::from_bytes_be(Sign::Plus, &hashed_message);
+
+        // Signatur vom Partner in BigInt umwandeln
+        let signature_big_int = BigInt::parse_bytes(_signature.as_bytes(), 10)
+            .expect("Die Signatur konnte nicht in einen BigInt umgewandelt werden");
+
+        // Verifizierung durchführen: verifizierung = signatur ^ (öffentlicher key vom partner) mod n
+        let verification = fast_exponentiation(&signature_big_int, &self.e, &self.n);
+
+        // Überprüfen, ob die Verifizierung mit der gehashten Nachricht übereinstimmt
+        verification == message_big_int
     }
 }
 
@@ -156,7 +175,8 @@ impl PrivateKey {
     pub(crate) fn decrypt(&self, message: &str, base_length: u32) -> String {
         info!("Entschlüsseln mit blockgröße {}", self.block_size);
 
-        let chunks = create_blocks_from_string_decrypt(message, true, base_length, self.block_size);
+        let chunks = create_blocks_from_string_decrypt(message, true,
+                                                                    base_length, self.block_size);
         let decrypted_chunks = chunks
             .iter()
             .map(|chunk| fast_exponentiation(chunk, &self.d, &self.n))
@@ -166,6 +186,18 @@ impl PrivateKey {
     }
 
     pub(crate) fn sign(&self, _message: &str) -> String {
-        todo!("Implementiere diese Funktion!")
+        // Nachricht hashen
+        let mut hasher = Sha256::new();
+        hasher.update(_message.as_bytes());
+        let hashed_message = hasher.finalize();
+
+        // Hash Nachricht in einen BigInt umwandeln
+        let message_big_int = BigInt::from_bytes_be(Sign::Plus, &hashed_message);
+
+        // Signatur berechnen: signatur = message^(eigener privater key) mod n
+        let signature = fast_exponentiation(&message_big_int, &self.d, &self.n);
+
+        // Signatur als String zurückgeben
+        signature.to_str_radix(10)
     }
 }

@@ -6,7 +6,7 @@ mod tests {
 
     use crate::big_i;
     use crate::encryption::math_functions::number_theory::{
-        fast_exponentiation, miller_rabin, modulo_inverse,
+        extended_euclid, fast_exponentiation, miller_rabin, modulo_inverse,
     };
 
     #[test]
@@ -83,7 +83,7 @@ mod tests {
 
     #[test]
     fn modulo_inverse_test() {
-        //assert_eq!(modulo_inverse(big_i!(1), big_i!(3)).unwrap(), big_i!(1));
+        //assert_eq!(modulo_inverse(&big_i!(1), &big_i!(3)).unwrap(), big_i!(1));
         assert_eq!(modulo_inverse(&big_i!(5), &big_i!(11)).unwrap(), big_i!(9));
         assert_eq!(
             modulo_inverse(&big_i!(315), &big_i!(661643)).unwrap(),
@@ -101,15 +101,47 @@ mod tests {
     }
 
     #[test]
+    fn extended_euclid_test() {
+        assert_eq!(
+            extended_euclid(&big_i!(6), &big_i!(11)),
+            (big_i!(1), big_i!(2), big_i!(-1))
+        );
+        assert_eq!(
+            extended_euclid(&big_i!(78), &big_i!(99)),
+            (big_i!(3), big_i!(14), big_i!(-11))
+        );
+        assert_eq!(
+            extended_euclid(&big_i!(315), &big_i!(661643)),
+            (big_i!(1), big_i!(-319269), big_i!(152))
+        );
+        assert_eq!(
+            extended_euclid(&big_i!(315), &big_i!(661643)),
+            (big_i!(1), big_i!(-319269), big_i!(152))
+        );
+        assert_eq!(
+            extended_euclid(
+                &BigInt::from_str("485398853520739824211578869461").unwrap(),
+                &BigInt::from_str("79617341660363802320192939486040130094939703771377").unwrap()
+            ),
+            (
+                big_i!(1),
+                BigInt::from_str("7173228757438794445922076835963679049602847038123").unwrap(),
+                big_i!(-43732645957409398462249346726)
+            )
+        );
+    }
+
+    #[test]
     fn miller_rabin_test() {
-        assert_eq!(miller_rabin(&big_i!(11), 40), true);
-        assert_eq!(miller_rabin(&big_i!(8727030382015287123761), 40), false);
-        assert_eq!(miller_rabin(&big_i!(2459872438590349034582), 40), false);
-        assert_eq!(miller_rabin(&big_i!(2211), 40), false);
+        assert_eq!(miller_rabin(&big_i!(11), 40, &big_i!(11)), true);
+        assert_eq!(miller_rabin(&big_i!(8727030382015287123761), 40, &big_i!(11)), false);
+        assert_eq!(miller_rabin(&big_i!(2459872438590349034582), 40, &big_i!(11)), false);
+        assert_eq!(miller_rabin(&big_i!(2211), 40, &big_i!(11)), false);
         assert_eq!(
             miller_rabin(
                 &BigInt::from_str("79617341660363802320192939486040130094939703771377").unwrap(),
-                40
+                40,
+                &big_i!(11)
             ),
             true
         );

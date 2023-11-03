@@ -3,7 +3,6 @@ use std::io::{Error, ErrorKind};
 use bigdecimal::num_bigint::BigInt;
 use bigdecimal::num_traits::Euclid;
 use bigdecimal::{One, Zero};
-use rayon::prelude::{IntoParallelIterator, ParallelIterator};
 
 use crate::big_i;
 use crate::encryption::math_functions::random_elsner::RandomElsner;
@@ -29,22 +28,18 @@ pub fn fast_exponentiation(base: &BigInt, exponent: &BigInt, modul: &BigInt) -> 
     if modul.is_one() {
         return BigInt::zero();
     }
-    if exponent.is_zero() {
-        return BigInt::one();
-    }
-    if exponent.is_one() {
-        return base.rem_euclid(modul);
-    }
+    let mut result = BigInt::one();
+    let mut base = base.clone();
+    let mut exp = exponent.clone();
 
-    // Berechnung des Zwischenschrittes mit halbiertem Exponenten.
-    let base_to_square = fast_exponentiation(base, &exponent.half(), modul);
-    return if exponent.is_even() {
-        // Ist der Exponent gerade, so wird nur quadriert.
-        base_to_square.pow(2).rem_euclid(modul)
-    } else {
-        // Ist der Exponent ungerade, wird die Basis erneut als Faktor herangezogen.
-        (base_to_square.pow(2) * base).rem_euclid(modul)
-    };
+    while !exp.is_zero() {
+        if exp.is_odd() {
+            result = (result * &base).rem_euclid(modul);
+        }
+        base = (&base * &base).rem_euclid(modul);
+        exp.half_assign();
+    }
+    result
 }
 
 /// Berechnet das Inverse-Element in einem Restklassenring.
@@ -89,33 +84,20 @@ pub fn modulo_inverse(n: &BigInt, modul: &BigInt) -> Result<BigInt, Error> {
 /// sowie den zwei Faktoren `x` und `y`.
 pub fn extended_euclid(n: &BigInt, modul: &BigInt) -> (BigInt, BigInt, BigInt) {
     //rotierendes Array, zur Berechnung und Speicherung der Faktoren `x` und `y`
-    let xy = [
-        BigInt::one(),
-        BigInt::one(),
-        BigInt::one(),
-        BigInt::zero(),
-        BigInt::zero(),
-        BigInt::one(),
-    ];
-    return extended_euclidean_algorithm(&n, &modul, xy);
-}
-
-fn extended_euclidean_algorithm(
-    n: &BigInt,
-    modul: &BigInt,
-    mut xy: [BigInt; 6],
-) -> (BigInt, BigInt, BigInt) {
-    xy.rotate_left(2);
-
-    return if modul.is_zero() {
-        (n.clone(), xy[0].clone(), xy[1].clone())
-    } else {
+    let mut xy = [BigInt::one(), BigInt::zero(), BigInt::zero(), BigInt::one()];
+    let mut m = modul.clone();
+    let mut n = n.clone();
+    while !m.is_zero() {
         // Berechnet die Faktoren und speichert sie in einem rotierenden Array.
-        let div = n / modul;
-        xy[4] = &xy[0] - (&div * &xy[2]);
-        xy[5] = &xy[1] - (&div * &xy[3]);
-        extended_euclidean_algorithm(modul, &n.rem_euclid(modul), xy)
-    };
+        let div = &n / &m;
+        xy[0] = &xy[0] - (&div * &xy[2]);
+        xy[1] = &xy[1] - (&div * &xy[3]);
+        let tmp = &n % &m;
+        n = m;
+        m = tmp;
+        xy.rotate_right(2);
+    }
+    (n.clone(), xy[0].clone(), xy[1].clone())
 }
 
 /// Führt den Miller-Rabin-Primzahltest auf `p` mit `repeats` Runden aus.
@@ -123,6 +105,7 @@ fn extended_euclidean_algorithm(
 /// # Argumente
 /// * `p` - Die zu testende Zahl >= 11.
 /// * `repeats` - Die Anzahl der Testrunden (Je mehr Runden, desto zuverlässiger).
+/// * `random_seed` - Seed für die gleichverteilte Zufallszahlerzeugung. Darf keine Primzahl sein!
 ///
 /// # Rückgabe
 /// `true`, wenn `p` wahrscheinlich eine Primzahl ist, andernfalls `false`.
@@ -134,7 +117,7 @@ fn extended_euclidean_algorithm(
 /// miller_rabin(11, 40) // => true
 /// miller_rabin(2211, 40) // => false
 /// ```
-pub fn miller_rabin(p: &BigInt, repeats: usize) -> bool {
+pub fn miller_rabin(p: &BigInt, repeats: usize, random_seed: &BigInt) -> bool {
     let mut d = p.decrement();
     let mut s = BigInt::zero();
 
@@ -143,13 +126,12 @@ pub fn miller_rabin(p: &BigInt, repeats: usize) -> bool {
         s.increment_assign();
     }
 
-    let rand = RandomElsner::new(&big_i!(2), &p);
+    let mut rand = RandomElsner::new(&big_i!(2), &p, random_seed);
 
-    (0..repeats).into_par_iter().all(|_| {
-        let mut local_rand = rand.clone();
-        let mut a = local_rand.take();
+    (0..repeats).into_iter().all(|_| { // TODO Parallelisieren
+        let mut a = rand.take();
         while p.is_divisible_by(&a) {
-            a = local_rand.take();
+            a = rand.take();
         }
         miller_rabin_test(p, &s, &d, &a)
     })
