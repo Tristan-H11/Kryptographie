@@ -2,6 +2,8 @@
 mod rsa_keys_test {
     use crate::encryption::rsa::rsa_keygen_service::RsaKeygenService;
     use rayon::prelude::{IntoParallelIterator, ParallelIterator};
+    use crate::big_i;
+    use bigdecimal::num_bigint::BigInt;
 
     #[test]
     fn test_happy_flow_1024() {
@@ -11,7 +13,7 @@ mod rsa_keys_test {
 
         let result = (0..range).into_par_iter().all(|_| {
             let keygen_service = RsaKeygenService::new(256);
-            let (public_key, private_key) = keygen_service.generate_keypair(40);
+            let (public_key, private_key) = keygen_service.generate_keypair(40, &big_i!(11));
 
             let encrypted_message = public_key.encrypt(message, 55296);
             println!("Verschlüsselte Nachricht: {}", encrypted_message);

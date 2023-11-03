@@ -1,9 +1,8 @@
 #[cfg(test)]
 mod tests {
     use bigdecimal::num_bigint::BigInt;
-    use bigdecimal::BigDecimal;
 
-    use crate::big_d;
+    use crate::big_i;
     use crate::encryption::math_functions::random_elsner::RandomElsner;
     use crate::encryption::math_functions::traits::divisible::Divisible;
 
@@ -13,7 +12,7 @@ mod tests {
         let b: BigInt = 997u32.into();
 
         let mut random =
-            RandomElsner::new_deterministic(big_d!(13).sqrt().unwrap(), &a.clone(), &b.clone());
+            RandomElsner::new(&a.clone(), &b.clone(), &big_i!(13));
 
         assert_eq!(random.take(), 604u32.into());
         assert_eq!(random.take(), 211u32.into());
@@ -29,7 +28,7 @@ mod tests {
         let a: BigInt = 500u32.into();
         let b: BigInt = 6000u32.into();
 
-        random = RandomElsner::new(&a, &b);
+        random = RandomElsner::new(&a, &b, &big_i!(40));
 
         for _ in 1..500 {
             let random = random.take();
@@ -42,7 +41,7 @@ mod tests {
         let a: BigInt = 500u32.into();
         let b: BigInt = 6000u32.into();
 
-        let mut random = RandomElsner::new(&a, &b);
+        let mut random = RandomElsner::new(&a, &b, &big_i!(23));
 
         for _ in 1..500 {
             let random = random.take_uneven();

@@ -1,6 +1,5 @@
 use bigdecimal::num_bigint::{BigInt, ToBigInt};
 use bigdecimal::{BigDecimal, One, Zero};
-use rand::random;
 
 use crate::big_d;
 use crate::encryption::math_functions::traits::divisible::Divisible;
@@ -24,19 +23,21 @@ impl RandomElsner {
     /// # Argumente
     /// * `a` - Die untere Grenze des Bereichs.
     /// * `b` - Die obere Grenze des Bereichs.
+    /// * `random_seed` - Seed für die Zufallszahlen. Darf keine Quadratzahl sein
     ///
     /// # Rückgabe
     /// * RandomElsner
     ///
-    pub fn new(a: &BigInt, b: &BigInt) -> Self {
+    pub fn new(a: &BigInt, b: &BigInt, random_seed: &BigInt) -> Self {
         let sqrt_m;
         loop {
-            let m = BigDecimal::from(random::<u128>());
-            match m.sqrt() {
+            match big_d!(random_seed.clone()).sqrt() {
                 Some(sqrt) => {
                     if sqrt.is_not_divisible_by(&BigDecimal::one()) {
                         sqrt_m = sqrt;
                         break;
+                    } else {
+                        panic!("Random_seed darf keine Quadratzahl sein!") // TODO Anständig machen.
                     }
                 }
                 None => panic!("Wurzel m konnte nicht berechnet werden."),
@@ -50,18 +51,6 @@ impl RandomElsner {
         };
     }
 
-    ///
-    /// Konstruktor für Testfälle, um deterministische Werte zu erhalten.
-    ///
-    #[cfg(test)]
-    pub fn new_deterministic(sqrt_m: BigDecimal, a: &BigInt, b: &BigInt) -> Self {
-        return Self {
-            sqrt_m,
-            n: BigInt::zero(),
-            a: a.clone(),
-            range: big_d!(BigInt::from(b - a + BigInt::one())),
-        };
-    }
 
     ///
     /// Gibt eine zufällige Zahl im Bereich von a bis b zurück.
