@@ -52,6 +52,16 @@ impl ViewBuilder<MainMenuModel> for MainMenuViewBuilder {
             Some(Alignment::Left),
         );
 
+        let random_seed_entry = common_components.create_entry_static(
+            "Random Seed: ",
+            "Seed für die Erzeugung der \n Primzahlen. Keine Quadratzahl! Z.B. 13",
+            false,
+            MainMenuModel::random_seed,
+            Some(cust_e_size_var_2),
+            None,
+            Some(Alignment::Left),
+        );
+
         let public_exponent_bob_entry = common_components.create_entry_static(
             "Öffentlicher Exponent Bob: ",
             "Wird automatisch berechnet",
@@ -130,6 +140,7 @@ impl ViewBuilder<MainMenuModel> for MainMenuViewBuilder {
             .with_flex_child(modul_width_entry, 0.2)
             .with_flex_child(miller_rabin_entry, 0.2)
             .with_flex_child(basis_entry, 0.2)
+            .with_flex_child(random_seed_entry, 0.2)
             .with_flex_child(calculate_keypair_alice, 0.1)
             .with_flex_child(calculate_keypair_bob, 0.1)
             .with_flex_child(public_exponent_alice_entry, 0.2)

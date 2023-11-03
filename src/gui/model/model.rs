@@ -12,6 +12,7 @@ pub struct MainMenuModel {
     pub(crate) modul_alice: String,
     pub(crate) public_exponent_bob: String,
     pub(crate) modul_bob: String,
+    pub(crate) random_seed: String,
 }
 
 #[derive(Clone, Data, Lens)]
@@ -61,6 +62,7 @@ impl Default for AppState {
                 modul_alice: String::new(),
                 public_exponent_bob: String::new(),
                 modul_bob: String::new(),
+                random_seed: String::new(),
             },
             alice: AliceModel {
                 plaintext_msg: String::new(),
