@@ -24,18 +24,21 @@ impl RandomElsner {
     /// # Argumente
     /// * `a` - Die untere Grenze des Bereichs.
     /// * `b` - Die obere Grenze des Bereichs.
+    /// * `random_seed` - Seed für die Zufallszahlen. Darf keine Quadratzahl sein
     ///
     /// # Rückgabe
     /// * RandomElsner
     ///
-    pub fn new(a: &BigInt, b: &BigInt, m: &BigInt) -> Self {
+    pub fn new(a: &BigInt, b: &BigInt, random_seed: &BigInt) -> Self {
         let sqrt_m;
         loop {
-            match big_d!(m.clone()).sqrt() {
+            match big_d!(random_seed.clone()).sqrt() {
                 Some(sqrt) => {
                     if sqrt.is_not_divisible_by(&BigDecimal::one()) {
                         sqrt_m = sqrt;
                         break;
+                    } else {
+                        panic!("Random_seed darf keine Quadratzahl sein!") // TODO Anständig machen.
                     }
                 }
                 None => panic!("Wurzel m konnte nicht berechnet werden."),
