@@ -1,14 +1,13 @@
-use druid::{
-    Widget,
-    widget::Flex, WidgetExt,
-};
 use druid::widget::{Label, SizedBox};
+use druid::{widget::Flex, WidgetExt};
 
 use crate::gui::controller::commands::{
     CLEAR, DECRYPT, ENCRYPT, SEND_MESSAGE, SIGN, SWITCH_TO_MAIN_MENU, VERIFY,
 };
 use crate::gui::model::model::AliceModel;
-use crate::gui::view::traits::common_view_builder::{CommonViewComponentsDefault, ViewBuilder, Alignment, EntrySize};
+use crate::gui::view::traits::common_view_builder::{
+    Alignment, CommonViewComponentsDefault, EntrySize, ViewBuilder,
+};
 
 pub struct AliceViewBuilder;
 
@@ -16,8 +15,14 @@ impl ViewBuilder<AliceModel> for AliceViewBuilder {
     fn build_view() -> SizedBox<AliceModel> {
         let common_components = CommonViewComponentsDefault::new();
 
-        let cust_size_var_1 = EntrySize { width: 500.0, height: 50.0 };
-        let cust_size_var_2 = EntrySize { width: 1200.0, height: 75.0 };
+        let cust_size_var_1 = EntrySize {
+            width: 500.0,
+            height: 50.0,
+        };
+        let cust_size_var_2 = EntrySize {
+            width: 1200.0,
+            height: 75.0,
+        };
 
         let plaintext_entry = common_components.create_entry_static(
             "Klartext: ",
@@ -70,49 +75,45 @@ impl ViewBuilder<AliceModel> for AliceViewBuilder {
             .with_child(signature_entry)
             .with_child(signature_status_label);
 
-
         let encrypt_button = common_components.create_button_static(
             "Mit Bobs PublicKey verschlüsseln",
             ENCRYPT,
             None,
             None,
-            None,);
-        let calc_sign_button = common_components.create_button_static(
-            "Signatur berechnen",
-            SIGN,
             None,
-            None,
-            None,);
-        let check_sign_button = common_components.create_button_static(
-            "Signatur prüfen",
-            VERIFY,
-            None,
-            None,
-            None,);
+        );
+        let calc_sign_button =
+            common_components.create_button_static("Signatur berechnen", SIGN, None, None, None);
+        let check_sign_button =
+            common_components.create_button_static("Signatur prüfen", VERIFY, None, None, None);
         let decrypt_button = common_components.create_button_static(
             "Mit eigenem PrivateKey entschlüsseln",
             DECRYPT,
             None,
             None,
-            None,);
+            None,
+        );
         let send_message_button = common_components.create_button_static(
             "Nachricht senden",
             SEND_MESSAGE,
             None,
             None,
-            None,);
+            None,
+        );
         let clear_button = common_components.create_button_static(
             "Alles außer privaten Schlüssel löschen",
             CLEAR,
             None,
             None,
-            None,);
+            None,
+        );
         let back_button = common_components.create_button_static(
             "Zurück zum Hauptmenü",
             SWITCH_TO_MAIN_MENU,
             None,
             None,
-            None,);
+            None,
+        );
 
         Flex::column()
             .with_flex_spacer(common_components.flex_space_default)

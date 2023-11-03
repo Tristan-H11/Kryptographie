@@ -1,9 +1,9 @@
 #[cfg(test)]
 mod tests {
-    use crate::encryption::rsa::rsa_keygen_service::RsaKeygenService;
-    use std::time::Instant;
-    use bigdecimal::num_bigint::BigInt;
     use crate::big_i;
+    use crate::encryption::rsa::rsa_keygen_service::RsaKeygenService;
+    use bigdecimal::num_bigint::BigInt;
+    use std::time::Instant;
 
     #[test]
     fn key_gen_timing_test() {

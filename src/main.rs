@@ -2,12 +2,9 @@ mod encryption;
 mod gui;
 mod tests;
 
-use druid::{AppLauncher, Color, FontDescriptor, theme, WindowDesc};
-use gui::gui::build_ui;
-use gui::model::model::AppState;
+use crate::gui::gui::start_gui;
 use log::LevelFilter;
 use simple_logger::SimpleLogger;
-use crate::gui::gui::start_gui;
 
 fn main() {
     SimpleLogger::new()

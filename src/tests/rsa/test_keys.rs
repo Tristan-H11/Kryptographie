@@ -1,9 +1,9 @@
 #[cfg(test)]
 mod rsa_keys_test {
-    use crate::encryption::rsa::rsa_keygen_service::RsaKeygenService;
-    use rayon::prelude::{IntoParallelIterator, ParallelIterator};
     use crate::big_i;
+    use crate::encryption::rsa::rsa_keygen_service::RsaKeygenService;
     use bigdecimal::num_bigint::BigInt;
+    use rayon::prelude::{IntoParallelIterator, ParallelIterator};
 
     #[test]
     fn test_happy_flow_1024() {

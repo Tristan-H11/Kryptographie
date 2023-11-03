@@ -93,8 +93,8 @@
 use crate::gui::controller::controller::AppController;
 use crate::gui::model::model::{AppState, View};
 use crate::gui::view::view::{build_alice_view, build_bob_view, build_haupt_menu};
+use druid::{theme, AppLauncher, Color, FontDescriptor, WindowDesc};
 use druid::{widget::ViewSwitcher, Widget, WidgetExt};
-use druid::{AppLauncher, Color, FontDescriptor, theme, WindowDesc};
 
 pub fn start_gui() {
     let main_window = WindowDesc::new(build_ui())

@@ -1,5 +1,8 @@
-use druid::{UnitPoint, widget::{Button, Flex, Label, TextBox}, Widget, WidgetExt};
 use druid::widget::SizedBox;
+use druid::{
+    widget::{Button, Flex, Label, TextBox},
+    UnitPoint, Widget, WidgetExt,
+};
 
 pub trait ViewBuilder<Model> {
     fn build_view() -> SizedBox<Model>;
@@ -19,7 +22,10 @@ pub struct EntrySize {
 }
 impl Default for EntrySize {
     fn default() -> Self {
-        Self { width: 200.0, height: 50.0 }
+        Self {
+            width: 200.0,
+            height: 50.0,
+        }
     }
 }
 
@@ -30,10 +36,12 @@ pub struct ButtonSize {
 }
 impl Default for ButtonSize {
     fn default() -> Self {
-        Self { width: 250.0, height: 50.0 }
+        Self {
+            width: 250.0,
+            height: 50.0,
+        }
     }
 }
-
 
 #[derive(Clone, Copy)]
 pub struct Spacing {
@@ -92,9 +100,7 @@ impl CommonViewComponentsDefault {
         let spacing = spacing.unwrap_or(self.flex_hight_spacing.spacing);
         let alignment = alignment.unwrap_or(self.alignment_default);
         Flex::column()
-            .with_child(
-                Label::new(label_text),
-            )
+            .with_child(Label::new(label_text))
             .with_child(
                 TextBox::multiline()
                     .with_placeholder(placeholder)
@@ -108,7 +114,6 @@ impl CommonViewComponentsDefault {
             )
             .padding(spacing)
             .align_horizontal(Self::alignment_to_unitpoint(alignment))
-
     }
 
     pub fn create_entry_dynamic<Model: druid::Data>(
@@ -125,10 +130,7 @@ impl CommonViewComponentsDefault {
         let spacing = spacing.unwrap_or(self.flex_hight_spacing.spacing);
         let alignment = alignment.unwrap_or(self.alignment_default);
         Flex::column()
-            .with_flex_child(
-                Label::new(label_text),
-                0.1,
-            )
+            .with_flex_child(Label::new(label_text), 0.1)
             .with_flex_child(
                 TextBox::multiline()
                     .with_placeholder(placeholder)

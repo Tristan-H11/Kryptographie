@@ -51,7 +51,6 @@ impl RandomElsner {
         };
     }
 
-
     ///
     /// Gibt eine zufällige Zahl im Bereich von a bis b zurück.
     ///

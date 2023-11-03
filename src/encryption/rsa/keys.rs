@@ -1,7 +1,6 @@
-use bigdecimal::Num;
 use bigdecimal::num_bigint::{BigInt, Sign};
-use sha2::{Sha256, Digest};
 use log::info;
+use sha2::{Digest, Sha256};
 
 use crate::big_i;
 use crate::encryption::math_functions::block_chiffre::{
@@ -80,8 +79,12 @@ impl PublicKey {
     pub(crate) fn encrypt(&self, message: &str, base_length: u32) -> String {
         info!("Verschlüsseln mit blockgröße {}", self.block_size);
 
-        let chunks = create_blocks_from_string_encrypt(message.trim_end(),
-                                                       self.block_size, true, base_length);
+        let chunks = create_blocks_from_string_encrypt(
+            message.trim_end(),
+            self.block_size,
+            true,
+            base_length,
+        );
         let encrypted_chunks = chunks
             .iter()
             .map(|chunk| fast_exponentiation(chunk, &self.e, &self.n))
@@ -175,8 +178,7 @@ impl PrivateKey {
     pub(crate) fn decrypt(&self, message: &str, base_length: u32) -> String {
         info!("Entschlüsseln mit blockgröße {}", self.block_size);
 
-        let chunks = create_blocks_from_string_decrypt(message, true,
-                                                                    base_length, self.block_size);
+        let chunks = create_blocks_from_string_decrypt(message, true, base_length, self.block_size);
         let decrypted_chunks = chunks
             .iter()
             .map(|chunk| fast_exponentiation(chunk, &self.d, &self.n))

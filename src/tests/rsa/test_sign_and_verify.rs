@@ -1,6 +1,6 @@
 #[cfg(test)]
 mod sign_verify_test {
-    use crate::encryption::rsa::keys::{PublicKey, PrivateKey};
+    use crate::encryption::rsa::keys::{PrivateKey, PublicKey};
     use bigdecimal::num_bigint::BigInt;
 
     #[test]

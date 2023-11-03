@@ -40,7 +40,8 @@ impl Default for AppController {
     ///
     /// Erstellt eine neue Instanz des AppControllers mit 1er Werten für die Keys.
     ///
-    fn default() -> Self { //todo -- auf realistische kleine Schlüssel umstellen und nicht auf 1
+    fn default() -> Self {
+        //todo -- auf realistische kleine Schlüssel umstellen und nicht auf 1
         debug!("Erstelle Default-AppController");
         AppController {
             alice_private_key: PrivateKey::new(big_i!(1), big_i!(1)),
@@ -158,8 +159,7 @@ impl AppController {
     ///
     fn calculate_keypair_alice(&mut self, app_state: &mut AppState) {
         info!("Berechne Schlüsselpaar für Alice");
-        let (public_key_alice, private_key_alice) =
-            self.calculate_keypair(app_state);
+        let (public_key_alice, private_key_alice) = self.calculate_keypair(app_state);
 
         self.alice_private_key = private_key_alice;
         self.alice_public_key = public_key_alice;
@@ -174,8 +174,7 @@ impl AppController {
     ///
     fn calculate_keypair_bob(&mut self, app_state: &mut AppState) {
         info!("Berechne Schlüsselpaar für Bob");
-        let (public_key_bob, private_key_bob) =
-            self.calculate_keypair(app_state);
+        let (public_key_bob, private_key_bob) = self.calculate_keypair(app_state);
 
         self.bob_private_key = private_key_bob;
         self.bob_public_key = public_key_bob;
@@ -192,8 +191,10 @@ impl AppController {
         let modul_width = match app_state.main_menu.modul_width.parse::<usize>() {
             Ok(x) => x,
             Err(_) => {
-                error!("Fehler beim Parsen der Modul-Breite. Es wird ein Default-Schlüssel \
-                        mit 4096-bit erstellt.");
+                error!(
+                    "Fehler beim Parsen der Modul-Breite. Es wird ein Default-Schlüssel \
+                        mit 4096-bit erstellt."
+                );
                 app_state.main_menu.modul_width = String::from("4096");
                 4096
             }
@@ -206,14 +207,16 @@ impl AppController {
         {
             Ok(x) => x,
             Err(_) => {
-                error!("Fehler beim Parsen der Miller-Rabin-Iterationen. Es wird ein Default-Wert \
-                        von 100 Iterationen verwendet.");
+                error!(
+                    "Fehler beim Parsen der Miller-Rabin-Iterationen. Es wird ein Default-Wert \
+                        von 100 Iterationen verwendet."
+                );
                 app_state.main_menu.miller_rabin_iterations = String::from("100");
                 100
             }
         };
 
-        let random_seed = match app_state.main_menu.random_seed.parse::<i32>(){
+        let random_seed = match app_state.main_menu.random_seed.parse::<i32>() {
             Ok(x) => x,
             Err(_) => {
                 error!("Fehler beim Parsen des Random-Seeds. Es wird ein Default-Wert von 13 verwendet.");

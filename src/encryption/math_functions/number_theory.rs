@@ -128,7 +128,8 @@ pub fn miller_rabin(p: &BigInt, repeats: usize, random_seed: &BigInt) -> bool {
 
     let mut rand = RandomElsner::new(&big_i!(2), &p, random_seed);
 
-    (0..repeats).into_iter().all(|_| { // TODO Parallelisieren
+    (0..repeats).into_iter().all(|_| {
+        // TODO Parallelisieren
         let mut a = rand.take();
         while p.is_divisible_by(&a) {
             a = rand.take();

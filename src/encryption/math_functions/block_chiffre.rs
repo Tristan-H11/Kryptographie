@@ -137,7 +137,8 @@ pub(crate) fn split_into_blocks(message: &str, block_size: usize, fill_block: bo
         "Erstelle Blöcke mit Blockgröße {} für '{}'",
         block_size, message
     );
-    message.chars()
+    message
+        .chars()
         .collect::<Vec<char>>()
         .chunks(block_size)
         .map(|c| {
@@ -224,12 +225,13 @@ pub(crate) fn to_sum_vec(d_vec: Vec<Vec<u32>>, base: &BigInt) -> Vec<BigInt> {
 fn helper_fun_sum_for_digits(i_vec: &Vec<u32>, g_base: &BigInt) -> BigInt {
     debug!("Erstelle Summe aus Integer Vektor");
 
-    let (sum, _) = i_vec.iter()
-        .rev()
-        .fold((BigInt::zero(), BigInt::one()), |(acc_sum, acc_base), &digit| {
+    let (sum, _) = i_vec.iter().rev().fold(
+        (BigInt::zero(), BigInt::one()),
+        |(acc_sum, acc_base), &digit| {
             trace!("Addiere {} * {} zu Summe", acc_base, digit);
             (&acc_sum + &acc_base * big_i!(digit), acc_base * g_base)
-        });
+        },
+    );
 
     debug!("Summe: {}", sum);
     sum

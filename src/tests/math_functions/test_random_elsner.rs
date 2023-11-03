@@ -11,8 +11,7 @@ mod tests {
         let a: BigInt = 1u32.into();
         let b: BigInt = 997u32.into();
 
-        let mut random =
-            RandomElsner::new(&a.clone(), &b.clone(), &big_i!(13));
+        let mut random = RandomElsner::new(&a.clone(), &b.clone(), &big_i!(13));
 
         assert_eq!(random.take(), 604u32.into());
         assert_eq!(random.take(), 211u32.into());

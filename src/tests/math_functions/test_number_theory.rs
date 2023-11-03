@@ -134,8 +134,14 @@ mod tests {
     #[test]
     fn miller_rabin_test() {
         assert_eq!(miller_rabin(&big_i!(11), 40, &big_i!(11)), true);
-        assert_eq!(miller_rabin(&big_i!(8727030382015287123761), 40, &big_i!(11)), false);
-        assert_eq!(miller_rabin(&big_i!(2459872438590349034582), 40, &big_i!(11)), false);
+        assert_eq!(
+            miller_rabin(&big_i!(8727030382015287123761), 40, &big_i!(11)),
+            false
+        );
+        assert_eq!(
+            miller_rabin(&big_i!(2459872438590349034582), 40, &big_i!(11)),
+            false
+        );
         assert_eq!(miller_rabin(&big_i!(2211), 40, &big_i!(11)), false);
         assert_eq!(
             miller_rabin(

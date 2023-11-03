@@ -1,11 +1,13 @@
-use druid::{Widget, widget::Flex, WidgetExt};
 use druid::widget::SizedBox;
+use druid::{widget::Flex, WidgetExt};
 
 use crate::gui::controller::commands::{
     CALCULATE_KEYPAIR_ALICE, CALCULATE_KEYPAIR_BOB, SWITCH_TO_ALICE, SWITCH_TO_BOB,
 };
 use crate::gui::model::model::MainMenuModel;
-use crate::gui::view::traits::common_view_builder::{CommonViewComponentsDefault, ViewBuilder, Alignment, EntrySize, ButtonSize};
+use crate::gui::view::traits::common_view_builder::{
+    Alignment, ButtonSize, CommonViewComponentsDefault, EntrySize, ViewBuilder,
+};
 
 // trait für Hauptmenü
 pub struct MainMenuViewBuilder;
@@ -14,12 +16,23 @@ impl ViewBuilder<MainMenuModel> for MainMenuViewBuilder {
     fn build_view() -> SizedBox<MainMenuModel> {
         let common_components = CommonViewComponentsDefault::new(); // Gemeinsame Komponenten instanziieren
 
-        let cust_e_size_var_1 = EntrySize { width: 250.0, height: 25.0 };
-        let cust_e_size_var_2 = EntrySize { width: 250.0, height: 50.0 };
-        let cust_e_size_var_3 = EntrySize { width: 1200.0, height: 75.0 };
+        let cust_e_size_var_1 = EntrySize {
+            width: 250.0,
+            height: 25.0,
+        };
+        let cust_e_size_var_2 = EntrySize {
+            width: 250.0,
+            height: 50.0,
+        };
+        let cust_e_size_var_3 = EntrySize {
+            width: 1200.0,
+            height: 75.0,
+        };
 
-        let cust_b_size_var_1 = ButtonSize { width: 400.0, height: 50.0 };
-
+        let cust_b_size_var_1 = ButtonSize {
+            width: 400.0,
+            height: 50.0,
+        };
 
         // Entry-Felder
         let modul_width_entry = common_components.create_entry_static(
@@ -124,15 +137,16 @@ impl ViewBuilder<MainMenuModel> for MainMenuViewBuilder {
             SWITCH_TO_ALICE,
             None,
             None,
-            None);
+            None,
+        );
 
         let open_bob_button = common_components.create_button_static(
             "Bob-Ansicht öffnen",
             SWITCH_TO_BOB,
             None,
             None,
-            None);
-
+            None,
+        );
 
         // UI Struktur
         Flex::column()
