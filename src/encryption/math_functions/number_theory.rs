@@ -3,7 +3,6 @@ use std::io::{Error, ErrorKind};
 use bigdecimal::num_bigint::BigInt;
 use bigdecimal::num_traits::Euclid;
 use bigdecimal::{One, Zero};
-use rayon::prelude::{IntoParallelIterator, ParallelIterator};
 
 use crate::big_i;
 use crate::encryption::math_functions::random_elsner::RandomElsner;

@@ -1,6 +1,5 @@
 use bigdecimal::num_bigint::{BigInt, ToBigInt};
 use bigdecimal::{BigDecimal, One, Zero};
-use rand::random;
 
 use crate::big_d;
 use crate::encryption::math_functions::traits::divisible::Divisible;
