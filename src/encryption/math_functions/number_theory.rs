@@ -117,7 +117,7 @@ pub fn extended_euclid(n: &BigInt, modul: &BigInt) -> (BigInt, BigInt, BigInt) {
 /// miller_rabin(11, 40) // => true
 /// miller_rabin(2211, 40) // => false
 /// ```
-pub fn miller_rabin(p: &BigInt, repeats: usize, random_generator: &mut RandomElsner) -> bool {
+pub fn miller_rabin(p: &BigInt, repeats: u32, random_generator: &mut RandomElsner) -> bool {
     let mut d = p.decrement();
     let mut s = BigInt::zero();
 

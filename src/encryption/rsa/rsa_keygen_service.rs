@@ -14,7 +14,7 @@ use crate::encryption::rsa::keys::{PrivateKey, PublicKey};
 /// Ein Service zum Generieren von Schlüsselpaaren für RSA.
 ///
 pub struct RsaKeygenService {
-    key_size: usize,
+    key_size: u32,
 }
 
 impl RsaKeygenService {
@@ -25,7 +25,7 @@ impl RsaKeygenService {
     ///
     /// * `key_width` - Die Breite des Moduls `n`, mit welchem die Schlüssel berechnet werden.
     ///
-    pub fn new(key_size: usize) -> RsaKeygenService {
+    pub fn new(key_size: u32) -> RsaKeygenService {
         debug!(
             "Erstellen eines neuen RsaKeygenService mit key_size {}",
             key_size
@@ -47,7 +47,7 @@ impl RsaKeygenService {
     ///
     pub(crate) fn generate_keypair(
         &self,
-        miller_rabin_iterations: usize,
+        miller_rabin_iterations: u32,
         random_seed: &BigInt,
         g_base: &BigInt
     ) -> (PublicKey, PrivateKey) {
@@ -76,7 +76,7 @@ impl RsaKeygenService {
     ///
     fn get_distinct_primes(
         &self,
-        miller_rabin_iterations: usize,
+        miller_rabin_iterations: u32,
         random_generator: &mut RandomElsner,
     ) -> (BigInt, BigInt) {
         let prim_size = self.key_size / 2;
@@ -111,8 +111,8 @@ impl RsaKeygenService {
     ///
     fn generate_prime(
         &self,
-        size: usize,
-        miller_rabin_iterations: usize,
+        size: u32,
+        miller_rabin_iterations: u32,
         random_generator: &mut RandomElsner
     ) -> BigInt {
         debug!(
@@ -120,8 +120,8 @@ impl RsaKeygenService {
             size, miller_rabin_iterations
         );
 
-        let upper_bound = &big_i!(2).pow(size as u32);
-        let lower_bound = &big_i!(2).pow((size - 1) as u32);
+        let upper_bound = &big_i!(2).pow(size);
+        let lower_bound = &big_i!(2).pow(size - 1);
 
         let mut prime_candidate = random_generator.take_uneven(lower_bound, upper_bound);
         let mut count = 0;

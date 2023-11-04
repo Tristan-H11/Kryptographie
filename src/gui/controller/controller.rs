@@ -187,7 +187,7 @@ impl AppController {
     /// Berechnet ein Schlüsselpaar
     ///
     fn calculate_keypair(&mut self, app_state: &mut AppState) -> (PublicKey, PrivateKey) {
-        let modul_width = match app_state.main_menu.modul_width.parse::<usize>() {
+        let modul_width = match app_state.main_menu.modul_width.parse::<u32>() {
             Ok(x) => x,
             Err(_) => {
                 error!(
@@ -202,7 +202,7 @@ impl AppController {
         let miller_rabin_iterations = match app_state
             .main_menu
             .miller_rabin_iterations
-            .parse::<usize>()
+            .parse::<u32>()
         {
             Ok(x) => x,
             Err(_) => {
