@@ -13,7 +13,8 @@ mod rsa_keys_test {
 
         let result = (0..range).into_par_iter().all(|_| {
             let keygen_service = RsaKeygenService::new(2048);
-            let (public_key, private_key) = keygen_service.generate_keypair(40, &big_i!(23), &big_i!(55296));
+            let (public_key, private_key) =
+                keygen_service.generate_keypair(40, &big_i!(23), &big_i!(55296));
 
             let encrypted_message = public_key.encrypt(message, &big_i!(55296));
             println!("Verschlüsselte Nachricht: {}", encrypted_message);

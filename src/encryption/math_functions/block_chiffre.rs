@@ -65,7 +65,11 @@ pub(crate) fn create_blocks_from_string_decrypt(
 /// # Rückgabe
 /// * `String` - Der decodierte String.
 ///
-pub(crate) fn create_string_from_blocks_encrypt(sums: Vec<BigInt>, target_size: usize, g_base: &BigInt) -> String {
+pub(crate) fn create_string_from_blocks_encrypt(
+    sums: Vec<BigInt>,
+    target_size: usize,
+    g_base: &BigInt,
+) -> String {
     debug!(
         "Erstelle String aus Vektor von Summen: Anzahl der Vectorblöcke --> {}",
         sums.len()

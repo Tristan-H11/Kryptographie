@@ -49,7 +49,7 @@ impl RsaKeygenService {
         &self,
         miller_rabin_iterations: u32,
         random_seed: &BigInt,
-        g_base: &BigInt
+        g_base: &BigInt,
     ) -> (PublicKey, PrivateKey) {
         debug!(
             "Generiere Schlüsselpaar mit key_size {} und Miller-Rabin-Iterations {}",
@@ -57,7 +57,8 @@ impl RsaKeygenService {
         );
         let random_generator = &mut RandomElsner::new(random_seed);
 
-        let (prime_one, prime_two) = self.get_distinct_primes(miller_rabin_iterations, random_generator);
+        let (prime_one, prime_two) =
+            self.get_distinct_primes(miller_rabin_iterations, random_generator);
 
         let n = &prime_one * &prime_two;
         debug!("n ist {}", n);
@@ -81,7 +82,8 @@ impl RsaKeygenService {
     ) -> (BigInt, BigInt) {
         let prim_size = self.key_size / 2;
 
-        let (prime_one, mut prime_two) = ( //rayon::join( TODO Tristan: wieder einbauen
+        let (prime_one, mut prime_two) = (
+            //rayon::join( TODO Tristan: wieder einbauen
             self.generate_prime(prim_size, miller_rabin_iterations, random_generator),
             self.generate_prime(prim_size, miller_rabin_iterations, random_generator),
         );
@@ -113,7 +115,7 @@ impl RsaKeygenService {
         &self,
         size: u32,
         miller_rabin_iterations: u32,
-        random_generator: &mut RandomElsner
+        random_generator: &mut RandomElsner,
     ) -> BigInt {
         debug!(
             "Generiere eine Primzahl mit size {} und Miller-Rabin-Iterations {}",

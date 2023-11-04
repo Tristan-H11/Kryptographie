@@ -5,7 +5,9 @@ use crate::gui::controller::commands::{
     CLEAR, DECRYPT, ENCRYPT, SEND_MESSAGE, SIGN, SWITCH_TO_MAIN_MENU, VERIFY,
 };
 use crate::gui::model::model::BobModel;
-use crate::gui::view::traits::common_view_builder::{Alignment, CommonViewComponentsDefault, EntrySize, Spacing, ViewBuilder};
+use crate::gui::view::traits::common_view_builder::{
+    Alignment, CommonViewComponentsDefault, EntrySize, ViewBuilder,
+};
 
 pub struct BobViewBuilder;
 
@@ -98,20 +100,10 @@ impl ViewBuilder<BobModel> for BobViewBuilder {
             .with_child(signature_entry)
             .with_child(signature_status_label);
 
-        let calc_sign_button = common_components.create_button_static(
-            "Signatur berechnen",
-            SIGN,
-            None,
-            None,
-            None
-        );
-        let check_sign_button = common_components.create_button_static(
-            "Signatur prüfen",
-            VERIFY,
-            None,
-            None,
-            None
-        );
+        let calc_sign_button =
+            common_components.create_button_static("Signatur berechnen", SIGN, None, None, None);
+        let check_sign_button =
+            common_components.create_button_static("Signatur prüfen", VERIFY, None, None, None);
 
         let send_message_button = common_components.create_button_static(
             "Nachricht senden",

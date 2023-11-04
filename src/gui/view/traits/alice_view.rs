@@ -5,7 +5,9 @@ use crate::gui::controller::commands::{
     CLEAR, DECRYPT, ENCRYPT, SEND_MESSAGE, SIGN, SWITCH_TO_MAIN_MENU, VERIFY,
 };
 use crate::gui::model::model::AliceModel;
-use crate::gui::view::traits::common_view_builder::{Alignment, CommonViewComponentsDefault, EntrySize, Spacing, ViewBuilder};
+use crate::gui::view::traits::common_view_builder::{
+    Alignment, CommonViewComponentsDefault, EntrySize, ViewBuilder,
+};
 
 pub struct AliceViewBuilder;
 
@@ -48,7 +50,6 @@ impl ViewBuilder<AliceModel> for AliceViewBuilder {
         let plainttext_chiffre_row = Flex::row()
             .with_child(plaintext_entry)
             .with_child(ciphertext_entry);
-
 
         let encrypt_button = common_components.create_button_static(
             "Mit Bobs PublicKey verschlüsseln",

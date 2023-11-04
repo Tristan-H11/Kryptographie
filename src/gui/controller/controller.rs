@@ -199,21 +199,18 @@ impl AppController {
             }
         };
         let keygen_service = RsaKeygenService::new(modul_width);
-        let miller_rabin_iterations = match app_state
-            .main_menu
-            .miller_rabin_iterations
-            .parse::<u32>()
-        {
-            Ok(x) => x,
-            Err(_) => {
-                error!(
+        let miller_rabin_iterations =
+            match app_state.main_menu.miller_rabin_iterations.parse::<u32>() {
+                Ok(x) => x,
+                Err(_) => {
+                    error!(
                     "Fehler beim Parsen der Miller-Rabin-Iterationen. Es wird ein Default-Wert \
                         von 100 Iterationen verwendet."
                 );
-                app_state.main_menu.miller_rabin_iterations = String::from("100");
-                100
-            }
-        };
+                    app_state.main_menu.miller_rabin_iterations = String::from("100");
+                    100
+                }
+            };
 
         let random_seed = match app_state.main_menu.random_seed.parse::<i32>() {
             Ok(x) => x,
@@ -224,13 +221,8 @@ impl AppController {
             }
         };
 
-
         let base = Self::parse_base(app_state);
-        keygen_service.generate_keypair(
-            miller_rabin_iterations,
-            &big_i!(random_seed),
-            &base
-        )
+        keygen_service.generate_keypair(miller_rabin_iterations, &big_i!(random_seed), &base)
     }
 
     ///
