@@ -23,7 +23,7 @@ mod tests {
 
         for _ in 0..12 {
             let keygen_service = RsaKeygenService::new(256);
-            let (public_key, private_key) = keygen_service.generate_keypair(1, &big_i!(34));
+            let (public_key, private_key) = keygen_service.generate_keypair(1, &big_i!(34), &big_i!(55296));
 
             let message = "bbbbbbbbbbbbbbb  äääääääääääääää  !&    ";
             let basis_length = 55296u32;
@@ -32,27 +32,27 @@ mod tests {
                 message,
                 public_key.get_block_size(),
                 true,
-                basis_length,
+                &big_i!(55296)
             )
             .iter()
             .map(|x| fast_exponentiation(x, &public_key.get_e(), &public_key.get_n()))
             .collect::<Vec<BigInt>>();
 
             let encrypted_string =
-                create_string_from_blocks_encrypt(result, public_key.get_block_size() + 1);
+                create_string_from_blocks_encrypt(result, public_key.get_block_size() + 1, &big_i!(55296));
 
             // Ohne Blocklänge, da diese in der Methode aus dem String extrahiert wird
             let result = create_blocks_from_string_decrypt(
                 &encrypted_string,
                 true,
-                basis_length,
+                &big_i!(55296),
                 private_key.get_block_size(),
             )
             .iter()
             .map(|x| fast_exponentiation(x, &private_key.get_d(), &private_key.get_n()))
             .collect();
 
-            let string = create_string_from_blocks_decrypt(result);
+            let string = create_string_from_blocks_decrypt(result, &big_i!(55296));
 
             // Ersetze assert durch eine if-Anweisung
             if string.trim() != message.trim() {
@@ -72,57 +72,61 @@ mod tests {
         let block_size = 8;
         let basis_length = 55296 as u32;
         let encoded = create_string_from_blocks_encrypt(
-            create_blocks_from_string_encrypt(m, block_size, true, basis_length),
+            create_blocks_from_string_encrypt(m, block_size, true, &big_i!(55296)),
             block_size + 1,
+            &big_i!(55296)
         );
         let decoded = create_string_from_blocks_decrypt(create_blocks_from_string_decrypt(
             &encoded,
             true,
-            basis_length,
+            &big_i!(55296),
             block_size + 1,
-        ));
+        ), &big_i!(55296));
         assert_eq!(decoded.trim(), m);
 
         let m = "Da苉 ist eine Testnachricht";
         let block_size = 6;
         let encoded = create_string_from_blocks_encrypt(
-            create_blocks_from_string_encrypt(m, block_size, true, basis_length),
+            create_blocks_from_string_encrypt(m, block_size, true, &big_i!(55296)),
             block_size + 1,
+            &big_i!(55296)
         );
         let decoded = create_string_from_blocks_decrypt(create_blocks_from_string_decrypt(
             &encoded,
             true,
-            basis_length,
+            &big_i!(55296),
             block_size + 1,
-        ));
+        ), &big_i!(55296));
         assert_eq!(decoded.trim(), m);
 
         let m = "Da苉 ist eine Testnachricht";
         let block_size = 47;
         let encoded = create_string_from_blocks_encrypt(
-            create_blocks_from_string_encrypt(m, block_size, true, basis_length),
+            create_blocks_from_string_encrypt(m, block_size, true, &big_i!(55296)),
             block_size + 1,
+            &big_i!(55296)
         );
         let decoded = create_string_from_blocks_decrypt(create_blocks_from_string_decrypt(
             &encoded,
             true,
-            basis_length,
+            &big_i!(55296),
             block_size + 1,
-        ));
+        ), &big_i!(55296));
         assert_eq!(decoded.trim(), m);
 
         let m = "Da苉 ist eine Testnachricht";
         let block_size = 3;
         let encoded = create_string_from_blocks_encrypt(
-            create_blocks_from_string_encrypt(m, block_size, true, basis_length),
+            create_blocks_from_string_encrypt(m, block_size, true, &big_i!(55296)),
             block_size + 1,
+            &big_i!(55296)
         );
         let decoded = create_string_from_blocks_decrypt(create_blocks_from_string_decrypt(
             &encoded,
             true,
-            basis_length,
+            &big_i!(55296),
             block_size + 1,
-        ));
+        ), &big_i!(55296));
         assert_eq!(decoded.trim(), m);
     }
 
@@ -131,7 +135,7 @@ mod tests {
         let message = "Da苉 ist eine Testnachricht";
         let block_size = 7;
         let basis_length = 55296 as u32;
-        let result = create_blocks_from_string_encrypt(message, block_size, true, basis_length);
+        let result = create_blocks_from_string_encrypt(message, block_size, true, &big_i!(55296));
         let expected_result = vec![
             big_i!(1943938337267550087026074257524),
             big_i!(914822981356602019800946507860),
@@ -149,7 +153,7 @@ mod tests {
             big_i!(2887304683313907978613082523752),
             big_i!(3258925137110102081877384560672),
         ];
-        let result = create_string_from_blocks_decrypt(sums);
+        let result = create_string_from_blocks_decrypt(sums, &big_i!(55296));
         let expected_result = "Da苉 ist eine Testnachricht".to_string();
         assert_eq!(result, expected_result);
     }
