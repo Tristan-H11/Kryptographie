@@ -44,11 +44,11 @@ impl Default for AppController {
         //todo -- auf realistische kleine Schlüssel umstellen und nicht auf 1
         debug!("Erstelle Default-AppController");
         AppController {
-            alice_private_key: PrivateKey::new(big_i!(1), big_i!(1)),
-            alice_public_key: PublicKey::new(big_i!(1), big_i!(1)),
+            alice_private_key: PrivateKey::new(big_i!(1), big_i!(1), &big_i!(55296)),
+            alice_public_key: PublicKey::new(big_i!(1), big_i!(1), &big_i!(55296)),
 
-            bob_private_key: PrivateKey::new(big_i!(1), big_i!(1)),
-            bob_public_key: PublicKey::new(big_i!(1), big_i!(1)),
+            bob_private_key: PrivateKey::new(big_i!(1), big_i!(1), &big_i!(55296)),
+            bob_public_key: PublicKey::new(big_i!(1), big_i!(1), &big_i!(55296)),
         }
     }
 }
@@ -225,14 +225,20 @@ impl AppController {
             }
         };
 
-        keygen_service.generate_keypair(miller_rabin_iterations, &big_i!(random_seed))
+
+        let base = Self::parse_base(app_state);
+        keygen_service.generate_keypair(
+            miller_rabin_iterations,
+            &big_i!(random_seed),
+            &base
+        )
     }
 
     ///
     /// Parst die Basis-Länge aus dem GUI-String.
     /// Falls der String nicht geparst werden kann, wird der Default-Wert 55296 verwendet.
     ///
-    fn parse_base(app_state: &mut AppState) -> u32 {
+    fn parse_base(app_state: &mut AppState) -> BigInt {
         let g_base = match app_state.main_menu.basis_length.parse::<u32>() {
             Ok(x) => x,
             Err(_) => {
@@ -241,7 +247,7 @@ impl AppController {
                 55296
             }
         };
-        g_base
+        big_i!(g_base)
     }
 
     ///
@@ -252,7 +258,7 @@ impl AppController {
         let plaintext = app_state.alice.plaintext_msg.clone();
         let encrypted = self
             .bob_public_key
-            .encrypt(&plaintext, Self::parse_base(app_state));
+            .encrypt(&plaintext, &Self::parse_base(app_state));
         app_state.alice.ciphre_msg = encrypted;
     }
 
@@ -264,7 +270,7 @@ impl AppController {
         let cipher_text = app_state.alice.ciphre_msg.clone();
         let decrypted = self
             .alice_private_key
-            .decrypt(&cipher_text, Self::parse_base(app_state));
+            .decrypt(&cipher_text, &Self::parse_base(app_state));
         app_state.alice.plaintext_msg = decrypted;
     }
 
@@ -355,7 +361,7 @@ impl AppController {
         let plaintext = app_state.bob.plaintext_msg.clone();
         let encrypted = self
             .alice_public_key
-            .encrypt(&plaintext, Self::parse_base(app_state));
+            .encrypt(&plaintext, &Self::parse_base(app_state));
         app_state.bob.ciphre_msg = encrypted;
     }
 
@@ -367,7 +373,7 @@ impl AppController {
         let cipher_text = app_state.bob.ciphre_msg.clone();
         let decrypted = self
             .bob_private_key
-            .decrypt(&cipher_text, Self::parse_base(app_state));
+            .decrypt(&cipher_text, &Self::parse_base(app_state));
         app_state.bob.plaintext_msg = decrypted;
     }
 

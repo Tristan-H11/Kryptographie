@@ -1,5 +1,6 @@
 use bigdecimal::num_bigint::{BigInt, ToBigInt};
 use bigdecimal::{BigDecimal, One, Zero};
+use log::debug;
 
 use crate::big_d;
 use crate::encryption::math_functions::traits::divisible::Divisible;
@@ -54,6 +55,7 @@ impl RandomElsner {
     /// * BigUint
     ///
     pub fn take(&mut self, a: &BigInt, b: &BigInt) -> BigInt {
+        debug!("Zufallszahl aus dem Bereich von {} bis {}", a, b);
         self.n.increment_assign();
 
         let factor = (&self.n * &self.sqrt_m) % BigDecimal::one();

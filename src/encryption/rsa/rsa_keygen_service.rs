@@ -49,6 +49,7 @@ impl RsaKeygenService {
         &self,
         miller_rabin_iterations: usize,
         random_seed: &BigInt,
+        g_base: &BigInt
     ) -> (PublicKey, PrivateKey) {
         debug!(
             "Generiere Schlüsselpaar mit key_size {} und Miller-Rabin-Iterations {}",
@@ -64,8 +65,8 @@ impl RsaKeygenService {
         let phi = (&prime_one - BigInt::one()) * (&prime_two - BigInt::one());
         let e = self.generate_e(&phi, random_generator);
         let d = self.generate_d(&e, &phi);
-        let public_key = PublicKey::new(e, n.clone());
-        let private_key = PrivateKey::new(d, n);
+        let public_key = PublicKey::new(e, n.clone(), g_base);
+        let private_key = PrivateKey::new(d, n, g_base);
         debug!("Schlüsselpaar generiert");
         (public_key, private_key)
     }

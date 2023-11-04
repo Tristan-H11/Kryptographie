@@ -1,8 +1,7 @@
 use bigdecimal::num_bigint::{BigInt, Sign};
-use log::info;
+use log::{debug, info};
 use sha2::{Digest, Sha256};
 
-use crate::big_i;
 use crate::encryption::math_functions::block_chiffre::{
     create_blocks_from_string_decrypt, create_blocks_from_string_encrypt,
     create_string_from_blocks_decrypt, create_string_from_blocks_encrypt,
@@ -28,10 +27,10 @@ impl PublicKey {
     /// * `e` - Der öffentliche Exponent.
     /// * `n` - Das Produkt der beiden Primzahlen.
     ///
-    pub fn new(e: BigInt, n: BigInt) -> PublicKey {
-        // Maximale Blockbreite = log_g(n), wenn g=55296 ist.
-        let g = big_i!(55296u16); //TODO in GUI auslagern
-        let block_size = n.log(&g) as usize;
+    pub fn new(e: BigInt, n: BigInt, g_base: &BigInt) -> PublicKey {
+        // Maximale Blockbreite = log_g(n).
+        let block_size = n.log(g_base) as usize;
+        debug!("Blocksize in der PublicKey-Erstellung: {}", block_size);
         PublicKey { e, n, block_size }
     }
 
@@ -76,14 +75,14 @@ impl PublicKey {
     ///
     /// * `String` - Die verschlüsselte Nachricht.
     ///
-    pub(crate) fn encrypt(&self, message: &str, base_length: u32) -> String {
+    pub(crate) fn encrypt(&self, message: &str, g_base: &BigInt) -> String {
         info!("Verschlüsseln mit blockgröße {}", self.block_size);
 
         let chunks = create_blocks_from_string_encrypt(
             message.trim_end(),
             self.block_size,
             true,
-            base_length,
+            g_base,
         );
         let encrypted_chunks = chunks
             .iter()
@@ -91,7 +90,7 @@ impl PublicKey {
             .collect();
 
         // Die Größe der verschlüsselten Blöcke ist immer um 1 größer als die Klartextgröße.
-        create_string_from_blocks_encrypt(encrypted_chunks, self.block_size + 1)
+        create_string_from_blocks_encrypt(encrypted_chunks, self.block_size + 1, g_base)
     }
 
     pub(crate) fn verify(&self, _signature: &str, _message: &str) -> bool {
@@ -133,11 +132,10 @@ impl PrivateKey {
     /// * `d` - Der private Exponent.
     /// * `n` - Das Produkt der beiden Primzahlen.
     ///
-    pub fn new(d: BigInt, n: BigInt) -> PrivateKey {
-        let g = big_i!(55296u16); //TODO in GUI auslagern
-
+    pub fn new(d: BigInt, n: BigInt, g_base: &BigInt) -> PrivateKey {
         // Die Größe der verschlüsselten Blöcke ist immer um 1 größer als die Klartextgröße.
-        let block_size = (n.log(&g) + 1) as usize;
+        let block_size = (n.log(g_base) + 1) as usize;
+        debug!("Blocksize in der PrivateKey-Erstellung: {}", block_size);
         PrivateKey { d, n, block_size }
     }
 
@@ -175,16 +173,16 @@ impl PrivateKey {
     ///
     /// * `String` - Die entschlüsselte Nachricht.
     ///
-    pub(crate) fn decrypt(&self, message: &str, base_length: u32) -> String {
+    pub(crate) fn decrypt(&self, message: &str, g_base: &BigInt) -> String {
         info!("Entschlüsseln mit blockgröße {}", self.block_size);
 
-        let chunks = create_blocks_from_string_decrypt(message, true, base_length, self.block_size);
+        let chunks = create_blocks_from_string_decrypt(message, true, g_base, self.block_size);
         let decrypted_chunks = chunks
             .iter()
             .map(|chunk| fast_exponentiation(chunk, &self.d, &self.n))
             .collect();
 
-        create_string_from_blocks_decrypt(decrypted_chunks)
+        create_string_from_blocks_decrypt(decrypted_chunks, g_base)
     }
 
     pub(crate) fn sign(&self, _message: &str) -> String {

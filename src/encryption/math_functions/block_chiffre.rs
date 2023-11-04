@@ -19,13 +19,12 @@ pub(crate) fn create_blocks_from_string_encrypt(
     m: &str,
     block_size: usize,
     fill_blocks: bool,
-    base_length: u32,
+    g_base: &BigInt,
 ) -> Vec<BigInt> {
     debug!("Erstelle Chiffre mit Blockgröße {} für {}", block_size, m);
     let b = split_into_blocks(m, block_size, fill_blocks);
     let i_vec = string_to_int_vec(b);
-    let base = big_i!(base_length);
-    to_sum_vec(i_vec, &base)
+    to_sum_vec(i_vec, g_base)
 }
 
 ///
@@ -43,7 +42,7 @@ pub(crate) fn create_blocks_from_string_encrypt(
 pub(crate) fn create_blocks_from_string_decrypt(
     m: &str,
     fill_blocks: bool,
-    base_length: u32,
+    g_base: &BigInt,
     block_size: usize,
 ) -> Vec<BigInt> {
     let message = m;
@@ -54,8 +53,7 @@ pub(crate) fn create_blocks_from_string_decrypt(
 
     let b = split_into_blocks(message, block_size, fill_blocks);
     let i_vec = string_to_int_vec(b);
-    let base = BigInt::from(base_length);
-    to_sum_vec(i_vec, &base)
+    to_sum_vec(i_vec, &g_base)
 }
 
 ///
@@ -67,13 +65,12 @@ pub(crate) fn create_blocks_from_string_decrypt(
 /// # Rückgabe
 /// * `String` - Der decodierte String.
 ///
-pub(crate) fn create_string_from_blocks_encrypt(sums: Vec<BigInt>, target_size: usize) -> String {
+pub(crate) fn create_string_from_blocks_encrypt(sums: Vec<BigInt>, target_size: usize, g_base: &BigInt) -> String {
     debug!(
         "Erstelle String aus Vektor von Summen: Anzahl der Vectorblöcke --> {}",
         sums.len()
     );
-    let base = big_i!(55296u32); //TODO in GUI auslagern
-    let strings = sums_vec_to_string_vec(sums, &base);
+    let strings = sums_vec_to_string_vec(sums, g_base);
     debug!("Chiffrierter Vector: {:?}", strings);
 
     // Füllt jeden String mit dem Zeichen "\u{FE8D}", um die maximale Länge zu erreichen
@@ -100,13 +97,12 @@ pub(crate) fn create_string_from_blocks_encrypt(sums: Vec<BigInt>, target_size: 
 /// # Rückgabe
 /// * `String` - Der decodierte String.
 ///
-pub(crate) fn create_string_from_blocks_decrypt(sums: Vec<BigInt>) -> String {
+pub(crate) fn create_string_from_blocks_decrypt(sums: Vec<BigInt>, g_base: &BigInt) -> String {
     debug!(
         "Erstelle String aus Vektor von Summen: Anzahl der Vectorblöcke --> {}",
         sums.len()
     );
-    let base = big_i!(55296u32); //TODO in GUI auslagern
-    let strings = sums_vec_to_string_vec(sums, &base);
+    let strings = sums_vec_to_string_vec(sums, g_base);
     debug!("Chiffrierter Vector: {:?}", strings);
 
     let result = strings.join("");
