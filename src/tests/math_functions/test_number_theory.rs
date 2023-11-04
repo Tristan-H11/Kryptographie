@@ -137,11 +137,17 @@ mod tests {
         let random_generator:&mut RandomElsner = &mut RandomElsner::new(&big_i!(11));
         assert_eq!(miller_rabin(&big_i!(11), 40, random_generator), true);
         assert_eq!(
-            miller_rabin(&big_i!(8727030382015287123761), 40, random_generator),
+            miller_rabin(&BigInt::from_str("3884010174220797539108782582068795892283779").unwrap(), 40, random_generator),
             false
         );
+
         assert_eq!(
-            miller_rabin(&big_i!(2459872438590349034582), 40, random_generator),
+            miller_rabin(&BigInt::from_str("3061046931436983206004510256116356531107241").unwrap(), 40, random_generator),
+            false
+        );
+
+        assert_eq!(
+            miller_rabin(&BigInt::from_str("3348205994756289303286119224981125339947473").unwrap(), 40, random_generator),
             false
         );
         assert_eq!(miller_rabin(&big_i!(2211), 40, random_generator), false);
