@@ -5,9 +5,7 @@ use crate::gui::controller::commands::{
     CLEAR, DECRYPT, ENCRYPT, SEND_MESSAGE, SIGN, SWITCH_TO_MAIN_MENU, VERIFY,
 };
 use crate::gui::model::model::AliceModel;
-use crate::gui::view::traits::common_view_builder::{
-    Alignment, CommonViewComponentsDefault, EntrySize, ViewBuilder,
-};
+use crate::gui::view::traits::common_view_builder::{Alignment, CommonViewComponentsDefault, EntrySize, Spacing, ViewBuilder};
 
 pub struct AliceViewBuilder;
 
@@ -16,12 +14,16 @@ impl ViewBuilder<AliceModel> for AliceViewBuilder {
         let common_components = CommonViewComponentsDefault::new();
 
         let cust_size_var_1 = EntrySize {
-            width: 500.0,
-            height: 50.0,
+            width: 800.0,
+            height: 200.0,
         };
         let cust_size_var_2 = EntrySize {
             width: 1200.0,
-            height: 75.0,
+            height: 50.0,
+        };
+        let cust_size_var_3 = EntrySize {
+            width: 1090.0,
+            height: 50.0,
         };
 
         let plaintext_entry = common_components.create_entry_static(
@@ -43,6 +45,27 @@ impl ViewBuilder<AliceModel> for AliceViewBuilder {
             None,
             Some(Alignment::Left),
         );
+        let plainttext_chiffre_row = Flex::row()
+            .with_child(plaintext_entry)
+            .with_child(ciphertext_entry);
+
+        let encrypt_button = common_components.create_button_static(
+            "Mit Bobs PublicKey verschlüsseln",
+            ENCRYPT,
+            None,
+            Some(15.0),
+            None,
+        );
+        let decrypt_button = common_components.create_button_static(
+            "Mit eigenem PrivateKey entschlüsseln",
+            DECRYPT,
+            None,
+            Some(15.0),
+            None,
+        );
+        let encrypt_decrypt_row = Flex::row()
+            .with_child(encrypt_button)
+            .with_child(decrypt_button);
 
         let secret_exponent_entry = common_components.create_entry_static(
             "Geheimer Exponent: ",
@@ -51,7 +74,7 @@ impl ViewBuilder<AliceModel> for AliceViewBuilder {
             AliceModel::private_exponent,
             Some(cust_size_var_2),
             None,
-            None,
+            Some(Alignment::Center),
         );
 
         let signature_entry = common_components.create_entry_static(
@@ -59,7 +82,7 @@ impl ViewBuilder<AliceModel> for AliceViewBuilder {
             "Wird automatisch berechnet",
             true,
             AliceModel::signature_msg,
-            Some(cust_size_var_2),
+            Some(cust_size_var_3),
             None,
             Some(Alignment::Left),
         );
@@ -75,24 +98,11 @@ impl ViewBuilder<AliceModel> for AliceViewBuilder {
             .with_child(signature_entry)
             .with_child(signature_status_label);
 
-        let encrypt_button = common_components.create_button_static(
-            "Mit Bobs PublicKey verschlüsseln",
-            ENCRYPT,
-            None,
-            None,
-            None,
-        );
         let calc_sign_button =
             common_components.create_button_static("Signatur berechnen", SIGN, None, None, None);
         let check_sign_button =
             common_components.create_button_static("Signatur prüfen", VERIFY, None, None, None);
-        let decrypt_button = common_components.create_button_static(
-            "Mit eigenem PrivateKey entschlüsseln",
-            DECRYPT,
-            None,
-            None,
-            None,
-        );
+
         let send_message_button = common_components.create_button_static(
             "Nachricht senden",
             SEND_MESSAGE,
@@ -117,11 +127,9 @@ impl ViewBuilder<AliceModel> for AliceViewBuilder {
 
         Flex::column()
             .with_flex_spacer(common_components.flex_space_default)
-            .with_flex_child(plaintext_entry, 0.2)
-            .with_flex_child(ciphertext_entry, 0.2)
-            .with_flex_child(encrypt_button, 0.1)
-            .with_flex_child(decrypt_button, 0.1)
-            .with_flex_child(secret_exponent_entry, 0.2)
+            .with_flex_child(plainttext_chiffre_row, 0.2)
+            .with_flex_child(encrypt_decrypt_row, 0.2)
+            .with_flex_child(secret_exponent_entry, 0.1)
             .with_flex_child(calc_sign_button, 0.1)
             .with_flex_child(check_sign_button, 0.1)
             .with_flex_child(signature_row, 0.2)

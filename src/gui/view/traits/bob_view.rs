@@ -16,11 +16,15 @@ impl ViewBuilder<BobModel> for BobViewBuilder {
         let common_components = CommonViewComponentsDefault::new();
 
         let cust_size_var_1 = EntrySize {
-            width: 500.0,
+            width: 800.0,
             height: 50.0,
         };
         let cust_size_var_2 = EntrySize {
             width: 1200.0,
+            height: 75.0,
+        };
+        let cust_size_var_3 = EntrySize {
+            width: 1090.0,
             height: 75.0,
         };
 
@@ -52,7 +56,7 @@ impl ViewBuilder<BobModel> for BobViewBuilder {
             BobModel::private_exponent,
             Some(cust_size_var_2),
             None,
-            Some(Alignment::Left),
+            Some(Alignment::Center),
         );
 
         let signature_entry = common_components.create_entry_static(
@@ -60,7 +64,7 @@ impl ViewBuilder<BobModel> for BobViewBuilder {
             "Wird automatisch berechnet",
             true,
             BobModel::signature_msg,
-            Some(cust_size_var_2),
+            Some(cust_size_var_3),
             None,
             Some(Alignment::Left),
         );

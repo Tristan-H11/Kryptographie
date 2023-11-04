@@ -41,14 +41,13 @@ impl Default for AppController {
     /// Erstellt eine neue Instanz des AppControllers mit 1er Werten für die Keys.
     ///
     fn default() -> Self {
-        //todo -- auf realistische kleine Schlüssel umstellen und nicht auf 1
         debug!("Erstelle Default-AppController");
         AppController {
-            alice_private_key: PrivateKey::new(big_i!(1), big_i!(1), &big_i!(55296)),
-            alice_public_key: PublicKey::new(big_i!(1), big_i!(1), &big_i!(55296)),
+            alice_private_key: PrivateKey::new(big_i!(351691), big_i!(8108339), &big_i!(55296)),
+            alice_public_key: PublicKey::new(big_i!(1751731), big_i!(8108339), &big_i!(55296)),
 
-            bob_private_key: PrivateKey::new(big_i!(1), big_i!(1), &big_i!(55296)),
-            bob_public_key: PublicKey::new(big_i!(1), big_i!(1), &big_i!(55296)),
+            bob_private_key: PrivateKey::new(big_i!(351691), big_i!(8108339), &big_i!(55296)),
+            bob_public_key: PublicKey::new(big_i!(1751731), big_i!(8108339), &big_i!(55296)),
         }
     }
 }
