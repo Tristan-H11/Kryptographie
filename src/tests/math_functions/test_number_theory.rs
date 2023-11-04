@@ -8,6 +8,7 @@ mod tests {
     use crate::encryption::math_functions::number_theory::{
         extended_euclid, fast_exponentiation, miller_rabin, modulo_inverse,
     };
+    use crate::encryption::math_functions::random_elsner::RandomElsner;
 
     #[test]
     fn fast_exponentiation_happy_flow() {
@@ -133,21 +134,22 @@ mod tests {
 
     #[test]
     fn miller_rabin_test() {
-        assert_eq!(miller_rabin(&big_i!(11), 40, &big_i!(11)), true);
+        let random_generator:&mut RandomElsner = &mut RandomElsner::new(&big_i!(11));
+        assert_eq!(miller_rabin(&big_i!(11), 40, random_generator), true);
         assert_eq!(
-            miller_rabin(&big_i!(8727030382015287123761), 40, &big_i!(11)),
+            miller_rabin(&big_i!(8727030382015287123761), 40, random_generator),
             false
         );
         assert_eq!(
-            miller_rabin(&big_i!(2459872438590349034582), 40, &big_i!(11)),
+            miller_rabin(&big_i!(2459872438590349034582), 40, random_generator),
             false
         );
-        assert_eq!(miller_rabin(&big_i!(2211), 40, &big_i!(11)), false);
+        assert_eq!(miller_rabin(&big_i!(2211), 40, random_generator), false);
         assert_eq!(
             miller_rabin(
                 &BigInt::from_str("79617341660363802320192939486040130094939703771377").unwrap(),
                 40,
-                &big_i!(11)
+                random_generator
             ),
             true
         );

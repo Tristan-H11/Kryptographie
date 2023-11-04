@@ -117,7 +117,7 @@ pub fn extended_euclid(n: &BigInt, modul: &BigInt) -> (BigInt, BigInt, BigInt) {
 /// miller_rabin(11, 40) // => true
 /// miller_rabin(2211, 40) // => false
 /// ```
-pub fn miller_rabin(p: &BigInt, repeats: usize, random_seed: &BigInt) -> bool {
+pub fn miller_rabin(p: &BigInt, repeats: usize, random_generator: &mut RandomElsner) -> bool {
     let mut d = p.decrement();
     let mut s = BigInt::zero();
 
@@ -126,13 +126,11 @@ pub fn miller_rabin(p: &BigInt, repeats: usize, random_seed: &BigInt) -> bool {
         s.increment_assign();
     }
 
-    let mut rand = RandomElsner::new(&big_i!(2), &p, random_seed);
-
     (0..repeats).into_iter().all(|_| {
         // TODO Parallelisieren
-        let mut a = rand.take();
+        let mut a = random_generator.take(&big_i!(2), &p);
         while p.is_divisible_by(&a) {
-            a = rand.take();
+            a = random_generator.take(&big_i!(2), &p);
         }
         miller_rabin_test(p, &s, &d, &a)
     })

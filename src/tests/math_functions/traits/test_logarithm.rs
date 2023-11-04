@@ -17,5 +17,9 @@ mod tests {
         let x3 = big_i!(7);
         let base3 = big_i!(3);
         assert_eq!(x3.log(&base3), 1);
+
+        let x4 = big_i!(2).pow(256);
+        let base4 = big_i!(55296);
+        assert_eq!(x4.log(&base4), 16);
     }
 }
