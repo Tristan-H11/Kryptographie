@@ -13,11 +13,11 @@ pub trait Logarithm {
     /// # Rückgabe
     ///
     /// * `u32` - Der abgerundete Logarithmus.
-    fn log(&self, base: &Self) -> u32;
+    fn log(&self, base: &Self) -> usize;
 }
 
 impl<T: One + Clone + Mul<Output = T> + PartialOrd> Logarithm for T {
-    fn log(&self, base: &Self) -> u32 {
+    fn log(&self, base: &Self) -> usize {
         let mut count = 0;
         let mut current_value = T::one();
 
