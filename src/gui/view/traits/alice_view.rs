@@ -49,18 +49,19 @@ impl ViewBuilder<AliceModel> for AliceViewBuilder {
             .with_child(plaintext_entry)
             .with_child(ciphertext_entry);
 
+
         let encrypt_button = common_components.create_button_static(
             "Mit Bobs PublicKey verschlüsseln",
             ENCRYPT,
             None,
-            Some(15.0),
+            None,
             None,
         );
         let decrypt_button = common_components.create_button_static(
             "Mit eigenem PrivateKey entschlüsseln",
             DECRYPT,
             None,
-            Some(15.0),
+            None,
             None,
         );
         let encrypt_decrypt_row = Flex::row()
@@ -128,6 +129,7 @@ impl ViewBuilder<AliceModel> for AliceViewBuilder {
         Flex::column()
             .with_flex_spacer(common_components.flex_space_default)
             .with_flex_child(plainttext_chiffre_row, 0.2)
+            .with_flex_spacer(0.125)
             .with_flex_child(encrypt_decrypt_row, 0.2)
             .with_flex_child(secret_exponent_entry, 0.1)
             .with_flex_child(calc_sign_button, 0.1)
