@@ -126,16 +126,13 @@ impl RsaKeygenService {
         let lower_bound = &big_i!(2).pow(size - 1);
 
         let mut prime_candidate = random_generator.take_uneven(lower_bound, upper_bound);
-        let mut count = 0;
         while !miller_rabin(&prime_candidate, miller_rabin_iterations, random_generator) {
-            count += 1;
             trace!(
                 "Generierter Primkandidat {} ist keine Primzahl",
                 prime_candidate
             );
             prime_candidate = random_generator.take_uneven(lower_bound, upper_bound);
         }
-        println!("Anzahl der Versuche: {}", count);
         debug!(
             "Generierter Primkandidat {} ist eine Primzahl",
             prime_candidate
