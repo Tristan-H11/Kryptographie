@@ -24,22 +24,7 @@ use crate::encryption::math_functions::traits::increment::Increment;
 /// fast_exponentiation(95, 130, 7) // => '4'
 /// ```
 pub fn fast_exponentiation(base: &BigInt, exponent: &BigInt, modul: &BigInt) -> BigInt {
-    // Sonderbedingungen der Exponentiation
-    if modul.is_one() {
-        return BigInt::zero();
-    }
-    let mut result = BigInt::one();
-    let mut base = base.clone();
-    let mut exp = exponent.clone();
-
-    while !exp.is_zero() {
-        if exp.is_odd() {
-            result = (result * &base).rem_euclid(modul);
-        }
-        base = (&base * &base).rem_euclid(modul);
-        exp.half_assign();
-    }
-    result
+    base.modpow(exponent, modul)
 }
 
 /// Berechnet das Inverse-Element in einem Restklassenring.
