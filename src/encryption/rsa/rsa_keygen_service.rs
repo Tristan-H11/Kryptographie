@@ -1,6 +1,6 @@
 use bigdecimal::num_bigint::BigInt;
 use bigdecimal::One;
-use log::{debug, trace};
+use log::{debug, error, trace};
 use rayon::prelude::{IntoParallelIterator, ParallelIterator};
 
 use crate::big_i;
@@ -131,7 +131,11 @@ impl RsaKeygenService {
         let mut prime_candidate = random_generator.take_uneven(lower_bound, upper_bound);
 
         loop {
-            if primitive_prime_checks(&prime_candidate) {
+            if prime_candidate < big_i!(10000) {
+                error!("Die erzeugte Zufallszahl ist kleiner als 10'000, der Algorithmus wird fehlschlagen!");
+                // TODO schön machen. Prüfung und entsprechend nur is_in_first_10000_primes aufrufen
+            }
+            if passes_primitive_prime_checks(&prime_candidate) {
                 // Ist die Zahl laut primitiver Tests scheinbar keine zusammengesetzte,
                 // so darf Miller-Rabin laufen
                 if miller_rabin(&prime_candidate, miller_rabin_iterations, random_generator) {
@@ -213,12 +217,14 @@ impl RsaKeygenService {
 
 ///
 /// Primitive Prüfung auf übliche Composite-Zahlen einer Nicht-Null und ungeraden Eingabezahl
+/// **Achtung: Funktioniert nur für Prime-Kandidaten größer 10'000**
 ///
-fn primitive_prime_checks(prime_candidate: &BigInt) -> bool {
+fn passes_primitive_prime_checks(prime_candidate: &BigInt) -> bool {
     let small_primes = get_primes_to_10_000();
 
-    small_primes.into_par_iter().all(|prime| {
+    let prime_division_test = small_primes.into_par_iter().all(|prime| {
         prime_candidate.is_not_divisible_by(&big_i!(prime))
-    })
-
+    });
+    //TODO Man könnte noch den fermatschen Primzahltest einbauen. Obs das aber schneller macht..?
+    prime_division_test
 }
