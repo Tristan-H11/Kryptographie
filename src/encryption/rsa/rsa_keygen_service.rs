@@ -154,7 +154,13 @@ impl RsaKeygenService {
     fn generate_e(&self, phi: &BigInt, random_generator: &mut RandomElsner) -> BigInt {
         debug!("Generiere e mit phi {}", phi);
 
-        let mut e = random_generator.take(&big_i!(3u8), &phi.decrement());
+        let fermat_four = big_i!(65537);
+        let mut e;
+        if &phi.decrement() < &fermat_four {
+            e = random_generator.take(&big_i!(3u8), &phi.decrement());
+        } else {
+            e = fermat_four
+        };
         while e < *phi {
             let euclid = &extended_euclid(&e, &phi).0;
             if euclid.is_one() {
