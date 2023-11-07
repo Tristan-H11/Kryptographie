@@ -29,7 +29,7 @@ impl PublicKey {
     ///
     pub fn new(e: BigInt, n: BigInt, g_base: &BigInt) -> PublicKey {
         // Maximale Blockbreite = log_g(n).
-        let block_size = n.log(g_base) as usize;
+        let block_size = n.log(g_base);
         debug!("Blocksize in der PublicKey-Erstellung: {}", block_size);
         PublicKey { e, n, block_size }
     }
@@ -78,12 +78,8 @@ impl PublicKey {
     pub(crate) fn encrypt(&self, message: &str, g_base: &BigInt) -> String {
         info!("Verschlüsseln mit blockgröße {}", self.block_size);
 
-        let chunks = create_blocks_from_string_encrypt(
-            message.trim_end(),
-            self.block_size,
-            true,
-            g_base,
-        );
+        let chunks =
+            create_blocks_from_string_encrypt(message.trim_end(), self.block_size, true, g_base);
         let encrypted_chunks = chunks
             .iter()
             .map(|chunk| fast_exponentiation(chunk, &self.e, &self.n))
@@ -134,7 +130,7 @@ impl PrivateKey {
     ///
     pub fn new(d: BigInt, n: BigInt, g_base: &BigInt) -> PrivateKey {
         // Die Größe der verschlüsselten Blöcke ist immer um 1 größer als die Klartextgröße.
-        let block_size = (n.log(g_base) + 1) as usize;
+        let block_size = n.log(g_base) + 1;
         debug!("Blocksize in der PrivateKey-Erstellung: {}", block_size);
         PrivateKey { d, n, block_size }
     }

@@ -41,14 +41,13 @@ impl Default for AppController {
     /// Erstellt eine neue Instanz des AppControllers mit 1er Werten für die Keys.
     ///
     fn default() -> Self {
-        //todo -- auf realistische kleine Schlüssel umstellen und nicht auf 1
         debug!("Erstelle Default-AppController");
         AppController {
-            alice_private_key: PrivateKey::new(big_i!(1), big_i!(1), &big_i!(55296)),
-            alice_public_key: PublicKey::new(big_i!(1), big_i!(1), &big_i!(55296)),
+            alice_private_key: PrivateKey::new(big_i!(351691), big_i!(8108339), &big_i!(55296)),
+            alice_public_key: PublicKey::new(big_i!(1751731), big_i!(8108339), &big_i!(55296)),
 
-            bob_private_key: PrivateKey::new(big_i!(1), big_i!(1), &big_i!(55296)),
-            bob_public_key: PublicKey::new(big_i!(1), big_i!(1), &big_i!(55296)),
+            bob_private_key: PrivateKey::new(big_i!(351691), big_i!(8108339), &big_i!(55296)),
+            bob_public_key: PublicKey::new(big_i!(1751731), big_i!(8108339), &big_i!(55296)),
         }
     }
 }
@@ -83,27 +82,14 @@ impl AppController {
             Event::Command(cmd) if cmd.is(DECRYPT) => {
                 self.a_decrypt_b_msg(app_state);
             }
-            // wenn ciphre, dann signiere diese, wenn keine, dann signiere plaintext
             Event::Command(cmd) if cmd.is(SIGN) => {
-                if !app_state.alice.ciphre_msg.is_empty() {
-                    self.a_sign_a_ciphre(app_state);
-                } else {
-                    self.a_sign_a_plaint(app_state);
-                }
+                    self.a_sign_a_msg(app_state);
             }
             Event::Command(cmd) if cmd.is(VERIFY) => {
-                if !app_state.alice.ciphre_msg.is_empty() {
-                    self.a_verify_b_msg_ciphre(app_state);
-                } else {
-                    self.a_verify_b_msg_plaint(app_state);
-                }
+                    self.a_verify_b_msg(app_state);
             }
             Event::Command(cmd) if cmd.is(SEND_MESSAGE) => {
-                if !app_state.alice.ciphre_msg.is_empty() {
-                    self.a_send_b_ciphre_msg(app_state);
-                } else {
-                    self.a_send_b_plaint_msg(app_state);
-                }
+                    self.a_send_b_msg(app_state);
             }
             Event::Command(cmd) if cmd.is(CLEAR) => {
                 self.a_clear_a_view(app_state);
@@ -124,25 +110,13 @@ impl AppController {
                 self.b_decode_b_msg(app_state);
             }
             Event::Command(cmd) if cmd.is(SIGN) => {
-                if !app_state.bob.ciphre_msg.is_empty() {
-                    self.b_sign_b_ciphre(app_state);
-                } else {
-                    self.b_sign_b_plaint(app_state);
-                }
+                self.b_sign_b_msg(app_state);
             }
             Event::Command(cmd) if cmd.is(VERIFY) => {
-                if !app_state.bob.ciphre_msg.is_empty() {
-                    self.b_verify_a_ciphre_msg(app_state);
-                } else {
-                    self.b_verify_a_plaint_msg(app_state);
-                }
+                self.b_verify_a_msg(app_state);
             }
             Event::Command(cmd) if cmd.is(SEND_MESSAGE) => {
-                if !app_state.bob.ciphre_msg.is_empty() {
-                    self.b_send_a_ciphre_msg(app_state);
-                } else {
-                    self.b_send_a_plaint_msg(app_state);
-                }
+                self.b_send_a_msg(app_state);
             }
             Event::Command(cmd) if cmd.is(CLEAR) => {
                 self.clear_bob(app_state);
@@ -188,7 +162,7 @@ impl AppController {
     /// Berechnet ein Schlüsselpaar
     ///
     fn calculate_keypair(&mut self, app_state: &mut AppState) -> (PublicKey, PrivateKey) {
-        let modul_width = match app_state.main_menu.modul_width.parse::<usize>() {
+        let modul_width = match app_state.main_menu.modul_width.parse::<u32>() {
             Ok(x) => x,
             Err(_) => {
                 error!(
@@ -200,21 +174,18 @@ impl AppController {
             }
         };
         let keygen_service = RsaKeygenService::new(modul_width);
-        let miller_rabin_iterations = match app_state
-            .main_menu
-            .miller_rabin_iterations
-            .parse::<usize>()
-        {
-            Ok(x) => x,
-            Err(_) => {
-                error!(
+        let miller_rabin_iterations =
+            match app_state.main_menu.miller_rabin_iterations.parse::<u32>() {
+                Ok(x) => x,
+                Err(_) => {
+                    error!(
                     "Fehler beim Parsen der Miller-Rabin-Iterationen. Es wird ein Default-Wert \
                         von 100 Iterationen verwendet."
                 );
-                app_state.main_menu.miller_rabin_iterations = String::from("100");
-                100
-            }
-        };
+                    app_state.main_menu.miller_rabin_iterations = String::from("100");
+                    100
+                }
+            };
 
         let random_seed = match app_state.main_menu.random_seed.parse::<i32>() {
             Ok(x) => x,
@@ -225,13 +196,8 @@ impl AppController {
             }
         };
 
-
         let base = Self::parse_base(app_state);
-        keygen_service.generate_keypair(
-            miller_rabin_iterations,
-            &big_i!(random_seed),
-            &base
-        )
+        keygen_service.generate_keypair(miller_rabin_iterations, &big_i!(random_seed), &base)
     }
 
     ///
@@ -274,74 +240,59 @@ impl AppController {
         app_state.alice.plaintext_msg = decrypted;
     }
 
-    //todo -- die signaturen von ciphre und signaturen von unverschlüsselt
-    // können in traits mit structs ausgelagert werden
-
     ///
     /// Signiert die Nachricht von Alice mit ihrem privaten Schlüssel.
     ///
-    fn a_sign_a_plaint(&mut self, _app_state: &mut AppState) {
+
+    fn a_sign_a_msg(&mut self, _app_state: &mut AppState) {
         info!("Signiere Nachricht von Alice");
-        let msg = _app_state.alice.plaintext_msg.clone();
-        let signed = self.alice_private_key.sign(&msg);
-        _app_state.alice.signature_msg = signed;
+        if !_app_state.alice.ciphre_msg.is_empty() {
+            let msg = _app_state.alice.ciphre_msg.clone();
+            let signed = self.alice_private_key.sign(&msg);
+            _app_state.alice.signature_msg = signed;
+        } else {
+            let msg = _app_state.alice.plaintext_msg.clone();
+            let signed = self.alice_private_key.sign(&msg);
+            _app_state.alice.signature_msg = signed;
+        }
     }
 
     ///
-    /// Signiert die Nachricht von Alice mit ihrem privaten Schlüssel.
+    /// Sendet die Nachricht von Alice an Bob
     ///
-    fn a_sign_a_ciphre(&mut self, _app_state: &mut AppState) {
-        info!("Signiere Nachricht von Alice");
-        let msg = _app_state.alice.ciphre_msg.clone();
-        let signed = self.alice_private_key.sign(&msg);
-        _app_state.alice.signature_msg = signed;
-    }
-
-    ///
-    /// Sendet die Nachricht von Alice an Bob -- nachricht war verschlüsselt
-    ///
-    fn a_send_b_ciphre_msg(&mut self, app_state: &mut AppState) {
+    fn a_send_b_msg(&mut self, _app_state: &mut AppState) {
         info!("Sende Nachricht von Alice an Bob");
-        let msg_to_send = &app_state.alice.ciphre_msg;
-        app_state.bob.ciphre_msg = msg_to_send.clone();
-        let signature = &app_state.alice.signature_msg;
-        app_state.bob.signature_msg = signature.clone();
-        // self.clear_alice(app_state); not needed because we have the Button to delete
-    }
-
-    ///
-    /// Sendet die Nachricht von Alice an Bob -- nachricht war unverschlüsselt
-    ///
-    fn a_send_b_plaint_msg(&mut self, app_state: &mut AppState) {
-        info!("Sende Nachricht von Alice an Bob");
-        let msg_to_send = &app_state.alice.plaintext_msg;
-        app_state.bob.plaintext_msg = msg_to_send.clone();
-        let signature = &app_state.alice.signature_msg;
-        app_state.bob.signature_msg = signature.clone();
-        // self.clear_alice(app_state); not needed because we have the Button to delete
+        if !_app_state.alice.ciphre_msg.is_empty() {
+            let msg_to_send = &_app_state.alice.ciphre_msg;
+            _app_state.bob.ciphre_msg = msg_to_send.clone();
+            let signature = &_app_state.alice.signature_msg;
+            _app_state.bob.signature_msg = signature.clone();
+        } else {
+            let msg_to_send = &_app_state.alice.plaintext_msg;
+            _app_state.bob.plaintext_msg = msg_to_send.clone();
+            let signature = &_app_state.alice.signature_msg;
+            _app_state.bob.signature_msg = signature.clone();
+        }
     }
 
     ///
     /// Verifiziert die Nachricht von Bob mit seinem öffentlichen Schlüssel.
     ///
-    fn a_verify_b_msg_ciphre(&mut self, _app_state: &mut AppState) {
+    fn a_verify_b_msg(&mut self, _app_state: &mut AppState) {
         info!("Verifiziere Nachricht von Bob");
-        let msg = _app_state.alice.ciphre_msg.clone();
-        let signature = _app_state.alice.signature_msg.clone();
-        let verified = self.bob_public_key.verify(&signature, &msg);
-        _app_state.alice.signature_status = verified;
+        if !_app_state.alice.ciphre_msg.is_empty() {
+            let msg = _app_state.alice.ciphre_msg.clone();
+            let signature = _app_state.alice.signature_msg.clone();
+            let verified = self.bob_public_key.verify(&signature, &msg);
+            _app_state.alice.signature_status = verified;
+        } else {
+            let msg = _app_state.alice.plaintext_msg.clone();
+            let signature = _app_state.alice.signature_msg.clone();
+            let verified = self.bob_public_key.verify(&signature, &msg);
+            _app_state.alice.signature_status = verified;
+        }
     }
 
-    ///
-    /// Verifiziert die Nachricht von Bob mit seinem öffentlichen Schlüssel.
-    ///
-    fn a_verify_b_msg_plaint(&mut self, _app_state: &mut AppState) {
-        info!("Verifiziere Nachricht von Bob");
-        let msg = _app_state.alice.plaintext_msg.clone();
-        let signature = _app_state.alice.signature_msg.clone();
-        let verified = self.bob_public_key.verify(&signature, &msg);
-        _app_state.alice.signature_status = verified;
-    }
 
     ///
     /// Löscht die Inhalte von Alice.
@@ -377,70 +328,39 @@ impl AppController {
         app_state.bob.plaintext_msg = decrypted;
     }
 
-    ///
-    /// Signiert die Nachricht von Bob mit seinem privaten Schlüssel.
-    ///
-    fn b_sign_b_ciphre(&mut self, _app_state: &mut AppState) {
+    fn b_sign_b_msg(&mut self, _app_state: &mut AppState) {
         info!("Signiere Nachricht von Bob");
-        let msg = _app_state.bob.ciphre_msg.clone();
+        let msg = if !_app_state.bob.ciphre_msg.is_empty() {
+            _app_state.bob.ciphre_msg.clone()
+        } else {
+            _app_state.bob.plaintext_msg.clone()
+        };
         let signed = self.bob_private_key.sign(&msg);
         _app_state.bob.signature_msg = signed;
     }
 
-    ///
-    /// Signiert die Nachricht von Bob mit seinem privaten Schlüssel.
-    ///
-    fn b_sign_b_plaint(&mut self, _app_state: &mut AppState) {
-        info!("Signiere Nachricht von Bob");
-        let msg = _app_state.bob.plaintext_msg.clone();
-        let signed = self.bob_private_key.sign(&msg);
-        _app_state.bob.signature_msg = signed;
-    }
-
-    ///
-    /// Sendet die Nachricht von Bob an Alice
-    ///
-    fn b_send_a_ciphre_msg(&mut self, app_state: &mut AppState) {
-        info!("Sende Nachricht von Bob an Alice");
-        let cipher_text = &app_state.bob.ciphre_msg;
-        app_state.alice.ciphre_msg = cipher_text.clone();
-        let signature = &app_state.bob.signature_msg;
-        app_state.alice.signature_msg = signature.clone();
-        // self.clear_bob(app_state); Not needed because we have the Button to delete
-    }
-
-    ///
-    /// Sendet die Nachricht von Bob an Alice
-    ///
-    fn b_send_a_plaint_msg(&mut self, app_state: &mut AppState) {
-        info!("Sende Nachricht von Bob an Alice");
-        let plain_msg = &app_state.bob.plaintext_msg;
-        app_state.alice.plaintext_msg = plain_msg.clone();
-        let signature = &app_state.bob.signature_msg;
-        app_state.alice.signature_msg = signature.clone();
-        // self.clear_bob(app_state); Not needed because we have the Button to delete
-    }
-
-    ///
-    /// Verifiziert die Nachricht von Alice mit ihrem öffentlichen Schlüssel.
-    ///
-    fn b_verify_a_ciphre_msg(&mut self, _app_state: &mut AppState) {
+    fn b_verify_a_msg(&mut self, _app_state: &mut AppState) {
         info!("Verifiziere Nachricht von Alice");
-        let message = _app_state.bob.ciphre_msg.clone();
-        let signature = _app_state.bob.signature_msg.clone();
+        let (message, signature) = if !_app_state.bob.ciphre_msg.is_empty() {
+            (_app_state.bob.ciphre_msg.clone(), _app_state.bob.signature_msg.clone())
+        } else {
+            (_app_state.bob.plaintext_msg.clone(), _app_state.bob.signature_msg.clone())
+        };
         let verified = self.alice_public_key.verify(&signature, &message);
         _app_state.bob.signature_status = verified;
     }
 
-    ///
-    /// Verifiziert die Nachricht von Alice mit ihrem öffentlichen Schlüssel.
-    ///
-    fn b_verify_a_plaint_msg(&mut self, _app_state: &mut AppState) {
-        info!("Verifiziere Nachricht von Alice");
-        let message = _app_state.bob.plaintext_msg.clone();
-        let signature = _app_state.bob.signature_msg.clone();
-        let verified = self.alice_public_key.verify(&signature, &message);
-        _app_state.bob.signature_status = verified;
+    fn b_send_a_msg(&mut self, _app_state: &mut AppState) {
+        info!("Sende Nachricht von Bob an Alice");
+        if !_app_state.bob.ciphre_msg.is_empty() {
+            let cipher_text = &_app_state.bob.ciphre_msg;
+            _app_state.alice.ciphre_msg = cipher_text.clone();
+        } else {
+            let plain_msg = &_app_state.bob.plaintext_msg;
+            _app_state.alice.plaintext_msg = plain_msg.clone();
+        }
+        let signature = &_app_state.bob.signature_msg;
+        _app_state.alice.signature_msg = signature.clone();
     }
 
     ///

@@ -71,6 +71,6 @@ impl RandomElsner {
     /// # Rückgabe
     /// * BigUint
     pub fn take_uneven(&mut self, a: &BigInt, b: &BigInt) -> BigInt {
-        self.take(a,b) | BigInt::one()
+        self.take(a, b) | BigInt::one()
     }
 }
