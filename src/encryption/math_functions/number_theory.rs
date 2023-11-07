@@ -3,12 +3,12 @@ use std::io::{Error, ErrorKind};
 use bigdecimal::num_bigint::BigInt;
 use bigdecimal::num_traits::Euclid;
 use bigdecimal::{One, Zero};
+use num::Integer;
 
 use crate::big_i;
 use crate::encryption::math_functions::random_elsner::RandomElsner;
 use crate::encryption::math_functions::traits::divisible::Divisible;
 use crate::encryption::math_functions::traits::increment::Increment;
-use crate::encryption::math_functions::traits::parity::Parity;
 
 ///
 /// Schnelle Exponentiation der Potenz und Reduzierung um einen Modul.
