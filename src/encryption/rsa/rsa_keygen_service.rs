@@ -1,12 +1,15 @@
 use bigdecimal::num_bigint::BigInt;
 use bigdecimal::One;
 use log::{debug, trace};
+use rayon::prelude::{IntoParallelIterator, ParallelIterator};
 
 use crate::big_i;
 use crate::encryption::math_functions::number_theory::{
     extended_euclid, miller_rabin, modulo_inverse,
 };
 use crate::encryption::math_functions::random_elsner::RandomElsner;
+use crate::encryption::math_functions::small_primes::get_primes_to_10_000;
+use crate::encryption::math_functions::traits::divisible::Divisible;
 use crate::encryption::math_functions::traits::increment::Increment;
 use crate::encryption::rsa::keys::{PrivateKey, PublicKey};
 
@@ -126,13 +129,24 @@ impl RsaKeygenService {
         let lower_bound = &big_i!(2).pow(size - 1);
 
         let mut prime_candidate = random_generator.take_uneven(lower_bound, upper_bound);
-        while !miller_rabin(&prime_candidate, miller_rabin_iterations, random_generator) {
+
+        loop {
+            if primitive_prime_checks(&prime_candidate) {
+                // Ist die Zahl laut primitiver Tests scheinbar keine zusammengesetzte,
+                // so darf Miller-Rabin laufen
+                if miller_rabin(&prime_candidate, miller_rabin_iterations, random_generator) {
+                    // Gibt der Miller-Rabin `wahr` zurück, sind wir fertig
+                    break;
+                }
+            }
+
             trace!(
                 "Generierter Primkandidat {} ist keine Primzahl",
                 prime_candidate
             );
             prime_candidate = random_generator.take_uneven(lower_bound, upper_bound);
         }
+
         debug!(
             "Generierter Primkandidat {} ist eine Primzahl",
             prime_candidate
@@ -195,4 +209,16 @@ impl RsaKeygenService {
         debug!("d ist {}", d);
         d
     }
+}
+
+///
+/// Primitive Prüfung auf übliche Composite-Zahlen einer Nicht-Null und ungeraden Eingabezahl
+///
+fn primitive_prime_checks(prime_candidate: &BigInt) -> bool {
+    let small_primes = get_primes_to_10_000();
+
+    small_primes.into_par_iter().all(|prime| {
+        prime_candidate.is_not_divisible_by(&big_i!(prime))
+    })
+
 }
