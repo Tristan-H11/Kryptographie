@@ -82,22 +82,9 @@ pub fn modulo_inverse(n: &BigInt, modul: &BigInt) -> Result<BigInt, Error> {
 /// * (ggT(n,modul),x,y)
 /// Ein tripel aus dem groessten gemeinsamen Teiler einer Zahl `n` und dem `modul`,
 /// sowie den zwei Faktoren `x` und `y`.
-pub fn extended_euclid(n: &BigInt, modul: &BigInt) -> (BigInt, BigInt, BigInt) {
-    //rotierendes Array, zur Berechnung und Speicherung der Faktoren `x` und `y`
-    let mut xy = [BigInt::one(), BigInt::zero(), BigInt::zero(), BigInt::one()];
-    let mut m = modul.clone();
-    let mut n = n.clone();
-    while !m.is_zero() {
-        // Berechnet die Faktoren und speichert sie in einem rotierenden Array.
-        let div = &n / &m;
-        xy[0] = &xy[0] - (&div * &xy[2]);
-        xy[1] = &xy[1] - (&div * &xy[3]);
-        let tmp = &n % &m;
-        n = m;
-        m = tmp;
-        xy.rotate_right(2);
-    }
-    (n.clone(), xy[0].clone(), xy[1].clone())
+pub fn extended_euclid(a: &BigInt, b: &BigInt) -> (BigInt, BigInt, BigInt) {
+    let e = a.extended_gcd(b);
+    (e.gcd, e.x, e.y)
 }
 
 /// Führt den Miller-Rabin-Primzahltest auf `p` mit `repeats` Runden aus.
