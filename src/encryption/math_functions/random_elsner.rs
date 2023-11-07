@@ -28,15 +28,16 @@ impl RandomElsner {
     /// * RandomElsner
     ///
     pub fn new(random_seed: &BigInt) -> Self {
+        let mut initial_random = random_seed.clone();
         let sqrt_m;
         loop {
-            match big_d!(random_seed.clone()).sqrt() {
+            match big_d!(initial_random.clone()).sqrt() {
                 Some(sqrt) => {
                     if sqrt.is_not_divisible_by(&BigDecimal::one()) {
                         sqrt_m = sqrt;
                         break;
                     } else {
-                        panic!("Random_seed darf keine Quadratzahl sein!") // TODO Anständig machen.
+                        initial_random.increment_assign()
                     }
                 }
                 None => panic!("Wurzel m konnte nicht berechnet werden."),
