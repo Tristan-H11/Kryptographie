@@ -149,7 +149,7 @@ pub(crate) fn split_into_blocks(message: &str, block_size: usize, fill_block: bo
                 }
             }
             trace!("Erstellte Block '{}'", b);
-            b.replace("\u{FE8D}", "")
+            b.replace("\u{FE8D}", "") // TODO Durch Mattis "0-Idee" ersetzten
         })
         .collect()
 }
