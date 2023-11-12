@@ -77,15 +77,15 @@ pub(crate) fn create_string_from_blocks_encrypt(
     let strings = sums_vec_to_string_vec(sums, &big_i!(g_base));
     debug!("Chiffrierter Vector: {:?}", strings);
 
-    // Füllt jeden String mit dem Zeichen "\u{FE8D}", um die maximale Länge zu erreichen
+    // Füllt jeden String vorne mit "0", um die maximale Länge zu erreichen
     // -- ziel ist es, eine einheitliche blocksize zu erhalten
     let strings: Vec<String> = strings
         .iter()
         .map(|s| {
             format!(
                 "{}{}",
-                s,
-                "\u{FE8D}".repeat(target_size - s.chars().count())
+                "\u{0}".repeat(target_size - s.chars().count()),
+                s
             )
         })
         .collect();
@@ -149,7 +149,7 @@ pub(crate) fn split_into_blocks(message: &str, block_size: usize, fill_block: bo
                 }
             }
             trace!("Erstellte Block '{}'", b);
-            b.replace("\u{FE8D}", "") // TODO Durch Mattis "0-Idee" ersetzten
+            b
         })
         .collect()
 }
