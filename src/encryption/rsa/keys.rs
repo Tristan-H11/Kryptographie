@@ -1,6 +1,7 @@
 use bigdecimal::num_bigint::{BigInt, Sign};
 use log::{debug, info};
 use sha2::{Digest, Sha256};
+use crate::big_i;
 
 use crate::encryption::math_functions::block_chiffre::{
     create_blocks_from_string_decrypt, create_blocks_from_string_encrypt,
@@ -27,9 +28,9 @@ impl PublicKey {
     /// * `e` - Der öffentliche Exponent.
     /// * `n` - Das Produkt der beiden Primzahlen.
     ///
-    pub fn new(e: BigInt, n: BigInt, g_base: &BigInt) -> PublicKey {
+    pub fn new(e: BigInt, n: BigInt, g_base: u32) -> PublicKey {
         // Maximale Blockbreite = log_g(n).
-        let block_size = n.log(g_base);
+        let block_size = n.log(&big_i!(g_base));
         debug!("Blocksize in der PublicKey-Erstellung: {}", block_size);
         PublicKey { e, n, block_size }
     }
@@ -75,7 +76,7 @@ impl PublicKey {
     ///
     /// * `String` - Die verschlüsselte Nachricht.
     ///
-    pub(crate) fn encrypt(&self, message: &str, g_base: &BigInt) -> String {
+    pub(crate) fn encrypt(&self, message: &str, g_base: u32) -> String {
         info!("Verschlüsseln mit blockgröße {}", self.block_size);
 
         let chunks =
@@ -128,9 +129,9 @@ impl PrivateKey {
     /// * `d` - Der private Exponent.
     /// * `n` - Das Produkt der beiden Primzahlen.
     ///
-    pub fn new(d: BigInt, n: BigInt, g_base: &BigInt) -> PrivateKey {
+    pub fn new(d: BigInt, n: BigInt, g_base: u32) -> PrivateKey {
         // Die Größe der verschlüsselten Blöcke ist immer um 1 größer als die Klartextgröße.
-        let block_size = n.log(g_base) + 1;
+        let block_size = n.log(&big_i!(g_base)) + 1;
         debug!("Blocksize in der PrivateKey-Erstellung: {}", block_size);
         PrivateKey { d, n, block_size }
     }
@@ -169,7 +170,7 @@ impl PrivateKey {
     ///
     /// * `String` - Die entschlüsselte Nachricht.
     ///
-    pub(crate) fn decrypt(&self, message: &str, g_base: &BigInt) -> String {
+    pub(crate) fn decrypt(&self, message: &str, g_base: u32) -> String {
         info!("Entschlüsseln mit blockgröße {}", self.block_size);
 
         let chunks = create_blocks_from_string_decrypt(message, true, g_base, self.block_size);

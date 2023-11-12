@@ -49,7 +49,7 @@ impl RsaKeygenService {
         &self,
         miller_rabin_iterations: u32,
         random_seed: &BigInt,
-        g_base: &BigInt,
+        g_base: u32,
     ) -> (PublicKey, PrivateKey) {
         debug!(
             "Generiere Schlüsselpaar mit key_size {} und Miller-Rabin-Iterations {}",
