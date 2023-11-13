@@ -82,10 +82,11 @@ impl RsaKeygenService {
     ) -> (BigInt, BigInt) {
         let prim_size = self.key_size / 2;
 
+        let n = &mut 1u128;
+
         let (prime_one, mut prime_two) = (
-            //rayon::join( TODO Tristan: wieder einbauen
-            self.generate_prime(prim_size, miller_rabin_iterations, random_generator),
-            self.generate_prime(prim_size, miller_rabin_iterations, random_generator),
+            self.generate_prime(prim_size, miller_rabin_iterations, random_generator, n),
+            self.generate_prime(prim_size, miller_rabin_iterations, random_generator, n),
         );
         while prime_one == prime_two {
             trace!(
@@ -93,7 +94,7 @@ impl RsaKeygenService {
                 prime_one,
                 prime_two
             );
-            prime_two = self.generate_prime(prim_size, miller_rabin_iterations, random_generator);
+            prime_two = self.generate_prime(prim_size, miller_rabin_iterations, random_generator, n);
         }
         (prime_one, prime_two)
     }
@@ -115,7 +116,8 @@ impl RsaKeygenService {
         &self,
         size: u32,
         miller_rabin_iterations: u32,
-        random_generator: &mut RandomElsner,
+        random_generator: &RandomElsner,
+        index_for_random_generator: &mut u128,
     ) -> BigInt {
         debug!(
             "Generiere eine Primzahl mit size {} und Miller-Rabin-Iterations {}",
@@ -125,13 +127,13 @@ impl RsaKeygenService {
         let upper_bound = &big_i!(2).pow(size);
         let lower_bound = &big_i!(2).pow(size - 1);
 
-        let mut prime_candidate = random_generator.take_uneven(lower_bound, upper_bound);
+        let mut prime_candidate = random_generator.take_uneven(lower_bound, upper_bound, index_for_random_generator);
         while !miller_rabin(&prime_candidate, miller_rabin_iterations, random_generator) {
             trace!(
                 "Generierter Primkandidat {} ist keine Primzahl",
                 prime_candidate
             );
-            prime_candidate = random_generator.take_uneven(lower_bound, upper_bound);
+            prime_candidate = random_generator.take_uneven(lower_bound, upper_bound, index_for_random_generator);
         }
         debug!(
             "Generierter Primkandidat {} ist eine Primzahl",
@@ -151,10 +153,10 @@ impl RsaKeygenService {
     ///
     /// Die generierte Zahl `e`.
     ///
-    fn generate_e(&self, phi: &BigInt, random_generator: &mut RandomElsner) -> BigInt {
+    fn generate_e(&self, phi: &BigInt, random_generator: &RandomElsner) -> BigInt {
         debug!("Generiere e mit phi {}", phi);
 
-        let mut e = random_generator.take(&big_i!(3u8), &phi.decrement());
+        let mut e = random_generator.take(&big_i!(3u8), &phi.decrement(), &mut 1);
         while e < *phi {
             let euclid = &extended_euclid(&e, &phi).0;
             if euclid.is_one() {
@@ -162,7 +164,7 @@ impl RsaKeygenService {
                 return e;
             }
             trace!("Generierter e {} ist nicht relativ prim zu phi {}", e, phi);
-            e += BigInt::one();
+            e.increment_assign();
         }
         panic!("Kein e gefunden, das relativ prim zu phi {} ist", phi);
     }

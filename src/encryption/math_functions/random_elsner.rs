@@ -1,6 +1,6 @@
 use bigdecimal::num_bigint::{BigInt, ToBigInt};
-use bigdecimal::{BigDecimal, One, Zero};
-use log::debug;
+use bigdecimal::{BigDecimal, One};
+use log::trace;
 
 use crate::big_d;
 use crate::encryption::math_functions::traits::divisible::Divisible;
@@ -12,7 +12,6 @@ use crate::encryption::math_functions::traits::increment::Increment;
 #[derive(Clone)]
 pub struct RandomElsner {
     sqrt_m: BigDecimal,
-    n: BigInt,
 }
 
 impl RandomElsner {
@@ -45,7 +44,6 @@ impl RandomElsner {
         }
         return Self {
             sqrt_m,
-            n: BigInt::zero(),
         };
     }
 
@@ -55,12 +53,14 @@ impl RandomElsner {
     /// # Rückgabe
     /// * BigUint
     ///
-    pub fn take(&mut self, a: &BigInt, b: &BigInt) -> BigInt {
-        debug!("Zufallszahl aus dem Bereich von {} bis {}", a, b);
-        self.n.increment_assign();
+    pub fn take(&self, a: &BigInt, b: &BigInt, n: &mut u128) -> BigInt {
+        trace!("Zufallszahl aus dem Bereich von {} bis {} mit n {}", a, b, n);
 
-        let factor = (&self.n * &self.sqrt_m) % BigDecimal::one();
+        let factor = (big_d!(*n) * &self.sqrt_m) % BigDecimal::one();
         let range = big_d!(b - a + BigInt::one());
+
+        n.increment_assign();
+
         // Das unwrap() wird niemals fehlschlagen, weil die Implementation von to_bigint() nur
         // Some, aber niemals None zurückgibt. Es ist unklar, warum es überhaupt Option ist.
         a + (factor * range).to_bigint().unwrap()
@@ -71,7 +71,7 @@ impl RandomElsner {
     ///
     /// # Rückgabe
     /// * BigUint
-    pub fn take_uneven(&mut self, a: &BigInt, b: &BigInt) -> BigInt {
-        self.take(a, b) | BigInt::one()
+    pub fn take_uneven(&self, a: &BigInt, b: &BigInt, n: &mut u128) -> BigInt {
+        self.take(a, b, n) | BigInt::one()
     }
 }

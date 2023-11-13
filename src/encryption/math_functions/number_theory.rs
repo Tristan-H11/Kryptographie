@@ -1,8 +1,10 @@
 use std::io::{Error, ErrorKind};
+use std::sync::{Arc, Mutex};
 
 use bigdecimal::num_bigint::BigInt;
 use bigdecimal::num_traits::Euclid;
 use bigdecimal::{One, Zero};
+use rayon::prelude::{IntoParallelIterator, ParallelIterator};
 
 use crate::big_i;
 use crate::encryption::math_functions::random_elsner::RandomElsner;
@@ -117,7 +119,7 @@ pub fn extended_euclid(n: &BigInt, modul: &BigInt) -> (BigInt, BigInt, BigInt) {
 /// miller_rabin(11, 40) // => true
 /// miller_rabin(2211, 40) // => false
 /// ```
-pub fn miller_rabin(p: &BigInt, repeats: u32, random_generator: &mut RandomElsner) -> bool {
+pub fn miller_rabin(p: &BigInt, repeats: u32, random_generator: &RandomElsner) -> bool {
     let mut d = p.decrement();
     let mut s = BigInt::zero();
 
@@ -126,11 +128,18 @@ pub fn miller_rabin(p: &BigInt, repeats: u32, random_generator: &mut RandomElsne
         s.increment_assign();
     }
 
-    (0..repeats).into_iter().all(|_| {
-        // TODO Parallelisieren
-        let mut a = random_generator.take(&big_i!(2), &p);
+    let n_arc = Arc::new(Mutex::new(1u128));
+
+    (0..repeats).into_par_iter().all(|_| {
+        // TODO Tristan: Hübsch machen
+        let n = {
+            let mut n = n_arc.lock().unwrap();
+            n.increment_assign();
+            &mut n.clone()
+        };
+        let mut a = random_generator.take(&big_i!(2), &p, n);
         while p.is_divisible_by(&a) {
-            a = random_generator.take(&big_i!(2), &p);
+            a = random_generator.take(&big_i!(2), &p, n);
         }
         miller_rabin_test(p, &s, &d, &a)
     })

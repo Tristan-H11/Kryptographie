@@ -11,26 +11,28 @@ mod tests {
         let a: BigInt = 1u32.into();
         let b: BigInt = 997u32.into();
 
-        let mut random = RandomElsner::new(&big_i!(13));
+        let random = RandomElsner::new(&big_i!(13));
 
-        assert_eq!(random.take(&a, &b), 604u32.into());
-        assert_eq!(random.take(&a, &b), 211u32.into());
-        assert_eq!(random.take(&a, &b), 815u32.into());
-        assert_eq!(random.take(&a, &b), 421u32.into());
-        assert_eq!(random.take(&a, &b), 28u32.into());
-        assert_eq!(random.take(&a, &b), 632u32.into());
-        assert_eq!(random.take(&a, &b), 239u32.into());
-        assert_eq!(random.take(&a, &b), 842u32.into());
-        assert_eq!(random.take(&a, &b), 449u32.into());
-        assert_eq!(random.take(&a, &b), 56u32.into());
+        let n = &mut 1;
+
+        assert_eq!(random.take(&a, &b, n), 604u32.into());
+        assert_eq!(random.take(&a, &b, n), 211u32.into());
+        assert_eq!(random.take(&a, &b, n), 815u32.into());
+        assert_eq!(random.take(&a, &b, n), 421u32.into());
+        assert_eq!(random.take(&a, &b, n), 28u32.into());
+        assert_eq!(random.take(&a, &b, n), 632u32.into());
+        assert_eq!(random.take(&a, &b, n), 239u32.into());
+        assert_eq!(random.take(&a, &b, n), 842u32.into());
+        assert_eq!(random.take(&a, &b, n), 449u32.into());
+        assert_eq!(random.take(&a, &b, n), 56u32.into());
 
         let a: BigInt = 500u32.into();
         let b: BigInt = 6000u32.into();
 
-        random = RandomElsner::new(&big_i!(40));
+        let random = RandomElsner::new(&big_i!(40));
 
         for _ in 1..500 {
-            let random = random.take(&a, &b);
+            let random = random.take(&a, &b, n);
             assert!(random >= a && random <= b);
         }
     }
@@ -40,10 +42,12 @@ mod tests {
         let a: BigInt = 500u32.into();
         let b: BigInt = 6000u32.into();
 
-        let mut random = RandomElsner::new(&big_i!(23));
+        let random = RandomElsner::new(&big_i!(23));
+
+        let n = &mut 1;
 
         for _ in 1..500 {
-            let random = random.take_uneven(&a, &b);
+            let random = random.take_uneven(&a, &b, n);
             assert!(random >= a && random <= b);
             assert!(random.is_not_divisible_by(&BigInt::from(2)));
         }
