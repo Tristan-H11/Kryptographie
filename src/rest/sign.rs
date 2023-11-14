@@ -11,9 +11,9 @@ pub(crate) async fn sign(req_body: Json<SignRequest>) -> impl Responder {
     let plaintext = req_body.plaintext;
     let private_key = PrivateKey::from_serializable(req_body.private_key);
 
-    let plaintext = private_key.sign(&plaintext);
+    let signature = private_key.sign(&plaintext);
     let response = SingleStringResponse {
-        message: plaintext
+        message: signature
     };
 
     HttpResponse::Ok().json(response)
