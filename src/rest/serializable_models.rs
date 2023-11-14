@@ -10,7 +10,7 @@ pub trait FromToSerializable {
     ///
     /// Erstellt aus dem Modell für die Serialisierung ein Datenmodell.
     ///
-    fn from_serializable(serializable: &Self::T) -> Self;
+    fn from_serializable(serializable: Self::T) -> Self;
 }
 
 impl FromToSerializable for crate::encryption::rsa::keys::PublicKey {
@@ -24,7 +24,7 @@ impl FromToSerializable for crate::encryption::rsa::keys::PublicKey {
         }
     }
 
-    fn from_serializable(serializable: &Self::T) -> Self {
+    fn from_serializable(serializable: Self::T) -> Self {
         crate::encryption::rsa::keys::PublicKey::new_with_blocksize(
             serializable.e.parse().unwrap(),
             serializable.modulus.parse().unwrap(),
@@ -44,7 +44,7 @@ impl FromToSerializable for crate::encryption::rsa::keys::PrivateKey {
         }
     }
 
-    fn from_serializable(serializable: &Self::T) -> Self {
+    fn from_serializable(serializable: Self::T) -> Self {
         crate::encryption::rsa::keys::PrivateKey::new_with_blocksize(
             serializable.d.parse().unwrap(),
             serializable.modulus.parse().unwrap(),
