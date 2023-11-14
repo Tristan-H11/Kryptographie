@@ -187,7 +187,7 @@ impl AppController {
                 }
             };
 
-        let random_seed = match app_state.main_menu.random_seed.parse::<i32>() {
+        let random_seed = match app_state.main_menu.random_seed.parse::<u32>() {
             Ok(x) => x,
             Err(_) => {
                 error!("Fehler beim Parsen des Random-Seeds. Es wird ein Default-Wert von 13 verwendet.");
@@ -197,7 +197,7 @@ impl AppController {
         };
 
         let base = Self::parse_base(app_state);
-        keygen_service.generate_keypair(miller_rabin_iterations, &big_i!(random_seed), base)
+        keygen_service.generate_keypair(miller_rabin_iterations, random_seed, base)
     }
 
     ///

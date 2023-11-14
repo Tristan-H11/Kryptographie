@@ -14,7 +14,7 @@ mod sign_verify_test {
 
         let (public_key, private_key) = keygen.generate_keypair(
             10,
-            13,
+            17,
             g_base
         );
 

@@ -48,14 +48,14 @@ impl RsaKeygenService {
     pub(crate) fn generate_keypair(
         &self,
         miller_rabin_iterations: u32,
-        random_seed: &BigInt,
+        random_seed: u32,
         g_base: u32,
     ) -> (PublicKey, PrivateKey) {
         debug!(
             "Generiere Schlüsselpaar mit key_size {} und Miller-Rabin-Iterations {}",
             self.key_size, miller_rabin_iterations
         );
-        let random_generator = &mut RandomElsner::new(random_seed);
+        let random_generator = &mut RandomElsner::new(&big_i!(random_seed));
 
         let (prime_one, prime_two) =
             self.get_distinct_primes(miller_rabin_iterations, random_generator);
