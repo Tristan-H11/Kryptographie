@@ -1,26 +1,21 @@
 import {Component} from '@angular/core';
 import {MatExpansionModule} from '@angular/material/expansion';
-import {MatDatepickerModule} from '@angular/material/datepicker';
 import {MatInputModule} from '@angular/material/input';
 import {MatFormFieldModule} from '@angular/material/form-field';
-import {MatIconModule} from '@angular/material/icon';
 import {MatButtonModule} from '@angular/material/button';
-import {MatNativeDateModule} from '@angular/material/core';
-import {FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators} from "@angular/forms";
+import {FormsModule} from "@angular/forms";
+import {StartseiteRoutingModule} from "./startseite-routing.module";
 
 
 @Component({
   selector: 'app-startseite',
   standalone: true,
   imports: [
+    StartseiteRoutingModule,
     MatExpansionModule,
-    MatIconModule,
     MatFormFieldModule,
     MatInputModule,
     MatButtonModule,
-    MatDatepickerModule,
-    MatNativeDateModule,
-    ReactiveFormsModule,
     FormsModule,
   ],
   templateUrl: './startseite.component.html',
