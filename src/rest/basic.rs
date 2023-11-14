@@ -1,5 +1,4 @@
-use actix_web::{App, get, HttpResponse, HttpServer, Responder, web};
-use actix_web::dev::Server;
+use actix_web::{HttpResponse, Responder, web};
 use serde::Serialize;
 
 #[derive(Serialize)]
