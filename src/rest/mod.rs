@@ -1,1 +1,1 @@
-mod healthcheck;
+pub mod basic;
