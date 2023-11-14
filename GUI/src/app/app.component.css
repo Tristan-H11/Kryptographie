@@ -7,52 +7,57 @@
 }
 
 .sidenav-header {
-  font-size: 2vw;
+  font-size: 1.8vw;
   font-weight: bold;
   margin-bottom: 1vw;
   margin-top: 1vw;
   text-align: center;
 }
 
-.sidenav-content {
-  height: 100%;
-  width: 100%;
-  position: relative;
-  z-index: 1;
-  background-color: #eee;
-  overflow-x: hidden;
-  padding: 2vw;
+.sidenav-header > div {
+  line-height: 3vh;
 }
 
-.inner-sidenav-container {
-  height: 100%;
-  display: flex;
-  flex-direction: column;
+.sidenav-logo {
+  width: 100%;
+  margin-bottom: 1vh;
+}
+.sidenav-content {
+  height: 96vh;
+  width: 77vw;
+  background-color: #eee;
+  padding: 2vh 2vw;
 }
 
 .sidenav-footer {
   margin-top: auto;
   width: 100%;
   text-align: center;
-  font-size: 1vw;
-  font-weight: bolder;
+  font-size: 1.2vh;
+}
+
+.inner-sidenav-container {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  row-gap: 1vh;
+  overflow: hidden;
 }
 
 .sidenav {
   height: 100%;
-  width: 20vw;
+  width: 19vw;
   position: fixed;
   z-index: 1;
   top: 0;
   left: 0;
   background-color: #fff;
-  padding: 2vw;
+  padding: 2vh 2vw;
 }
 
 .sidenav button {
   width: 100%;
-  margin-top: 1vw;
-  margin-bottom: 1vw;
   cursor: pointer;
-  font-size: 1vw;
+  font-size: 1.8vh;
+  padding: 2vh 2vw;
 }
