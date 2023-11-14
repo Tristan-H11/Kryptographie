@@ -4,3 +4,4 @@ mod serializable_models;
 mod encrypt;
 mod decrypt;
 mod sign;
+mod verify;

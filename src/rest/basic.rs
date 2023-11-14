@@ -4,6 +4,7 @@ use crate::rest::create_key_pair::create_key_pair;
 use crate::rest::decrypt::decrypt;
 use crate::rest::encrypt::encrypt;
 use crate::rest::sign::sign;
+use crate::rest::verify::verify;
 
 #[derive(Serialize)]
 pub struct Response {
@@ -22,7 +23,7 @@ pub fn config_app(cfg: &mut web::ServiceConfig) {
                 .route("/encrypt", web::post().to(encrypt))
                 .route("/decrypt", web::post().to(decrypt))
                 .route("/sign", web::post().to(sign))
-                // .route("/verify", web::post().to(verify))
+                .route("/verify", web::post().to(verify))
         )
         .default_service(web::route().to(not_found));
 }

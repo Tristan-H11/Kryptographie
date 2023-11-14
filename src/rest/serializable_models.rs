@@ -106,3 +106,10 @@ pub struct SignRequest {
     pub plaintext: String,
     pub private_key: PrivateKey,
 }
+
+#[derive(Deserialize)]
+pub struct VerifyRequest {
+    pub plaintext: String,
+    pub signature: String,
+    pub public_key: PublicKey,
+}
