@@ -1,6 +1,7 @@
 use actix_web::{HttpResponse, Responder, web};
 use serde::Serialize;
 use crate::rest::key_pair::create_key_pair;
+use crate::rest::create_key_pair::create_key_pair;
 
 #[derive(Serialize)]
 pub struct Response {
