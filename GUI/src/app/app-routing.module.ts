@@ -3,11 +3,13 @@ import {RouterModule, Routes} from "@angular/router";
 import {StartseiteComponent} from "./startseite/startseite.component";
 import {AliceComponent} from "./alice/alice.component";
 import {BobComponent} from "./bob/bob.component";
+import {ExponentiationComponent} from "./exponentiation/exponentiation.component";
 
 export const routes: Routes = [
   { path: 'startseite', component: StartseiteComponent },
   { path: 'alice', component: AliceComponent},
   { path: 'bob', component: BobComponent},
+  { path: 'exponentiation', component: ExponentiationComponent},
   { path: '', redirectTo: '/startseite', pathMatch: 'full' },
   { path: '**', component: StartseiteComponent }
 
