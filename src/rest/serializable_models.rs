@@ -100,3 +100,9 @@ pub struct DecryptRequest {
     pub private_key: PrivateKey,
     pub number_system_base: u32,
 }
+
+#[derive(Deserialize)]
+pub struct SignRequest {
+    pub plaintext: String,
+    pub private_key: PrivateKey,
+}
