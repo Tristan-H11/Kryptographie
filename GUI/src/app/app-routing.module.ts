@@ -5,6 +5,7 @@ import {AliceComponent} from "./alice/alice.component";
 import {BobComponent} from "./bob/bob.component";
 import {ExponentiationComponent} from "./exponentiation/exponentiation.component";
 import {ExtendedGcdComponent} from "./extendedgcd/extended-gcd.component";
+import {ShanksComponent} from "./shanks/shanks.component";
 
 export const routes: Routes = [
   { path: 'startseite', component: StartseiteComponent },
@@ -12,6 +13,7 @@ export const routes: Routes = [
   { path: 'bob', component: BobComponent},
   { path: 'exponentiation', component: ExponentiationComponent},
   { path: 'extendedGcd',  component: ExtendedGcdComponent},
+  { path: 'shanks',  component: ShanksComponent},
   { path: '', redirectTo: '/startseite', pathMatch: 'full' },
   { path: '**', component: StartseiteComponent }
 
