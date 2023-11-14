@@ -1,14 +1,10 @@
 #[cfg(test)]
 mod sign_verify_test {
-    use std::str::FromStr;
-    use crate::encryption::rsa::keys::{PrivateKey, PublicKey};
-    use bigdecimal::num_bigint::BigInt;
-    use crate::encryption::math_functions::number_theory::fast_exponentiation;
     use crate::encryption::rsa::rsa_keygen_service::RsaKeygenService;
 
     #[test]
     fn test_sign_and_verify_lowest_possible_happyflow() {
-        let keygen = RsaKeygenService::new(257);
+        let keygen = RsaKeygenService::new(258);
 
         let g_base = 55296;
 
