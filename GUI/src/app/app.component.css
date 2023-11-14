@@ -1,0 +1,58 @@
+.global-container {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+}
+
+.sidenav-header {
+  font-size: 2vw;
+  font-weight: bold;
+  margin-bottom: 1vw;
+  margin-top: 1vw;
+  text-align: center;
+}
+
+.sidenav-content {
+  height: 100%;
+  width: 100%;
+  position: relative;
+  z-index: 1;
+  background-color: #eee;
+  overflow-x: hidden;
+  padding: 2vw;
+}
+
+.inner-sidenav-container {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.sidenav-footer {
+  margin-top: auto;
+  width: 100%;
+  text-align: center;
+  font-size: 1vw;
+  font-weight: bolder;
+}
+
+.sidenav {
+  height: 100%;
+  width: 20vw;
+  position: fixed;
+  z-index: 1;
+  top: 0;
+  left: 0;
+  background-color: #fff;
+  padding: 2vw;
+}
+
+.sidenav button {
+  width: 100%;
+  margin-top: 1vw;
+  margin-bottom: 1vw;
+  cursor: pointer;
+  font-size: 1vw;
+}
