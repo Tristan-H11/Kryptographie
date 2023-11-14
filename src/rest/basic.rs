@@ -7,17 +7,16 @@ pub struct Response {
     pub message: String,
 }
 
-pub fn configure_http_server() -> Server {
-    HttpServer::new(|| {
-        App::new()
-            .service(healthcheck)
-            .default_service(web::route().to(not_found))
-    })
-        .bind(("127.0.0.1", 8080)).expect("Can not bind to port 8080")
-        .run()
+pub fn config_app(cfg: &mut web::ServiceConfig) {
+    cfg.service(
+        web::scope("/health")
+            .service(
+                web::resource("")
+                    .route(web::get().to(healthcheck))
+            )
+    ).default_service(web::route().to(not_found));
 }
 
-#[get("/health")]
 async fn healthcheck() -> impl Responder {
     let response = Response {
         message: "Everything is working fine".to_string(),
