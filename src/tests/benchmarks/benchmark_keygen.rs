@@ -15,7 +15,7 @@ mod tests {
 
         for _i in 0..n {
             let start = Instant::now();
-            keygen_service.generate_keypair(100, &big_i!(13), 55296);
+            keygen_service.generate_keypair(100, 13, 55296);
             let end = Instant::now();
             times.push(end.duration_since(start).as_millis());
         }

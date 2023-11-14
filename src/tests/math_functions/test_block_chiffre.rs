@@ -24,7 +24,7 @@ mod tests {
         for _ in 0..12 {
             let keygen_service = RsaKeygenService::new(256);
             let (public_key, private_key) =
-                keygen_service.generate_keypair(1, &big_i!(34), 55296);
+                keygen_service.generate_keypair(1, 34, 55296);
 
             let message = "bbbbbbbbbbbbbbb  äääääääääääääää  !&    ";
             let _basis_length = 55296u32;

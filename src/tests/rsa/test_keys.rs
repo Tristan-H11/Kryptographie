@@ -14,7 +14,7 @@ mod rsa_keys_test {
         let result = (0..range).into_par_iter().all(|_| {
             let keygen_service = RsaKeygenService::new(2048);
             let (public_key, private_key) =
-                keygen_service.generate_keypair(40, &big_i!(23), 55296);
+                keygen_service.generate_keypair(40, 23, 55296);
 
             let encrypted_message = public_key.encrypt(message, 55296);
             println!("Verschlüsselte Nachricht: {}", encrypted_message);
@@ -30,7 +30,7 @@ mod rsa_keys_test {
         let message = "Hallo wie geht es dir?";
             let keygen_service = RsaKeygenService::new(1024);
             let (public_key, private_key) =
-                keygen_service.generate_keypair(40, &big_i!(13), 55296);
+                keygen_service.generate_keypair(40, 13, 55296);
 
             let encrypted_message = public_key.encrypt(message, 55296);
             println!("Verschlüsselte Nachricht: {}", encrypted_message);
