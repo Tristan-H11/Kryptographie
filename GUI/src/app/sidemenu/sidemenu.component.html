@@ -1,27 +1,28 @@
-<mat-sidenav-container class="sidenav-container">
+<mat-sidenav-container class="global-container">
   <mat-sidenav mode="side" class="sidenav" opened>
-    <div class="sidenav-header">
-      <mat-icon class="sidenav-logo">lock</mat-icon>
-      <br>
-      <span>RSA <br> Implementation</span>
-    </div>
+    <div class="inner-sidenav-container">
+      <div class="sidenav-header">
+        <mat-icon class="sidenav-logo">lock</mat-icon>
+        <br>
+        <span>RSA <br> Implementation</span>
+      </div>
 
-
-    <button mat-stroked-button routerLink="/startseite">Startseite</button>
-    <mat-divider></mat-divider>
-    <button mat-stroked-button routerLink="/alice">Alice</button>
-    <mat-divider></mat-divider>
-    <button mat-stroked-button routerLink="/bob">Bob</button>
-    <mat-divider></mat-divider>
-    <button mat-stroked-button routerLink="/schnelleExp">Exponentiation</button>
-    <mat-divider></mat-divider>
-    <button mat-stroked-button routerLink="/extendedGcd">Extended GCD</button>
-    <mat-divider></mat-divider>
-    <button mat-stroked-button routerLink="/shanks">Shanks</button>
-
-    <div class="sidenav-footer">
+      <button mat-stroked-button routerLink="/startseite">Startseite</button>
       <mat-divider></mat-divider>
-      Tristan Hörmann, Lucas Menke, Simon Ganteför
+      <button mat-stroked-button routerLink="/alice">Alice</button>
+      <mat-divider></mat-divider>
+      <button mat-stroked-button routerLink="/bob">Bob</button>
+      <mat-divider></mat-divider>
+      <button mat-stroked-button routerLink="/schnelleExp">Exponentiation</button>
+      <mat-divider></mat-divider>
+      <button mat-stroked-button routerLink="/extendedGcd">Extended GCD</button>
+      <mat-divider></mat-divider>
+      <button mat-stroked-button routerLink="/shanks">Shanks</button>
+
+      <div class="sidenav-footer">
+        <mat-divider></mat-divider>
+        Tristan Hörmann, Lucas Menke, Simon Ganteför
+      </div>
     </div>
   </mat-sidenav>
   <mat-sidenav-content class="sidenav-content">
