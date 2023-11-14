@@ -65,6 +65,13 @@ impl PublicKey {
         self.n.to_str_radix(10)
     }
 
+    ///
+    /// Gibt die Blockgröße als String zurück.
+    ///
+    pub fn get_block_size_as_str(&self) -> String {
+        self.block_size.to_string()
+    }
+
     #[cfg(test)]
     pub fn get_e(&self) -> BigInt {
         self.e.clone()
@@ -173,6 +180,20 @@ impl PrivateKey {
     ///
     pub fn get_d_as_str(&self) -> String {
         self.d.to_str_radix(10)
+    }
+
+    ///
+    /// Gibt den Modul als String zurück.
+    ///
+    pub fn get_n_as_str(&self) -> String {
+        self.n.to_str_radix(10)
+    }
+
+    ///
+    /// Gibt die Blockgröße als String zurück.
+    ///
+    pub fn get_block_size_as_str(&self) -> String {
+        self.block_size.to_string()
     }
 
     #[cfg(test)]
