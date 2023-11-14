@@ -1,7 +1,7 @@
 use actix_web::{HttpResponse, Responder, web};
 use serde::Serialize;
-use crate::rest::key_pair::create_key_pair;
 use crate::rest::create_key_pair::create_key_pair;
+use crate::rest::encrypt::encrypt;
 
 #[derive(Serialize)]
 pub struct Response {
@@ -17,7 +17,7 @@ pub fn config_app(cfg: &mut web::ServiceConfig) {
         .service(
             web::scope("/rsa")
                 .route("/createKeyPair", web::post().to(create_key_pair))
-                // .route("/encrypt", web::post().to(encrypt))
+                .route("/encrypt", web::post().to(encrypt))
                 // .route("/decrypt", web::post().to(decrypt))
                 // .route("/sign", web::post().to(signieren))
                 // .route("/verify", web::post().to(verify))
