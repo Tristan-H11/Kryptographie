@@ -93,3 +93,10 @@ pub struct EncryptRequest {
     pub public_key: PublicKey,
     pub number_system_base: u32,
 }
+
+#[derive(Deserialize)]
+pub struct DecryptRequest {
+    pub ciphertext: String,
+    pub private_key: PrivateKey,
+    pub number_system_base: u32,
+}
