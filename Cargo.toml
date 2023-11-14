@@ -9,7 +9,9 @@ edition = "2021"
 bigdecimal = "0.4.2"
 rand = "0.8"
 
-iced = { version = "0.10.0" , features = ["canvas", "advanced", "debug", "lazy"]}
+actix-web = "4.4.0"
+uuid = { version = "1.5.0", features = ["v4"] }
+serde = { version = "1.0.192", features = ["derive"] }
 
 
 log = "0.4.20"
