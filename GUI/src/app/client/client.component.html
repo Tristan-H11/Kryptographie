@@ -1,0 +1,71 @@
+<mat-accordion class="accordion-container" multi="true">
+  <mat-expansion-panel>
+    <mat-expansion-panel-header>
+      <mat-panel-title>
+        Nachrichten von {{clientName}}
+      </mat-panel-title>
+      <mat-panel-description>
+        Die zu verschickenden und erhaltenden Nachrichten
+      </mat-panel-description>
+    </mat-expansion-panel-header>
+
+    <mat-form-field class="width-100">
+      <mat-label>Klartext</mat-label>
+      <textarea matInput placeholder="Das ist ein wunderbarer Tag..." [(ngModel)]="plainText"></textarea>
+    </mat-form-field>
+    <mat-form-field class="width-100">
+      <mat-label>Geheimtext</mat-label>
+      <textarea matInput placeholder="Qnf vfg rva jhaqreonere Gnt..." [(ngModel)]="cipherText"></textarea>
+    </mat-form-field>
+
+    <mat-action-row>
+      <button mat-flat-button color="primary" (click)="clearFields()">Nachrichtenfelder leeren</button>
+      <button mat-flat-button color="primary" (click)="encrypt()">Verschlüsseln</button>
+      <button mat-flat-button color="primary" (click)="decrypt()">Entschlüsseln</button>
+    </mat-action-row>
+  </mat-expansion-panel>
+
+  <mat-expansion-panel>
+    <mat-expansion-panel-header>
+      <mat-panel-title>
+        Privater Exponent von {{clientName}}
+      </mat-panel-title>
+      <mat-panel-description>
+        Die privaten Schlüsselkomponenten
+      </mat-panel-description>
+    </mat-expansion-panel-header>
+
+    <mat-form-field class="width-100">
+      <mat-label>Privater Exponent</mat-label>
+      <textarea matInput placeholder="Wird nach dem Berechnen automatisch angezeigt" [(ngModel)]="privateExponent"></textarea>
+    </mat-form-field>
+  </mat-expansion-panel>
+
+  <mat-expansion-panel>
+    <mat-expansion-panel-header>
+      <mat-panel-title>
+        Signatur
+      </mat-panel-title>
+      <mat-panel-description>
+        Das Signieren und Verifizieren von Nachrichten
+      </mat-panel-description>
+    </mat-expansion-panel-header>
+
+    <mat-form-field class="width-100">
+      <mat-label>Signatur</mat-label>
+      <textarea matInput placeholder="Wird nach dem Berechnen automatisch angezeigt" [(ngModel)]="signature"></textarea>
+    </mat-form-field>
+    <mat-form-field class="width-100">
+      <mat-label>Signatur gültig?</mat-label>
+      <mat-label *ngIf="signatureValid && signatureCalculated">Signatur gültig!</mat-label>
+      <mat-label *ngIf="!signatureValid && signatureCalculated">Signatur ungültig!</mat-label>
+      <mat-label *ngIf="!signatureCalculated">Signatur noch nicht berechnet</mat-label>
+    </mat-form-field>
+
+    <mat-action-row>
+      <button mat-flat-button color="primary" (click)="clearFields()">Signaturfelder leeren</button>
+      <button mat-flat-button color="primary" (click)="sign()">Signieren</button>
+      <button mat-flat-button color="primary" (click)="verify()">Verifizieren</button>
+    </mat-action-row>
+  </mat-expansion-panel>
+</mat-accordion>
