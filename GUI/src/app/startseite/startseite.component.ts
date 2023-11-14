@@ -32,9 +32,14 @@ export class StartseiteComponent {
   public zahlensystem: number = 55296;
   public random_seed: number = 13;
   public miller_rabin_iterations: number = 100;
+  public modul_alice: string = "";
+  public e_alice: string = "";
+  public modul_bob: string = "";
+  public e_bob: string = "";
 
   public onSubmit() {
     // Hier können Sie die Daten verwenden, z.B. an einen Service senden oder in der Konsole ausgeben
     console.log(this.modulbreite, this.zahlensystem, this.random_seed, this.miller_rabin_iterations);
+    this.modul_alice = this.modulbreite.toString();
   }
 }

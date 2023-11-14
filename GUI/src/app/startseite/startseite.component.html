@@ -1,34 +1,34 @@
-<mat-accordion class="accordion-container">
-  <mat-expansion-panel hideToggle>
+<mat-accordion class="accordion-container" multi="true">
+  <mat-expansion-panel>
     <mat-expansion-panel-header>
       <mat-panel-title>
         Allgemeine Konfiguration
       </mat-panel-title>
       <mat-panel-description>
-        Bitte gib die Basis-Eigenschaften der Simulation an
+        Die Basis-Eigenschaften der Simulation
       </mat-panel-description>
     </mat-expansion-panel-header>
 
       <mat-form-field class="config-form-field">
         <mat-label>Modulbreite</mat-label>
-        <input class="example-right-align" matInput type="number" [(ngModel)]="modulbreite">
+        <input class="text-align-right" matInput type="number" [(ngModel)]="modulbreite">
         <span matTextSuffix>-Bit</span>
       </mat-form-field>
 
       <mat-form-field class="config-form-field">
         <mat-label>Zahlensystem</mat-label>
-        <input class="example-right-align" matInput type="number" [(ngModel)]="zahlensystem">
+        <input class="text-align-right" matInput type="number" [(ngModel)]="zahlensystem">
       </mat-form-field>
 
     <mat-form-field class="config-form-field">
       <mat-label>Miller-Rabin Iterationen</mat-label>
-      <input class="example-right-align" matInput type="number" [(ngModel)]="miller_rabin_iterations">
+      <input class="text-align-right" matInput type="number" [(ngModel)]="miller_rabin_iterations">
       <span matTextSuffix>-Iterationen</span>
     </mat-form-field>
 
     <mat-form-field class="config-form-field">
       <mat-label>Zufallsseed</mat-label>
-      <input class="example-right-align" matInput type="number" [(ngModel)]="random_seed">
+      <input class="text-align-right" matInput type="number" [(ngModel)]="random_seed">
     </mat-form-field>
 
       <mat-action-row class="action-row-content-left">
@@ -37,4 +37,43 @@
       </mat-action-row>
   </mat-expansion-panel>
 
+  <mat-expansion-panel>
+    <mat-expansion-panel-header>
+      <mat-panel-title>
+        Alice
+      </mat-panel-title>
+      <mat-panel-description>
+        Die öffentlichen Schlüsselkomponenten von Alice
+      </mat-panel-description>
+    </mat-expansion-panel-header>
+
+    <mat-form-field class="width-100">
+      <mat-label>Modul</mat-label>
+      <textarea matInput placeholder="Wird nach dem Berechnen automatisch angezeigt" [(ngModel)]="modul_alice"></textarea>
+    </mat-form-field>
+    <mat-form-field class="width-100">
+      <mat-label>Öffentlicher Exponent</mat-label>
+      <textarea matInput placeholder="Wird nach dem Berechnen automatisch angezeigt" [(ngModel)]="e_alice"></textarea>
+    </mat-form-field>
+  </mat-expansion-panel>
+
+  <mat-expansion-panel>
+    <mat-expansion-panel-header>
+      <mat-panel-title>
+        Bob
+      </mat-panel-title>
+      <mat-panel-description>
+        Die öffentlichen Schlüsselkomponenten von Bob
+      </mat-panel-description>
+    </mat-expansion-panel-header>
+
+    <mat-form-field class="width-100">
+      <mat-label>Modul</mat-label>
+      <textarea matInput placeholder="Wird nach dem Berechnen automatisch angezeigt" [(ngModel)]="modul_bob"></textarea>
+    </mat-form-field>
+    <mat-form-field class="width-100">
+      <mat-label>Öffentlicher Exponent</mat-label>
+      <textarea matInput placeholder="Wird nach dem Berechnen automatisch angezeigt" [(ngModel)]="e_bob"></textarea>
+    </mat-form-field>
+  </mat-expansion-panel>
 </mat-accordion>

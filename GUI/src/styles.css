@@ -2,3 +2,20 @@
 
 html, body { height: 100%; }
 body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
+
+.text-align-right {
+  text-align: right;
+}
+
+input.text-align-right::-webkit-outer-spin-button,
+input.text-align-right::-webkit-inner-spin-button {
+  display: none;
+}
+
+input.text-align-right {
+  -moz-appearance: textfield;
+}
+
+.width-100 {
+  width: 100%;
+}
