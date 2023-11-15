@@ -1,77 +1,34 @@
+use std::str::FromStr;
+
 use serde::{Deserialize, Serialize};
 
-pub trait FromToSerializable {
-    type T;
-    ///
-    /// Erstellt aus dem Datenmodell ein Modell für die Serialisierung.
-    ///
-    fn to_serializable(&self) -> Self::T;
-
-    ///
-    /// Erstellt aus dem Modell für die Serialisierung ein Datenmodell.
-    ///
-    fn from_serializable(serializable: Self::T) -> Self;
-}
-
-impl FromToSerializable for crate::encryption::rsa::keys::PublicKey {
-    type T = PublicKey;
-
-    fn to_serializable(&self) -> Self::T {
-        PublicKey {
-            modulus: self.get_n_as_str(),
-            e: self.get_e_as_str(),
-            block_size: self.get_block_size_as_str(),
-        }
-    }
-
-    fn from_serializable(serializable: Self::T) -> Self {
-        crate::encryption::rsa::keys::PublicKey::new_with_blocksize(
-            serializable.e.parse().unwrap(),
-            serializable.modulus.parse().unwrap(),
-            serializable.block_size.parse().unwrap()
-        )
-    }
-}
-
-impl FromToSerializable for crate::encryption::rsa::keys::PrivateKey {
-    type T = PrivateKey;
-
-    fn to_serializable(&self) -> Self::T {
-        PrivateKey {
-            modulus: self.get_n_as_str(),
-            d: self.get_d_as_str(),
-            block_size: self.get_block_size_as_str(),
-        }
-    }
-
-    fn from_serializable(serializable: Self::T) -> Self {
-        crate::encryption::rsa::keys::PrivateKey::new_with_blocksize(
-            serializable.d.parse().unwrap(),
-            serializable.modulus.parse().unwrap(),
-            serializable.block_size.parse().unwrap()
-        )
-    }
-}
-
-#[derive(Serialize, Deserialize)]
-pub struct PublicKey {
-    pub modulus: String,
-    pub e: String,
-    pub block_size: String,
-}
-
-#[derive(Serialize, Deserialize)]
-pub struct PrivateKey {
-    pub modulus: String,
-    pub d: String,
-    pub block_size: String,
-}
-
+use crate::encryption::rsa::keys::{PrivateKey, PublicKey};
 
 #[derive(Serialize, Deserialize)]
 pub struct KeyPair {
-    pub public_key: PublicKey,
-    pub private_key: PrivateKey,
+    pub modulus: String,
+    pub e: String,
+    pub d: String,
+    pub block_size_pub: String,
+    pub block_size_priv: String,
+}
+
+impl KeyPair {
+    pub(crate) fn to_private_key(&self) -> PrivateKey {
+        PrivateKey::new_with_blocksize(
+            (&self).modulus.parse().unwrap(),
+            (&self).d.parse().unwrap(),
+            (&self.block_size_priv).parse().unwrap(),
+        )
+    }
+
+    pub(crate) fn to_public_key(&self) -> PublicKey {
+        PublicKey::new_with_blocksize(
+            (&self).modulus.parse().unwrap(),
+            (&self).e.parse().unwrap(),
+            (&self.block_size_pub).parse().unwrap(),
+        )
+    }
 }
 
 #[derive(Serialize)]
@@ -90,26 +47,26 @@ pub struct CreateKeyPairRequest {
 #[derive(Deserialize)]
 pub struct EncryptRequest {
     pub plaintext: String,
-    pub public_key: PublicKey,
+    pub key_pair: KeyPair,
     pub number_system_base: u32,
 }
 
 #[derive(Deserialize)]
 pub struct DecryptRequest {
     pub ciphertext: String,
-    pub private_key: PrivateKey,
+    pub key_pair: KeyPair,
     pub number_system_base: u32,
 }
 
 #[derive(Deserialize)]
 pub struct SignRequest {
     pub plaintext: String,
-    pub private_key: PrivateKey,
+    pub key_pair: KeyPair,
 }
 
 #[derive(Deserialize)]
 pub struct VerifyRequest {
     pub plaintext: String,
     pub signature: String,
-    pub public_key: PublicKey,
+    pub key_pair: KeyPair,
 }
