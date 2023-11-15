@@ -88,12 +88,12 @@ export class StartseiteComponent implements OnInit {
   protected readonly ClientEnum = ClientEnum;
 
   ngOnInit(): void {
-    this.keyService.getKeyPairObservableWithRegister(ClientEnum.Alice).subscribe(keyPair => {
+    this.keyService.getObservableWithRegister(ClientEnum.Alice).subscribe(keyPair => {
       this.modul_alice = keyPair.public_key.modulus;
       this.e_alice = keyPair.public_key.e;
     });
 
-    this.keyService.getKeyPairObservableWithRegister(ClientEnum.Bob).subscribe(keyPair => {
+    this.keyService.getObservableWithRegister(ClientEnum.Bob).subscribe(keyPair => {
       this.modul_bob = keyPair.public_key.modulus;
       this.e_bob = keyPair.public_key.e;
     });

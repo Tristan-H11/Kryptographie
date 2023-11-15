@@ -2,6 +2,8 @@ import {Injectable} from '@angular/core';
 import {HttpClient} from "@angular/common/http";
 import {EndpointsService} from "./endpoints.service";
 import {firstValueFrom} from "rxjs";
+import {CreateKeyPairRequest} from "../models/create-key-pair-request";
+import {KeyPair} from "../models/key-pair";
 
 @Injectable({
   providedIn: 'root'
@@ -26,4 +28,15 @@ export class BackendRequestService {
       return false;
     }
   }
+
+  /**
+   * Fragt den Post Endpunkt zum Ertellen eines neuen Schlüsselpaares ab.
+   */
+  public async createKeyPair(body: CreateKeyPairRequest): Promise<KeyPair> {
+    return firstValueFrom(
+      this.http.post<KeyPair>(this.endpointsService.getCreateKeyPairEndpoint(), body)
+    );
+  }
+
+
 }

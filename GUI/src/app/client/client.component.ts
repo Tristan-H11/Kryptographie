@@ -79,12 +79,12 @@ export class ClientComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.keyService.getKeyPairObservableWithRegister(this.client).subscribe(keyPair => {
+    this.keyService.getObservableWithRegister(this.client).subscribe(keyPair => {
       this.privateExponent = keyPair.private_key.d;
       this.modulus = keyPair.public_key.modulus;
     });
 
-    this.messageService.getMessageObservableWithRegister(this.client).subscribe(message => {
+    this.messageService.getObservableWithRegister(this.client).subscribe(message => {
       // Werden die Nachrichten neu gesetzt, muss die Signatur neu berechnet werden.
       this.signatureVerified = false;
       this.cipherText = message.ciphertext;
