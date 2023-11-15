@@ -33,9 +33,29 @@ export class ClientComponent implements OnInit {
   public signatureVerified: boolean = false;
   public signatureValid: boolean = false;
 
-  public cipherText: string = "";
-  public plainText: string = "";
-  public signature: string = "";
+  public get cipherText(): string {
+    return this.messageService.getCiphertext(this.client);
+  }
+
+  public set cipherText(value: string) {
+    this.messageService.setCiphertext(value, this.client);
+  }
+
+  public get plainText(): string {
+    return this.messageService.getPlaintext(this.client);
+  }
+
+  public set plainText(value: string) {
+    this.messageService.setPlaintext(value, this.client);
+  }
+
+  public get signature(): string {
+    return this.messageService.getSignature(this.client);
+  }
+
+  public set signature(value: string) {
+    this.messageService.setSignature(value, this.client);
+  }
 
   public get privateExponent(): string {
     return this.keyService.getD(this.client);
@@ -82,14 +102,12 @@ export class ClientComponent implements OnInit {
   public encrypt() {
     let ciphertext = this.plainText + " encrypted!"  //TODO Encrypt
     this.messageService.setCiphertext(ciphertext, this.client);
-    this.messageService.setPlaintext("", this.client); // Plaintext löschen
     this.showSnackbar("Nachricht verschlüsselt!");
   }
 
   public decrypt() {
     let plaintext = this.cipherText + " decrypted!"  //TODO Decrypt
     this.messageService.setPlaintext(plaintext, this.client);
-    this.messageService.setCiphertext("", this.client); // Ciphertext löschen
     this.showSnackbar("Nachricht entschlüsselt!");
   }
 
