@@ -16,16 +16,16 @@ pub struct KeyPair {
 impl KeyPair {
     pub(crate) fn to_private_key(&self) -> PrivateKey {
         PrivateKey::new_with_blocksize(
-            (&self).modulus.parse().unwrap(),
             (&self).d.parse().unwrap(),
+            (&self).modulus.parse().unwrap(),
             (&self.block_size_priv).parse().unwrap(),
         )
     }
 
     pub(crate) fn to_public_key(&self) -> PublicKey {
         PublicKey::new_with_blocksize(
-            (&self).modulus.parse().unwrap(),
             (&self).e.parse().unwrap(),
+            (&self).modulus.parse().unwrap(),
             (&self.block_size_pub).parse().unwrap(),
         )
     }
