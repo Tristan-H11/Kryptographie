@@ -1,0 +1,6 @@
+.send-button-container {
+  display: flex;
+  justify-content: right;
+  width: auto;
+  padding: 2vh 2vw;
+}

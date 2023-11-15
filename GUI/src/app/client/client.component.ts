@@ -1,5 +1,5 @@
 import {Component, Input, OnInit} from '@angular/core';
-import { CommonModule } from '@angular/common';
+import {CommonModule} from '@angular/common';
 import {FormsModule} from "@angular/forms";
 import {MatButtonModule} from "@angular/material/button";
 import {MatExpansionModule} from "@angular/material/expansion";
@@ -8,6 +8,7 @@ import {MatInputModule} from "@angular/material/input";
 import {ClientEnum} from "../models/client-enum";
 import {KeyManagementService} from "../services/key-management.service";
 import {MessageManagementService} from "../services/message-management.service";
+import {MatIconModule} from "@angular/material/icon";
 
 @Component({
   selector: 'client',
@@ -18,7 +19,8 @@ import {MessageManagementService} from "../services/message-management.service";
     MatButtonModule,
     MatExpansionModule,
     MatFormFieldModule,
-    MatInputModule
+    MatInputModule,
+    MatIconModule
   ],
   templateUrl: './client.component.html',
   styleUrl: './client.component.css'
@@ -38,7 +40,6 @@ export class ClientComponent implements OnInit {
   public blockSize: string = "";
 
   constructor(private keyService: KeyManagementService, private messageService: MessageManagementService) {
-
   }
 
   ngOnInit(): void {
@@ -68,8 +69,8 @@ export class ClientComponent implements OnInit {
   }
 
   public clearFields() {
-    this.plainText = "";
-    this.cipherText = "";
+    this.messageService.setPlaintext("", this.client)
+    this.messageService.setCiphertext("", this.client);
   }
 
   public sign() {
@@ -82,4 +83,20 @@ export class ClientComponent implements OnInit {
     this.signatureValid = this.signatureCalculated; //TODO Verify
   }
 
+  /**
+   * Sendet die verschlüsselte Nachricht und die Signatur an den anderen Client.
+   * Leert anschließend die Nachrichtenfelder.
+   */
+  public sendMessageAndSignature() {
+    this.messageService.setCiphertext(this.cipherText, this.otherClient);
+    this.messageService.setSignature(this.signature, this.otherClient);
+
+    this.clearFields()
+  }
+
+  public clearSignatureFields() {
+    this.messageService.setSignature("", this.client);
+    this.signatureCalculated = false;
+    this.signatureValid = false;
+  }
 }

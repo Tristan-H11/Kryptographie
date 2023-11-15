@@ -61,9 +61,15 @@
     <mat-label *ngIf="!signatureCalculated">Signatur noch nicht überprüft...</mat-label>
 
     <mat-action-row>
-      <button mat-flat-button color="primary" (click)="clearFields()">Signaturfelder leeren</button>
+      <button mat-flat-button color="primary" (click)="clearSignatureFields()">Signaturfelder leeren</button>
       <button mat-flat-button color="primary" (click)="sign()">Signieren</button>
       <button mat-flat-button color="primary" (click)="verify()">Verifizieren</button>
     </mat-action-row>
   </mat-expansion-panel>
 </mat-accordion>
+<div class="send-button-container">
+  <button mat-fab extended color="primary" (click)="sendMessageAndSignature()">
+    <mat-icon>send</mat-icon>
+    <span>Senden</span>
+  </button>
+</div>
