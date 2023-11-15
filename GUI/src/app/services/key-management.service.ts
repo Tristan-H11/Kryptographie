@@ -79,4 +79,20 @@ export class KeyManagementService {
       return this.bobKeyPair.value.public_key.e;
     }
   }
+
+  public getD(client: ClientEnum) {
+    if (client == ClientEnum.Alice) {
+      return this.aliceKeyPair.value.private_key.d;
+    } else {
+      return this.bobKeyPair.value.private_key.d;
+    }
+  }
+
+  public setD(client: ClientEnum, d: string): void {
+    if (client == ClientEnum.Alice) {
+      this.aliceKeyPair.value.private_key.d = d;
+    } else {
+      this.bobKeyPair.value.private_key.d = d;
+    }
+  }
 }

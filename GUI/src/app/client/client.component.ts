@@ -37,8 +37,21 @@ export class ClientComponent implements OnInit {
   public plainText: string = "";
   public signature: string = "";
 
-  public privateExponent: string = "";
-  public blockSize: string = "";
+  public get privateExponent(): string {
+    return this.keyService.getD(this.client);
+  }
+
+  public set privateExponent(value: string) {
+    this.keyService.setD(this.client, value);
+  }
+
+  public get modulus(): string {
+    return this.keyService.getModul(this.client);
+  }
+
+  public set modulus(value: string) {
+    this.keyService.setModul(this.client, value);
+  }
 
   constructor(private keyService: KeyManagementService,
               private messageService: MessageManagementService,
@@ -47,8 +60,8 @@ export class ClientComponent implements OnInit {
 
   ngOnInit(): void {
     this.keyService.getKeyPair(this.client).subscribe(keyPair => {
-      this.blockSize = keyPair.private_key.block_size;
       this.privateExponent = keyPair.private_key.d;
+      this.modulus = keyPair.public_key.modulus;
     });
 
     this.messageService.getMessageOberservable(this.client).subscribe(message => {

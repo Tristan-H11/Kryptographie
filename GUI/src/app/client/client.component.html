@@ -28,7 +28,7 @@
   <mat-expansion-panel>
     <mat-expansion-panel-header>
       <mat-panel-title>
-        Privater Exponent von {{client}}
+        Privater Schlüssel von {{client}}
       </mat-panel-title>
       <mat-panel-description>
         Die Komponenten des privaten Schlüssels
@@ -39,6 +39,11 @@
       <mat-label>Privater Exponent</mat-label>
       <textarea matInput placeholder="Wird nach dem Berechnen automatisch angezeigt"
                 [(ngModel)]="privateExponent"></textarea>
+    </mat-form-field>
+    <mat-form-field class="width-100">
+      <mat-label>Modul</mat-label>
+      <textarea matInput placeholder="Wird nach dem Berechnen automatisch angezeigt"
+                [(ngModel)]="modulus"></textarea>
     </mat-form-field>
   </mat-expansion-panel>
 
