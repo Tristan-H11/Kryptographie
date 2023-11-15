@@ -33,11 +33,18 @@ export class AppComponent implements OnInit {
               private snackBar: MatSnackBar) {
   }
 
+  /**
+   * Registriert die Clients Alice und Bob auf allen Services.
+   * Hier müssen neue initiale Clients nachgetragen werden.
+   */
   ngOnInit(): void {
     this.clientRegistrationService.registerClient(ClientEnum.Alice);
     this.clientRegistrationService.registerClient(ClientEnum.Bob);
   }
 
+  /**
+   * Prüft die Erreichbarkeit des Servers.
+   */
   public checkServerConnection() {
     this.backendRequestService.checkHealth().then((result) => {
       if (result) {

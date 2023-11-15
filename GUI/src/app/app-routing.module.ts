@@ -1,4 +1,4 @@
-import { NgModule } from '@angular/core';
+import {NgModule} from '@angular/core';
 import {RouterModule, Routes} from "@angular/router";
 import {StartseiteComponent} from "./startseite/startseite.component";
 import {AliceComponent} from "./alice/alice.component";
@@ -8,14 +8,14 @@ import {ExtendedGcdComponent} from "./extendedgcd/extended-gcd.component";
 import {ShanksComponent} from "./shanks/shanks.component";
 
 export const routes: Routes = [
-  { path: 'startseite', component: StartseiteComponent },
-  { path: 'alice', component: AliceComponent},
-  { path: 'bob', component: BobComponent},
-  { path: 'exponentiation', component: ExponentiationComponent},
-  { path: 'extendedGcd',  component: ExtendedGcdComponent},
-  { path: 'shanks',  component: ShanksComponent},
-  { path: '', redirectTo: '/startseite', pathMatch: 'full' },
-  { path: '**', component: StartseiteComponent }
+  {path: 'startseite', component: StartseiteComponent},
+  {path: 'alice', component: AliceComponent},
+  {path: 'bob', component: BobComponent},
+  {path: 'exponentiation', component: ExponentiationComponent},
+  {path: 'extendedGcd', component: ExtendedGcdComponent},
+  {path: 'shanks', component: ShanksComponent},
+  {path: '', redirectTo: '/startseite', pathMatch: 'full'},
+  {path: '**', component: StartseiteComponent}
 
 ];
 
@@ -23,4 +23,5 @@ export const routes: Routes = [
   imports: [RouterModule.forRoot(routes)],
   exports: [RouterModule]
 })
-export class AppRoutingModule { }
+export class AppRoutingModule {
+}
