@@ -38,6 +38,19 @@ export abstract class AbstractClientObservableManagementService<T> {
       }
 
     /**
+     * Gibt den Inhalt des BehaviorSubjects für den Client zurück, falls der Client registriert ist.
+     */
+    protected getValue(client: ClientEnum): T {
+        let entry = this.clientMap.get(client);
+        if (entry) {
+            return entry.value;
+        } else {
+            console.error("Client " + client + " is not registered! Value could not be accessed.");
+            return this.createDefaultObject();
+        }
+    }
+
+    /**
      * Gibt eine Property aus dem Value des BehaviorSubjects zurück, falls der Client registriert ist.
      */
     protected getPropertyNullable<K extends keyof T>(client: ClientEnum, property: K): T[K] | null {

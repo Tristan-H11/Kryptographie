@@ -31,6 +31,10 @@ export class KeyManagementService extends AbstractClientObservableManagementServ
         );
     }
 
+    public getKeyPair(client: ClientEnum): KeyPair {
+        return this.getValue(client);
+    }
+
     public setModul(client: ClientEnum, modulus: string): void {
         this.setProperty(client, "modulus", modulus)
     }
