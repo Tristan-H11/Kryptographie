@@ -84,7 +84,7 @@ export class ClientComponent implements OnInit {
       this.modulus = keyPair.public_key.modulus;
     });
 
-    this.messageService.getMessageOberservable(this.client).subscribe(message => {
+    this.messageService.getMessageObservableWithRegister(this.client).subscribe(message => {
       // Werden die Nachrichten neu gesetzt, muss die Signatur neu berechnet werden.
       this.signatureVerified = false;
       this.cipherText = message.ciphertext;
