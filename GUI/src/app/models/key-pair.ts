@@ -30,5 +30,5 @@ export function createKeyPairFrom(modulus: string, e: string, d: string, block_s
 }
 
 export function createEmptyKeyPair() {
-  return createKeyPairFrom("0", "0", "0", "0", "0");
+  return createKeyPairFrom("", "", "", "", "");
 }
