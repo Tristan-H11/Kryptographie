@@ -79,7 +79,7 @@ export class ClientComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.keyService.getKeyPair(this.client).subscribe(keyPair => {
+    this.keyService.getKeyPairObservableWithRegister(this.client).subscribe(keyPair => {
       this.privateExponent = keyPair.private_key.d;
       this.modulus = keyPair.public_key.modulus;
     });
