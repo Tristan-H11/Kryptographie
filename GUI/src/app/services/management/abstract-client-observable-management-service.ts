@@ -11,7 +11,7 @@ export abstract class AbstractClientObservableManagementService<T> {
       protected constructor() {
       }
 
-      protected abstract createEmptyObject(): T;
+      protected abstract createDefaultObject(): T;
 
       /**
        * Registriert einen Client und erstellt ein BehaviorSubject mit leeren Attributen für diesen.
@@ -19,7 +19,7 @@ export abstract class AbstractClientObservableManagementService<T> {
        */
       public registerClient(client: ClientEnum): void {
         this.clientMap.set(client, new BehaviorSubject<T>(
-          this.createEmptyObject()
+          this.createDefaultObject()
         ));
       }
 

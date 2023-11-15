@@ -1,7 +1,7 @@
 import {Injectable} from '@angular/core';
 import {createEmptyKeyPair, KeyPair} from "../../models/key-pair";
 import {ClientEnum} from "../../models/client-enum";
-import {CreateKeyPairRequest} from "../../models/create-key-pair-request";
+import {ConfigurationData} from "../../models/configuration-data";
 import {BackendRequestService} from "../backend-request.service";
 import {AbstractClientObservableManagementService} from './abstract-client-observable-management-service';
 
@@ -10,7 +10,7 @@ import {AbstractClientObservableManagementService} from './abstract-client-obser
 })
 export class KeyManagementService extends AbstractClientObservableManagementService<KeyPair>{
 
-    protected override createEmptyObject(): KeyPair {
+    protected override createDefaultObject(): KeyPair {
         return createEmptyKeyPair();
     }
 
@@ -18,7 +18,7 @@ export class KeyManagementService extends AbstractClientObservableManagementServ
         super();
     }
 
-    public generateKeyPair(requestContent: CreateKeyPairRequest, client: ClientEnum): void {
+    public generateKeyPair(requestContent: ConfigurationData, client: ClientEnum): void {
         this.backendRequestService.createKeyPair(requestContent).then(
             (keyPair) => {
                 let entry = this.clientMap.get(client);

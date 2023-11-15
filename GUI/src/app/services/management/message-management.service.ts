@@ -7,7 +7,7 @@ import {AbstractClientObservableManagementService} from "./abstract-client-obser
   providedIn: 'root'
 })
 export class MessageManagementService extends AbstractClientObservableManagementService<MessageSignatureContainer>{
-  protected override createEmptyObject(): MessageSignatureContainer {
+  protected override createDefaultObject(): MessageSignatureContainer {
       return createEmptyMessageSignatureContainer();
   }
 

@@ -11,25 +11,25 @@
 
       <mat-form-field class="config-form-field">
         <mat-label>Modulbreite</mat-label>
-        <input class="text-align-right" matInput type="number" [(ngModel)]="modulbreite">
+        <input class="text-align-right" matInput type="number" [(ngModel)]="modulusWidth">
         <span matTextSuffix>-Bit</span>
         <mat-hint><260Bit erlaubt keine Signatur!</mat-hint>
       </mat-form-field>
 
       <mat-form-field class="config-form-field">
         <mat-label>Zahlensystem</mat-label>
-        <input class="text-align-right" matInput type="number" [(ngModel)]="zahlensystem">
+        <input class="text-align-right" matInput type="number" [(ngModel)]="numberSystem">
       </mat-form-field>
 
     <mat-form-field class="config-form-field">
       <mat-label>Miller-Rabin Iterationen</mat-label>
-      <input class="text-align-right" matInput type="number" [(ngModel)]="miller_rabin_iterations">
+      <input class="text-align-right" matInput type="number" [(ngModel)]="millerRabinIterations">
       <span matTextSuffix>-Iterationen</span>
     </mat-form-field>
 
     <mat-form-field class="config-form-field">
       <mat-label>Zufallsseed</mat-label>
-      <input class="text-align-right" matInput type="number" [(ngModel)]="random_seed">
+      <input class="text-align-right" matInput type="number" [(ngModel)]="randomSeed">
     </mat-form-field>
 
       <mat-action-row class="action-row-content-left">

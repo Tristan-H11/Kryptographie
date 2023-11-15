@@ -7,8 +7,9 @@ import {FormsModule} from "@angular/forms";
 import {StartseiteRoutingModule} from "./startseite-routing.module";
 import {ClientEnum} from "../models/client-enum";
 import {KeyManagementService} from "../services/management/key-management.service";
-import {createKeyPairRequestFrom} from "../models/create-key-pair-request";
+import {createConfigurationDataFrom} from "../models/configuration-data";
 import {MatSnackBar} from "@angular/material/snack-bar";
+import {ConfigurationManagementService} from "../services/management/configuration-management.service";
 
 
 @Component({
@@ -27,18 +28,73 @@ import {MatSnackBar} from "@angular/material/snack-bar";
 })
 export class StartseiteComponent implements OnInit {
 
-  public modulbreite: number = 4096;
-  public zahlensystem: number = 55296;
-  public random_seed: number = 13;
-  public miller_rabin_iterations: number = 100;
+  protected readonly ClientEnum = ClientEnum;
 
-  constructor(private keyService: KeyManagementService, private snackBar: MatSnackBar) {
+  constructor(private keyService: KeyManagementService,
+              private configurationService: ConfigurationManagementService,
+              private snackBar: MatSnackBar) {
+  }
+
+  public generateKeys(client: ClientEnum) {
+    let requestContent = createConfigurationDataFrom(
+        this.modulusWidth,
+        this.millerRabinIterations,
+        this.randomSeed,
+        this.numberSystem
+    )
+    this.keyService.generateKeyPair(requestContent, client);
+
+    this.showSnackbar("Schlüsselpaar für " + ClientEnum[client] + " generiert.");
+  }
+
+  ngOnInit(): void {
+    this.keyService.getObservableWithRegister(ClientEnum.Alice).subscribe(keyPair => {
+      this.modul_alice = keyPair.modulus;
+      this.e_alice = keyPair.e;
+    });
+
+    this.keyService.getObservableWithRegister(ClientEnum.Bob).subscribe(keyPair => {
+      this.modul_bob = keyPair.modulus;
+      this.e_bob = keyPair.e;
+    });
   }
 
   private showSnackbar(message: string) {
     this.snackBar.open(message, "Ok", {
       duration: 4000,
     })
+  }
+
+  public set modulusWidth(value: number) {
+    this.configurationService.setModulusWidth(value);
+  }
+
+  public get modulusWidth(): number {
+    return this.configurationService.getModulbreite();
+  }
+
+  public set numberSystem(value: number) {
+    this.configurationService.setNumberSystem(value);
+  }
+
+  public get numberSystem(): number {
+    return this.configurationService.getNumberSystem();
+  }
+
+  public set randomSeed(value: number) {
+    this.configurationService.setRandomSeed(value);
+  }
+
+  public get randomSeed(): number {
+    return this.configurationService.getRandomSeed();
+  }
+
+  public set millerRabinIterations(value: number) {
+    this.configurationService.setMillerRabinIterations(value);
+  }
+
+  public get millerRabinIterations(): number {
+    return this.configurationService.getMillerRabinIterations();
   }
 
   public set modul_alice(modul: string) {
@@ -71,31 +127,5 @@ export class StartseiteComponent implements OnInit {
 
   public get e_bob(): string {
     return this.keyService.getE(ClientEnum.Bob);
-  }
-
-  public generateKeys(client: ClientEnum) {
-    let requestContent = createKeyPairRequestFrom(
-      this.modulbreite,
-      this.miller_rabin_iterations,
-      this.random_seed,
-      this.zahlensystem
-    )
-    this.keyService.generateKeyPair(requestContent, client);
-
-    this.showSnackbar("Schlüsselpaar für " + ClientEnum[client] + " generiert.");
-  }
-
-  protected readonly ClientEnum = ClientEnum;
-
-  ngOnInit(): void {
-    this.keyService.getObservableWithRegister(ClientEnum.Alice).subscribe(keyPair => {
-      this.modul_alice = keyPair.modulus;
-      this.e_alice = keyPair.e;
-    });
-
-    this.keyService.getObservableWithRegister(ClientEnum.Bob).subscribe(keyPair => {
-      this.modul_bob = keyPair.modulus;
-      this.e_bob = keyPair.e;
-    });
   }
 }
