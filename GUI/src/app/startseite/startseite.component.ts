@@ -31,10 +31,6 @@ export class StartseiteComponent implements OnInit {
   public zahlensystem: number = 55296;
   public random_seed: number = 13;
   public miller_rabin_iterations: number = 100;
-  public modul_alice: string = "";
-  public e_alice: string = "";
-  public modul_bob: string = "";
-  public e_bob: string = "";
 
   constructor(private keyService: KeyManagementService, private snackBar: MatSnackBar) {
   }
@@ -43,6 +39,38 @@ export class StartseiteComponent implements OnInit {
     this.snackBar.open(message, "Ok", {
       duration: 4000,
     })
+  }
+
+  public set modul_alice(modul: string) {
+    this.keyService.setModul(ClientEnum.Alice, modul);
+  }
+
+  public set modul_bob(modul: string) {
+    this.keyService.setModul(ClientEnum.Bob, modul);
+  }
+
+  public get modul_alice(): string {
+    return this.keyService.getModul(ClientEnum.Alice);
+  }
+
+  public get modul_bob(): string {
+    return this.keyService.getModul(ClientEnum.Bob);
+  }
+
+  public set e_alice(e: string) {
+    this.keyService.setE(ClientEnum.Alice, e);
+  }
+
+  public set e_bob(e: string) {
+    this.keyService.setE(ClientEnum.Bob, e);
+  }
+
+  public get e_alice(): string {
+    return this.keyService.getE(ClientEnum.Alice);
+  }
+
+  public get e_bob(): string {
+    return this.keyService.getE(ClientEnum.Bob);
   }
 
   public generateKeys(client: ClientEnum) {

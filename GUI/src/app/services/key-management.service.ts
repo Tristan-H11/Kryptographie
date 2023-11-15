@@ -17,10 +17,11 @@ export class KeyManagementService {
     createEmptyKeyPair()
   );
 
-  constructor() { }
+  constructor() {
+  }
 
 
-  public generateKeyPair(requestContent: CreateKeyPairRequest,client: ClientEnum): void {
+  public generateKeyPair(requestContent: CreateKeyPairRequest, client: ClientEnum): void {
     let keyPair: KeyPair = createKeyPairFrom(
       String(requestContent.modulus_width), //TODO
       String(requestContent.miller_rabin_rounds), //TODO
@@ -44,6 +45,38 @@ export class KeyManagementService {
       return this.aliceKeyPair.asObservable();
     } else {
       return this.bobKeyPair.asObservable();
+    }
+  }
+
+  public setModul(client: ClientEnum, modul: string): void {
+    if (client == ClientEnum.Alice) {
+      this.aliceKeyPair.value.public_key.modulus = modul;
+    } else {
+      this.bobKeyPair.value.public_key.modulus = modul;
+    }
+  }
+
+  public getModul(client: ClientEnum) {
+    if (client == ClientEnum.Alice) {
+      return this.aliceKeyPair.value.public_key.modulus;
+    } else {
+      return this.bobKeyPair.value.public_key.modulus;
+    }
+  }
+
+  public setE(client: ClientEnum, e: string): void {
+    if (client == ClientEnum.Alice) {
+      this.aliceKeyPair.value.public_key.e = e;
+    } else {
+      this.bobKeyPair.value.public_key.e = e;
+    }
+  }
+
+  public getE(client: ClientEnum) {
+    if (client == ClientEnum.Alice) {
+      return this.aliceKeyPair.value.public_key.e;
+    } else {
+      return this.bobKeyPair.value.public_key.e;
     }
   }
 }
