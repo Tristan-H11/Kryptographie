@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import {createEmptyMessageSignature, MessageSignature} from "../models/message-signature";
+import {createEmptyMessageSignatureContainer, MessageSignatureContainer} from "../models/message-signature-container";
 import {BehaviorSubject, Observable} from "rxjs";
 import {ClientEnum} from "../models/client-enum";
 
@@ -8,11 +8,11 @@ import {ClientEnum} from "../models/client-enum";
 })
 export class MessageManagementService {
 
-  private aliceMessage = new BehaviorSubject<MessageSignature>(
-    createEmptyMessageSignature()
+  private aliceMessage = new BehaviorSubject<MessageSignatureContainer>(
+    createEmptyMessageSignatureContainer()
   );
-  private bobMessage = new BehaviorSubject<MessageSignature>(
-    createEmptyMessageSignature()
+  private bobMessage = new BehaviorSubject<MessageSignatureContainer>(
+    createEmptyMessageSignatureContainer()
   );
 
   constructor() { }
@@ -65,7 +65,7 @@ export class MessageManagementService {
     }
   }
 
-  public getMessageOberservable(client: ClientEnum): Observable<MessageSignature> {
+  public getMessageOberservable(client: ClientEnum): Observable<MessageSignatureContainer> {
     if (client == ClientEnum.Alice) {
       return this.aliceMessage.asObservable();
     } else {
