@@ -1,4 +1,4 @@
-import {Component} from '@angular/core';
+import {Component, OnInit} from '@angular/core';
 import {CommonModule} from "@angular/common";
 import {ClientComponent} from "../client/client.component";
 import {MatInputModule} from "@angular/material/input";
@@ -7,6 +7,8 @@ import {MatFormFieldModule} from "@angular/material/form-field";
 import {MatButtonModule} from "@angular/material/button";
 import {MatExpansionModule} from "@angular/material/expansion";
 import {BobRoutingModule} from "./bob-routing.module";
+import {ClientEnum} from "../models/client-enum";
+import {KeyManagementService} from "../services/key-management.service";
 
 @Component({
   selector: 'app-bob',
@@ -25,9 +27,5 @@ import {BobRoutingModule} from "./bob-routing.module";
   styleUrl: './bob.component.css'
 })
 export class BobComponent {
-  public name: string = "Bob"
-  public cipherText: string = "";
-  public plainText: string = "";
-  public signature: string = "";
-  public privateExponent: string = "";
+  public client: ClientEnum = ClientEnum.Bob;
 }
