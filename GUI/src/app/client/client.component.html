@@ -2,7 +2,7 @@
   <mat-expansion-panel>
     <mat-expansion-panel-header>
       <mat-panel-title>
-        Nachrichten von {{clientName}}
+        Briefkasten von {{clientName}}
       </mat-panel-title>
       <mat-panel-description>
         Die zu verschickenden und erhaltenden Nachrichten
@@ -37,7 +37,8 @@
 
     <mat-form-field class="width-100">
       <mat-label>Privater Exponent</mat-label>
-      <textarea matInput placeholder="Wird nach dem Berechnen automatisch angezeigt" [(ngModel)]="privateExponent"></textarea>
+      <textarea matInput placeholder="Wird nach dem Berechnen automatisch angezeigt"
+                [(ngModel)]="privateExponent"></textarea>
     </mat-form-field>
   </mat-expansion-panel>
 
@@ -55,10 +56,9 @@
       <mat-label>Signatur</mat-label>
       <textarea matInput placeholder="Wird nach dem Berechnen automatisch angezeigt" [(ngModel)]="signature"></textarea>
     </mat-form-field>
-      <mat-label>Signatur gültig?</mat-label>
-      <mat-label *ngIf="signatureValid && signatureCalculated">Signatur gültig!</mat-label>
-      <mat-label *ngIf="!signatureValid && signatureCalculated">Signatur ungültig!</mat-label>
-      <mat-label *ngIf="!signatureCalculated">Signatur noch nicht berechnet</mat-label>
+    <mat-label *ngIf="signatureValid && signatureCalculated">Signatur gültig!</mat-label>
+    <mat-label *ngIf="!signatureValid && signatureCalculated">Signatur ungültig!</mat-label>
+    <mat-label *ngIf="!signatureCalculated">Signatur noch nicht überprüft...</mat-label>
 
     <mat-action-row>
       <button mat-flat-button color="primary" (click)="clearFields()">Signaturfelder leeren</button>
