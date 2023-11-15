@@ -9,13 +9,13 @@ import {ClientEnum} from "../models/client-enum";
 @Component({
   selector: 'app-alice',
   standalone: true,
-    imports: [
-      CommonModule,
-      ClientComponent,
-      AliceRoutingModule,
-      MatFormFieldModule,
-      MatInputModule
-    ],
+  imports: [
+    CommonModule,
+    ClientComponent,
+    AliceRoutingModule,
+    MatFormFieldModule,
+    MatInputModule
+  ],
   templateUrl: './alice.component.html',
   styleUrl: './alice.component.css'
 })
