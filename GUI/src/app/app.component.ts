@@ -5,6 +5,8 @@ import {MatSidenavModule} from "@angular/material/sidenav";
 import {MatIconModule} from "@angular/material/icon";
 import {MatDividerModule} from "@angular/material/divider";
 import {MatButtonModule} from "@angular/material/button";
+import {BackendRequestService} from "./services/backend-request.service";
+import {MatSnackBar} from "@angular/material/snack-bar";
 
 @Component({
   selector: 'app-root',
@@ -16,11 +18,25 @@ import {MatButtonModule} from "@angular/material/button";
     MatSidenavModule,
     MatIconModule,
     MatDividerModule,
-    MatButtonModule
+    MatButtonModule,
   ],
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.css']
 })
 export class AppComponent {
   title = 'GUI';
+
+  constructor(private backendRequestService: BackendRequestService,
+              private snackBar: MatSnackBar) {
+  }
+
+  public checkServerConnection() {
+    this.backendRequestService.checkHealth().then((result) => {
+      if (result) {
+        this.snackBar.open("Server is reachable!", "OK", {duration: 4000});
+      } else {
+        this.snackBar.open("Server is not reachable!", "OK", {duration: 4000});
+      }
+    });
+  }
 }

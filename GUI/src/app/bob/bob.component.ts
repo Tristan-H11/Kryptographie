@@ -16,9 +16,6 @@ import {ClientEnum} from "../models/client-enum";
     CommonModule,
     ClientComponent,
     BobRoutingModule,
-    FormsModule,
-    MatButtonModule,
-    MatExpansionModule,
     MatFormFieldModule,
     MatInputModule
   ],
