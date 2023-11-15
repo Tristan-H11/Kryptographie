@@ -61,9 +61,9 @@
       <mat-label>Signatur</mat-label>
       <textarea matInput placeholder="Wird nach dem Berechnen automatisch angezeigt" [(ngModel)]="signature"></textarea>
     </mat-form-field>
-    <mat-label *ngIf="signatureValid && signatureVerified">Signatur gültig!</mat-label>
-    <mat-label *ngIf="!signatureValid && signatureVerified">Signatur ungültig!</mat-label>
-    <mat-label *ngIf="!signatureVerified">Signatur noch nicht überprüft...</mat-label>
+    <mat-label *ngIf="signatureValid && signatureVerificationCalculated">Signatur gültig!</mat-label>
+    <mat-label *ngIf="!signatureValid && signatureVerificationCalculated">Signatur ungültig!</mat-label>
+    <mat-label *ngIf="!signatureVerificationCalculated">Signatur noch nicht überprüft...</mat-label>
 
     <mat-action-row>
       <button mat-flat-button color="primary" (click)="clearSignatureFields()">Signaturfelder leeren</button>
