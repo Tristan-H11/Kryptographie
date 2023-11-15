@@ -7,6 +7,7 @@ import {MatFormFieldModule} from "@angular/material/form-field";
 import {MatInputModule} from "@angular/material/input";
 import {ClientEnum} from "../models/client-enum";
 import {KeyManagementService} from "../services/key-management.service";
+import {MessageManagementService} from "../services/message-management.service";
 
 @Component({
   selector: 'client',
@@ -25,6 +26,7 @@ import {KeyManagementService} from "../services/key-management.service";
 export class ClientComponent implements OnInit {
 
   @Input() client: ClientEnum = ClientEnum.Alice;
+  @Input() otherClient: ClientEnum = ClientEnum.Bob;
   public signatureCalculated: boolean = false;
   public signatureValid: boolean = false;
 
@@ -35,7 +37,7 @@ export class ClientComponent implements OnInit {
   public privateExponent: string = "";
   public blockSize: string = "";
 
-  constructor(private keyService: KeyManagementService) {
+  constructor(private keyService: KeyManagementService, private messageService: MessageManagementService) {
 
   }
 
@@ -44,15 +46,25 @@ export class ClientComponent implements OnInit {
       this.blockSize = keyPair.private_key.block_size;
       this.privateExponent = keyPair.private_key.d;
     });
+
+    this.messageService.getMessageOberservable(this.client).subscribe(message => {
+      // Werden die Nachrichten neu gesetzt, muss die Signatur neu berechnet werden.
+      this.signatureCalculated = false;
+      this.cipherText = message.ciphertext;
+      this.plainText = message.plaintext;
+      this.signature = message.signature;
+    });
   }
 
 
   public encrypt() {
-    console.log("encrypt");
+    let ciphertext = this.plainText + " encrypted!"  //TODO Encrypt
+    this.messageService.setCiphertext(ciphertext, this.client);
   }
 
   public decrypt() {
-    console.log("decrypt");
+    let plaintext = this.cipherText + " decrypted!"  //TODO Decrypt
+    this.messageService.setPlaintext(plaintext, this.client);
   }
 
   public clearFields() {
@@ -61,11 +73,13 @@ export class ClientComponent implements OnInit {
   }
 
   public sign() {
-    console.log("sign");
+    let signature = this.plainText + " signed!"  //TODO Sign
+    this.messageService.setSignature(signature, this.client);
   }
 
   public verify() {
-    console.log("verify");
+    this.signatureCalculated = true;
+    this.signatureValid = this.signatureCalculated; //TODO Verify
   }
 
 }
