@@ -1,9 +1,9 @@
-import {PublicKey} from "./public-key";
-import {PrivateKey} from "./private-key";
-
 export interface KeyPair {
-  public_key: PublicKey;
-  private_key: PrivateKey;
+  modulus: string;
+  e: string;
+  d: string;
+  block_size_pub: string;
+  block_size_priv: string;
 }
 
 /**
@@ -11,22 +11,17 @@ export interface KeyPair {
  * @param modulus Modulus
  * @param e Exponent
  * @param d Privater Exponent
- * @param block_size_enc Blockgröße für die Verschlüsselung
- * @param block_size_dec Blockgröße für die Entschlüsselung
+ * @param block_size_pub Blockgröße für den öffentlichen Schlüssel
+ * @param block_size_priv Blockgröße für den privaten Schlüssel
  */
-export function createKeyPairFrom(modulus: string, e: string, d: string, block_size_enc: string, block_size_dec: string): KeyPair {
+export function createKeyPairFrom(modulus: string, e: string, d: string, block_size_pub: string, block_size_priv: string): KeyPair {
   return {
-    public_key: {
       modulus: modulus,
       e: e,
-      block_size: block_size_enc
-    },
-    private_key: {
-      modulus: modulus,
+      block_size_pub: block_size_pub,
       d: d,
-      block_size: block_size_dec
+      block_size_priv: block_size_priv
     }
-  }
 }
 
 export function createEmptyKeyPair() {
