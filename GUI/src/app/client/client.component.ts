@@ -6,8 +6,8 @@ import {MatExpansionModule} from "@angular/material/expansion";
 import {MatFormFieldModule} from "@angular/material/form-field";
 import {MatInputModule} from "@angular/material/input";
 import {ClientEnum} from "../models/client-enum";
-import {KeyManagementService} from "../services/key-management.service";
-import {MessageManagementService} from "../services/message-management.service";
+import {KeyManagementService} from "../services/management/key-management.service";
+import {MessageManagementService} from "../services/management/message-management.service";
 import {MatIconModule} from "@angular/material/icon";
 import {MatSnackBar} from "@angular/material/snack-bar";
 
@@ -80,8 +80,8 @@ export class ClientComponent implements OnInit {
 
   ngOnInit(): void {
     this.keyService.getObservableWithRegister(this.client).subscribe(keyPair => {
-      this.privateExponent = keyPair.private_key.d;
-      this.modulus = keyPair.public_key.modulus;
+      this.privateExponent = keyPair.d;
+      this.modulus = keyPair.modulus;
     });
 
     this.messageService.getObservableWithRegister(this.client).subscribe(message => {

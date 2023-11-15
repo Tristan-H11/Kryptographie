@@ -6,7 +6,7 @@ import {MatButtonModule} from '@angular/material/button';
 import {FormsModule} from "@angular/forms";
 import {StartseiteRoutingModule} from "./startseite-routing.module";
 import {ClientEnum} from "../models/client-enum";
-import {KeyManagementService} from "../services/key-management.service";
+import {KeyManagementService} from "../services/management/key-management.service";
 import {createKeyPairRequestFrom} from "../models/create-key-pair-request";
 import {MatSnackBar} from "@angular/material/snack-bar";
 
@@ -89,13 +89,13 @@ export class StartseiteComponent implements OnInit {
 
   ngOnInit(): void {
     this.keyService.getObservableWithRegister(ClientEnum.Alice).subscribe(keyPair => {
-      this.modul_alice = keyPair.public_key.modulus;
-      this.e_alice = keyPair.public_key.e;
+      this.modul_alice = keyPair.modulus;
+      this.e_alice = keyPair.e;
     });
 
     this.keyService.getObservableWithRegister(ClientEnum.Bob).subscribe(keyPair => {
-      this.modul_bob = keyPair.public_key.modulus;
-      this.e_bob = keyPair.public_key.e;
+      this.modul_bob = keyPair.modulus;
+      this.e_bob = keyPair.e;
     });
   }
 }
