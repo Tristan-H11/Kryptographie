@@ -1,9 +1,15 @@
+/**
+ * Container für die Nachricht, den verschlüsselten Text und die Signatur.
+ */
 export interface MessageSignatureContainer {
   plaintext: string;
   ciphertext: string;
   signature: string;
 }
 
+/**
+ * Erstellt ein MessageSignatureContainer-Objekt.
+ */
 export function getMessageSignatureFrom(plaintext: string, ciphertext: string, signature: string): MessageSignatureContainer {
   return {
     plaintext: plaintext,
@@ -12,6 +18,9 @@ export function getMessageSignatureFrom(plaintext: string, ciphertext: string, s
   }
 }
 
+/**
+ * Erstellt ein leeres MessageSignatureContainer-Objekt.
+ */
 export function createEmptyMessageSignatureContainer(): MessageSignatureContainer {
   return getMessageSignatureFrom("", "", "");
 }

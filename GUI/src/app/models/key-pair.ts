@@ -1,3 +1,6 @@
+/**
+ * Schnittstelle für ein KeyPair-Objekt.
+ */
 export interface KeyPair {
   modulus: string;
   e: string;
@@ -16,14 +19,17 @@ export interface KeyPair {
  */
 export function createKeyPairFrom(modulus: string, e: string, d: string, block_size_pub: string, block_size_priv: string): KeyPair {
   return {
-      modulus: modulus,
-      e: e,
-      block_size_pub: block_size_pub,
-      d: d,
-      block_size_priv: block_size_priv
-    }
+    modulus: modulus,
+    e: e,
+    block_size_pub: block_size_pub,
+    d: d,
+    block_size_priv: block_size_priv
+  }
 }
 
+/**
+ * Erstellt ein leeres KeyPair-Objekt.
+ */
 export function createEmptyKeyPair() {
   return createKeyPairFrom("", "", "", "", "");
 }
