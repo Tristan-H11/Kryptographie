@@ -27,5 +27,5 @@ import {KeyManagementService} from "../services/key-management.service";
   styleUrl: './bob.component.css'
 })
 export class BobComponent {
-  public client: ClientEnum = ClientEnum.Bob;
+  protected readonly ClientEnum = ClientEnum;
 }

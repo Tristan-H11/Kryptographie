@@ -1,6 +1,6 @@
 import {Injectable} from '@angular/core';
 import {BehaviorSubject, Observable} from "rxjs";
-import {KeyPair} from "../models/key-pair";
+import {createEmptyKeyPair, createKeyPairFrom, KeyPair} from "../models/key-pair";
 import {ClientEnum} from "../models/client-enum";
 import {CreateKeyPairRequest} from "../models/create-key-pair-request";
 
@@ -9,27 +9,25 @@ import {CreateKeyPairRequest} from "../models/create-key-pair-request";
 })
 export class KeyManagementService {
 
-  private emptyKeyPair: KeyPair = {
-    public_key: {
-      modulus: "",
-      e: "",
-      block_size: ""
-    },
-    private_key: {
-      modulus: "",
-      d: "",
-      block_size: ""
-    }
-  };
 
-  private aliceKeyPair = new BehaviorSubject<KeyPair>(this.emptyKeyPair);
-  private bobKeyPair = new BehaviorSubject<KeyPair>(this.emptyKeyPair);
+  private aliceKeyPair = new BehaviorSubject<KeyPair>(
+    createEmptyKeyPair()
+  );
+  private bobKeyPair = new BehaviorSubject<KeyPair>(
+    createEmptyKeyPair()
+  );
 
   constructor() { }
 
 
-  private generateKeyPair(requestContent: CreateKeyPairRequest,client: ClientEnum): void {
-    let keyPair: KeyPair = this.emptyKeyPair;
+  public generateKeyPair(requestContent: CreateKeyPairRequest,client: ClientEnum): void {
+    let keyPair: KeyPair = createKeyPairFrom(
+      String(requestContent.modulus_width), //TODO
+      String(requestContent.miller_rabin_rounds), //TODO
+      "neuer WERT!", //TODO
+      "blocksize enc", //TODO
+      "blocksize dec" //TODO
+    );
 
     keyPair.public_key.modulus = String(requestContent.modulus_width);
     keyPair.private_key.d = String(requestContent.miller_rabin_rounds);

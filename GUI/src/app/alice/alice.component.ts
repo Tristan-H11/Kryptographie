@@ -21,6 +21,5 @@ import {KeyManagementService} from "../services/key-management.service";
   styleUrl: './alice.component.css'
 })
 export class AliceComponent {
-  public client: ClientEnum = ClientEnum.Alice;
-
+  protected readonly ClientEnum = ClientEnum;
 }
