@@ -45,15 +45,8 @@ pub struct CreateKeyPairRequest {
 }
 
 #[derive(Deserialize)]
-pub struct EncryptRequest {
-    pub plaintext: String,
-    pub key_pair: KeyPair,
-    pub number_system_base: u32,
-}
-
-#[derive(Deserialize)]
-pub struct DecryptRequest {
-    pub ciphertext: String,
+pub struct EncryptDecryptRequest {
+    pub message: String,
     pub key_pair: KeyPair,
     pub number_system_base: u32,
 }
