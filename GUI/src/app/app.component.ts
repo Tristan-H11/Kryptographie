@@ -1,4 +1,4 @@
-import {Component} from '@angular/core';
+import {Component, OnInit} from '@angular/core';
 import {CommonModule} from '@angular/common';
 import {RouterLink, RouterOutlet} from '@angular/router';
 import {MatSidenavModule} from "@angular/material/sidenav";
@@ -7,6 +7,8 @@ import {MatDividerModule} from "@angular/material/divider";
 import {MatButtonModule} from "@angular/material/button";
 import {BackendRequestService} from "./services/backend-request.service";
 import {MatSnackBar} from "@angular/material/snack-bar";
+import {ClientRegistrationService} from "./services/management/client-registration.service";
+import {ClientEnum} from "./models/client-enum";
 
 @Component({
   selector: 'app-root',
@@ -23,11 +25,17 @@ import {MatSnackBar} from "@angular/material/snack-bar";
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.css']
 })
-export class AppComponent {
-  title = 'GUI';
+export class AppComponent implements OnInit {
+  title = 'RSA-Encryption-Tool';
 
   constructor(private backendRequestService: BackendRequestService,
+              private clientRegistrationService: ClientRegistrationService,
               private snackBar: MatSnackBar) {
+  }
+
+  ngOnInit(): void {
+    this.clientRegistrationService.registerClient(ClientEnum.Alice);
+    this.clientRegistrationService.registerClient(ClientEnum.Bob);
   }
 
   public checkServerConnection() {
