@@ -6,72 +6,114 @@ import {BackendRequestService} from "../backend-request.service";
 import {AbstractClientObservableManagementService} from './abstract-client-observable-management-service';
 
 @Injectable({
-    providedIn: 'root'
+  providedIn: 'root'
 })
-export class KeyManagementService extends AbstractClientObservableManagementService<KeyPair>{
+/**
+ * Service zum Verwalten der Schlüssel von Clients.
+ */
+export class KeyManagementService extends AbstractClientObservableManagementService<KeyPair> {
 
-    protected override createDefaultObject(): KeyPair {
-        return createEmptyKeyPair();
-    }
+  /**
+   * @inheritDoc
+   */
+  protected override createDefaultObject(): KeyPair {
+    return createEmptyKeyPair();
+  }
 
-    constructor(private backendRequestService: BackendRequestService) {
-        super();
-    }
+  constructor(private backendRequestService: BackendRequestService) {
+    super();
+  }
 
-    public generateKeyPair(requestContent: ConfigurationData, client: ClientEnum): void {
-        this.backendRequestService.createKeyPair(requestContent).then(
-            (keyPair) => {
-                let entry = this.clientMap.get(client);
-                if (entry) {
-                    entry.next(keyPair);
-                } else {
-                    console.log("Client " + client + " is not registered!");
-                }
-            }
-        );
-    }
+  /**
+   * Generiert ein Schlüsselpaar mit der gegebenen Konfiguration für den Client.
+   */
+  public generateKeyPair(requestContent: ConfigurationData, client: ClientEnum): void {
+    this.backendRequestService.createKeyPair(requestContent).then(
+      (keyPair) => {
+        let entry = this.clientMap.get(client);
+        if (entry) {
+          entry.next(keyPair);
+        } else {
+          console.log("Client " + client + " is not registered!");
+        }
+      }
+    );
+  }
 
-    public getKeyPair(client: ClientEnum): KeyPair {
-        return this.getValue(client);
-    }
+  /**
+   * Gibt das Schlüsselpaar des Clients zurück.
+   */
+  public getKeyPair(client: ClientEnum): KeyPair {
+    return this.getValue(client);
+  }
 
-    public setModul(client: ClientEnum, modulus: string): void {
-        this.setProperty(client, "modulus", modulus)
-    }
+  /**
+   * Setzt den Modul des Schlüssels vom Client.
+   */
+  public setModul(client: ClientEnum, modulus: string): void {
+    this.setProperty(client, "modulus", modulus)
+  }
 
-    public getModul(client: ClientEnum): string {
-        return this.getPropertyAsString(client, "modulus");
-    }
+  /**
+   * Gibt den Modul des Schlüssels vom Client zurück.
+   */
+  public getModul(client: ClientEnum): string {
+    return this.getPropertyAsString(client, "modulus");
+  }
 
-    public setE(client: ClientEnum, e: string): void {
-        this.setProperty(client, "e", e);
-    }
+  /**
+   * Setzt den öffentlichen Exponenten des Schlüssels vom Client.
+   */
+  public setE(client: ClientEnum, e: string): void {
+    this.setProperty(client, "e", e);
+  }
 
-    public getE(client: ClientEnum): string {
-        return this.getPropertyAsString(client, "e");
-    }
+  /**
+   * Gibt den öffentlichen Exponenten des Schlüssels vom Client zurück.
+   */
+  public getE(client: ClientEnum): string {
+    return this.getPropertyAsString(client, "e");
+  }
 
-    public setBlockSizePub(client: ClientEnum, blockSize: string): void {
-        this.setProperty(client, "block_size_pub", blockSize);
-    }
+  /**
+   * Setzt die Blockgröße für den öffentlichen Schlüssel des Clients.
+   */
+  public setBlockSizePub(client: ClientEnum, blockSize: string): void {
+    this.setProperty(client, "block_size_pub", blockSize);
+  }
 
-    public getBlockSizePub(client: ClientEnum): string {
-        return this.getPropertyAsString(client, "block_size_pub");
-    }
+  /**
+   * Gibt die Blockgröße für den öffentlichen Schlüssel des Clients zurück.
+   */
+  public getBlockSizePub(client: ClientEnum): string {
+    return this.getPropertyAsString(client, "block_size_pub");
+  }
 
-    public setBlockSizePriv(client: ClientEnum, blockSize: string): void {
-        this.setProperty(client, "block_size_priv", blockSize);
-    }
+  /**
+   * Setzt die Blockgröße für den privaten Schlüssel des Clients.
+   */
+  public setBlockSizePriv(client: ClientEnum, blockSize: string): void {
+    this.setProperty(client, "block_size_priv", blockSize);
+  }
 
-    public getBlockSizePriv(client: ClientEnum): string {
-        return this.getPropertyAsString(client, "block_size_priv");
-    }
+  /**
+   * Gibt die Blockgröße für den privaten Schlüssel des Clients zurück.
+   */
+  public getBlockSizePriv(client: ClientEnum): string {
+    return this.getPropertyAsString(client, "block_size_priv");
+  }
 
-    public setD(client: ClientEnum, d: string): void {
-        this.setProperty(client, "d", d);
-    }
+  /**
+   * Setzt den privaten Exponenten des Schlüssels vom Client.
+   */
+  public setD(client: ClientEnum, d: string): void {
+    this.setProperty(client, "d", d);
+  }
 
-    public getD(client: ClientEnum): string {
-        return this.getPropertyAsString(client, "d");
-    }
+  /**
+   * Gibt den privaten Exponenten des Schlüssels vom Client zurück.
+   */
+  public getD(client: ClientEnum): string {
+    return this.getPropertyAsString(client, "d");
+  }
 }

@@ -5,28 +5,28 @@ import {MessageManagementService} from "./message-management.service";
 import {KeyManagementService} from "./key-management.service";
 
 @Injectable({
-    providedIn: 'root'
+  providedIn: 'root'
 })
 /**
  * Service zum Registrieren von Clients bei allen Client-Observable-Services.
  */
 export class ClientRegistrationService {
 
-    private services: AbstractClientObservableManagementService<any>[] = [];
+  private services: AbstractClientObservableManagementService<any>[] = [];
 
-    constructor(
-        private messageService: MessageManagementService,
-        private keyService: KeyManagementService,
-    ) {
-        this.services.push(messageService, keyService);
-    }
+  constructor(
+    private messageService: MessageManagementService,
+    private keyService: KeyManagementService,
+  ) {
+    this.services.push(messageService, keyService);
+  }
 
-    /**
-     * Registriert einen Client bei allen Services.
-     * @param client
-     * @param service
-     */
-    public registerClient<T extends AbstractClientObservableManagementService<any>>(client: ClientEnum): void {
-        this.services.forEach(service => service.registerClient(client));
-    }
+  /**
+   * Registriert einen Client bei allen Services.
+   * @param client
+   * @param service
+   */
+  public registerClient(client: ClientEnum): void {
+    this.services.forEach(service => service.registerClient(client));
+  }
 }
