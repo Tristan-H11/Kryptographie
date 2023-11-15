@@ -9,6 +9,7 @@ import {ClientEnum} from "../models/client-enum";
 import {KeyManagementService} from "../services/key-management.service";
 import {MessageManagementService} from "../services/message-management.service";
 import {MatIconModule} from "@angular/material/icon";
+import {MatSnackBar} from "@angular/material/snack-bar";
 
 @Component({
   selector: 'client',
@@ -29,7 +30,7 @@ export class ClientComponent implements OnInit {
 
   @Input() client: ClientEnum = ClientEnum.Alice;
   @Input() otherClient: ClientEnum = ClientEnum.Bob;
-  public signatureCalculated: boolean = false;
+  public signatureVerified: boolean = false;
   public signatureValid: boolean = false;
 
   public cipherText: string = "";
@@ -39,7 +40,9 @@ export class ClientComponent implements OnInit {
   public privateExponent: string = "";
   public blockSize: string = "";
 
-  constructor(private keyService: KeyManagementService, private messageService: MessageManagementService) {
+  constructor(private keyService: KeyManagementService,
+              private messageService: MessageManagementService,
+              private snackBar: MatSnackBar) {
   }
 
   ngOnInit(): void {
@@ -50,22 +53,31 @@ export class ClientComponent implements OnInit {
 
     this.messageService.getMessageOberservable(this.client).subscribe(message => {
       // Werden die Nachrichten neu gesetzt, muss die Signatur neu berechnet werden.
-      this.signatureCalculated = false;
+      this.signatureVerified = false;
       this.cipherText = message.ciphertext;
       this.plainText = message.plaintext;
       this.signature = message.signature;
     });
   }
 
+  private showSnackbar(message: string) {
+    this.snackBar.open(message, "Ok", {
+      duration: 4000,
+    })
+  }
 
   public encrypt() {
     let ciphertext = this.plainText + " encrypted!"  //TODO Encrypt
     this.messageService.setCiphertext(ciphertext, this.client);
+    this.messageService.setPlaintext("", this.client); // Plaintext löschen
+    this.showSnackbar("Nachricht verschlüsselt!");
   }
 
   public decrypt() {
     let plaintext = this.cipherText + " decrypted!"  //TODO Decrypt
     this.messageService.setPlaintext(plaintext, this.client);
+    this.messageService.setCiphertext("", this.client); // Ciphertext löschen
+    this.showSnackbar("Nachricht entschlüsselt!");
   }
 
   public clearFields() {
@@ -76,11 +88,13 @@ export class ClientComponent implements OnInit {
   public sign() {
     let signature = this.plainText + " signed!"  //TODO Sign
     this.messageService.setSignature(signature, this.client);
+    this.showSnackbar("Nachricht signiert!");
   }
 
   public verify() {
-    this.signatureCalculated = true;
-    this.signatureValid = this.signatureCalculated; //TODO Verify
+    this.signatureVerified = true;
+    this.signatureValid = this.signatureVerified; //TODO Verify
+    this.showSnackbar("Signatur verifiziert!");
   }
 
   /**
@@ -90,13 +104,16 @@ export class ClientComponent implements OnInit {
   public sendMessageAndSignature() {
     this.messageService.setCiphertext(this.cipherText, this.otherClient);
     this.messageService.setSignature(this.signature, this.otherClient);
+    this.showSnackbar("Nachricht und Signatur gesendet!");
 
-    this.clearFields()
+    // Alle Felder leeren, wenn gesendet wird
+    this.clearFields();
+    this.clearSignatureFields();
   }
 
   public clearSignatureFields() {
     this.messageService.setSignature("", this.client);
-    this.signatureCalculated = false;
+    this.signatureVerified = false;
     this.signatureValid = false;
   }
 }

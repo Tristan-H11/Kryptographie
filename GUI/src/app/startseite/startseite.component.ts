@@ -8,6 +8,7 @@ import {StartseiteRoutingModule} from "./startseite-routing.module";
 import {ClientEnum} from "../models/client-enum";
 import {KeyManagementService} from "../services/key-management.service";
 import {createKeyPairRequestFrom} from "../models/create-key-pair-request";
+import {MatSnackBar} from "@angular/material/snack-bar";
 
 
 @Component({
@@ -35,7 +36,13 @@ export class StartseiteComponent implements OnInit {
   public modul_bob: string = "";
   public e_bob: string = "";
 
-  constructor(private keyService: KeyManagementService) {
+  constructor(private keyService: KeyManagementService, private snackBar: MatSnackBar) {
+  }
+
+  private showSnackbar(message: string) {
+    this.snackBar.open(message, "Ok", {
+      duration: 4000,
+    })
   }
 
   public generateKeys(client: ClientEnum) {
@@ -46,6 +53,8 @@ export class StartseiteComponent implements OnInit {
       this.zahlensystem
     )
     this.keyService.generateKeyPair(requestContent, client);
+
+    this.showSnackbar("Schlüsselpaar für " + ClientEnum[client] + " generiert.");
   }
 
   protected readonly ClientEnum = ClientEnum;
