@@ -19,3 +19,16 @@ input.text-align-right {
 .width-100 {
   width: 100%;
 }
+
+.extended-button-container {
+  display: flex;
+  justify-content: right;
+  width: auto;
+  padding: 2vh 2vw;
+}
+
+.accordion-container {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+}

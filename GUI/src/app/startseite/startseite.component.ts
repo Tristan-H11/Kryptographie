@@ -12,6 +12,9 @@ import {MatSnackBar} from "@angular/material/snack-bar";
 import {ConfigurationManagementService} from "../services/management/configuration-management.service";
 import {ClientService} from "../services/management/client.service";
 import {NgForOf} from "@angular/common";
+import {MatIconModule} from "@angular/material/icon";
+import {MatDialog} from "@angular/material/dialog";
+import {SimpleDialogComponent} from "../simple-dialog/simple-dialog.component";
 
 
 @Component({
@@ -25,6 +28,7 @@ import {NgForOf} from "@angular/common";
     MatButtonModule,
     FormsModule,
     NgForOf,
+    MatIconModule,
   ],
   templateUrl: './startseite.component.html',
   styleUrl: './startseite.component.css'
@@ -60,6 +64,7 @@ export class StartseiteComponent implements AfterViewInit {
   constructor(private keyService: KeyManagementService,
               private configurationService: ConfigurationManagementService,
               private clientService: ClientService,
+              public dialog: MatDialog,
               private snackBar: MatSnackBar) {
   }
 
@@ -164,6 +169,16 @@ export class StartseiteComponent implements AfterViewInit {
         component.setExponent(client, value);
       },
     };
+  }
+
+  openDialog(): void {
+    const dialogRef = this.dialog.open(SimpleDialogComponent, {
+      data: "",
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      this.clientService.createAndRegisterClient(result);
+    });
   }
 
   public getClients(): Set<Client> {
