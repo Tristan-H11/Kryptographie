@@ -21,8 +21,8 @@
     <mat-action-row>
       <mat-form-field>
         <mat-label>Ziel-Client</mat-label>
-        <mat-select>
-          <mat-option *ngFor="let client of getOtherClients()" [value]="targetClient">{{client.name}}</mat-option>
+        <mat-select [(value)]="targetClient">
+          <mat-option *ngFor="let client of getOtherClients()" [value]="client">{{client.name}}</mat-option>
         </mat-select>
       </mat-form-field>
       <button mat-flat-button color="primary" (click)="clearFields()">Nachrichtenfelder leeren</button>
