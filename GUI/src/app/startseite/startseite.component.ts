@@ -1,4 +1,4 @@
-import {Component, OnInit} from '@angular/core';
+import {AfterViewInit, Component, OnInit} from '@angular/core';
 import {MatExpansionModule} from '@angular/material/expansion';
 import {MatInputModule} from '@angular/material/input';
 import {MatFormFieldModule} from '@angular/material/form-field';
@@ -32,7 +32,7 @@ import {NgForOf} from "@angular/common";
 /**
  * Komponente für die Darstellung der Startseite inklusive der Konfigurationsmöglichkeiten.
  */
-export class StartseiteComponent implements OnInit {
+export class StartseiteComponent implements AfterViewInit {
 
   /**
    * Ein notwendiger Zwischenspeicher für die öffentlichen Komponenten der Schlüssel.
@@ -43,13 +43,13 @@ export class StartseiteComponent implements OnInit {
   /**
    * Registriert sich bei dem KeyService, um die öffentlichen Komponenten der Schlüssel bereitstellen zu können.
    */
-  ngOnInit(): void {
-    // Annahme: getClients() gibt eine Liste von Client-Namen zurück
+  ngAfterViewInit(): void {
     const clients = this.getClients();
 
-    clients.forEach(clientName => {
-      this.keyService.getObservable(Client).subscribe(keyPair => {
-        this.clientKeys.set(clientName, {
+    clients.forEach(client => {
+      this.keyService.getObservable(client).subscribe(keyPair => {
+        console.log("Startseite: KeyPair for " + client.name + " updated.");
+        this.clientKeys.set(client, {
           modulus: keyPair.modulus,
           exponent: keyPair.e
         });
