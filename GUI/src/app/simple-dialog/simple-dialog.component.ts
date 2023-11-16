@@ -36,4 +36,8 @@ export class SimpleDialogComponent {
   public onNoClick(): void {
     this.dialogRef.close();
   }
+
+  public onEnter() {
+    this.dialogRef.close(this.data)
+  }
 }

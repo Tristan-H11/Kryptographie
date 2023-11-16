@@ -3,10 +3,10 @@
   <p>Wie soll der Client heißen?</p>
   <mat-form-field>
     <mat-label>Name</mat-label>
-    <input matInput [(ngModel)]="data">
+    <input matInput (keyup.enter)="onEnter()" [(ngModel)]="data">
   </mat-form-field>
 </div>
 <div mat-dialog-actions>
   <button mat-button (click)="onNoClick()">Abbrechen</button>
-  <button mat-button [mat-dialog-close]="data" cdkFocusInitial>Ok</button>
+  <button mat-button [mat-dialog-close]="data" cdkFocusInitial>Erstellen</button>
 </div>
