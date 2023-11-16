@@ -1,6 +1,6 @@
 import {Injectable} from '@angular/core';
 import {createEmptyMessageSignatureContainer, MessageSignatureContainer} from "../../models/message-signature-container";
-import {ClientEnum} from "../../models/client-enum";
+import {Client} from "../../models/client";
 import {AbstractClientObservableManagementService} from "./abstract-client-observable-management-service";
 
 @Injectable({
@@ -24,42 +24,42 @@ export class MessageManagementService extends AbstractClientObservableManagement
   /**
    * Setzt den Klartext des Clients.
    */
-  public setPlaintext(plaintext: string, client: ClientEnum): void {
+  public setPlaintext(plaintext: string, client: Client): void {
     this.setProperty(client, "plaintext", plaintext);
   }
 
   /**
    * Gibt den Klartext des Clients zurück.
    */
-  public getPlaintext(client: ClientEnum): string {
+  public getPlaintext(client: Client): string {
     return this.getPropertyAsString(client, "plaintext");
   }
 
   /**
    * Setzt den Geheimtext des Clients.
    */
-  public setCiphertext(ciphertext: string, client: ClientEnum): void {
+  public setCiphertext(ciphertext: string, client: Client): void {
     this.setProperty(client, "ciphertext", ciphertext);
   }
 
   /**
    * Gibt den Geheimtext des Clients zurück.
    */
-  public getCiphertext(client: ClientEnum): string {
+  public getCiphertext(client: Client): string {
     return this.getPropertyAsString(client, "ciphertext");
   }
 
   /**
    * Setzt die Signatur des Clients.
    */
-  public setSignature(signature: string, client: ClientEnum): void {
+  public setSignature(signature: string, client: Client): void {
     this.setProperty(client, "signature", signature);
   }
 
   /**
    * Gibt die Signatur des Clients zurück.
    */
-  public getSignature(client: ClientEnum): string {
+  public getSignature(client: Client): string {
     return this.getPropertyAsString(client, "signature");
   }
 }

@@ -7,8 +7,8 @@ import {MatDividerModule} from "@angular/material/divider";
 import {MatButtonModule} from "@angular/material/button";
 import {BackendRequestService} from "./services/backend-request.service";
 import {MatSnackBar} from "@angular/material/snack-bar";
-import {ClientRegistrationService} from "./services/management/client-registration.service";
-import {ClientEnum} from "./models/client-enum";
+import {ClientService} from "./services/management/client.service";
+import {Client} from "./models/client";
 
 @Component({
   selector: 'app-root',
@@ -29,17 +29,19 @@ export class AppComponent implements OnInit {
   title = 'RSA-Encryption-Tool';
 
   constructor(private backendRequestService: BackendRequestService,
-              private clientRegistrationService: ClientRegistrationService,
+              private clientService: ClientService,
               private snackBar: MatSnackBar) {
   }
 
-  /**
-   * Registriert die Clients Alice und Bob auf allen Services.
-   * Hier müssen neue initiale Clients nachgetragen werden.
-   */
   ngOnInit(): void {
-    this.clientRegistrationService.registerClient(ClientEnum.Alice);
-    this.clientRegistrationService.registerClient(ClientEnum.Bob);
+    this.registerNewClientByName("Alice");
+    this.registerNewClientByName("Bob");
+    this.registerNewClientByName("Charlie");
+  }
+
+  public registerNewClientByName(name: string) {
+    this.clientService.registerServices();
+    this.clientService.createAndRegisterClient(name);
   }
 
   /**
@@ -54,4 +56,8 @@ export class AppComponent implements OnInit {
       }
     });
   }
+
+    public getClients(): Set<Client> {
+        return this.clientService.getClients();
+    }
 }

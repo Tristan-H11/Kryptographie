@@ -1,6 +1,6 @@
 import {Injectable} from '@angular/core';
 import {createEmptyKeyPair, KeyPair} from "../../models/key-pair";
-import {ClientEnum} from "../../models/client-enum";
+import {Client} from "../../models/client";
 import {ConfigurationData} from "../../models/configuration-data";
 import {BackendRequestService} from "../backend-request.service";
 import {AbstractClientObservableManagementService} from './abstract-client-observable-management-service';
@@ -27,7 +27,7 @@ export class KeyManagementService extends AbstractClientObservableManagementServ
   /**
    * Generiert ein Schlüsselpaar mit der gegebenen Konfiguration für den Client.
    */
-  public generateKeyPair(requestContent: ConfigurationData, client: ClientEnum): void {
+  public generateKeyPair(requestContent: ConfigurationData, client: Client): void {
     this.backendRequestService.createKeyPair(requestContent).then(
       (keyPair) => {
         let entry = this.clientMap.get(client);
@@ -43,77 +43,77 @@ export class KeyManagementService extends AbstractClientObservableManagementServ
   /**
    * Gibt das Schlüsselpaar des Clients zurück.
    */
-  public getKeyPair(client: ClientEnum): KeyPair {
+  public getKeyPair(client: Client): KeyPair {
     return this.getValue(client);
   }
 
   /**
    * Setzt den Modul des Schlüssels vom Client.
    */
-  public setModul(client: ClientEnum, modulus: string): void {
+  public setModul(client: Client, modulus: string): void {
     this.setProperty(client, "modulus", modulus)
   }
 
   /**
    * Gibt den Modul des Schlüssels vom Client zurück.
    */
-  public getModul(client: ClientEnum): string {
+  public getModul(client: Client): string {
     return this.getPropertyAsString(client, "modulus");
   }
 
   /**
    * Setzt den öffentlichen Exponenten des Schlüssels vom Client.
    */
-  public setE(client: ClientEnum, e: string): void {
+  public setE(client: Client, e: string): void {
     this.setProperty(client, "e", e);
   }
 
   /**
    * Gibt den öffentlichen Exponenten des Schlüssels vom Client zurück.
    */
-  public getE(client: ClientEnum): string {
+  public getE(client: Client): string {
     return this.getPropertyAsString(client, "e");
   }
 
   /**
    * Setzt die Blockgröße für den öffentlichen Schlüssel des Clients.
    */
-  public setBlockSizePub(client: ClientEnum, blockSize: string): void {
+  public setBlockSizePub(client: Client, blockSize: string): void {
     this.setProperty(client, "block_size_pub", blockSize);
   }
 
   /**
    * Gibt die Blockgröße für den öffentlichen Schlüssel des Clients zurück.
    */
-  public getBlockSizePub(client: ClientEnum): string {
+  public getBlockSizePub(client: Client): string {
     return this.getPropertyAsString(client, "block_size_pub");
   }
 
   /**
    * Setzt die Blockgröße für den privaten Schlüssel des Clients.
    */
-  public setBlockSizePriv(client: ClientEnum, blockSize: string): void {
+  public setBlockSizePriv(client: Client, blockSize: string): void {
     this.setProperty(client, "block_size_priv", blockSize);
   }
 
   /**
    * Gibt die Blockgröße für den privaten Schlüssel des Clients zurück.
    */
-  public getBlockSizePriv(client: ClientEnum): string {
+  public getBlockSizePriv(client: Client): string {
     return this.getPropertyAsString(client, "block_size_priv");
   }
 
   /**
    * Setzt den privaten Exponenten des Schlüssels vom Client.
    */
-  public setD(client: ClientEnum, d: string): void {
+  public setD(client: Client, d: string): void {
     this.setProperty(client, "d", d);
   }
 
   /**
    * Gibt den privaten Exponenten des Schlüssels vom Client zurück.
    */
-  public getD(client: ClientEnum): string {
+  public getD(client: Client): string {
     return this.getPropertyAsString(client, "d");
   }
 }

@@ -1,80 +1,68 @@
 <mat-accordion class="accordion-container" multi="true">
-  <mat-expansion-panel [expanded]="true"> <!-- Initial geöffnet -->
-    <mat-expansion-panel-header>
-      <mat-panel-title>
-        Allgemeine Konfiguration
-      </mat-panel-title>
-      <mat-panel-description>
-        Die Basis-Eigenschaften der Simulation
-      </mat-panel-description>
-    </mat-expansion-panel-header>
+    <mat-expansion-panel [expanded]="true"> <!-- Initial geöffnet -->
+        <mat-expansion-panel-header>
+            <mat-panel-title>
+                Allgemeine Konfiguration
+            </mat-panel-title>
+            <mat-panel-description>
+                Die Basis-Eigenschaften der Simulation
+            </mat-panel-description>
+        </mat-expansion-panel-header>
 
-      <mat-form-field class="config-form-field">
-        <mat-label>Modulbreite</mat-label>
-        <input class="text-align-right" matInput type="number" [(ngModel)]="modulusWidth">
-        <span matTextSuffix>-Bit</span>
-        <mat-hint><260Bit erlaubt keine Signatur!</mat-hint>
-      </mat-form-field>
+        <mat-form-field class="config-form-field">
+            <mat-label>Modulbreite</mat-label>
+            <input class="text-align-right" matInput type="number" [(ngModel)]="modulusWidth">
+            <span matTextSuffix>-Bit</span>
+            <mat-hint><260Bit erlaubt keine Signatur!</mat-hint>
+        </mat-form-field>
 
-      <mat-form-field class="config-form-field">
-        <mat-label>Zahlensystem</mat-label>
-        <input class="text-align-right" matInput type="number" [(ngModel)]="numberSystem">
-      </mat-form-field>
+        <mat-form-field class="config-form-field">
+            <mat-label>Zahlensystem</mat-label>
+            <input class="text-align-right" matInput type="number" [(ngModel)]="numberSystem">
+        </mat-form-field>
 
-    <mat-form-field class="config-form-field">
-      <mat-label>Miller-Rabin Iterationen</mat-label>
-      <input class="text-align-right" matInput type="number" [(ngModel)]="millerRabinIterations">
-      <span matTextSuffix>-Iterationen</span>
-    </mat-form-field>
+        <mat-form-field class="config-form-field">
+            <mat-label>Miller-Rabin Iterationen</mat-label>
+            <input class="text-align-right" matInput type="number" [(ngModel)]="millerRabinIterations">
+            <span matTextSuffix>-Iterationen</span>
+        </mat-form-field>
 
-    <mat-form-field class="config-form-field">
-      <mat-label>Zufallsseed</mat-label>
-      <input class="text-align-right" matInput type="number" [(ngModel)]="randomSeed">
-    </mat-form-field>
+        <mat-form-field class="config-form-field">
+            <mat-label>Zufallsseed</mat-label>
+            <input class="text-align-right" matInput type="number" [(ngModel)]="randomSeed">
+        </mat-form-field>
 
-      <mat-action-row class="action-row-content-left">
-        <button mat-flat-button color="primary" (click)="generateKeys(ClientEnum.Alice)">Alice Schlüsselpaar erzeugen</button>
-        <button mat-flat-button color="primary" (click)="generateKeys(ClientEnum.Bob)">Bobs Schlüsselpaar erzeugen</button>
-      </mat-action-row>
-  </mat-expansion-panel>
+        <mat-action-row class="action-row-content-left">
+            <button mat-flat-button *ngFor="let client of getClients()" color="primary" (click)="generateKeys(client)">
+                Schlüsselpaar für {{client.name}} erzeugen
+            </button>
+        </mat-action-row>
+    </mat-expansion-panel>
 
-  <mat-expansion-panel>
-    <mat-expansion-panel-header>
-      <mat-panel-title>
-        Alice
-      </mat-panel-title>
-      <mat-panel-description>
-        Die öffentlichen Schlüsselkomponenten von Alice
-      </mat-panel-description>
-    </mat-expansion-panel-header>
+    <mat-expansion-panel *ngFor="let client of getClients()">
 
-    <mat-form-field class="width-100">
-      <mat-label>Modul</mat-label>
-      <textarea matInput placeholder="Wird nach dem Berechnen automatisch angezeigt" [(ngModel)]="modul_alice"></textarea>
-    </mat-form-field>
-    <mat-form-field class="width-100">
-      <mat-label>Öffentlicher Exponent</mat-label>
-      <textarea matInput placeholder="Wird nach dem Berechnen automatisch angezeigt" [(ngModel)]="e_alice"></textarea>
-    </mat-form-field>
-  </mat-expansion-panel>
+        <mat-expansion-panel-header>
+            <mat-panel-title>
+                {{client.name}}
+            </mat-panel-title>
+            <mat-panel-description>
+                Die öffentlichen Schlüsselkomponenten von {{client.name}}
+            </mat-panel-description>
+        </mat-expansion-panel-header>
 
-  <mat-expansion-panel>
-    <mat-expansion-panel-header>
-      <mat-panel-title>
-        Bob
-      </mat-panel-title>
-      <mat-panel-description>
-        Die öffentlichen Schlüsselkomponenten von Bob
-      </mat-panel-description>
-    </mat-expansion-panel-header>
 
-    <mat-form-field class="width-100">
-      <mat-label>Modul</mat-label>
-      <textarea matInput placeholder="Wird nach dem Berechnen automatisch angezeigt" [(ngModel)]="modul_bob"></textarea>
-    </mat-form-field>
-    <mat-form-field class="width-100">
-      <mat-label>Öffentlicher Exponent</mat-label>
-      <textarea matInput placeholder="Wird nach dem Berechnen automatisch angezeigt" [(ngModel)]="e_bob"></textarea>
-    </mat-form-field>
-  </mat-expansion-panel>
+        <mat-form-field class="width-100">
+            <mat-label>Modul</mat-label>
+            <textarea matInput placeholder="Wird nach dem Berechnen automatisch angezeigt"
+                      [ngModel]="getBindingContext(client).modulus"
+                      (ngModelChange)="getBindingContext(client).modulus = $event"></textarea>
+        </mat-form-field>
+
+        <mat-form-field class="width-100">
+            <mat-label>Öffentlicher Exponent</mat-label>
+            <textarea matInput placeholder="Wird nach dem Berechnen automatisch angezeigt"
+                      [ngModel]="getBindingContext(client).exponent"
+                      (ngModelChange)="getBindingContext(client).exponent = $event"></textarea>
+        </mat-form-field>
+    </mat-expansion-panel>
 </mat-accordion>

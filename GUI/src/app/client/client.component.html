@@ -2,7 +2,7 @@
   <mat-expansion-panel [expanded]="true"> <!-- Initial geöffnet -->
     <mat-expansion-panel-header>
       <mat-panel-title>
-        Briefkasten von {{client}}
+        Briefkasten von {{client?.name}}
       </mat-panel-title>
       <mat-panel-description>
         Die zu verschickenden und erhaltenden Nachrichten
@@ -28,7 +28,7 @@
   <mat-expansion-panel>
     <mat-expansion-panel-header>
       <mat-panel-title>
-        Privater Schlüssel von {{client}}
+        Privater Schlüssel von {{client?.name}}
       </mat-panel-title>
       <mat-panel-description>
         Die Komponenten des privaten Schlüssels
