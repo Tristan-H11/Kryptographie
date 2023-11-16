@@ -46,7 +46,7 @@ export class ClientComponent implements OnInit {
   /**
    * Der Client, mit dem kommuniziert wird.
    */
-  targetClient: Client | undefined;
+  targetClient: Client | undefined = this.clientService.getClientByName("Alice");
   public signatureVerificationCalculated: boolean = false;
   public signatureValid: boolean = false;
 
