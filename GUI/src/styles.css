@@ -20,7 +20,7 @@ input.text-align-right {
   width: 100%;
 }
 
-.extended-button-container {
+.element-below-accordion-container {
   display: flex;
   justify-content: right;
   width: auto;
@@ -31,4 +31,10 @@ input.text-align-right {
   width: 100%;
   display: flex;
   flex-direction: column;
+}
+
+.below-accordion {
+  display: flex;
+  flex-direction: row-reverse;
+  column-gap: 0.5vw;
 }

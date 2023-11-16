@@ -1,11 +1,11 @@
-import {Component, Input, OnInit} from '@angular/core';
+import {Component, OnInit} from '@angular/core';
 import {CommonModule} from '@angular/common';
 import {FormsModule} from "@angular/forms";
 import {MatButtonModule} from "@angular/material/button";
 import {MatExpansionModule} from "@angular/material/expansion";
 import {MatFormFieldModule} from "@angular/material/form-field";
 import {MatInputModule} from "@angular/material/input";
-import {Client, createNewClient} from "../models/client";
+import {Client} from "../models/client";
 import {KeyManagementService} from "../services/management/key-management.service";
 import {MessageManagementService} from "../services/management/message-management.service";
 import {MatIconModule} from "@angular/material/icon";
@@ -17,6 +17,7 @@ import {signRequestFrom} from "../models/sign-request";
 import {verifyRequestFrom} from "../models/verify-request";
 import {ActivatedRoute} from "@angular/router";
 import {ClientService} from "../services/management/client.service";
+import {MatSelectModule} from "@angular/material/select";
 
 @Component({
   selector: 'client',
@@ -28,7 +29,8 @@ import {ClientService} from "../services/management/client.service";
     MatExpansionModule,
     MatFormFieldModule,
     MatInputModule,
-    MatIconModule
+    MatIconModule,
+    MatSelectModule
   ],
   templateUrl: './client.component.html',
   styleUrl: './client.component.css'
@@ -232,4 +234,13 @@ export class ClientComponent implements OnInit {
   public set modulus(value: string) {
     this.keyService.setModul(this.client!, value);
   }
+
+  /**
+   * Gibt alle Clients außer dem "eigenen" zurück.
+   */
+  public getOtherClients(): Set<Client> {
+    const allClients = this.clientService.getClients(); // Angenommen, dies gibt ein Set<Client> zurück
+    return new Set(
+      [...allClients].filter(clientFromSet => clientFromSet !== this.client)
+    );  }
 }
