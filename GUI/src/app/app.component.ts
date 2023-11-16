@@ -36,7 +36,6 @@ export class AppComponent implements OnInit {
   ngOnInit(): void {
     this.registerNewClientByName("Alice");
     this.registerNewClientByName("Bob");
-    this.registerNewClientByName("Charlie");
   }
 
   public registerNewClientByName(name: string) {
