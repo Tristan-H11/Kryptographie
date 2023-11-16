@@ -51,12 +51,16 @@ export class StartseiteComponent implements AfterViewInit {
     const clients = this.getClients();
 
     clients.forEach(client => {
-      this.keyService.getObservable(client).subscribe(keyPair => {
-        console.log("Startseite: KeyPair for " + client.name + " updated.");
-        this.clientKeys.set(client, {
-          modulus: keyPair.modulus,
-          exponent: keyPair.e
-        });
+      this.subscribeToClientKeys(client);
+    });
+  }
+
+  private subscribeToClientKeys(client: Client) {
+    this.keyService.getObservable(client).subscribe(keyPair => {
+      console.log("Startseite: KeyPair for " + client.name + " updated.");
+      this.clientKeys.set(client, {
+        modulus: keyPair.modulus,
+        exponent: keyPair.e
       });
     });
   }
@@ -177,7 +181,8 @@ export class StartseiteComponent implements AfterViewInit {
     });
 
     dialogRef.afterClosed().subscribe(result => {
-      this.clientService.createAndRegisterClient(result);
+      let newClient = this.clientService.createAndRegisterClient(result);
+      this.subscribeToClientKeys(newClient);
     });
   }
 
