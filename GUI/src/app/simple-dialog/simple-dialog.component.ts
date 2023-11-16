@@ -30,14 +30,22 @@ import {MatFormFieldModule} from '@angular/material/form-field';
 export class SimpleDialogComponent {
   constructor(
     public dialogRef: MatDialogRef<SimpleDialogComponent>,
-    @Inject(MAT_DIALOG_DATA) public data: string,
+    @Inject(MAT_DIALOG_DATA) public data: { name: string, aborted: boolean },
   ) {}
 
+  // TODO: Bei Escape fliegt ein Fehler, weil Result undefined ist. Result wie onNoClick handhaben.
+
   public onNoClick(): void {
-    this.dialogRef.close();
+    this.dialogRef.close(
+      {name: this.data.name, aborted: true}
+    );
   }
 
   public onEnter() {
+    if (this.data.name.length < 1) {
+      this.onNoClick(); // Bei leerem Namen wird das Dialogfenster abgebrochen.
+      return;
+    }
     this.dialogRef.close(this.data)
   }
 }

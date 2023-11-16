@@ -177,11 +177,14 @@ export class StartseiteComponent implements AfterViewInit {
 
   openDialog(): void {
     const dialogRef = this.dialog.open(SimpleDialogComponent, {
-      data: "",
+      data: {name: "", aborted: false},
     });
 
     dialogRef.afterClosed().subscribe(result => {
-      let newClient = this.clientService.createAndRegisterClient(result);
+      if (result.aborted) {
+        return;
+      }
+      let newClient = this.clientService.createAndRegisterClient(result.name);
       this.subscribeToClientKeys(newClient);
     });
   }
