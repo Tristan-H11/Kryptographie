@@ -13,8 +13,9 @@ import {ConfigurationManagementService} from "../services/management/configurati
 import {ClientService} from "../services/management/client.service";
 import {NgForOf} from "@angular/common";
 import {MatIconModule} from "@angular/material/icon";
-import {MatDialog} from "@angular/material/dialog";
+import {MatDialog, MatDialogRef} from "@angular/material/dialog";
 import {SimpleDialogComponent} from "../simple-dialog/simple-dialog.component";
+import {LoadingDialogComponent} from "../loading-dialog/loading-dialog.component";
 
 
 @Component({
@@ -76,15 +77,30 @@ export class StartseiteComponent implements AfterViewInit {
    * Generiert ein Schlüsselpaar für den Client.
    */
   public generateKeys(client: Client) {
+
+    let loadingDialog = this.openLoadDialog();
+
     let requestContent = createConfigurationDataFrom(
       this.modulusWidth,
       this.millerRabinIterations,
       this.randomSeed,
       this.numberSystem
     )
-    this.keyService.generateKeyPair(requestContent, client);
+    this.keyService.generateKeyPair(requestContent, client).subscribe({
+      next: () => {
+        loadingDialog.close()
+        this.showSnackbar("Schlüsselpaar für " + client.name + " generiert.");
+      }
+    });
+  }
 
-    this.showSnackbar("Schlüsselpaar für " + client.name + " generiert.");
+  /**
+   * Öffnet den Laden-Dialog.
+   */
+  public openLoadDialog(): MatDialogRef<LoadingDialogComponent> {
+    return this.dialog.open(LoadingDialogComponent, {
+      disableClose: true // Verhindert das Schließen durch den Benutzer
+    });
   }
 
   /**
@@ -160,7 +176,7 @@ export class StartseiteComponent implements AfterViewInit {
   public getBindingContext(client: Client) {
     const component = this;
     return {
-      get modulus():string  {
+      get modulus(): string {
         return component.getModulus(client);
       },
       set modulus(value) {
@@ -175,7 +191,10 @@ export class StartseiteComponent implements AfterViewInit {
     };
   }
 
-  openDialog(): void {
+  /**
+   * Öffnet einen Dialog, um einen neuen Client zu erstellen.
+   */
+  public openNameInputDialog(): void {
     const dialogRef = this.dialog.open(SimpleDialogComponent, {
       data: {name: "", aborted: false},
     });
@@ -196,7 +215,7 @@ export class StartseiteComponent implements AfterViewInit {
   /**
    * Löscht einen Client und entfernt alle Registrierungen.
    */
-   public deleteClient(client: Client) {
+  public deleteClient(client: Client) {
     this.clientService.deleteAndUnregisterClient(client);
   }
 }

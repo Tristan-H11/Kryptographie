@@ -4,6 +4,7 @@ import {Client} from "../../models/client";
 import {ConfigurationData} from "../../models/configuration-data";
 import {BackendRequestService} from "../backend-api/backend-request.service";
 import {AbstractClientObservableManagementService} from './abstract-client-observable-management-service';
+import {Observable} from "rxjs";
 
 @Injectable({
   providedIn: 'root'
@@ -26,18 +27,24 @@ export class KeyManagementService extends AbstractClientObservableManagementServ
 
   /**
    * Generiert ein Schlüsselpaar mit der gegebenen Konfiguration für den Client.
+   * Nimmt ein Callback entgegen, welches nach dem Erhalt des Schlüsselpaares ausgeführt wird.
    */
-  public generateKeyPair(requestContent: ConfigurationData, client: Client): void {
-    this.backendRequestService.createKeyPair(requestContent).then(
-      (keyPair) => {
-        let entry = this.clientMap.get(client);
-        if (entry) {
-          entry.next(keyPair);
-        } else {
-          console.log("Client " + client + " is not registered!");
+  public generateKeyPair(requestContent: ConfigurationData, client: Client): Observable<void> {
+    return new Observable<void>(observer => {
+      this.backendRequestService.createKeyPair(requestContent).then(
+        (keyPair) => {
+          let entry = this.clientMap.get(client);
+          if (entry) {
+            entry.next(keyPair);
+            observer.next();
+            observer.complete();
+          } else {
+            // TODO im observer als Fehler werfen
+            console.log("Client " + client + " is not registered!");
+          }
         }
-      }
-    );
+      );
+    });
   }
 
   /**
