@@ -16,12 +16,12 @@ pub(crate) async fn euclid_endpoint(req_body: Json<ExtendedEuclidRequest>) -> im
     let a = &BigInt::from_str(&*req_body.a).unwrap();
     let b = &BigInt::from_str(&*req_body.b).unwrap();
 
-    let (x, y, ggt) = extended_euclid(a, b);
+    let (ggt, x, y) = extended_euclid(a, b);
 
     let response = ExtendedEuclidResponse {
         x: x.to_str_radix(10),
-        y: x.to_str_radix(10),
-        ggt: x.to_str_radix(10),
+        y: y.to_str_radix(10),
+        ggt: ggt.to_str_radix(10),
     };
 
     HttpResponse::Ok().json(response)

@@ -1,1 +1,50 @@
-<p>exponentiation works!</p>
+<mat-accordion multi>
+  <mat-expansion-panel expanded>
+    <mat-expansion-panel-header>
+      <mat-panel-title>
+        Parameter für die schnelle Exponentiation
+      </mat-panel-title>
+      <mat-panel-description>
+        Berechnungen der schnellen Exponentiation für beliebig große Zahlen
+      </mat-panel-description>
+    </mat-expansion-panel-header>
+
+    <mat-form-field class="width-100">
+      <mat-label>Basis</mat-label>
+      <textarea matInput placeholder="Die Basis für die Exponentiation"
+                [(ngModel)]="base"></textarea>
+    </mat-form-field>
+    <mat-form-field class="width-100">
+      <mat-label>Exponent</mat-label>
+      <textarea matInput placeholder="Der Exponent für die Exponentiation"
+                [(ngModel)]="exponent"></textarea>
+    </mat-form-field>
+    <mat-form-field class="width-100">
+      <mat-label>Modul</mat-label>
+      <textarea matInput placeholder="Der Modul für die Reduzierung der Exponentiation"
+                [(ngModel)]="modulus"></textarea>
+    </mat-form-field>
+
+    <mat-action-row>
+      <button mat-raised-button color="primary" (click)="calculate()">Berechnen</button>
+    </mat-action-row>
+  </mat-expansion-panel>
+
+  <mat-expansion-panel expanded>
+    <mat-expansion-panel-header>
+      <mat-panel-title>
+        Ergebnis
+      </mat-panel-title>
+      <mat-panel-description>
+        Das Ergebnis der schnellen Exponentiation
+      </mat-panel-description>
+    </mat-expansion-panel-header>
+
+    <mat-form-field class="width-100">
+      <mat-label>Basis</mat-label>
+      <textarea matInput placeholder="Wird automatisch berechnet."
+                [(ngModel)]="result"></textarea>
+    </mat-form-field>
+
+  </mat-expansion-panel>
+</mat-accordion>

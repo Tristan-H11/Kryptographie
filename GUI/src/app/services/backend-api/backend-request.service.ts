@@ -8,6 +8,9 @@ import {EncryptDecryptRequest} from "../../models/encrypt-decrypt-request";
 import {SingleMessageModel} from "../../models/SingleMessageModel";
 import {SignRequest} from "../../models/sign-request";
 import {VerifyRequest} from "../../models/verify-request";
+import {ExponentiationRequest} from "../../models/exponentiation-request";
+import {ExtendedEuclidRequest} from "../../models/extended-euclid-request";
+import {ExtendedEuclidResponse} from "../../models/extended-euclid-response";
 
 @Injectable({
   providedIn: 'root'
@@ -79,6 +82,18 @@ export class BackendRequestService {
   public async verify(body: VerifyRequest): Promise<SingleMessageModel> {
     return firstValueFrom(
       this.http.post<SingleMessageModel>(this.endpointsService.getVerifyEndpoint(), body)
+    );
+  }
+
+  public async exponentiation(body: ExponentiationRequest): Promise<SingleMessageModel> {
+    return firstValueFrom(
+      this.http.post<SingleMessageModel>(this.endpointsService.getExponentiationEndpoint(), body)
+    );
+  }
+
+  public async extendedGcd(body: ExtendedEuclidRequest): Promise<ExtendedEuclidResponse> {
+    return firstValueFrom(
+      this.http.post<ExtendedEuclidResponse>(this.endpointsService.getExtendedGcdEndpoint(), body)
     );
   }
 }

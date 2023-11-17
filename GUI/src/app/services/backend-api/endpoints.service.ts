@@ -10,6 +10,7 @@ export class EndpointsService {
 
   private domain: string = "http://localhost:8080";
   private rsaEndpoint: string = "/rsa";
+  private mathEndpoint: string = "/math";
 
   constructor() {
   }
@@ -54,5 +55,19 @@ export class EndpointsService {
    */
   public getVerifyEndpoint(): string {
     return this.domain + this.rsaEndpoint + "/verify";
+  }
+
+  /**
+   * Gibt den Endpoint zum Berechnen der schnellen Exponentiation zurück.
+   */
+  public getExponentiationEndpoint(): string {
+    return this.domain + this.mathEndpoint + "/exponentiation";
+  }
+
+  /**
+   *
+   */
+  public getExtendedGcdEndpoint() {
+    return this.domain + this.mathEndpoint + "/extended_euclid";
   }
 }

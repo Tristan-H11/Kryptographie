@@ -1,1 +1,55 @@
-<p>extendedgcd works!</p>
+<mat-accordion multi>
+  <mat-expansion-panel expanded>
+    <mat-expansion-panel-header>
+      <mat-panel-title>
+        Parameter für den erweiterten Euklidischen Algorithmus
+      </mat-panel-title>
+      <mat-panel-description>
+        Berechnungen der schnellen Exponentiation für beliebig große Zahlen
+      </mat-panel-description>
+    </mat-expansion-panel-header>
+
+    <mat-form-field class="width-100">
+      <mat-label>Parameter A</mat-label>
+      <textarea matInput placeholder="Die Basis für die Exponentiation"
+                [(ngModel)]="parameterA"></textarea>
+    </mat-form-field>
+    <mat-form-field class="width-100">
+      <mat-label>Parameter B</mat-label>
+      <textarea matInput placeholder="Der Exponent für die Exponentiation"
+                [(ngModel)]="parameterB"></textarea>
+    </mat-form-field>
+
+    <mat-action-row>
+      <button mat-raised-button color="primary" (click)="calculate()">Berechnen</button>
+    </mat-action-row>
+  </mat-expansion-panel>
+
+  <mat-expansion-panel expanded>
+    <mat-expansion-panel-header>
+      <mat-panel-title>
+        Ergebnis
+      </mat-panel-title>
+      <mat-panel-description>
+        Der größte gemeinsame Teiler von A und B und die Bezout-Koeffizienten
+      </mat-panel-description>
+    </mat-expansion-panel-header>
+
+    <mat-form-field class="width-100">
+      <mat-label>GgT</mat-label>
+      <textarea matInput placeholder="Wird automatisch berechnet."
+                [(ngModel)]="ggT"></textarea>
+    </mat-form-field>
+    <mat-form-field class="width-100">
+      <mat-label>Koeffizient X</mat-label>
+      <textarea matInput placeholder="Wird automatisch berechnet."
+                [(ngModel)]="coefficientX"></textarea>
+    </mat-form-field>
+    <mat-form-field class="width-100">
+      <mat-label>Koeffzient Y</mat-label>
+      <textarea matInput placeholder="Wird automatisch berechnet."
+                [(ngModel)]="coefficientY"></textarea>
+    </mat-form-field>
+
+  </mat-expansion-panel>
+</mat-accordion>
