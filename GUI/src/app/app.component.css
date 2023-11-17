@@ -61,3 +61,10 @@
   font-size: 1.8vh;
   padding: 2vh 2vw;
 }
+
+.sidenav-client-button-container {
+  display: flex;
+  flex-direction: column;
+  row-gap: 1vh;
+  justify-content: flex-end;
+}
