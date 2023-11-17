@@ -1,5 +1,6 @@
 use actix_web::{HttpResponse, Responder};
 use actix_web::web::Json;
+use log::info;
 
 use crate::rest::serializable_models::{EncryptDecryptRequest, SingleStringResponse};
 
@@ -7,6 +8,7 @@ use crate::rest::serializable_models::{EncryptDecryptRequest, SingleStringRespon
 /// Verschlüsselt eine Nachricht.
 ///
 pub(crate) async fn encrypt(req_body: Json<EncryptDecryptRequest>) -> impl Responder {
+    info!("Endpunkt /rsa/encrypt wurde aufgerufen");
     let req_body: EncryptDecryptRequest = req_body.into_inner();
     let plaintext = req_body.message;
     let public_key = req_body.key_pair.to_public_key();

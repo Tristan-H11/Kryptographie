@@ -113,11 +113,12 @@ impl PublicKey {
         create_string_from_blocks_encrypt(encrypted_chunks, self.block_size + 1, g_base)
     }
 
-    pub(crate) fn verify(&self, _signature: &str, _message: &str) -> bool {
-        let message_big_int = get_decimal_hash(_message);
+    pub(crate) fn verify(&self, signature: &str, message: &str) -> bool {
+        info!("Verifizieren der Nachricht {} mit Signatur {}", message, signature);
+        let message_big_int = get_decimal_hash(message);
 
         // Signatur vom Partner in BigInt umwandeln
-        let signature_big_int = BigInt::parse_bytes(_signature.as_bytes(), 10)
+        let signature_big_int = BigInt::parse_bytes(signature.as_bytes(), 10)
             .expect("Die Signatur konnte nicht in einen BigInt umgewandelt werden");
 
         // Verifizierung durchführen: verifizierung = signatur ^ (öffentlicher key vom partner) mod n
@@ -229,8 +230,9 @@ impl PrivateKey {
         create_string_from_blocks_decrypt(decrypted_chunks, g_base)
     }
 
-    pub(crate) fn sign(&self, _message: &str) -> String {
-        let message_big_int = get_decimal_hash(_message);
+    pub(crate) fn sign(&self, message: &str) -> String {
+        info!("Signieren der Nachricht {}", message);
+        let message_big_int = get_decimal_hash(message);
 
         // Signatur berechnen: signatur = message^(eigener privater key) mod n
         let signature = fast_exponentiation(&message_big_int, &self.d, &self.n);
@@ -242,9 +244,10 @@ impl PrivateKey {
 
 }
 
-pub(crate) fn get_decimal_hash(_message: &str) -> BigInt {
+pub(crate) fn get_decimal_hash(message: &str) -> BigInt {
+    debug!("Hashen der Nachricht {} mit SHA256", message);
     let mut hasher = Sha256::new();
-    hasher.update(_message.as_bytes());
+    hasher.update(message.as_bytes());
     let hashed_message = hasher.finalize();
 
     // Hash Nachricht in einen BigInt umwandeln

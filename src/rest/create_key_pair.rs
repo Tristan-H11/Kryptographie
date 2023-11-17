@@ -14,7 +14,7 @@ use crate::rest::serializable_models::{CreateKeyPairRequest, KeyPair};
 /// # Returns
 /// * `HttpResponse` - Die Antwort, die das Schlüsselpaar enthält.
 pub(crate) async fn create_key_pair(req_body: Json<CreateKeyPairRequest>) -> impl Responder {
-    info!("Erstelle neues Schlüsselpaar.");
+    info!("Endpunkt /rsa/createKeyPair wurde aufgerufen");
     let req_body: CreateKeyPairRequest = req_body.into_inner();
 
     let key_gen_service = RsaKeygenService::new(req_body.modulus_width);

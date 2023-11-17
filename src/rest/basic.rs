@@ -1,4 +1,5 @@
 use actix_web::{HttpResponse, Responder, web};
+use log::info;
 use serde::Serialize;
 use crate::rest::create_key_pair::create_key_pair;
 use crate::rest::decrypt::decrypt;
@@ -30,6 +31,7 @@ pub fn config_app(cfg: &mut web::ServiceConfig) {
 
 
 async fn healthcheck() -> impl Responder {
+    info!("Endpunkt /health wurde aufgerufen");
     let response = Response {
         message: "Everything is working fine".to_string(),
     };
@@ -37,6 +39,7 @@ async fn healthcheck() -> impl Responder {
 }
 
 async fn not_found() -> HttpResponse {
+    info!("Endpunkt wurde nicht gefunden");
     let response = Response {
         message: "Resource not found".to_string(),
     };

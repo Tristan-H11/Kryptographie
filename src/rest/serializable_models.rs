@@ -1,4 +1,5 @@
 use std::str::FromStr;
+use log::debug;
 
 use serde::{Deserialize, Serialize};
 
@@ -15,6 +16,7 @@ pub struct KeyPair {
 
 impl KeyPair {
     pub(crate) fn to_private_key(&self) -> PrivateKey {
+        debug!("Serialisiere KeyPair zu PrivateKey");
         PrivateKey::new_with_blocksize(
             (&self).d.parse().unwrap(),
             (&self).modulus.parse().unwrap(),
@@ -23,6 +25,7 @@ impl KeyPair {
     }
 
     pub(crate) fn to_public_key(&self) -> PublicKey {
+        debug!("Serialisiere KeyPair zu PublicKey");
         PublicKey::new_with_blocksize(
             (&self).e.parse().unwrap(),
             (&self).modulus.parse().unwrap(),
