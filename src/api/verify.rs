@@ -2,7 +2,7 @@ use actix_web::{HttpResponse, Responder};
 use actix_web::web::Json;
 use log::info;
 
-use crate::rest::serializable_models::{SingleStringResponse, VerifyRequest};
+use crate::api::serializable_models::{SingleStringResponse, VerifyRequest};
 
 ///
 /// Verifiziert eine Signatur zu einer Nachricht.

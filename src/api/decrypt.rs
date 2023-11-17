@@ -2,7 +2,7 @@ use actix_web::{HttpResponse, Responder};
 use actix_web::web::Json;
 use log::info;
 
-use crate::rest::serializable_models::{EncryptDecryptRequest, SingleStringResponse};
+use crate::api::serializable_models::{EncryptDecryptRequest, SingleStringResponse};
 
 ///
 /// Entschlüsselt eine Nachricht.

@@ -3,7 +3,7 @@ use actix_web::web::Json;
 use log::info;
 
 use crate::encryption::rsa::rsa_keygen_service::RsaKeygenService;
-use crate::rest::serializable_models::{CreateKeyPairRequest, KeyPair};
+use crate::api::serializable_models::{CreateKeyPairRequest, KeyPair};
 
 ///
 /// Erstellt ein neues Schlüsselpaar.

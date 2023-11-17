@@ -1,13 +1,13 @@
 mod encryption;
 mod tests;
-mod rest;
+mod api;
 
 use actix_cors::Cors;
 use actix_web::{App, HttpServer};
 use actix_web::middleware::Logger;
 use log::LevelFilter;
 use simple_logger::SimpleLogger;
-use crate::rest::basic::config_app;
+use crate::api::basic::config_app;
 
 
 #[actix_web::main]

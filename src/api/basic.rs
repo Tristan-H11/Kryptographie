@@ -1,11 +1,11 @@
 use actix_web::{HttpResponse, Responder, web};
 use log::info;
 use serde::Serialize;
-use crate::rest::create_key_pair::create_key_pair;
-use crate::rest::decrypt::decrypt;
-use crate::rest::encrypt::encrypt;
-use crate::rest::sign::sign;
-use crate::rest::verify::verify;
+use crate::api::create_key_pair::create_key_pair;
+use crate::api::decrypt::decrypt;
+use crate::api::encrypt::encrypt;
+use crate::api::sign::sign;
+use crate::api::verify::verify;
 
 #[derive(Serialize)]
 pub struct Response {
