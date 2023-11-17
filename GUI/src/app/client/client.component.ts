@@ -48,7 +48,7 @@ export class ClientComponent implements OnInit {
   /**
    * Der Client, mit dem kommuniziert wird.
    */
-  targetClient: Client = this.clientService.getClientByName("Alice");
+  targetClient: Client | undefined;
   public signatureVerificationCalculated: boolean = false;
   public signatureValid: boolean = false;
 
@@ -109,7 +109,7 @@ export class ClientComponent implements OnInit {
   public encrypt() {
     const requestBody = createEncryptDecryptRequestFrom(
       this.plainText,
-      this.keyService.getKeyPair(this.targetClient),
+      this.keyService.getKeyPair(this.targetClient!),
       this.configurationService.getNumberSystem()
     );
     this.backendRequestService.encrypt(requestBody).then(r => {
@@ -169,9 +169,9 @@ export class ClientComponent implements OnInit {
    * Setzt anschließend die Nachrichten- und Signaturfelder zurück.
    */
   public sendMessageAndSignature() {
-    console.log("Sending message and signature from " + this.client?.name + " to " + this.targetClient.name + "");
-    this.messageService.setCiphertext(this.cipherText, this.targetClient);
-    this.messageService.setSignature(this.signature, this.targetClient);
+    console.log("Sending message and signature from " + this.client?.name + " to " + this.targetClient!.name + "");
+    this.messageService.setCiphertext(this.cipherText, this.targetClient!);
+    this.messageService.setSignature(this.signature, this.targetClient!);
     this.showSnackbar("Nachricht und Signatur gesendet!");
 
     // Alle Felder leeren, wenn gesendet wird
