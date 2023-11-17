@@ -64,6 +64,12 @@
                       [ngModel]="getBindingContext(client).exponent"
                       (ngModelChange)="getBindingContext(client).exponent = $event"></textarea>
         </mat-form-field>
+
+      <mat-action-row>
+        <button mat-flat-button color="primary" (click)="deleteClient(client)">
+          {{client.name}} löschen
+        </button>
+      </mat-action-row>
     </mat-expansion-panel>
 </mat-accordion>
 <div class="element-below-accordion-container">

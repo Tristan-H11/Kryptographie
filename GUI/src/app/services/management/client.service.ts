@@ -42,7 +42,18 @@ export class ClientService {
         console.log(this.clients)
     }
 
-    /**
+  /**
+   * Löscht einen Client und entfernt alle Registrierungen.
+   */
+  public deleteAndUnregisterClient(client: Client): void {
+    this.clients.delete(client);
+    this.services.forEach(service => {
+      console.log("Unregistering client " + client.name + " at " + service.constructor.name);
+      service.unregisterClient(client)
+    });
+  }
+
+  /**
      * Gibt die Liste aller Clients zurück.
      */
     public getClients(): Set<Client> {

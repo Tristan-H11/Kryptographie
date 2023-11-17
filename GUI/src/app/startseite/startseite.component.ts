@@ -192,4 +192,11 @@ export class StartseiteComponent implements AfterViewInit {
   public getClients(): Set<Client> {
     return this.clientService.getClients();
   }
+
+  /**
+   * Löscht einen Client und entfernt alle Registrierungen.
+   */
+   public deleteClient(client: Client) {
+    this.clientService.deleteAndUnregisterClient(client);
+  }
 }

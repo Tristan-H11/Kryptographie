@@ -102,4 +102,11 @@ export abstract class AbstractClientObservableManagementService<T> {
             console.error("Client " + client.name + " is not registered! Property " + String(property) + " could not be set.");
         }
     }
+
+  /**
+   * Entfernt die Registrierung eines Clients.
+   */
+  public unregisterClient(client: Client) {
+    this.clientMap.delete(client);
+  }
 }
