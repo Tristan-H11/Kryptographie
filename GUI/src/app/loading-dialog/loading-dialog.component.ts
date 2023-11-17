@@ -8,7 +8,7 @@ import {MatProgressSpinnerModule} from "@angular/material/progress-spinner";
   standalone: true,
   imports: [CommonModule, MatDialogTitle, MatDialogContent, MatProgressSpinnerModule],
   templateUrl: './loading-dialog.component.html',
-  styleUrl: './loading-dialog.component.css'
+  styleUrl: './loading-dialog.component.scss'
 })
 export class LoadingDialogComponent {
 

@@ -7,7 +7,7 @@ import {ShanksRoutingModule} from "./shanks-routing.module";
   standalone: true,
   imports: [CommonModule, ShanksRoutingModule],
   templateUrl: './shanks.component.html',
-  styleUrl: './shanks.component.css'
+  styleUrl: './shanks.component.scss'
 })
 export class ShanksComponent {
 

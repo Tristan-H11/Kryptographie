@@ -14,7 +14,7 @@ import {createExtendedEuclidRequestFrom} from "../models/extended-euclid-request
   standalone: true,
   imports: [CommonModule, ExtendedGcdRoutingModule, MatButtonModule, MatExpansionModule, MatFormFieldModule, MatInputModule, ReactiveFormsModule, FormsModule],
   templateUrl: './extended-gcd.component.html',
-  styleUrl: './extended-gcd.component.css'
+  styleUrl: './extended-gcd.component.scss'
 })
 export class ExtendedGcdComponent {
   public ggT: string= "";

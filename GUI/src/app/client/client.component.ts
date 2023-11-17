@@ -33,7 +33,7 @@ import {MatSelectModule} from "@angular/material/select";
     MatSelectModule
   ],
   templateUrl: './client.component.html',
-  styleUrl: './client.component.css'
+  styleUrl: './client.component.scss'
 })
 /**
  * Komponente für die Darstellung eines Clients.

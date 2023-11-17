@@ -14,7 +14,7 @@ import {MatButtonModule} from "@angular/material/button";
   standalone: true,
   imports: [CommonModule, ExponentiationRoutingModule, MatExpansionModule, MatFormFieldModule, MatInputModule, ReactiveFormsModule, FormsModule, MatButtonModule],
   templateUrl: './exponentiation.component.html',
-  styleUrl: './exponentiation.component.css'
+  styleUrl: './exponentiation.component.scss'
 })
 export class ExponentiationComponent {
 

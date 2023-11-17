@@ -32,7 +32,7 @@ import {LoadingDialogComponent} from "../loading-dialog/loading-dialog.component
     MatIconModule,
   ],
   templateUrl: './startseite.component.html',
-  styleUrl: './startseite.component.css'
+  styleUrl: './startseite.component.scss'
 })
 /**
  * Komponente für die Darstellung der Startseite inklusive der Konfigurationsmöglichkeiten.
