@@ -2,7 +2,7 @@ import {Injectable} from '@angular/core';
 import {createEmptyKeyPair, KeyPair} from "../../models/key-pair";
 import {Client} from "../../models/client";
 import {ConfigurationData} from "../../models/configuration-data";
-import {BackendRequestService} from "../backend-request.service";
+import {BackendRequestService} from "../backend-api/backend-request.service";
 import {AbstractClientObservableManagementService} from './abstract-client-observable-management-service';
 
 @Injectable({

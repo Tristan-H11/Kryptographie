@@ -5,7 +5,7 @@ import {MatSidenavModule} from "@angular/material/sidenav";
 import {MatIconModule} from "@angular/material/icon";
 import {MatDividerModule} from "@angular/material/divider";
 import {MatButtonModule} from "@angular/material/button";
-import {BackendRequestService} from "./services/backend-request.service";
+import {BackendRequestService} from "./services/backend-api/backend-request.service";
 import {MatSnackBar} from "@angular/material/snack-bar";
 import {ClientService} from "./services/management/client.service";
 import {Client} from "./models/client";

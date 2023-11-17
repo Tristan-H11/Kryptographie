@@ -10,7 +10,7 @@ import {KeyManagementService} from "../services/management/key-management.servic
 import {MessageManagementService} from "../services/management/message-management.service";
 import {MatIconModule} from "@angular/material/icon";
 import {MatSnackBar} from "@angular/material/snack-bar";
-import {BackendRequestService} from "../services/backend-request.service";
+import {BackendRequestService} from "../services/backend-api/backend-request.service";
 import {createEncryptDecryptRequestFrom} from "../models/encrypt-decrypt-request";
 import {ConfigurationManagementService} from "../services/management/configuration-management.service";
 import {signRequestFrom} from "../models/sign-request";

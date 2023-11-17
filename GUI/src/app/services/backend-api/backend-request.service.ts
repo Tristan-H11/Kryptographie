@@ -2,12 +2,12 @@ import {Injectable} from '@angular/core';
 import {HttpClient} from "@angular/common/http";
 import {EndpointsService} from "./endpoints.service";
 import {firstValueFrom} from "rxjs";
-import {ConfigurationData} from "../models/configuration-data";
-import {KeyPair} from "../models/key-pair";
-import {EncryptDecryptRequest} from "../models/encrypt-decrypt-request";
-import {SingleMessageModel} from "../models/SingleMessageModel";
-import {SignRequest} from "../models/sign-request";
-import {VerifyRequest} from "../models/verify-request";
+import {ConfigurationData} from "../../models/configuration-data";
+import {KeyPair} from "../../models/key-pair";
+import {EncryptDecryptRequest} from "../../models/encrypt-decrypt-request";
+import {SingleMessageModel} from "../../models/SingleMessageModel";
+import {SignRequest} from "../../models/sign-request";
+import {VerifyRequest} from "../../models/verify-request";
 
 @Injectable({
   providedIn: 'root'
