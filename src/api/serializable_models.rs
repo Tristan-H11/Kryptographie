@@ -40,6 +40,26 @@ pub struct SingleStringResponse {
 }
 
 #[derive(Deserialize)]
+pub struct ExponentiationRequest {
+    pub exponent: String,
+    pub base: String,
+    pub modulus: String,
+}
+
+#[derive(Deserialize)]
+pub struct ExtendedEuclidRequest {
+    pub a: String,
+    pub b: String,
+}
+
+#[derive(Serialize)]
+pub struct ExtendedEuclidResponse {
+    pub x: String,
+    pub y: String,
+    pub ggt: String,
+}
+
+#[derive(Deserialize)]
 pub struct CreateKeyPairRequest {
     pub modulus_width: u32,
     pub miller_rabin_rounds: u32,

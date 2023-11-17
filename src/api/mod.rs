@@ -5,3 +5,5 @@ mod encrypt;
 mod decrypt;
 mod sign;
 mod verify;
+mod exponentiation;
+mod extended_euclid;

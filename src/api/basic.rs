@@ -4,6 +4,8 @@ use serde::Serialize;
 use crate::api::create_key_pair::create_key_pair;
 use crate::api::decrypt::decrypt;
 use crate::api::encrypt::encrypt;
+use crate::api::exponentiation::exponentiation;
+use crate::api::extended_euclid::euclid_endpoint;
 use crate::api::sign::sign;
 use crate::api::verify::verify;
 
@@ -25,6 +27,11 @@ pub fn config_app(cfg: &mut web::ServiceConfig) {
                 .route("/decrypt", web::post().to(decrypt))
                 .route("/sign", web::post().to(sign))
                 .route("/verify", web::post().to(verify))
+        )
+        .service(
+            web::scope("/math")
+                .route("/exponentiation", web::post().to(exponentiation))
+                .route("/extended_euclid", web::post().to(euclid_endpoint))
         )
         .default_service(web::route().to(not_found));
 }
