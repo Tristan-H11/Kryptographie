@@ -1,0 +1,18 @@
+.loading-dialog-content {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 20vw;
+  height: 15vh;
+  min-width: 300px;
+  min-height: 150px;
+}
+
+.loading-dialog-content p {
+  margin-left: 2vw;
+}
+
+mat-spinner {
+  width: 2vw;
+  height: 2vw;
+}
