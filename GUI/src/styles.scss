@@ -1,16 +1,13 @@
 /* You can add global styles to this file, and also import other style files */
 
-.indigo-pink-theme {
-  @import '~@angular/material/prebuilt-themes/indigo-pink.css';
+html, body {
+  height: 100%;
 }
 
-.pink-bluegrey-theme {
-  @import '~@angular/material/prebuilt-themes/pink-bluegrey.css';
+body {
+  margin: 0;
+  font-family: Roboto, "Helvetica Neue", sans-serif;
 }
-
-
-html, body { height: 100%; }
-body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
 
 .text-align-right {
   text-align: right;
@@ -29,21 +26,27 @@ input.text-align-right {
   width: 100%;
 }
 
-.element-below-accordion-container {
-  display: flex;
-  justify-content: right;
-  width: auto;
-  padding: 2vh 2vw;
-}
-
 .accordion-container {
   width: 100%;
   display: flex;
   flex-direction: column;
 }
 
+.element-below-accordion-container {
+  display: flex;
+  justify-content: right;
+  width: auto;
+  padding: 2vh 2vw;
+  height: 100%;
+}
+
 .below-accordion {
   display: flex;
   flex-direction: row-reverse;
   column-gap: 0.5vw;
+  align-items: center;
+}
+
+.form-field-no-hint .mat-mdc-form-field-subscript-wrapper {
+  margin-bottom: -1.25em;
 }

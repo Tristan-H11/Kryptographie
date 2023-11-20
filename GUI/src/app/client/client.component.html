@@ -9,24 +9,18 @@
       </mat-panel-description>
     </mat-expansion-panel-header>
 
-    <mat-form-field class="width-100">
+    <mat-form-field appearance="outline" class="width-100">
       <mat-label>Klartext</mat-label>
       <textarea matInput placeholder="Das ist ein wunderbarer Tag..." [(ngModel)]="plainText"></textarea>
     </mat-form-field>
-    <mat-form-field class="width-100">
+    <mat-form-field appearance="outline" class="width-100">
       <mat-label>Geheimtext</mat-label>
       <textarea matInput placeholder="Qnf vfg rva jhaqreonere Gnt..." [(ngModel)]="cipherText"></textarea>
     </mat-form-field>
 
     <mat-action-row>
-      <mat-form-field>
-        <mat-label>Ziel-Client</mat-label>
-        <mat-select [(value)]="targetClient">
-          <mat-option *ngFor="let client of getOtherClients()" [value]="client">{{client.name}}</mat-option>
-        </mat-select>
-      </mat-form-field>
       <button mat-flat-button color="primary" (click)="clearFields()">Nachrichtenfelder leeren</button>
-      <button mat-flat-button color="primary" (click)="encrypt()">Verschlüsseln</button>
+      <button mat-flat-button color="primary" [disabled]="!clientToSendTo" (click)="encrypt()">Für {{clientToSendTo?.name}} verschlüsseln</button>
       <button mat-flat-button color="primary" (click)="decrypt()">Entschlüsseln</button>
     </mat-action-row>
   </mat-expansion-panel>
@@ -41,12 +35,12 @@
       </mat-panel-description>
     </mat-expansion-panel-header>
 
-    <mat-form-field class="width-100">
+    <mat-form-field appearance="outline" class="width-100">
       <mat-label>Modul</mat-label>
       <textarea matInput placeholder="Wird nach dem Berechnen automatisch angezeigt"
                 [(ngModel)]="modulus"></textarea>
     </mat-form-field>
-    <mat-form-field class="width-100">
+    <mat-form-field appearance="outline" class="width-100">
       <mat-label>Privater Exponent</mat-label>
       <textarea matInput placeholder="Wird nach dem Berechnen automatisch angezeigt"
                 [(ngModel)]="privateExponent"></textarea>
@@ -74,15 +68,23 @@
     <mat-action-row>
       <button mat-flat-button color="primary" (click)="clearSignatureFields()">Signaturfelder leeren</button>
       <button mat-flat-button color="primary" (click)="sign()">Signieren</button>
-      <button mat-flat-button color="primary" (click)="verify()">Verifizieren</button>
+      <button mat-flat-button color="primary" (click)="verify()" [disabled]="!clientFromWhichMessageWasReceived">Verifizieren</button>
     </mat-action-row>
   </mat-expansion-panel>
 </mat-accordion>
 <div class="below-accordion">
   <div class="element-below-accordion-container">
-    <button mat-fab extended color="primary" (click)="sendMessageAndSignature()">
+    <button mat-fab extended color="primary" [disabled]="!clientToSendTo" (click)="sendMessageAndSignature()">
       <mat-icon>send</mat-icon>
-      <span>An {{targetClient?.name}} Senden</span>
+      <span>An {{clientToSendTo?.name}} Senden</span>
     </button>
+  </div>
+  <div class="element-below-accordion-container form-field-no-hint">
+    <mat-form-field appearance="outline">
+      <mat-label>Ziel-Client</mat-label>
+      <mat-select [(value)]="clientToSendTo">
+        <mat-option *ngFor="let client of getOtherClients()" [value]="client">{{client.name}}</mat-option>
+      </mat-select>
+    </mat-form-field>
   </div>
 </div>

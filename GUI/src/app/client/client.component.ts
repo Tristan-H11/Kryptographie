@@ -18,6 +18,7 @@ import {verifyRequestFrom} from "../models/verify-request";
 import {ActivatedRoute} from "@angular/router";
 import {ClientService} from "../services/management/client.service";
 import {MatSelectModule} from "@angular/material/select";
+import {MatCardModule} from "@angular/material/card";
 
 @Component({
   selector: 'client',
@@ -30,7 +31,8 @@ import {MatSelectModule} from "@angular/material/select";
     MatFormFieldModule,
     MatInputModule,
     MatIconModule,
-    MatSelectModule
+    MatSelectModule,
+    MatCardModule
   ],
   templateUrl: './client.component.html',
   styleUrl: './client.component.scss'
@@ -48,7 +50,12 @@ export class ClientComponent implements OnInit {
   /**
    * Der Client, mit dem kommuniziert wird.
    */
-  targetClient: Client | undefined;
+  clientToSendTo: Client | undefined;
+
+  /**
+   * Client, welcher mir eine Nachricht gesendet hat. Notwendig für die Signaturverifikation.
+   */
+  clientFromWhichMessageWasReceived: Client | undefined;
   public signatureVerificationCalculated: boolean = false;
   public signatureValid: boolean = false;
 
@@ -73,7 +80,7 @@ export class ClientComponent implements OnInit {
       console.log("OnInit in Client with name " + name);
       if (name) {
         this.client = this.clientService.getClientByName(name);
-        this.targetClient = this.getOtherClients().values().next().value;
+        this.clientToSendTo = this.getOtherClients().values().next().value;
       } else {
         console.error("Client name is null! Invalid path");
         return;
@@ -110,7 +117,7 @@ export class ClientComponent implements OnInit {
   public encrypt() {
     const requestBody = createEncryptDecryptRequestFrom(
       this.plainText,
-      this.keyService.getKeyPair(this.targetClient!),
+      this.keyService.getKeyPair(this.clientToSendTo!),
       this.configurationService.getNumberSystem()
     );
     this.backendRequestService.encrypt(requestBody).then(r => {
@@ -170,9 +177,9 @@ export class ClientComponent implements OnInit {
    * Setzt anschließend die Nachrichten- und Signaturfelder zurück.
    */
   public sendMessageAndSignature() {
-    console.log("Sending message and signature from " + this.client?.name + " to " + this.targetClient!.name + "");
-    this.messageService.setCiphertext(this.cipherText, this.targetClient!);
-    this.messageService.setSignature(this.signature, this.targetClient!);
+    console.log("Sending message and signature from " + this.client?.name + " to " + this.clientToSendTo!.name + "");
+    this.messageService.setCiphertext(this.cipherText, this.clientToSendTo!);
+    this.messageService.setSignature(this.signature, this.clientToSendTo!);
     this.showSnackbar("Nachricht und Signatur gesendet!");
 
     // Alle Felder leeren, wenn gesendet wird
