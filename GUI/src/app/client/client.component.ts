@@ -73,6 +73,7 @@ export class ClientComponent implements OnInit {
       console.log("OnInit in Client with name " + name);
       if (name) {
         this.client = this.clientService.getClientByName(name);
+        this.targetClient = this.getOtherClients().values().next().value;
       } else {
         console.error("Client name is null! Invalid path");
         return;
