@@ -1,17 +1,31 @@
 mod encryption;
-mod gui;
 mod tests;
+mod api;
 
-use crate::gui::gui::start_gui;
+use actix_cors::Cors;
+use actix_web::{App, HttpServer};
+use actix_web::middleware::Logger;
 use log::LevelFilter;
 use simple_logger::SimpleLogger;
+use crate::api::basic::config_app;
 
-fn main() {
+
+#[actix_web::main]
+async fn main() -> std::io::Result<()> {
     SimpleLogger::new()
         .with_level(LevelFilter::Info)
         .with_colors(true)
         .init()
         .unwrap();
 
-    start_gui();
+
+    HttpServer::new(|| {
+        App::new()
+            .configure(config_app)
+            .wrap(Logger::default())
+            .wrap(Cors::permissive())
+    })
+        .bind(("127.0.0.1", 8080))?
+        .run()
+        .await
 }

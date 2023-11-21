@@ -8,7 +8,12 @@ edition = "2021"
 [dependencies]
 bigdecimal = "0.4.2"
 rand = "0.8"
-druid = "0.8.3"
+
+actix-web = "4.4.0"
+actix-cors = "0.6.4"
+serde = { version = "1.0.192", features = ["derive"] }
+
+
 log = "0.4.20"
 simple_logger = "4.2.0"
 rayon = "1.8.0"

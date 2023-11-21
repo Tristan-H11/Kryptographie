@@ -1,0 +1,32 @@
+<mat-sidenav-container class="global-container">
+  <mat-sidenav mode="side" class="sidenav" opened>
+    <div class="inner-sidenav-container">
+      <div class="sidenav-header">
+        <mat-icon class="sidenav-logo">lock</mat-icon>
+        <div>RSA Implementation</div>
+      </div>
+
+      <button mat-stroked-button routerLink="/startseite">Startseite</button>
+      <mat-divider></mat-divider>
+      <div class="sidenav-client-button-container">
+        <button *ngFor="let client of getClients()" mat-raised-button color="primary"
+                routerLink="/client/{{client.name}}">{{client.name}}</button>
+      </div>
+      <mat-divider></mat-divider>
+      <button mat-stroked-button routerLink="/exponentiation">Exponentiation</button>
+      <mat-divider></mat-divider>
+      <button mat-stroked-button routerLink="/extendedGcd">Extended GCD</button>
+      <mat-divider></mat-divider>
+      <button mat-stroked-button routerLink="/shanks">Shanks</button>
+
+      <div class="sidenav-footer">
+        <button mat-stroked-button (click)="checkServerConnection()">Serververbindung prüfen</button>
+        <mat-divider></mat-divider>
+        Tristan Hörmann, Lucas Menke, Simon Ganteföhr
+      </div>
+    </div>
+  </mat-sidenav>
+  <mat-sidenav-content class="sidenav-content">
+    <router-outlet></router-outlet>
+  </mat-sidenav-content>
+</mat-sidenav-container>

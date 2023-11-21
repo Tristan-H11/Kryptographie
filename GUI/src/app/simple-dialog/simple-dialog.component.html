@@ -1,0 +1,12 @@
+<h1 mat-dialog-title>Neuen Client hinzufügen</h1>
+<div mat-dialog-content>
+  <p>Wie soll der Client heißen?</p>
+  <mat-form-field>
+    <mat-label>Name</mat-label>
+    <input matInput cdkFocusInitial (keyup.enter)="onEnter()" [(ngModel)]="data.name">
+  </mat-form-field>
+</div>
+<div mat-dialog-actions>
+  <button mat-button (click)="onNoClick()">Abbrechen</button>
+  <button mat-button [mat-dialog-close]="data">Erstellen</button>
+</div>
