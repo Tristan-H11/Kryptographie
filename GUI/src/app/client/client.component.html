@@ -2,7 +2,7 @@
   <mat-expansion-panel [expanded]="true"> <!-- Initial geöffnet -->
     <mat-expansion-panel-header>
       <mat-panel-title>
-        Briefkasten von {{client?.name}}
+        Briefkasten von {{client.name}}
       </mat-panel-title>
       <mat-panel-description>
         Die zu verschickenden und erhaltenden Nachrichten
@@ -20,7 +20,7 @@
 
     <mat-action-row>
       <button mat-flat-button color="primary" (click)="clearFields()">Nachrichtenfelder leeren</button>
-      <button mat-flat-button color="primary" [disabled]="!clientToSendTo" (click)="encrypt()">Für {{clientToSendTo?.name}} verschlüsseln</button>
+      <button mat-flat-button color="primary" [disabled]="!sendingTo" (click)="encrypt()">Für {{sendingTo.name}} verschlüsseln</button>
       <button mat-flat-button color="primary" (click)="decrypt()">Entschlüsseln</button>
     </mat-action-row>
   </mat-expansion-panel>
@@ -28,7 +28,7 @@
   <mat-expansion-panel>
     <mat-expansion-panel-header>
       <mat-panel-title>
-        Privater Schlüssel von {{client?.name}}
+        Privater Schlüssel von {{client.name}}
       </mat-panel-title>
       <mat-panel-description>
         Die Komponenten des privaten Schlüssels
@@ -67,22 +67,30 @@
 
     <mat-action-row>
       <button mat-flat-button color="primary" (click)="clearSignatureFields()">Signaturfelder leeren</button>
-      <button mat-flat-button color="primary" (click)="sign()">Signieren</button>
-      <button mat-flat-button color="primary" (click)="verify()" [disabled]="!clientFromWhichMessageWasReceived">Verifizieren</button>
+      <button mat-flat-button color="primary" [matMenuTriggerFor]="signMenu" [disabled]="signFieldIsNotEmpty()">Signieren</button>
+      <mat-menu #signMenu="matMenu">
+        <button mat-menu-item (click)="signPlaintext()">Klartext</button>
+        <button mat-menu-item (click)="signCiphertext()">Geheimtext</button>
+      </mat-menu>
+      <button mat-flat-button color="primary" [matMenuTriggerFor]="verifyMenu" [disabled]="!receivedFromIsSet()">Verifizieren</button>
+      <mat-menu #verifyMenu="matMenu">
+        <button mat-menu-item (click)="verifyPlaintext()">Klartext</button>
+        <button mat-menu-item (click)="verifyCiphertext()">Geheimtext</button>
+      </mat-menu>
     </mat-action-row>
   </mat-expansion-panel>
 </mat-accordion>
 <div class="below-accordion">
   <div class="element-below-accordion-container">
-    <button mat-fab extended color="primary" [disabled]="!clientToSendTo" (click)="sendMessageAndSignature()">
+    <button mat-fab extended color="primary" [disabled]="!sendingTo" (click)="sendMessageAndSignature()">
       <mat-icon>send</mat-icon>
-      <span>An {{clientToSendTo?.name}} Senden</span>
+      <span>An {{sendingTo?.name}} Senden</span>
     </button>
   </div>
   <div class="element-below-accordion-container form-field-no-hint">
     <mat-form-field appearance="outline">
       <mat-label>Ziel-Client</mat-label>
-      <mat-select [(value)]="clientToSendTo">
+      <mat-select [(value)]="sendingTo">
         <mat-option *ngFor="let client of getOtherClients()" [value]="client">{{client.name}}</mat-option>
       </mat-select>
     </mat-form-field>

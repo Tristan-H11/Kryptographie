@@ -2,9 +2,11 @@
  * Darstellung der Clients.
  */
 export class Client {
-  public name = "";
+    public name = "";
+    public sendingTo: Client | undefined;
+    public receivedFrom: Client | undefined;
 }
 
 export function createNewClient(name: string): Client {
-  return {name: name};
+    return {receivedFrom: undefined, sendingTo: undefined, name: name};
 }

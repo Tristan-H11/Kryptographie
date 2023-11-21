@@ -19,23 +19,25 @@ import {ActivatedRoute} from "@angular/router";
 import {ClientService} from "../services/management/client.service";
 import {MatSelectModule} from "@angular/material/select";
 import {MatCardModule} from "@angular/material/card";
+import {MatMenuModule} from "@angular/material/menu";
 
 @Component({
-  selector: 'client',
-  standalone: true,
-  imports: [
-    CommonModule,
-    FormsModule,
-    MatButtonModule,
-    MatExpansionModule,
-    MatFormFieldModule,
-    MatInputModule,
-    MatIconModule,
-    MatSelectModule,
-    MatCardModule
-  ],
-  templateUrl: './client.component.html',
-  styleUrl: './client.component.scss'
+    selector: 'client',
+    standalone: true,
+    imports: [
+        CommonModule,
+        FormsModule,
+        MatButtonModule,
+        MatExpansionModule,
+        MatFormFieldModule,
+        MatInputModule,
+        MatIconModule,
+        MatSelectModule,
+        MatCardModule,
+        MatMenuModule
+    ],
+    templateUrl: './client.component.html',
+    styleUrl: './client.component.scss'
 })
 /**
  * Komponente für die Darstellung eines Clients.
@@ -43,213 +45,295 @@ import {MatCardModule} from "@angular/material/card";
  */
 export class ClientComponent implements OnInit {
 
-  /**
-   * Der Client, für den die Komponente dargestellt wird.
-   */
-  client: Client | undefined;
-  /**
-   * Der Client, mit dem kommuniziert wird.
-   */
-  clientToSendTo: Client | undefined;
+    /**
+     * Der Client, für den die Komponente dargestellt wird.
+     */
+    private _client: Client | undefined;
 
-  /**
-   * Client, welcher mir eine Nachricht gesendet hat. Notwendig für die Signaturverifikation.
-   */
-  clientFromWhichMessageWasReceived: Client | undefined;
-  public signatureVerificationCalculated: boolean = false;
-  public signatureValid: boolean = false;
+    public signatureVerificationCalculated: boolean = false;
+    public signatureValid: boolean = false;
 
-  /**
-   * Konstruktor der Komponente.
-   */
-  constructor(private keyService: KeyManagementService,
-              private messageService: MessageManagementService,
-              private backendRequestService: BackendRequestService,
-              private configurationService: ConfigurationManagementService,
-              private clientService: ClientService,
-              private route: ActivatedRoute,
-              private snackBar: MatSnackBar) {
-  }
+    public get client(): Client {
+        if (!this._client) {
+            throw new Error("Client is undefined!");
+        }
+        return this._client;
+    }
 
-  /**
-   * Registriert die Komponente bei den Services, um über Änderungen informiert zu werden.
-   */
-  ngOnInit(): void {
-    this.route.paramMap.subscribe(params => {
-      const name = params.get("client");
-      console.log("OnInit in Client with name " + name);
-      if (name) {
-        this.client = this.clientService.getClientByName(name);
-        this.clientToSendTo = this.getOtherClients().values().next().value;
-      } else {
-        console.error("Client name is null! Invalid path");
-        return;
-      }
-    });
+    public set client(value: Client) {
+        this._client = value;
+    }
 
-    this.keyService.getObservable(this.client!).subscribe(keyPair => {
-      this.privateExponent = keyPair.d;
-      this.modulus = keyPair.modulus;
-    });
-    this.messageService.getObservable(this.client!).subscribe(message => {
-      // Werden die Nachrichten neu gesetzt, muss die Signatur neu berechnet werden.
-      this.signatureVerificationCalculated = false;
-      this.cipherText = message.ciphertext;
-      this.plainText = message.plaintext;
-      this.signature = message.signature;
-    });
-  }
+    public get sendingTo(): Client {
+        if (!this.client) {
+            throw new Error("Client is undefined!");
+        }
+        if (!this.client.sendingTo) {
+            throw new Error("SendingTo is undefined!");
+        }
+        return this.client.sendingTo;
+    }
 
-  /**
-   * Zeigt eine Snackbar mit der übergebenen Nachricht an.
-   * @param message
-   * @private
-   */
-  private showSnackbar(message: string) {
-    this.snackBar.open(message, "Ok", {
-      duration: 4000,
-    })
-  }
+    public set sendingTo(value: Client) {
+        if (!this.client) {
+            throw new Error("Client is undefined!");
+        }
+        this.client.sendingTo = value;
+    }
 
-  /**
-   * Verschlüsselt die Nachricht.
-   */
-  public encrypt() {
-    const requestBody = createEncryptDecryptRequestFrom(
-      this.plainText,
-      this.keyService.getKeyPair(this.clientToSendTo!),
-      this.configurationService.getNumberSystem()
-    );
-    this.backendRequestService.encrypt(requestBody).then(r => {
-      this.messageService.setCiphertext(r.message, this.client!);
-      this.showSnackbar("Nachricht verschlüsselt!");
-    })
-  }
+    public get receivedFrom(): Client {
+        if (!this.client) {
+            throw new Error("Client is undefined!");
+        }
+        if (!this.client.receivedFrom) {
+            throw new Error("ReceivedFrom is undefined!");
+        }
+        return this.client.receivedFrom;
+    }
 
-  /**
-   * Entschlüsselt die Nachricht.
-   */
-  public decrypt() {
-    const requestBody = createEncryptDecryptRequestFrom(
-      this.cipherText,
-      this.keyService.getKeyPair(this.client!),
-      this.configurationService.getNumberSystem()
-    );
-    this.backendRequestService.decrypt(requestBody).then(r => {
-      this.messageService.setPlaintext(r.message, this.client!);
-      this.showSnackbar("Nachricht entschlüsselt!");
-    })
-  }
+    public receivedFromIsSet(): boolean {
+        if (!this.client) {
+            throw new Error("Client is undefined!");
+        }
+        if(this.client.receivedFrom) {
+            console.log("Received from is set: " + this.client.receivedFrom.name);
+            return true;
+        }
+        console.log("Received from is not set");
+        return false;
+    }
 
-  /**
-   * Berechnet die Signatur der Nachricht.
-   */
-  public sign() {
-    const requestBody = signRequestFrom(
-      this.plainText,
-      this.keyService.getKeyPair(this.client!),
-    );
-    this.backendRequestService.sign(requestBody).then(r => {
-      this.messageService.setSignature(r.message, this.client!);
-      this.showSnackbar("Signatur berechnet!");
-    })
-  }
+    /**
+     * Konstruktor der Komponente.
+     */
+    constructor(private keyService: KeyManagementService,
+                private messageService: MessageManagementService,
+                private backendRequestService: BackendRequestService,
+                private configurationService: ConfigurationManagementService,
+                private clientService: ClientService,
+                private route: ActivatedRoute,
+                private snackBar: MatSnackBar) {
+    }
 
-  /**
-   * Verifiziert die Signatur der Nachricht.
-   */
-  public verify() {
-    const requestBody = verifyRequestFrom(
-      this.plainText,
-      this.signature,
-      this.keyService.getKeyPair(this.client!),
-    );
-    this.backendRequestService.verify(requestBody).then(r => {
-      let verified = r.message === "true";
-      this.signatureVerificationCalculated = true;
-      this.signatureValid = verified;
-      this.showSnackbar("Signatur verifiziert!");
-    })
-  }
+    /**
+     * Registriert die Komponente bei den Services, um über Änderungen informiert zu werden.
+     */
+    ngOnInit(): void {
+        this.route.paramMap.subscribe(params => {
+            const name = params.get("client");
+            console.log("OnInit in Client with name " + name);
+            if (name) {
+                this.client = this.clientService.getClientByName(name);
+                this.sendingTo = this.getOtherClients().values().next().value;
+                console.log(this.client)
+            } else {
+                console.error("Client name is null! Invalid path");
+                return;
+            }
+        });
 
-  /**
-   * Sendet die verschlüsselte Nachricht und die Signatur an den anderen Client.
-   * Setzt anschließend die Nachrichten- und Signaturfelder zurück.
-   */
-  public sendMessageAndSignature() {
-    console.log("Sending message and signature from " + this.client?.name + " to " + this.clientToSendTo!.name + "");
-    this.messageService.setCiphertext(this.cipherText, this.clientToSendTo!);
-    this.messageService.setSignature(this.signature, this.clientToSendTo!);
-    this.showSnackbar("Nachricht und Signatur gesendet!");
+        this.keyService.getObservable(this.client!).subscribe(keyPair => {
+            this.privateExponent = keyPair.d;
+            this.modulus = keyPair.modulus;
+        });
+        this.messageService.getObservable(this.client!).subscribe(message => {
+            // Werden die Nachrichten neu gesetzt, muss die Signatur neu berechnet werden.
+            this.signatureVerificationCalculated = false;
+            this.cipherText = message.ciphertext;
+            this.plainText = message.plaintext;
+            this.signature = message.signature;
+        });
+    }
 
-    // Alle Felder leeren, wenn gesendet wird
-    this.clearFields();
-    this.clearSignatureFields();
-  }
+    /**
+     * Zeigt eine Snackbar mit der übergebenen Nachricht an.
+     * @param message
+     * @private
+     */
+    private showSnackbar(message: string) {
+        this.snackBar.open(message, "Ok", {
+            duration: 4000,
+        })
+    }
 
-  /**
-   * Setzt die Nachrichtenfelder zurück.
-   */
-  public clearFields() {
-    this.messageService.setPlaintext("", this.client!)
-    this.messageService.setCiphertext("", this.client!);
-  }
+    /**
+     * Verschlüsselt die Nachricht.
+     */
+    public encrypt() {
+        const requestBody = createEncryptDecryptRequestFrom(
+            this.plainText,
+            this.keyService.getKeyPair(this.sendingTo),
+            this.configurationService.getNumberSystem()
+        );
+        this.backendRequestService.encrypt(requestBody).then(r => {
+            this.messageService.setCiphertext(r.message, this.client);
+            this.showSnackbar("Nachricht verschlüsselt!");
+        })
+    }
 
-  /**
-   * Setzt die Signaturfelder zurück.
-   */
-  public clearSignatureFields() {
-    this.messageService.setSignature("", this.client!);
-    this.signatureVerificationCalculated = false;
-    this.signatureValid = false;
-  }
+    /**
+     * Entschlüsselt die Nachricht.
+     */
+    public decrypt() {
+        const requestBody = createEncryptDecryptRequestFrom(
+            this.cipherText,
+            this.keyService.getKeyPair(this.client),
+            this.configurationService.getNumberSystem()
+        );
+        this.backendRequestService.decrypt(requestBody).then(r => {
+            this.messageService.setPlaintext(r.message, this.client);
+            this.showSnackbar("Nachricht entschlüsselt!");
+        })
+    }
 
-  public get cipherText(): string {
-    return this.messageService.getCiphertext(this.client!);
-  }
+    /**
+     * Berechnet die Signatur des Klartextes.
+     */
+    public signPlaintext() {
+        const requestBody = signRequestFrom(
+            this.plainText,
+            this.keyService.getKeyPair(this.client),
+        );
+        this.backendRequestService.sign(requestBody).then(r => {
+            this.messageService.setSignature(r.message, this.client);
+            this.showSnackbar("Signatur berechnet!");
+        })
+    }
 
-  public set cipherText(value: string) {
-    this.messageService.setCiphertext(value, this.client!);
-  }
+    /**
+     * Berechnet die Signatur des Chiffrats.
+     */
+    public signCiphertext() {
+        const requestBody = signRequestFrom(
+            this.cipherText,
+            this.keyService.getKeyPair(this.client),
+        );
+        this.backendRequestService.sign(requestBody).then(r => {
+            this.messageService.setSignature(r.message, this.client);
+            this.showSnackbar("Signatur berechnet!");
+        })
+    }
 
-  public get plainText(): string {
-    return this.messageService.getPlaintext(this.client!);
-  }
+    /**
+     * Verifiziert die Signatur des Klartextes.
+     */
+    public verifyPlaintext() {
+        const requestBody = verifyRequestFrom(
+            this.plainText,
+            this.signature,
+            this.keyService.getKeyPair(this.receivedFrom),
+        );
+        this.backendRequestService.verify(requestBody).then(r => {
+            let verified = r.message === "true";
+            this.signatureVerificationCalculated = true;
+            this.signatureValid = verified;
+            this.showSnackbar("Signatur verifiziert!");
+        })
+    }
 
-  public set plainText(value: string) {
-    this.messageService.setPlaintext(value, this.client!);
-  }
+    /**
+     * Verifiziert die Signatur des Chiffrats.
+     */
+    public verifyCiphertext() {
+        const requestBody = verifyRequestFrom(
+            this.cipherText,
+            this.signature,
+            this.keyService.getKeyPair(this.receivedFrom),
+        );
+        this.backendRequestService.verify(requestBody).then(r => {
+            let verified = r.message === "true";
+            this.signatureVerificationCalculated = true;
+            this.signatureValid = verified;
+            this.showSnackbar("Signatur verifiziert!");
+        })
+    }
 
-  public get signature(): string {
-    return this.messageService.getSignature(this.client!);
-  }
+    /**
+     * Sendet die verschlüsselte Nachricht und die Signatur an den anderen Client.
+     * Setzt anschließend die Nachrichten- und Signaturfelder zurück.
+     */
+    public sendMessageAndSignature() {
+        if (this.sendingTo) {
+            console.log("Sending message and signature from " + this.client?.name + " to " + this.sendingTo.name + "");
+            this.messageService.setCiphertext(this.cipherText, this.sendingTo);
+            this.messageService.setSignature(this.signature, this.sendingTo);
+            this.sendingTo.receivedFrom = this.client;
+            this.showSnackbar("Nachricht und Signatur gesendet!");
 
-  public set signature(value: string) {
-    this.messageService.setSignature(value, this.client!);
-  }
+            // Alle Felder leeren, wenn gesendet wird
+            this.clearFields();
+            this.clearSignatureFields();
+        }
+    }
 
-  public get privateExponent(): string {
-    return this.keyService.getD(this.client!);
-  }
+    /**
+     * Setzt die Nachrichtenfelder zurück.
+     */
+    public clearFields() {
+        this.messageService.setPlaintext("", this.client)
+        this.messageService.setCiphertext("", this.client);
+    }
 
-  public set privateExponent(value: string) {
-    this.keyService.setD(this.client!, value);
-  }
+    /**
+     * Setzt die Signaturfelder zurück.
+     */
+    public clearSignatureFields() {
+        this.messageService.setSignature("", this.client);
+        this.signatureVerificationCalculated = false;
+        this.signatureValid = false;
+    }
 
-  public get modulus(): string {
-    return this.keyService.getModul(this.client!);
-  }
+    public get cipherText(): string {
+        return this.messageService.getCiphertext(this.client);
+    }
 
-  public set modulus(value: string) {
-    this.keyService.setModul(this.client!, value);
-  }
+    public set cipherText(value: string) {
+        this.messageService.setCiphertext(value, this.client);
+    }
 
-  /**
-   * Gibt alle Clients außer dem "eigenen" zurück.
-   */
-  public getOtherClients(): Set<Client> {
-    const allClients = this.clientService.getClients(); // Angenommen, dies gibt ein Set<Client> zurück
-    return new Set(
-      [...allClients].filter(clientFromSet => clientFromSet !== this.client)
-    );  }
+    public get plainText(): string {
+        return this.messageService.getPlaintext(this.client);
+    }
+
+    public set plainText(value: string) {
+        this.messageService.setPlaintext(value, this.client);
+    }
+
+    public get signature(): string {
+        return this.messageService.getSignature(this.client);
+    }
+
+    public set signature(value: string) {
+        this.messageService.setSignature(value, this.client);
+    }
+
+    public get privateExponent(): string {
+        return this.keyService.getD(this.client);
+    }
+
+    public set privateExponent(value: string) {
+        this.keyService.setD(this.client, value);
+    }
+
+    public get modulus(): string {
+        return this.keyService.getModul(this.client);
+    }
+
+    public set modulus(value: string) {
+        this.keyService.setModul(this.client, value);
+    }
+
+    /**
+     * Gibt alle Clients außer dem "eigenen" zurück.
+     */
+    public getOtherClients(): Set<Client> {
+        const allClients = this.clientService.getClients();
+        return new Set(
+            [...allClients].filter(clientFromSet => clientFromSet !== this.client)
+        );
+    }
+
+    signFieldIsNotEmpty() {
+        return this.signature !== "";
+    }
 }
