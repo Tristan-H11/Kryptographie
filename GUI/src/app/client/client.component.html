@@ -1,104 +1,111 @@
 <mat-accordion class="accordion-container" multi="true">
-  <mat-expansion-panel [expanded]="true"> <!-- Initial geöffnet -->
-    <mat-expansion-panel-header>
-      <mat-panel-title>
-        Briefkasten von {{client.name}}
-      </mat-panel-title>
-      <mat-panel-description>
-        Die zu verschickenden und erhaltenden Nachrichten
-      </mat-panel-description>
-    </mat-expansion-panel-header>
+    <mat-expansion-panel [expanded]="true"> <!-- Initial geöffnet -->
+        <mat-expansion-panel-header>
+            <mat-panel-title>
+                Briefkasten von {{client.name}}
+            </mat-panel-title>
+            <mat-panel-description>
+                Die zu verschickenden und erhaltenden Nachrichten
+            </mat-panel-description>
+        </mat-expansion-panel-header>
 
-    <mat-form-field appearance="outline" class="width-100">
-      <mat-label>Klartext</mat-label>
-      <textarea matInput placeholder="Das ist ein wunderbarer Tag..." [(ngModel)]="plainText"></textarea>
-    </mat-form-field>
-    <mat-form-field appearance="outline" class="width-100">
-      <mat-label>Geheimtext</mat-label>
-      <textarea matInput placeholder="Qnf vfg rva jhaqreonere Gnt..." [(ngModel)]="cipherText"></textarea>
-    </mat-form-field>
+        <mat-form-field appearance="outline" class="width-100">
+            <mat-label>Klartext</mat-label>
+            <textarea matInput placeholder="Das ist ein wunderbarer Tag..." [(ngModel)]="plainText"></textarea>
+        </mat-form-field>
+        <mat-form-field appearance="outline" class="width-100">
+            <mat-label>Geheimtext</mat-label>
+            <textarea matInput placeholder="Qnf vfg rva jhaqreonere Gnt..." [(ngModel)]="cipherText"></textarea>
+        </mat-form-field>
 
-    <mat-action-row>
-      <button mat-flat-button color="primary" (click)="clearFields()">Nachrichtenfelder leeren</button>
-      <button mat-flat-button color="primary" [disabled]="!sendingTo" (click)="encrypt()">Für {{sendingTo.name}} verschlüsseln</button>
-      <button mat-flat-button color="primary" (click)="decrypt()">Entschlüsseln</button>
-    </mat-action-row>
-  </mat-expansion-panel>
+        <mat-action-row>
+            <button mat-flat-button color="primary" (click)="clearFields()">Nachrichtenfelder leeren</button>
+            <button mat-flat-button color="primary" [disabled]="!sendingTo" (click)="encrypt()">Für {{sendingTo.name}}
+                verschlüsseln
+            </button>
+            <button mat-flat-button color="primary" (click)="decrypt()">Entschlüsseln</button>
+        </mat-action-row>
+    </mat-expansion-panel>
 
-  <mat-expansion-panel>
-    <mat-expansion-panel-header>
-      <mat-panel-title>
-        Privater Schlüssel von {{client.name}}
-      </mat-panel-title>
-      <mat-panel-description>
-        Die Komponenten des privaten Schlüssels
-      </mat-panel-description>
-    </mat-expansion-panel-header>
+    <mat-expansion-panel>
+        <mat-expansion-panel-header>
+            <mat-panel-title>
+                Privater Schlüssel von {{client.name}}
+            </mat-panel-title>
+            <mat-panel-description>
+                Die Komponenten des privaten Schlüssels
+            </mat-panel-description>
+        </mat-expansion-panel-header>
 
-    <mat-form-field appearance="outline" class="width-100">
-      <mat-label>Modul</mat-label>
-      <textarea matInput placeholder="Wird nach dem Berechnen automatisch angezeigt"
-                [(ngModel)]="modulus"></textarea>
-    </mat-form-field>
-    <mat-form-field appearance="outline" class="width-100">
-      <mat-label>Privater Exponent</mat-label>
-      <textarea matInput placeholder="Wird nach dem Berechnen automatisch angezeigt"
-                [(ngModel)]="privateExponent"></textarea>
-    </mat-form-field>
-  </mat-expansion-panel>
+        <mat-form-field appearance="outline" class="width-100">
+            <mat-label>Modul</mat-label>
+            <textarea matInput placeholder="Wird nach dem Berechnen automatisch angezeigt"
+                      [(ngModel)]="modulus"></textarea>
+        </mat-form-field>
+        <mat-form-field appearance="outline" class="width-100">
+            <mat-label>Privater Exponent</mat-label>
+            <textarea matInput placeholder="Wird nach dem Berechnen automatisch angezeigt"
+                      [(ngModel)]="privateExponent"></textarea>
+        </mat-form-field>
+    </mat-expansion-panel>
 
-  <mat-expansion-panel>
-    <mat-expansion-panel-header>
-      <mat-panel-title>
-        Signatur
-      </mat-panel-title>
-      <mat-panel-description>
-        Das Signieren und Verifizieren von Nachrichten
-      </mat-panel-description>
-    </mat-expansion-panel-header>
+    <mat-expansion-panel>
+        <mat-expansion-panel-header>
+            <mat-panel-title>
+                Signatur
+            </mat-panel-title>
+            <mat-panel-description>
+                Das Signieren und Verifizieren von Nachrichten
+            </mat-panel-description>
+        </mat-expansion-panel-header>
 
-    <mat-form-field class="width-100">
-      <mat-label>Signatur</mat-label>
-      <textarea matInput placeholder="Wird nach dem Berechnen automatisch angezeigt" [(ngModel)]="signature"></textarea>
-    </mat-form-field>
-    <mat-label *ngIf="signatureValid && signatureVerificationCalculated">Signatur gültig!</mat-label>
-    <mat-label *ngIf="!signatureValid && signatureVerificationCalculated">Signatur ungültig!</mat-label>
-    <mat-label *ngIf="!signatureVerificationCalculated">Signatur noch nicht überprüft...</mat-label>
+        <mat-form-field class="width-100">
+            <mat-label>Signatur</mat-label>
+            <textarea matInput placeholder="Wird nach dem Berechnen automatisch angezeigt"
+                      [(ngModel)]="signature"></textarea>
+        </mat-form-field>
+        <mat-label *ngIf="signatureValid && signatureVerificationCalculated">Signatur gültig!</mat-label>
+        <mat-label *ngIf="!signatureValid && signatureVerificationCalculated">Signatur ungültig!</mat-label>
+        <mat-label *ngIf="!signatureVerificationCalculated">Signatur noch nicht überprüft...</mat-label>
 
-    <mat-action-row>
-      <button mat-flat-button color="primary" (click)="clearSignatureFields()">Signaturfelder leeren</button>
-      <button mat-flat-button color="primary" [matMenuTriggerFor]="signMenu" [disabled]="signFieldIsNotEmpty()">Signieren</button>
-      <mat-menu #signMenu="matMenu">
-        <button mat-menu-item (click)="signPlaintext()">Klartext</button>
-        <button mat-menu-item (click)="signCiphertext()">Geheimtext</button>
-      </mat-menu>
-      <button mat-flat-button color="primary" [matMenuTriggerFor]="verifyMenu" [disabled]="!receivedFromIsSet()">Verifizieren</button>
-      <mat-menu #verifyMenu="matMenu">
-        <button mat-menu-item (click)="verifyPlaintext()">Klartext</button>
-        <button mat-menu-item (click)="verifyCiphertext()">Geheimtext</button>
-      </mat-menu>
-    </mat-action-row>
-  </mat-expansion-panel>
+        <mat-action-row>
+            <button mat-flat-button color="primary" (click)="clearSignatureFields()">Signaturfelder leeren</button>
+            <button mat-flat-button color="primary" [matMenuTriggerFor]="signMenu" [disabled]="signFieldIsNotEmpty()">
+                Signieren
+            </button>
+            <mat-menu #signMenu="matMenu">
+                <button mat-menu-item (click)="signPlaintext()">Klartext</button>
+                <button mat-menu-item (click)="signCiphertext()">Geheimtext</button>
+            </mat-menu>
+            <button mat-flat-button color="primary" [matMenuTriggerFor]="verifyMenu" [disabled]="!receivedFromIsSet()">
+                Verifizieren
+            </button>
+            <mat-menu #verifyMenu="matMenu">
+                <button mat-menu-item (click)="verifyPlaintext()">Klartext</button>
+                <button mat-menu-item (click)="verifyCiphertext()">Geheimtext</button>
+            </mat-menu>
+        </mat-action-row>
+    </mat-expansion-panel>
 </mat-accordion>
 <div class="below-accordion">
-  <div class="element-below-accordion-container"  *ngIf="!isCiphertextEmpty()">
-    <button mat-fab extended color="primary" [disabled]="!sendingTo" (click)="sendCiphertextAndSignature()">
-      <mat-icon>send</mat-icon>
-      <span>Geheimtext an {{sendingTo?.name}} Senden</span>
-    </button>
-  </div>
-  <div class="element-below-accordion-container">
-    <button mat-fab extended color="primary" [disabled]="!sendingTo" (click)="sendPlaintextAndSignature()">
-      <mat-icon>send</mat-icon>
-      <span>Klartext an {{sendingTo?.name}} Senden</span>
-    </button>
-  </div>
-  <div class="element-below-accordion-container form-field-no-hint">
-    <mat-form-field appearance="outline">
-      <mat-label>Ziel-Client</mat-label>
-      <mat-select [(value)]="sendingTo">
-        <mat-option *ngFor="let client of getOtherClients()" [value]="client">{{client.name}}</mat-option>
-      </mat-select>
-    </mat-form-field>
-  </div>
+    <div class="element-below-accordion-container" *ngIf="!isCiphertextEmpty()">
+        <button mat-fab extended color="primary" [disabled]="!sendingTo" (click)="sendCiphertextAndSignature()">
+            <mat-icon>send</mat-icon>
+            <span>Geheimtext an {{sendingTo?.name}} Senden</span>
+        </button>
+    </div>
+    <div class="element-below-accordion-container" *ngIf="!isPlaintextEmpty()">
+        <button mat-fab extended color="primary" [disabled]="!sendingTo" (click)="sendPlaintextAndSignature()">
+            <mat-icon>send</mat-icon>
+            <span>Klartext an {{sendingTo?.name}} Senden</span>
+        </button>
+    </div>
+    <div class="element-below-accordion-container form-field-no-hint">
+        <mat-form-field appearance="outline">
+            <mat-label>Ziel-Client</mat-label>
+            <mat-select [(value)]="sendingTo">
+                <mat-option *ngFor="let client of getOtherClients()" [value]="client">{{client.name}}</mat-option>
+            </mat-select>
+        </mat-form-field>
+    </div>
 </div>

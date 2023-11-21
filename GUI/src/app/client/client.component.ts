@@ -280,6 +280,10 @@ export class ClientComponent implements OnInit {
         return this.cipherText === "";
     }
 
+    public isPlaintextEmpty(): boolean {
+        return this.plainText === "";
+    }
+
     /**
      * Setzt die Nachrichtenfelder zurück.
      */
