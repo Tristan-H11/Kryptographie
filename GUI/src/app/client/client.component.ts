@@ -95,7 +95,7 @@ export class ClientComponent implements OnInit {
         if (!this.client) {
             throw new Error("Client is undefined!");
         }
-        if(this.client.receivedFrom) {
+        if (this.client.receivedFrom) {
             console.log("Received from is set: " + this.client.receivedFrom.name);
             return true;
         }
@@ -252,18 +252,32 @@ export class ClientComponent implements OnInit {
      * Sendet die verschlüsselte Nachricht und die Signatur an den anderen Client.
      * Setzt anschließend die Nachrichten- und Signaturfelder zurück.
      */
-    public sendMessageAndSignature() {
-        if (this.sendingTo) {
-            console.log("Sending message and signature from " + this.client?.name + " to " + this.sendingTo.name + "");
-            this.messageService.setCiphertext(this.cipherText, this.sendingTo);
-            this.messageService.setSignature(this.signature, this.sendingTo);
-            this.sendingTo.receivedFrom = this.client;
-            this.showSnackbar("Nachricht und Signatur gesendet!");
+    public sendCiphertextAndSignature() {
+        console.log("Sending message and signature from " + this.client?.name + " to " + this.sendingTo.name + "");
+        this.messageService.setCiphertext(this.cipherText, this.sendingTo);
+        this.messageService.setSignature(this.signature, this.sendingTo);
+        this.sendingTo.receivedFrom = this.client;
+        this.showSnackbar("Nachricht und Signatur gesendet!");
 
-            // Alle Felder leeren, wenn gesendet wird
-            this.clearFields();
-            this.clearSignatureFields();
-        }
+        // Alle Felder leeren, wenn gesendet wird
+        this.clearFields();
+        this.clearSignatureFields();
+    }
+
+    public sendPlaintextAndSignature() {
+        console.log("Sending message and signature from " + this.client?.name + " to " + this.sendingTo.name + "");
+        this.messageService.setPlaintext(this.plainText, this.sendingTo);
+        this.messageService.setSignature(this.signature, this.sendingTo);
+        this.sendingTo.receivedFrom = this.client;
+        this.showSnackbar("Nachricht und Signatur gesendet!");
+
+        // Alle Felder leeren, wenn gesendet wird
+        this.clearFields();
+        this.clearSignatureFields();
+    }
+
+    public isCiphertextEmpty(): boolean {
+        return this.cipherText === "";
     }
 
     /**

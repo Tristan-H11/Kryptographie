@@ -36,14 +36,14 @@ input.text-align-right {
   display: flex;
   justify-content: right;
   width: auto;
-  padding: 2vh 2vw;
+  padding: 2vh 0;
   height: 100%;
 }
 
 .below-accordion {
   display: flex;
   flex-direction: row-reverse;
-  column-gap: 0.5vw;
+  column-gap: 1vw;
   align-items: center;
 }
 
