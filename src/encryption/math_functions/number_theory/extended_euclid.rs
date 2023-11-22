@@ -45,6 +45,9 @@ impl ExtendedEuclid {
         }
     }
 
+    /// Setzt das n neu, um kein neues Objekt erstellen zu müssen.
+    pub fn setN(&mut self,
+
     /// Eigene Implementation des erweiterten Euklischen Algorithmus.
     fn extended_euclid(n: &BigInt, modul: &BigInt) -> (BigInt, BigInt, BigInt) {
         //rotierendes Array, zur Berechnung und Speicherung der Faktoren `x` und `y`

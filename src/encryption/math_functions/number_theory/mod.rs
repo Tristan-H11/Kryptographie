@@ -1,5 +1,5 @@
-mod fast_exponentiation;
-mod extended_euclid;
-mod modulo_inverse;
-mod primality_test;
-mod small_primes;
+pub mod fast_exponentiation;
+pub mod extended_euclid;
+pub mod modulo_inverse;
+pub mod primality_test;
+pub mod small_primes;

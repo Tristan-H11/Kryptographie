@@ -3,11 +3,11 @@ use bigdecimal::One;
 use log::{debug, trace};
 
 use crate::big_i;
-use crate::encryption::math_functions::number_theory::{
-    extended_euclid, miller_rabin, modulo_inverse,
-};
+use crate::encryption::math_functions::number_theory::extended_euclid::ExtendedEuclid;
+use crate::encryption::math_functions::number_theory::primality_test::PrimalityTest;
 use crate::encryption::math_functions::random_elsner::RandomElsner;
 use crate::encryption::math_functions::traits::increment::Increment;
+use crate::encryption::math_functions::traits::rapid_math_ops::RapidMathOps;
 use crate::encryption::rsa::keys::{PrivateKey, PublicKey};
 
 ///
@@ -127,13 +127,16 @@ impl RsaKeygenService {
         let upper_bound = &big_i!(2).pow(size);
         let lower_bound = &big_i!(2).pow(size - 1);
 
-        let mut prime_candidate = random_generator.take_uneven(lower_bound, upper_bound, index_for_random_generator);
-        while !miller_rabin(&prime_candidate, miller_rabin_iterations, random_generator) {
+        let prime_candidate = random_generator.take_uneven(lower_bound, upper_bound, index_for_random_generator);
+        let mut prime_tester = PrimalityTest::new(prime_candidate.clone(), miller_rabin_iterations, random_generator);
+
+        while !prime_tester.calculate(false) { // TODO useFast durchreichen
             trace!(
                 "Generierter Primkandidat {} ist keine Primzahl",
                 prime_candidate
             );
-            prime_candidate = random_generator.take_uneven(lower_bound, upper_bound, index_for_random_generator);
+            let new_prime_candidate = random_generator.take_uneven(lower_bound, upper_bound, index_for_random_generator);
+            prime_tester.set_prime_candidate(new_prime_candidate)
         }
         debug!(
             "Generierter Primkandidat {} ist eine Primzahl",
@@ -157,14 +160,16 @@ impl RsaKeygenService {
         debug!("Generiere e mit phi {}", phi);
 
         let mut e = random_generator.take(&big_i!(3u8), &phi.decrement(), &mut 1);
+        let mut extended_euclid = ExtendedEuclid::new(e.clone(), phi.clone());
         while e < *phi {
-            let euclid = &extended_euclid(&e, &phi).0;
+            let euclid = &extended_euclid.calculate(false).0; //TODO useFast durchreichen
             if euclid.is_one() {
                 debug!("Generierter e {} ist relativ prim zu phi {}", e, phi);
                 return e;
             }
             trace!("Generierter e {} ist nicht relativ prim zu phi {}", e, phi);
             e.increment_assign();
+            extended_euclid.
         }
         panic!("Kein e gefunden, das relativ prim zu phi {} ist", phi);
     }

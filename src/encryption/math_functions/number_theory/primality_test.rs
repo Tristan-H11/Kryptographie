@@ -41,12 +41,18 @@ impl RapidMathOps<bool> for PrimalityTest {
 
 impl PrimalityTest {
     /// Erstellt eine neue Instanz von PrimalityTest.
-    pub fn new(p: BigInt, repeats: u32, random_generator: RandomElsner) -> Self {
+    pub fn new(p: BigInt, repeats: u32, random_generator: &RandomElsner) -> Self {
         PrimalityTest {
             p,
             repeats,
-            random_generator,
+            random_generator: random_generator.clone()
         }
+    }
+
+
+    /// Setzt die fragliche Zahl auf einen neuen Wert, um kein neues Objekt erstellen zu müssen.
+    pub fn set_prime_candidate(&mut self, p: BigInt) {
+        self.p = p;
     }
 
     ///
