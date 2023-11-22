@@ -8,6 +8,7 @@ edition = "2021"
 [dependencies]
 bigdecimal = "0.4.2"
 rand = "0.8"
+num = "0.4.1"
 
 actix-web = "4.4.0"
 actix-cors = "0.6.4"
