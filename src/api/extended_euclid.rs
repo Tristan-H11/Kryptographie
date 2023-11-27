@@ -12,7 +12,7 @@ use crate::encryption::math_functions::number_theory::extended_euclid::ExtendedE
  * Führt den erweiterten Euklidischen Algorithmus aus
  */
 pub(crate) async fn euclid_endpoint(req_body: Json<ExtendedEuclidRequest>, query: Query<UseFastQuery>) -> impl Responder {
-    info!("Endpunkt /math/extended_euclid wurde aufgerufen");
+    info!("Endpunkt /math/extended_euclid wurde aufgerufen, use_fast: {}", query.use_fast);
     let req_body: ExtendedEuclidRequest = req_body.into_inner();
     let use_fast = query.use_fast;
 

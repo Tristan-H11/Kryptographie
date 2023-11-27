@@ -14,7 +14,7 @@ use crate::encryption::rsa::rsa_keygen_service::RsaKeygenService;
 /// # Returns
 /// * `HttpResponse` - Die Antwort, die das Schlüsselpaar enthält.
 pub(crate) async fn create_key_pair(req_body: Json<CreateKeyPairRequest>, query: Query<UseFastQuery>) -> impl Responder {
-    info!("Endpunkt /rsa/createKeyPair wurde aufgerufen");
+    info!("Endpunkt /rsa/createKeyPair wurde aufgerufen, use_fast: {}", query.use_fast);
     let req_body: CreateKeyPairRequest = req_body.into_inner();
     let use_fast = query.use_fast;
 

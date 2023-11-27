@@ -8,7 +8,7 @@ use crate::api::serializable_models::{SingleStringResponse, UseFastQuery, Verify
 /// Verifiziert eine Signatur zu einer Nachricht.
 ///
 pub(crate) async fn verify(req_body: Json<VerifyRequest>, query: Query<UseFastQuery>) -> impl Responder {
-    info!("Endpunkt /rsa/verify wurde aufgerufen");
+    info!("Endpunkt /rsa/verify wurde aufgerufen, use_fast: {}", query.use_fast);
     let req_body: VerifyRequest = req_body.into_inner();
     let use_fast = query.use_fast;
 

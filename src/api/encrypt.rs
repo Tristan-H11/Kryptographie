@@ -8,7 +8,7 @@ use crate::api::serializable_models::{EncryptDecryptRequest, SingleStringRespons
 /// Verschlüsselt eine Nachricht.
 ///
 pub(crate) async fn encrypt(req_body: Json<EncryptDecryptRequest>, query: Query<UseFastQuery>) -> impl Responder {
-    info!("Endpunkt /rsa/encrypt wurde aufgerufen");
+    info!("Endpunkt /rsa/encrypt wurde aufgerufen, use_fast: {}", query.use_fast);
     let req_body: EncryptDecryptRequest = req_body.into_inner();
     let use_fast = query.use_fast;
 

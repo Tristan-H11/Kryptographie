@@ -8,7 +8,7 @@ use crate::api::serializable_models::{SignRequest, SingleStringResponse, UseFast
 /// Signiert eine Nachricht.
 ///
 pub(crate) async fn sign(req_body: Json<SignRequest>, query: Query<UseFastQuery>) -> impl Responder {
-    info!("Endpunkt /rsa/sign wurde aufgerufen");
+    info!("Endpunkt /rsa/sign wurde aufgerufen, use_fast: {}", query.use_fast);
     let req_body: SignRequest = req_body.into_inner();
     let use_fast = query.use_fast;
 
