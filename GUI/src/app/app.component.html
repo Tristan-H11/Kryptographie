@@ -1,12 +1,21 @@
 <mat-sidenav-container *ngIf="isServerReachable" class="global-container">
     <mat-sidenav class="sidenav" mode="side" opened>
         <div class="inner-sidenav-container">
-            <div class="sidenav-header">
-                <mat-slide-toggle
-                    [(ngModel)]="isTurboMode"
+            <button mat-stroked-button
+                    *ngIf="!isTurboMode"
+                    (click)="toggleTurboMode()"
+                    class="turbo-toggle-button">
+                Normaler Modus aktiv
+            </button>
+            <button mat-flat-button
+                    *ngIf="isTurboMode"
+                    (click)="toggleTurboMode()"
+                    class="turbo-toggle-button"
                     color="warn">
-                    Turbo-Modus
-                </mat-slide-toggle>
+                Turbo Modus aktiv
+            </button>
+            <div class="sidenav-header">
+
                 <div>RSA Implementation</div>
             </div>
 

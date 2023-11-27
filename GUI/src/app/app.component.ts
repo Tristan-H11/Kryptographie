@@ -1,4 +1,4 @@
-import {Component, OnInit} from "@angular/core";
+import {Component, OnInit, signal} from "@angular/core";
 import {CommonModule} from "@angular/common";
 import {RouterLink, RouterOutlet} from "@angular/router";
 import {MatSidenavModule} from "@angular/material/sidenav";
@@ -55,6 +55,12 @@ export class AppComponent implements OnInit {
 		});
 	}
 
+    /**
+     * Schaltet den Turbo-Modus um.
+     */
+    public toggleTurboMode() {
+        this.isTurboMode = !this.isTurboMode;
+    }
 
 	/**
 	 * Prüft die Erreichbarkeit des Servers.
