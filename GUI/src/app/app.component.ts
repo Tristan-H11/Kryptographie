@@ -7,8 +7,8 @@ import {MatDividerModule} from "@angular/material/divider";
 import {MatButtonModule} from "@angular/material/button";
 import {BackendRequestService} from "./services/backend-api/backend-request.service";
 import {MatSnackBar} from "@angular/material/snack-bar";
-import {ClientService} from "./services/management/client.service";
 import {Client} from "./models/client";
+import {StateManagementService} from "./services/management/state-management.service";
 
 @Component({
   selector: 'app-root',
@@ -29,19 +29,15 @@ export class AppComponent implements OnInit {
   title = 'RSA-Encryption-Tool';
 
   constructor(private backendRequestService: BackendRequestService,
-              private clientService: ClientService,
+              private stateService: StateManagementService,
               private snackBar: MatSnackBar) {
   }
 
   ngOnInit(): void {
-    this.registerNewClientByName("Alice");
-    this.registerNewClientByName("Bob");
+    this.stateService.createClient("Alice");
+    this.stateService.createClient("Bob");
   }
 
-  public registerNewClientByName(name: string) {
-    this.clientService.registerServices();
-    this.clientService.createAndRegisterClient(name);
-  }
 
   /**
    * Prüft die Erreichbarkeit des Servers.
@@ -57,6 +53,6 @@ export class AppComponent implements OnInit {
   }
 
     public getClients(): Set<Client> {
-        return this.clientService.getClients();
+        return this.stateService.getAllClients();
     }
 }

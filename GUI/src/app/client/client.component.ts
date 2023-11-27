@@ -1,4 +1,4 @@
-import {Component, OnInit} from '@angular/core';
+import {Component, OnInit, WritableSignal} from '@angular/core';
 import {CommonModule} from '@angular/common';
 import {FormsModule} from "@angular/forms";
 import {MatButtonModule} from "@angular/material/button";
@@ -6,20 +6,18 @@ import {MatExpansionModule} from "@angular/material/expansion";
 import {MatFormFieldModule} from "@angular/material/form-field";
 import {MatInputModule} from "@angular/material/input";
 import {Client} from "../models/client";
-import {KeyManagementService} from "../services/management/key-management.service";
-import {MessageManagementService} from "../services/management/message-management.service";
 import {MatIconModule} from "@angular/material/icon";
 import {MatSnackBar} from "@angular/material/snack-bar";
 import {BackendRequestService} from "../services/backend-api/backend-request.service";
 import {createEncryptDecryptRequestFrom} from "../models/encrypt-decrypt-request";
-import {ConfigurationManagementService} from "../services/management/configuration-management.service";
 import {signRequestFrom} from "../models/sign-request";
 import {verifyRequestFrom} from "../models/verify-request";
 import {ActivatedRoute} from "@angular/router";
-import {ClientService} from "../services/management/client.service";
 import {MatSelectModule} from "@angular/material/select";
 import {MatCardModule} from "@angular/material/card";
 import {MatMenuModule} from "@angular/material/menu";
+import {StateManagementService} from "../services/management/state-management.service";
+import {KeyPair} from "../models/key-pair";
 
 @Component({
     selector: 'client',
@@ -53,6 +51,17 @@ export class ClientComponent implements OnInit {
     public signatureVerificationCalculated: boolean = false;
     public signatureValid: boolean = false;
 
+    private configurationData = this.stateService.getConfigurationData();
+
+    private _clientKeyPair: WritableSignal<KeyPair> | undefined;
+
+    public get clientKeyPair(): WritableSignal<KeyPair> {
+        if (!this._clientKeyPair) {
+            throw new Error("ClientKeyPair is undefined!");
+        }
+        return this._clientKeyPair;
+    }
+
     public get client(): Client {
         if (!this._client) {
             throw new Error("Client is undefined!");
@@ -60,14 +69,7 @@ export class ClientComponent implements OnInit {
         return this._client;
     }
 
-    public set client(value: Client) {
-        this._client = value;
-    }
-
     public get sendingTo(): Client {
-        if (!this.client) {
-            throw new Error("Client is undefined!");
-        }
         if (!this.client.sendingTo) {
             throw new Error("SendingTo is undefined!");
         }
@@ -75,16 +77,10 @@ export class ClientComponent implements OnInit {
     }
 
     public set sendingTo(value: Client) {
-        if (!this.client) {
-            throw new Error("Client is undefined!");
-        }
         this.client.sendingTo = value;
     }
 
     public get receivedFrom(): Client {
-        if (!this.client) {
-            throw new Error("Client is undefined!");
-        }
         if (!this.client.receivedFrom) {
             throw new Error("ReceivedFrom is undefined!");
         }
@@ -92,9 +88,6 @@ export class ClientComponent implements OnInit {
     }
 
     public receivedFromIsSet(): boolean {
-        if (!this.client) {
-            throw new Error("Client is undefined!");
-        }
         if (this.client.receivedFrom) {
             console.log("Received from is set: " + this.client.receivedFrom.name);
             return true;
@@ -106,11 +99,8 @@ export class ClientComponent implements OnInit {
     /**
      * Konstruktor der Komponente.
      */
-    constructor(private keyService: KeyManagementService,
-                private messageService: MessageManagementService,
-                private backendRequestService: BackendRequestService,
-                private configurationService: ConfigurationManagementService,
-                private clientService: ClientService,
+    constructor(private backendRequestService: BackendRequestService,
+                private stateService: StateManagementService,
                 private route: ActivatedRoute,
                 private snackBar: MatSnackBar) {
     }
@@ -123,26 +113,23 @@ export class ClientComponent implements OnInit {
             const name = params.get("client");
             console.log("OnInit in Client with name " + name);
             if (name) {
-                this.client = this.clientService.getClientByName(name);
-                this.sendingTo = this.getOtherClients().values().next().value;
-                console.log(this.client)
+                this.initClientComponent(name);
             } else {
                 console.error("Client name is null! Invalid path");
                 return;
             }
         });
 
-        this.keyService.getObservable(this.client!).subscribe(keyPair => {
-            this.privateExponent = keyPair.d;
-            this.modulus = keyPair.modulus;
-        });
-        this.messageService.getObservable(this.client!).subscribe(message => {
-            // Werden die Nachrichten neu gesetzt, muss die Signatur neu berechnet werden.
-            this.signatureVerificationCalculated = false;
-            this.cipherText = message.ciphertext;
-            this.plainText = message.plaintext;
-            this.signature = message.signature;
-        });
+    }
+
+    /**
+     * Initialisiert die Komponente mit dem Client, der in der URL angegeben ist.
+     */
+    private initClientComponent(name: string) {
+        this._client = this.stateService.getClientByName(name);
+        this.sendingTo = this.getOtherClients().values().next().value;
+        console.log(this.client)
+        this._clientKeyPair = this.stateService.getClientKey(this.client);
     }
 
     /**
@@ -162,11 +149,11 @@ export class ClientComponent implements OnInit {
     public encrypt() {
         const requestBody = createEncryptDecryptRequestFrom(
             this.plainText,
-            this.keyService.getKeyPair(this.sendingTo),
-            this.configurationService.getNumberSystem()
+            this.stateService.getClientKey(this.sendingTo)(),
+            this.configurationData().number_system_base
         );
         this.backendRequestService.encrypt(requestBody).then(r => {
-            this.messageService.setCiphertext(r.message, this.client);
+            this.setCiphertext(this.client, r.message)
             this.showSnackbar("Nachricht verschlüsselt!");
         })
     }
@@ -177,11 +164,11 @@ export class ClientComponent implements OnInit {
     public decrypt() {
         const requestBody = createEncryptDecryptRequestFrom(
             this.cipherText,
-            this.keyService.getKeyPair(this.client),
-            this.configurationService.getNumberSystem()
+            this.clientKeyPair(),
+            this.configurationData().number_system_base
         );
         this.backendRequestService.decrypt(requestBody).then(r => {
-            this.messageService.setPlaintext(r.message, this.client);
+            this.setPlaintext(this.client, r.message)
             this.showSnackbar("Nachricht entschlüsselt!");
         })
     }
@@ -192,10 +179,10 @@ export class ClientComponent implements OnInit {
     public signPlaintext() {
         const requestBody = signRequestFrom(
             this.plainText,
-            this.keyService.getKeyPair(this.client),
+            this.clientKeyPair(),
         );
         this.backendRequestService.sign(requestBody).then(r => {
-            this.messageService.setSignature(r.message, this.client);
+            this.setSignature(this.client, r.message)
             this.showSnackbar("Signatur berechnet!");
         })
     }
@@ -206,10 +193,10 @@ export class ClientComponent implements OnInit {
     public signCiphertext() {
         const requestBody = signRequestFrom(
             this.cipherText,
-            this.keyService.getKeyPair(this.client),
+            this.clientKeyPair(),
         );
         this.backendRequestService.sign(requestBody).then(r => {
-            this.messageService.setSignature(r.message, this.client);
+            this.setSignature(this.client, r.message)
             this.showSnackbar("Signatur berechnet!");
         })
     }
@@ -221,7 +208,7 @@ export class ClientComponent implements OnInit {
         const requestBody = verifyRequestFrom(
             this.plainText,
             this.signature,
-            this.keyService.getKeyPair(this.receivedFrom),
+            this.stateService.getClientKey(this.receivedFrom)(),
         );
         this.backendRequestService.verify(requestBody).then(r => {
             let verified = r.message === "true";
@@ -238,7 +225,7 @@ export class ClientComponent implements OnInit {
         const requestBody = verifyRequestFrom(
             this.cipherText,
             this.signature,
-            this.keyService.getKeyPair(this.receivedFrom),
+            this.stateService.getClientKey(this.receivedFrom)(),
         );
         this.backendRequestService.verify(requestBody).then(r => {
             let verified = r.message === "true";
@@ -254,8 +241,8 @@ export class ClientComponent implements OnInit {
      */
     public sendCiphertextAndSignature() {
         console.log("Sending message and signature from " + this.client?.name + " to " + this.sendingTo.name + "");
-        this.messageService.setCiphertext(this.cipherText, this.sendingTo);
-        this.messageService.setSignature(this.signature, this.sendingTo);
+        this.setCiphertext(this.sendingTo, this.cipherText);
+        this.setSignature(this.sendingTo, this.signature);
         this.sendingTo.receivedFrom = this.client;
         this.showSnackbar("Nachricht und Signatur gesendet!");
 
@@ -266,8 +253,8 @@ export class ClientComponent implements OnInit {
 
     public sendPlaintextAndSignature() {
         console.log("Sending message and signature from " + this.client?.name + " to " + this.sendingTo.name + "");
-        this.messageService.setPlaintext(this.plainText, this.sendingTo);
-        this.messageService.setSignature(this.signature, this.sendingTo);
+        this.setPlaintext(this.sendingTo, this.plainText);
+        this.setSignature(this.sendingTo, this.signature);
         this.sendingTo.receivedFrom = this.client;
         this.showSnackbar("Nachricht und Signatur gesendet!");
 
@@ -284,68 +271,95 @@ export class ClientComponent implements OnInit {
         return this.plainText === "";
     }
 
+    private setCiphertext(client: Client, value: string) {
+        this.stateService.getClientMessage(client).update(message => ({
+            ...message,
+            ciphertext: value
+        }));
+    }
+
+    private setPlaintext(client: Client, value: string) {
+        this.stateService.getClientMessage(client).update(message => ({
+            ...message,
+            plaintext: value
+        }));
+    }
+
+    private setSignature(client: Client, value: string) {
+        this.stateService.getClientMessage(client).update(message => ({
+            ...message,
+            signature: value
+        }));
+    }
+
     /**
      * Setzt die Nachrichtenfelder zurück.
      */
     public clearFields() {
-        this.messageService.setPlaintext("", this.client)
-        this.messageService.setCiphertext("", this.client);
+        this.setPlaintext(this.client, "")
+        this.setCiphertext(this.client, "");
     }
 
     /**
      * Setzt die Signaturfelder zurück.
      */
     public clearSignatureFields() {
-        this.messageService.setSignature("", this.client);
+        this.setSignature(this.client, "");
         this.signatureVerificationCalculated = false;
         this.signatureValid = false;
     }
 
     public get cipherText(): string {
-        return this.messageService.getCiphertext(this.client);
+        return this.stateService.getClientMessage(this.client)().ciphertext;
     }
 
     public set cipherText(value: string) {
-        this.messageService.setCiphertext(value, this.client);
+        this.setCiphertext(this.client, value);
     }
 
     public get plainText(): string {
-        return this.messageService.getPlaintext(this.client);
+        return this.stateService.getClientMessage(this.client)().plaintext;
     }
 
     public set plainText(value: string) {
-        this.messageService.setPlaintext(value, this.client);
+        this.setPlaintext(this.client, value);
     }
 
     public get signature(): string {
-        return this.messageService.getSignature(this.client);
+        return this.stateService.getClientMessage(this.client)().signature;
     }
 
     public set signature(value: string) {
-        this.messageService.setSignature(value, this.client);
+        this.setSignature(this.client, value);
     }
 
     public get privateExponent(): string {
-        return this.keyService.getD(this.client);
+        return this.clientKeyPair().d;
     }
 
-    public set privateExponent(value: string) {
-        this.keyService.setD(this.client, value);
+    public set privateExponent(d: string) {
+        this.clientKeyPair.update(keyPair => ({
+            ...keyPair,
+            d
+        }));
     }
 
     public get modulus(): string {
-        return this.keyService.getModul(this.client);
+        return this.clientKeyPair().modulus;
     }
 
-    public set modulus(value: string) {
-        this.keyService.setModul(this.client, value);
+    public set modulus(modulus: string) {
+        this.clientKeyPair.update(keyPair => ({
+            ...keyPair,
+            modulus
+        }));
     }
 
     /**
      * Gibt alle Clients außer dem "eigenen" zurück.
      */
     public getOtherClients(): Set<Client> {
-        const allClients = this.clientService.getClients();
+        const allClients = this.stateService.getAllClients();
         return new Set(
             [...allClients].filter(clientFromSet => clientFromSet !== this.client)
         );

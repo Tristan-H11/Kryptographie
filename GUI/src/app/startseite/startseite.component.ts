@@ -1,4 +1,4 @@
-import {AfterViewInit, Component, OnInit} from '@angular/core';
+import {Component} from '@angular/core';
 import {MatExpansionModule} from '@angular/material/expansion';
 import {MatInputModule} from '@angular/material/input';
 import {MatFormFieldModule} from '@angular/material/form-field';
@@ -6,216 +6,211 @@ import {MatButtonModule} from '@angular/material/button';
 import {FormsModule} from "@angular/forms";
 import {StartseiteRoutingModule} from "./startseite-routing.module";
 import {Client} from "../models/client";
-import {KeyManagementService} from "../services/management/key-management.service";
-import {createConfigurationDataFrom} from "../models/configuration-data";
+import {ConfigurationData, createConfigurationDataFrom} from "../models/configuration-data";
 import {MatSnackBar} from "@angular/material/snack-bar";
-import {ConfigurationManagementService} from "../services/management/configuration-management.service";
-import {ClientService} from "../services/management/client.service";
 import {NgForOf} from "@angular/common";
 import {MatIconModule} from "@angular/material/icon";
 import {MatDialog, MatDialogRef} from "@angular/material/dialog";
 import {SimpleDialogComponent} from "../simple-dialog/simple-dialog.component";
 import {LoadingDialogComponent} from "../loading-dialog/loading-dialog.component";
+import {StateManagementService} from "../services/management/state-management.service";
+import {BackendRequestService} from "../services/backend-api/backend-request.service";
 
 
 @Component({
-  selector: 'app-startseite',
-  standalone: true,
-  imports: [
-    StartseiteRoutingModule,
-    MatExpansionModule,
-    MatFormFieldModule,
-    MatInputModule,
-    MatButtonModule,
-    FormsModule,
-    NgForOf,
-    MatIconModule,
-  ],
-  templateUrl: './startseite.component.html',
-  styleUrl: './startseite.component.scss'
+    selector: 'app-startseite',
+    standalone: true,
+    imports: [
+        StartseiteRoutingModule,
+        MatExpansionModule,
+        MatFormFieldModule,
+        MatInputModule,
+        MatButtonModule,
+        FormsModule,
+        NgForOf,
+        MatIconModule,
+    ],
+    templateUrl: './startseite.component.html',
+    styleUrl: './startseite.component.scss'
 })
 /**
  * Komponente für die Darstellung der Startseite inklusive der Konfigurationsmöglichkeiten.
  */
-export class StartseiteComponent implements AfterViewInit {
+export class StartseiteComponent {
 
-  /**
-   * Ein notwendiger Zwischenspeicher für die öffentlichen Komponenten der Schlüssel.
-   * Ohne dies wäre eine dynamische Aktualisierung der Schlüssel nicht möglich.
-   */
-  clientKeys: Map<Client, { modulus: string, exponent: string }> = new Map();
+    private configurationData = this.stateService.getConfigurationData();
 
-  /**
-   * Registriert sich bei dem KeyService, um die öffentlichen Komponenten der Schlüssel bereitstellen zu können.
-   */
-  ngAfterViewInit(): void {
-    const clients = this.getClients();
-
-    clients.forEach(client => {
-      this.subscribeToClientKeys(client);
-    });
-  }
-
-  private subscribeToClientKeys(client: Client) {
-    this.keyService.getObservable(client).subscribe(keyPair => {
-      console.log("Startseite: KeyPair for " + client.name + " updated.");
-      this.clientKeys.set(client, {
-        modulus: keyPair.modulus,
-        exponent: keyPair.e
-      });
-    });
-  }
-
-  constructor(private keyService: KeyManagementService,
-              private configurationService: ConfigurationManagementService,
-              private clientService: ClientService,
-              public dialog: MatDialog,
-              private snackBar: MatSnackBar) {
-  }
-
-  /**
-   * Generiert ein Schlüsselpaar für den Client.
-   */
-  public generateKeys(client: Client) {
-
-    let loadingDialog = this.openLoadDialog();
-
-    let requestContent = createConfigurationDataFrom(
-      this.modulusWidth,
-      this.millerRabinIterations,
-      this.randomSeed,
-      this.numberSystem
-    )
-    this.keyService.generateKeyPair(requestContent, client).subscribe({
-      next: () => {
-        loadingDialog.close()
-        this.showSnackbar("Schlüsselpaar für " + client.name + " generiert.");
-      }
-    });
-  }
-
-  /**
-   * Öffnet den Laden-Dialog.
-   */
-  public openLoadDialog(): MatDialogRef<LoadingDialogComponent> {
-    return this.dialog.open(LoadingDialogComponent, {
-      disableClose: true // Verhindert das Schließen durch den Benutzer
-    });
-  }
-
-  /**
-   * Zeigt eine Snackbar mit der gegebenen Nachricht an.
-   */
-  private showSnackbar(message: string) {
-    this.snackBar.open(message, "Ok", {
-      duration: 4000,
-    })
-  }
-
-  public set modulusWidth(value: number) {
-    this.configurationService.setModulusWidth(value);
-  }
-
-  public get modulusWidth(): number {
-    return this.configurationService.getModulbreite();
-  }
-
-  public set numberSystem(value: number) {
-    this.configurationService.setNumberSystem(value);
-  }
-
-  public get numberSystem(): number {
-    return this.configurationService.getNumberSystem();
-  }
-
-  public set randomSeed(value: number) {
-    this.configurationService.setRandomSeed(value);
-  }
-
-  public get randomSeed(): number {
-    return this.configurationService.getRandomSeed();
-  }
-
-  public set millerRabinIterations(value: number) {
-    this.configurationService.setMillerRabinIterations(value);
-  }
-
-  public get millerRabinIterations(): number {
-    return this.configurationService.getMillerRabinIterations();
-  }
-
-  public getModulus(client: Client): string {
-    return this.clientKeys.get(client)?.modulus || '';
-  }
-
-  public setModulus(client: Client, value: string): void {
-    const keyPair = this.clientKeys.get(client);
-    if (keyPair) {
-      keyPair.modulus = value;
-      this.keyService.setModul(client, value);
-      this.keyService.updateClient(client);
+    constructor(private stateService: StateManagementService,
+                public dialog: MatDialog,
+                private backendRequestService: BackendRequestService,
+                private snackBar: MatSnackBar) {
     }
-  }
 
-  public getExponent(client: Client): string {
-    return this.clientKeys.get(client)?.exponent || '';
-  }
-
-  public setExponent(client: Client, value: string): void {
-    const keyPair = this.clientKeys.get(client);
-    if (keyPair) {
-      keyPair.exponent = value;
-      this.keyService.setE(client, value);
-      this.keyService.updateClient(client);
+    /**
+     * Generiert ein Schlüsselpaar für den Client.
+     */
+    public generateKeys(client: Client) {
+        let requestContent = createConfigurationDataFrom(
+            this.modulusWidth,
+            this.millerRabinIterations,
+            this.randomSeed,
+            this.numberSystem
+        )
+        this.generateKeyPair(requestContent, client);
     }
-  }
 
-  /**
-   * Gibt den BindingContext für die Schlüsselverwaltung dynamischer Clients zurück.
-   */
-  public getBindingContext(client: Client) {
-    const component = this;
-    return {
-      get modulus(): string {
-        return component.getModulus(client);
-      },
-      set modulus(value) {
-        component.setModulus(client, value);
-      },
-      get exponent(): string {
-        return component.getExponent(client);
-      },
-      set exponent(value) {
-        component.setExponent(client, value);
-      },
-    };
-  }
+    /**
+     * Generiert ein Schlüsselpaar mit der gegebenen Konfiguration für den Client.
+     */
+    private generateKeyPair(requestContent: ConfigurationData, client: Client): void {
+        this.backendRequestService.createKeyPair(requestContent).then(
+            (keyPair) => {
+                let loadingDialog = this.openLoadDialog();
+                let entry = this.stateService.getClientKey(client);
+                if (entry) {
+                    entry.set(keyPair);
+                } else {
+                    console.log("Client " + client + " is not registered!");
+                }
+                loadingDialog.close()
+                this.showSnackbar("Schlüsselpaar für " + client.name + " generiert.");
+            }
+        );
+    }
 
-  /**
-   * Öffnet einen Dialog, um einen neuen Client zu erstellen.
-   */
-  public openNameInputDialog(): void {
-    const dialogRef = this.dialog.open(SimpleDialogComponent, {
-      data: {name: "", aborted: false},
-    });
+    /**
+     * Öffnet den Laden-Dialog.
+     */
+    public openLoadDialog(): MatDialogRef<LoadingDialogComponent> {
+        return this.dialog.open(LoadingDialogComponent, {
+            disableClose: true // Verhindert das Schließen durch den Benutzer
+        });
+    }
 
-    dialogRef.afterClosed().subscribe(result => {
-      if (result.aborted) {
-        return;
-      }
-      let newClient = this.clientService.createAndRegisterClient(result.name);
-      this.subscribeToClientKeys(newClient);
-    });
-  }
+    /**
+     * Zeigt eine Snackbar mit der gegebenen Nachricht an.
+     */
+    private showSnackbar(message: string) {
+        this.snackBar.open(message, "Ok", {
+            duration: 4000,
+        })
+    }
 
-  public getClients(): Set<Client> {
-    return this.clientService.getClients();
-  }
+    public set modulusWidth(modulus_width: number) {
+        this.configurationData.update(value => ({
+            ...value,
+            modulus_width
+        }));
+    }
 
-  /**
-   * Löscht einen Client und entfernt alle Registrierungen.
-   */
-  public deleteClient(client: Client) {
-    this.clientService.deleteAndUnregisterClient(client);
-  }
+    public get modulusWidth(): number {
+        return this.configurationData().modulus_width;
+    }
+
+    public set numberSystem(value: number) {
+        this.configurationData.update(data => ({
+            ...data,
+            number_system_base: value
+        }));
+    }
+
+    public get numberSystem(): number {
+        return this.configurationData().number_system_base
+    }
+
+    public set randomSeed(value: number) {
+        this.configurationData.update(data => ({
+            ...data,
+            random_seed: value
+        }));
+    }
+
+    public get randomSeed(): number {
+        return this.configurationData().random_seed;
+    }
+
+    public set millerRabinIterations(value: number) {
+        this.configurationData.update(data => ({
+            ...data,
+            miller_rabin_rounds: value
+        }));
+    }
+
+    public get millerRabinIterations(): number {
+        return this.configurationData().miller_rabin_rounds;
+    }
+
+    public getModulus(client: Client): string {
+        const keyPairSignal = this.stateService.getClientKey(client);
+        return keyPairSignal().modulus || '';
+    }
+
+    public setModulus(client: Client, modulus: string): void {
+        const keyPairSignal = this.stateService.getClientKey(client);
+        keyPairSignal.update(keyPair => ({
+            ...keyPair,
+            modulus
+        }));
+    }
+
+    public getExponent(client: Client): string {
+        const keyPairSignal = this.stateService.getClientKey(client);
+        return keyPairSignal().e || '';
+    }
+
+    public setExponent(client: Client, value: string): void {
+        const keyPair = this.stateService.getClientKey(client);
+        keyPair.update(keyPair => ({
+            ...keyPair,
+            e: value
+        }));
+    }
+
+    /**
+     * Gibt den BindingContext für die Schlüsselverwaltung dynamischer Clients zurück.
+     */
+    public getBindingContext(client: Client) {
+        const component = this;
+        return {
+            get modulus(): string {
+                return component.getModulus(client);
+            },
+            set modulus(value) {
+                component.setModulus(client, value);
+            },
+            get exponent(): string {
+                return component.getExponent(client);
+            },
+            set exponent(value) {
+                component.setExponent(client, value);
+            },
+        };
+    }
+
+    /**
+     * Öffnet einen Dialog, um einen neuen Client zu erstellen.
+     */
+    public openNameInputDialog(): void {
+        const dialogRef = this.dialog.open(SimpleDialogComponent, {
+            data: {name: "", aborted: false},
+        });
+
+        dialogRef.afterClosed().subscribe(result => {
+            if (result.aborted) {
+                return;
+            }
+            this.stateService.createClient(result.name);
+        });
+    }
+
+    public getClients(): Set<Client> {
+        return this.stateService.getAllClients();
+    }
+
+    /**
+     * Löscht einen Client und entfernt alle Registrierungen.
+     */
+    public deleteClient(client: Client) {
+        this.stateService.deleteClient(client);
+    }
 }

@@ -91,13 +91,13 @@
     <div class="element-below-accordion-container" *ngIf="!isCiphertextEmpty()">
         <button mat-fab extended color="primary" [disabled]="!sendingTo" (click)="sendCiphertextAndSignature()">
             <mat-icon>send</mat-icon>
-            <span>Geheimtext an {{sendingTo?.name}} Senden</span>
+            <span>Geheimtext an {{sendingTo.name}} Senden</span>
         </button>
     </div>
     <div class="element-below-accordion-container" *ngIf="!isPlaintextEmpty()">
         <button mat-fab extended color="primary" [disabled]="!sendingTo" (click)="sendPlaintextAndSignature()">
             <mat-icon>send</mat-icon>
-            <span>Klartext an {{sendingTo?.name}} Senden</span>
+            <span>Klartext an {{sendingTo.name}} Senden</span>
         </button>
     </div>
     <div class="element-below-accordion-container form-field-no-hint">
