@@ -84,3 +84,8 @@ pub struct VerifyRequest {
     pub signature: String,
     pub key_pair: KeyPair,
 }
+
+#[derive(Deserialize)]
+pub struct UseFastQuery {
+    pub use_fast: bool,
+}

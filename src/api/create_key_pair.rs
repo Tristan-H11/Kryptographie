@@ -1,9 +1,9 @@
 use actix_web::{HttpResponse, Responder};
-use actix_web::web::Json;
+use actix_web::web::{Json, Query};
 use log::info;
 
+use crate::api::serializable_models::{CreateKeyPairRequest, KeyPair, UseFastQuery};
 use crate::encryption::rsa::rsa_keygen_service::RsaKeygenService;
-use crate::api::serializable_models::{CreateKeyPairRequest, KeyPair};
 
 ///
 /// Erstellt ein neues Schlüsselpaar.
@@ -13,12 +13,18 @@ use crate::api::serializable_models::{CreateKeyPairRequest, KeyPair};
 ///
 /// # Returns
 /// * `HttpResponse` - Die Antwort, die das Schlüsselpaar enthält.
-pub(crate) async fn create_key_pair(req_body: Json<CreateKeyPairRequest>) -> impl Responder {
+pub(crate) async fn create_key_pair(req_body: Json<CreateKeyPairRequest>, query: Query<UseFastQuery>) -> impl Responder {
     info!("Endpunkt /rsa/createKeyPair wurde aufgerufen");
     let req_body: CreateKeyPairRequest = req_body.into_inner();
+    let use_fast = query.use_fast;
 
     let key_gen_service = RsaKeygenService::new(req_body.modulus_width);
-    let (public_key, private_key) = key_gen_service.generate_keypair(req_body.miller_rabin_rounds, req_body.random_seed, req_body.number_system_base, false); //TODO UseFast einbauen
+    let (public_key, private_key) = key_gen_service.generate_keypair(
+        req_body.miller_rabin_rounds,
+        req_body.random_seed,
+        req_body.number_system_base,
+        use_fast,
+    );
 
     let key_pair_response = KeyPair {
         modulus: public_key.get_n_as_str(),
