@@ -2,7 +2,11 @@
     <mat-sidenav class="sidenav" mode="side" opened>
         <div class="inner-sidenav-container">
             <div class="sidenav-header">
-                <mat-icon class="sidenav-logo">lock</mat-icon>
+                <mat-slide-toggle
+                    [(ngModel)]="isTurboMode"
+                    color="warn">
+                    Turbo-Modus
+                </mat-slide-toggle>
                 <div>RSA Implementation</div>
             </div>
 

@@ -9,25 +9,37 @@ import {BackendRequestService} from "./services/backend-api/backend-request.serv
 import {MatSnackBar} from "@angular/material/snack-bar";
 import {Client} from "./models/client";
 import {StateManagementService} from "./services/management/state-management.service";
+import {MatSlideToggleModule} from "@angular/material/slide-toggle";
+import {FormsModule} from "@angular/forms";
 
 @Component({
 	selector: "app-root",
 	standalone: true,
-	imports: [
-		CommonModule,
-		RouterOutlet,
-		RouterLink,
-		MatSidenavModule,
-		MatIconModule,
-		MatDividerModule,
-		MatButtonModule,
-	],
+    imports: [
+        CommonModule,
+        RouterOutlet,
+        RouterLink,
+        MatSidenavModule,
+        MatIconModule,
+        MatDividerModule,
+        MatButtonModule,
+        MatSlideToggleModule,
+        FormsModule,
+    ],
 	templateUrl: "./app.component.html",
 	styleUrls: ["./app.component.scss"]
 })
 export class AppComponent implements OnInit {
 
 	public isServerReachable: boolean = false;
+
+    public get isTurboMode(): boolean {
+        return this.stateService.getUseFastMath()();
+    }
+
+    public set isTurboMode(useFastMath: boolean) {
+        this.stateService.getUseFastMath().update(value => useFastMath);
+    }
 
 	constructor(private backendRequestService: BackendRequestService,
 				private stateService: StateManagementService,
