@@ -5,91 +5,100 @@ import {MessageSignatureContainer} from "../../models/message-signature-containe
 import {ConfigurationData} from "../../models/configuration-data";
 
 @Injectable({
-	providedIn: "root"
+    providedIn: "root"
 })
 export class StateManagementService {
 
-	private configurationData = signal(ConfigurationData.createDefaultConfigurationData());
+    private configurationData = signal(ConfigurationData.createDefaultConfigurationData());
 
-	private clientKeyMap = new Map<Client, WritableSignal<KeyPair>>();
+    private clientKeyMap = new Map<Client, WritableSignal<KeyPair>>();
 
-	private clientMessageMap = new Map<Client, WritableSignal<MessageSignatureContainer>>();
+    private clientMessageMap = new Map<Client, WritableSignal<MessageSignatureContainer>>();
 
-	private clients = new Set<Client>();
+    private clients = new Set<Client>();
 
-	constructor() {
-	}
+    private use_fast_math = signal(false);
 
-	/**
-	 * Erstellt einen Client und fügt ihn bei allen Services hinzu.
-	 */
-	public createClient(clientName: string): void {
-		let client = new Client(clientName);
-		console.log("Registering client " + client.name + " at all services");
-		this.clients.add(client);
-		this.clientKeyMap.set(client, signal(KeyPair.createEmptyKeyPair()));
-		this.clientMessageMap.set(client, signal({plaintext: "", ciphertext: "", signature: ""}));
-	}
+    constructor() {
+    }
 
-	/**
-	 * Gibt einen Client anhand seines Namens zurück.
-	 */
-	public getClientByName(name: string): Client {
-		for (let client of this.clients) {
-			if (client.name === name) {
-				return client;
-			}
-		}
-		console.error("Client " + name + " not found! Creating empty client.");
-		return new Client("");
-	}
+    /**
+     * Gibt das Signal für die Verwendung von FastMath zurück.
+     */
+    public getUseFastMath(): WritableSignal<boolean> {
+        return this.use_fast_math;
+    }
 
-	/**
-	 * Gibt die Menge aller Clients zurück.
-	 */
-	public getAllClients(): Set<Client> {
-		return this.clients;
-	}
+    /**
+     * Erstellt einen Client und fügt ihn bei allen Services hinzu.
+     */
+    public createClient(clientName: string): void {
+        let client = new Client(clientName);
+        console.log("Registering client " + client.name + " at all services");
+        this.clients.add(client);
+        this.clientKeyMap.set(client, signal(KeyPair.createEmptyKeyPair()));
+        this.clientMessageMap.set(client, signal({plaintext: "", ciphertext: "", signature: ""}));
+    }
 
-	/**
-	 * Löscht einen Client und entfernt alle Registrierungen.
-	 */
-	public deleteClient(client: Client): void {
-		this.clients.delete(client);
-		this.clientKeyMap.delete(client);
-		this.clientMessageMap.delete(client);
-	}
+    /**
+     * Gibt einen Client anhand seines Namens zurück.
+     */
+    public getClientByName(name: string): Client {
+        for (let client of this.clients) {
+            if (client.name === name) {
+                return client;
+            }
+        }
+        console.error("Client " + name + " not found! Creating empty client.");
+        return new Client("");
+    }
 
-	/**
-	 * Gibt die Konfigurationsdaten zurück.
-	 */
-	public getConfigurationData() {
-		return this.configurationData;
-	}
+    /**
+     * Gibt die Menge aller Clients zurück.
+     */
+    public getAllClients(): Set<Client> {
+        return this.clients;
+    }
 
-	public getClientKey(client: Client): WritableSignal<KeyPair> {
-		let entry = this.clientKeyMap.get(client);
-		if (entry) {
-			return entry;
-		} else {
-			console.log("Client " + client.name + " is not registered! Returning empty KeyPair and registering client.");
-			this.clientKeyMap.set(client, signal(KeyPair.createEmptyKeyPair()));
-			return this.clientKeyMap.get(client)!; // Wir erstellen es ja in der Zeile davor
-		}
-	}
+    /**
+     * Löscht einen Client und entfernt alle Registrierungen.
+     */
+    public deleteClient(client: Client): void {
+        this.clients.delete(client);
+        this.clientKeyMap.delete(client);
+        this.clientMessageMap.delete(client);
+    }
 
-	/**
-	 * Gibt den MessageSignatureContainer für den Client zurück.
-	 */
-	public getClientMessage(client: Client): WritableSignal<MessageSignatureContainer> {
-		let entry = this.clientMessageMap.get(client);
-		if (entry) {
-			return entry;
-		} else {
-			console.log("Client " + client.name + " is not registered! Returning empty MessageSignatureContainer and registering client.");
-			this.clientMessageMap.set(client, signal({plaintext: "", ciphertext: "", signature: ""}));
-			return this.clientMessageMap.get(client)!; // Wir erstellen es ja in der Zeile davor
-		}
-	}
+    /**
+     * Gibt die Konfigurationsdaten zurück.
+     */
+    public getConfigurationData() {
+        return this.configurationData;
+    }
+
+    public getClientKey(client: Client): WritableSignal<KeyPair> {
+        let entry = this.clientKeyMap.get(client);
+        if (entry) {
+            return entry;
+        } else {
+            console.log("Client " + client.name + " is not registered! Returning empty KeyPair and registering client.");
+            this.clientKeyMap.set(client, signal(KeyPair.createEmptyKeyPair()));
+            return this.clientKeyMap.get(client)!; // Wir erstellen es ja in der Zeile davor
+        }
+    }
+
+    /**
+     * Gibt den MessageSignatureContainer für den Client zurück.
+     */
+    public getClientMessage(client: Client): WritableSignal<MessageSignatureContainer> {
+        let entry = this.clientMessageMap.get(client);
+        if (entry) {
+            return entry;
+        } else {
+            console.log("Client " + client.name + " is not registered! Returning empty MessageSignatureContainer and registering client.");
+            this.clientMessageMap.set(client, signal({plaintext: "", ciphertext: "", signature: ""}));
+            return this.clientMessageMap.get(client)!; // Wir erstellen es ja in der Zeile davor
+        }
+    }
 
 }
