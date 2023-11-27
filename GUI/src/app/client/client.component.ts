@@ -9,15 +9,15 @@ import {Client} from "../models/client";
 import {MatIconModule} from "@angular/material/icon";
 import {MatSnackBar} from "@angular/material/snack-bar";
 import {BackendRequestService} from "../services/backend-api/backend-request.service";
-import {createEncryptDecryptRequestFrom} from "../models/encrypt-decrypt-request";
-import {signRequestFrom} from "../models/sign-request";
-import {verifyRequestFrom} from "../models/verify-request";
 import {ActivatedRoute} from "@angular/router";
 import {MatSelectModule} from "@angular/material/select";
 import {MatCardModule} from "@angular/material/card";
 import {MatMenuModule} from "@angular/material/menu";
 import {StateManagementService} from "../services/management/state-management.service";
 import {KeyPair} from "../models/key-pair";
+import {EncryptDecryptRequest} from "../models/encrypt-decrypt-request";
+import {SignRequest} from "../models/sign-request";
+import {VerifyRequest} from "../models/verify-request";
 
 @Component({
 	selector: "client",
@@ -43,8 +43,8 @@ import {KeyPair} from "../models/key-pair";
  */
 export class ClientComponent implements OnInit {
 
-	private signatureVerificationCalculated: boolean = false;
-	private signatureValid: boolean = false;
+	protected signatureVerificationCalculated: boolean = false;
+	protected signatureValid: boolean = false;
 	private configurationData = this.stateService.getConfigurationData();
 
 	/**
@@ -171,7 +171,7 @@ export class ClientComponent implements OnInit {
 	 * Verschlüsselt die Nachricht.
 	 */
 	public encrypt() {
-		const requestBody = createEncryptDecryptRequestFrom(
+		const requestBody = new EncryptDecryptRequest(
 			this.plainText,
 			this.stateService.getClientKey(this.sendingTo)(),
 			this.configurationData().number_system_base
@@ -186,7 +186,7 @@ export class ClientComponent implements OnInit {
 	 * Entschlüsselt die Nachricht.
 	 */
 	public decrypt() {
-		const requestBody = createEncryptDecryptRequestFrom(
+		const requestBody = new EncryptDecryptRequest(
 			this.cipherText,
 			this.clientKeyPair(),
 			this.configurationData().number_system_base
@@ -201,7 +201,7 @@ export class ClientComponent implements OnInit {
 	 * Berechnet die Signatur des Klartextes.
 	 */
 	public signPlaintext() {
-		const requestBody = signRequestFrom(
+		const requestBody = new SignRequest(
 			this.plainText,
 			this.clientKeyPair(),
 		);
@@ -215,7 +215,7 @@ export class ClientComponent implements OnInit {
 	 * Berechnet die Signatur des Chiffrats.
 	 */
 	public signCiphertext() {
-		const requestBody = signRequestFrom(
+		const requestBody = new SignRequest(
 			this.cipherText,
 			this.clientKeyPair(),
 		);
@@ -229,7 +229,7 @@ export class ClientComponent implements OnInit {
 	 * Verifiziert die Signatur des Klartextes.
 	 */
 	public verifyPlaintext() {
-		const requestBody = verifyRequestFrom(
+		const requestBody = new VerifyRequest(
 			this.plainText,
 			this.signature,
 			this.stateService.getClientKey(this.receivedFrom)(),
@@ -246,7 +246,7 @@ export class ClientComponent implements OnInit {
 	 * Verifiziert die Signatur des Chiffrats.
 	 */
 	public verifyCiphertext() {
-		const requestBody = verifyRequestFrom(
+		const requestBody = new VerifyRequest(
 			this.cipherText,
 			this.signature,
 			this.stateService.getClientKey(this.receivedFrom)(),
