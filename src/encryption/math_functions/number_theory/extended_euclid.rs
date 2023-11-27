@@ -24,24 +24,24 @@ impl ExtendedEuclid {
     /// * `n` - Die Zahl, welche mit dem Modul verechnet werden soll.
     /// * `modul` - Die Modulo-Zahl, gegen die der Algorithmus durchgeführt wird.
     /// * `use_fast` - Gibt an, ob die eigene Implementation oder die von `num` verwendet werden soll.
-    pub fn calculate(n: &BigInt, modul: &BigInt, use_fast: bool) -> (BigInt, BigInt, BigInt) {
+    pub fn calculate(a: &BigInt, b: &BigInt, use_fast: bool) -> (BigInt, BigInt, BigInt) {
         return if use_fast {
-            ExtendedEuclid::fast(n, modul)
+            ExtendedEuclid::fast(a, b)
         } else {
-            ExtendedEuclid::own(n, modul)
+            ExtendedEuclid::own(a, b)
         };
     }
 
-    fn fast(n: &BigInt, modul: &BigInt) -> (BigInt, BigInt, BigInt) {
-        let e = n.extended_gcd(modul);
+    fn fast(a: &BigInt, b: &BigInt) -> (BigInt, BigInt, BigInt) {
+        let e = a.extended_gcd(b);
         (e.gcd, e.x, e.y)
     }
 
-    fn own(n: &BigInt, modul: &BigInt) -> (BigInt, BigInt, BigInt) {
+    fn own(a: &BigInt, b: &BigInt) -> (BigInt, BigInt, BigInt) {
         //rotierendes Array, zur Berechnung und Speicherung der Faktoren `x` und `y`
         let mut xy = [BigInt::one(), BigInt::zero(), BigInt::zero(), BigInt::one()];
-        let mut m = modul.clone();
-        let mut n = n.clone();
+        let mut m = b.clone();
+        let mut n = a.clone();
         while !m.is_zero() {
             // Berechnet die Faktoren und speichert sie in einem rotierenden Array.
             let div = &n / &m;
