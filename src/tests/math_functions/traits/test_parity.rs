@@ -1,8 +1,9 @@
 #[cfg(test)]
 mod tests {
-    use crate::{big_i, big_u};
+    use bigdecimal::num_bigint::BigInt;
+
+    use crate::big_i;
     use crate::encryption::math_functions::traits::parity::Parity;
-    use bigdecimal::num_bigint::{BigInt, BigUint};
 
     #[test]
     fn test_is_even() {

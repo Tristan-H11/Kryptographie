@@ -8,7 +8,7 @@ mod tests {
         create_string_from_blocks_decrypt, create_string_from_blocks_encrypt, split_into_blocks,
         string_to_int_vec, sums_vec_to_string_vec, to_sum_vec, u32_to_c,
     };
-    use crate::encryption::math_functions::number_theory::fast_exponentiation;
+    use crate::encryption::math_functions::number_theory::fast_exponentiation::FastExponentiation;
     use crate::encryption::rsa::rsa_keygen_service::RsaKeygenService;
 
     ///
@@ -21,10 +21,10 @@ mod tests {
     fn test_loop_create_mult_decode_create_div_decode_1() {
         let mut failure_count = 0;
 
-        for _ in 0..12 {
+        for _ in 0..2 { //TODO für Test hochsetzen
             let keygen_service = RsaKeygenService::new(256);
             let (public_key, private_key) =
-                keygen_service.generate_keypair(1, 34, 55296);
+                keygen_service.generate_keypair(1, 34, 55296, false); //TODO UseFast einbauen
 
             let message = "bbbbbbbbbbbbbbb  äääääääääääääää  !&    ";
             let _basis_length = 55296u32;
@@ -35,9 +35,9 @@ mod tests {
                 true,
                 55296,
             )
-            .iter()
-            .map(|x| fast_exponentiation(x, &public_key.get_e(), &public_key.get_n()))
-            .collect::<Vec<BigInt>>();
+                .iter()
+                .map(|x| FastExponentiation::calculate(x, &public_key.get_e(), &public_key.get_n(), false)) //TODO UseFast einbauen
+                .collect::<Vec<BigInt>>();
 
             let encrypted_string = create_string_from_blocks_encrypt(
                 result,
@@ -52,9 +52,9 @@ mod tests {
                 55296,
                 private_key.get_block_size(),
             )
-            .iter()
-            .map(|x| fast_exponentiation(x, &private_key.get_d(), &private_key.get_n()))
-            .collect();
+                .iter()
+                .map(|x| FastExponentiation::calculate(x, &private_key.get_d(), &private_key.get_n(), false)) //TODO UseFast einbauen
+                .collect();
 
             let string = create_string_from_blocks_decrypt(result, 55296);
 

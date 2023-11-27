@@ -30,7 +30,7 @@ impl ModuloInverse {
 
     /// Eigene Implementation des modularen Inversen.
     fn modulo_inverse(n: &BigInt, modul: &BigInt, use_fast: bool) -> Result<BigInt, Error> {
-        let (ggt, _x, y) = ExtendedEuclid::calculate(n , modul, use_fast);
+        let (ggt, _x, y) = ExtendedEuclid::calculate(modul, n, use_fast);
         // Wenn ggT nicht 1, existiert kein Inverse. -> Error
         if !ggt.is_one() {
             let no_inverse_error = Error::new(ErrorKind::InvalidInput, format!("n hat keinen Inverse"));

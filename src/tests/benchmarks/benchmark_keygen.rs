@@ -1,9 +1,8 @@
 #[cfg(test)]
 mod tests {
-    use crate::big_i;
-    use crate::encryption::rsa::rsa_keygen_service::RsaKeygenService;
-    use bigdecimal::num_bigint::BigInt;
     use std::time::Instant;
+
+    use crate::encryption::rsa::rsa_keygen_service::RsaKeygenService;
 
     #[test]
     fn key_gen_timing_test() {
@@ -15,7 +14,7 @@ mod tests {
 
         for _i in 0..n {
             let start = Instant::now();
-            keygen_service.generate_keypair(100, 13, 55296);
+            keygen_service.generate_keypair(100, 13, 55296, false); //TODO UseFast einbauen
             let end = Instant::now();
             times.push(end.duration_since(start).as_millis());
         }

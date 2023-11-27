@@ -11,14 +11,15 @@ mod sign_verify_test {
         let (public_key, private_key) = keygen.generate_keypair(
             10,
             17,
-            g_base
-        );
+            g_base,
+            false,
+        ); //TODO UseFast einbauen
 
         let message = "Die Nachricht soll signiert werden.";
 
-        let signature = private_key.sign(&message);
+        let signature = private_key.sign(&message, false); //TODO UseFast einbauen
 
-        let is_valid = public_key.verify(&signature, &message);
+        let is_valid = public_key.verify(&signature, &message, false); //TODO UseFast einbauen
         assert!(is_valid);
     }
 
@@ -31,14 +32,15 @@ mod sign_verify_test {
         let (public_key, private_key) = keygen.generate_keypair(
             10,
             13,
-            g_base
-        );
+            g_base,
+            false
+        ); //TODO UseFast einbauen
 
         let message = "Die Nachricht soll signiert werden.";
 
-        let signature = private_key.sign(&message);
+        let signature = private_key.sign(&message, false); //TODO UseFast einbauen
 
-        let is_valid = public_key.verify(&signature, &message);
+        let is_valid = public_key.verify(&signature, &message, false); //TODO UseFast einbauen
         // Assert NOT is_valid, because the key is too small and thus the message is truncated.
         assert!(!is_valid);
     }

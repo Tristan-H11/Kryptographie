@@ -121,7 +121,7 @@ impl PrimalityTest {
         let mut r = BigInt::zero();
 
         while &r < s {
-            x = FastExponentiation::calculate(&x, d, p, use_fast);
+            x = FastExponentiation::calculate(&x, &big_i!(2), p, use_fast);
             if x == p.decrement() {
                 return true;
             }
