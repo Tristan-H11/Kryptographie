@@ -1,6 +1,6 @@
 use std::str::FromStr;
-use log::debug;
 
+use log::debug;
 use serde::{Deserialize, Serialize};
 
 use crate::encryption::rsa::keys::{PrivateKey, PublicKey};

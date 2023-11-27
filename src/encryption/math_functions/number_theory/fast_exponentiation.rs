@@ -1,8 +1,8 @@
 use num::{BigInt, One, Zero};
 use num::traits::Euclid;
+
 use crate::encryption::math_functions::traits::divisible::Divisible;
 use crate::encryption::math_functions::traits::parity::Parity;
-use crate::encryption::math_functions::traits::rapid_math_ops::RapidMathOps;
 
 ///
 /// Berechnet die schnelle Exponentiation der Potenz und Reduzierung um einen Modul.
@@ -16,25 +16,12 @@ use crate::encryption::math_functions::traits::rapid_math_ops::RapidMathOps;
 /// ```
 /// fast_exponentiation(95, 130, 7) // => '4'
 /// ```
-pub struct FastExponentiation {
-    base: BigInt,
-    exponent: BigInt,
-    modul: BigInt,
-}
+pub struct FastExponentiation {}
 
-impl RapidMathOps<BigInt> for FastExponentiation {
-    fn fast(&self) -> BigInt {
-        self.base.modpow(&self.exponent, &self.modul)
-    }
-
-    fn own(&self) -> BigInt {
-        self.fast_exponentiation(&self.base, &self.exponent, &self.modul)
-    }
-}
 
 impl FastExponentiation {
     ///
-    /// Erstellt eine neue Instanz von FastExponentiation.
+    /// Berechnet die schnelle Exponentiation der Potenz und Reduzierung um einen Modul.
     ///
     /// # Argumente
     ///
@@ -42,24 +29,19 @@ impl FastExponentiation {
     /// * `exponent`- Der Exponent zur Berechnung der Potenz.
     /// * `modul` - Der Modul, durch den reduziert werden soll.
     ///
-    pub fn new(base: BigInt, exponent: BigInt, modul: BigInt) -> Self {
-        FastExponentiation {
-            base,
-            exponent,
-            modul,
-        }
+    pub fn calculate(base: &BigInt, exponent: &BigInt, modul: &BigInt, use_fast: bool) -> BigInt {
+        return if use_fast {
+            FastExponentiation::fast(base, exponent, modul)
+        } else {
+            FastExponentiation::own(base, exponent, modul)
+        };
     }
 
-    ///
-    /// Setzt die Basis der Potenz auf einen neuen Wert, um kein neues Objekt erstellen zu müssen.
-    ///
-    pub fn set_base(&mut self, base: BigInt) {
-        self.base = base;
+    fn fast(base: &BigInt, exponent: &BigInt, modul: &BigInt) -> BigInt {
+        base.modpow(exponent, modul)
     }
 
-    /// Schnelle Exponentiation der Potenz und Reduzierung um einen Modul.
-    /// Alternativer Ansatz von Herrn Elsner zur schnellen Exponentiation durch Halbieren der Potenz.
-    fn fast_exponentiation(base: &BigInt, exponent: &BigInt, modul: &BigInt) -> BigInt {
+    fn own(base: &BigInt, exponent: &BigInt, modul: &BigInt) -> BigInt {
         // Sonderbedingungen der Exponentiation
         if modul.is_one() {
             return BigInt::zero();

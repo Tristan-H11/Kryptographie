@@ -14,7 +14,7 @@ pub(crate) async fn decrypt(req_body: Json<EncryptDecryptRequest>) -> impl Respo
     let private_key = req_body.key_pair.to_private_key();
     let number_system_base = req_body.number_system_base;
 
-    let plaintext = private_key.decrypt(&ciphertext, number_system_base);
+    let plaintext = private_key.decrypt(&ciphertext, number_system_base, false); //TODO UseFast einbauen
     let response = SingleStringResponse {
         message: plaintext
     };

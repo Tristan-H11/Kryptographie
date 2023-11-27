@@ -1,9 +1,11 @@
-use crate::encryption::math_functions::number_theory::fast_exponentiation;
-use crate::encryption::math_functions::traits::increment::Increment;
-use bigdecimal::num_bigint::BigInt;
-use bigdecimal::{One, Zero};
 use std::collections::HashMap;
 use std::io::{Error, ErrorKind};
+
+use bigdecimal::{One, Zero};
+use bigdecimal::num_bigint::BigInt;
+
+use crate::encryption::math_functions::number_theory::fast_exponentiation::FastExponentiation;
+use crate::encryption::math_functions::traits::increment::Increment;
 
 ///
 /// Berechnet den Logarithmus eines Elementes einer Restklasse zur einer Basis
@@ -25,18 +27,18 @@ use std::io::{Error, ErrorKind};
 ///
 /// TODO: Liste sortieren nach Größe zweiter Komponente
 /// TODO: Error wenn falsche Eingabe (Modul keine Primzahl etc.)
-pub fn shanks(base: &BigInt, element: &BigInt, modul: &BigInt) -> Result<BigInt, Error> {
+pub fn shanks(base: &BigInt, element: &BigInt, modul: &BigInt, use_fast: bool) -> Result<BigInt, Error> {
     //aufrundung: nachkommateil abschneiden (to_bigint) +1
     let mut m = (modul - BigInt::one()).sqrt();
     if (&m * &m) != (modul - BigInt::one()) {
         m += BigInt::one();
     }
 
-    let g_ex_m = fast_exponentiation(base, &m, modul);
+    let g_ex_m = FastExponentiation::calculate(base, &m, modul, use_fast);
     let mut hash: HashMap<BigInt, BigInt> = HashMap::new();
     let mut j = BigInt::zero();
     while j < m {
-        let giantstep = fast_exponentiation(&g_ex_m, &j, modul);
+        let giantstep = FastExponentiation::calculate(&g_ex_m, &j, modul, use_fast);
         hash.insert(j.clone(), giantstep);
         j.increment_assign();
     }
@@ -45,7 +47,7 @@ pub fn shanks(base: &BigInt, element: &BigInt, modul: &BigInt) -> Result<BigInt,
     while i < m {
         j = BigInt::zero();
         let babystep =
-            (element * fast_exponentiation(base, &(modul - BigInt::one() - &i), modul)) % modul;
+            (element * FastExponentiation::calculate(base, &(modul - BigInt::one() - &i), modul, use_fast)) % modul;
         while j < m {
             if hash.get(&j).unwrap() == &babystep {
                 return Ok((&m * &j + &i) % (modul - BigInt::one()));
@@ -64,10 +66,10 @@ pub fn shanks(base: &BigInt, element: &BigInt, modul: &BigInt) -> Result<BigInt,
     return Err(no_exponent_error);
 }
 
-pub fn log_naiv(base: &BigInt, element: &BigInt, modul: &BigInt) -> Result<BigInt, Error> {
+pub fn log_naiv(base: &BigInt, element: &BigInt, modul: &BigInt, use_fast: bool) -> Result<BigInt, Error> {
     let mut x = BigInt::one();
     while &x < modul {
-        if &fast_exponentiation(base, &x, modul) == element {
+        if &FastExponentiation::calculate(base, &x, modul, use_fast) == element {
             return Ok(x);
         }
         x.increment_assign();

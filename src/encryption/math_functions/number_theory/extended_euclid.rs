@@ -1,5 +1,4 @@
 use num::{BigInt, Integer, One, Zero};
-use crate::encryption::math_functions::traits::rapid_math_ops::RapidMathOps;
 
 /// Implementiert den erweiterten euklidischen Algorithmus.
 ///
@@ -15,41 +14,30 @@ use crate::encryption::math_functions::traits::rapid_math_ops::RapidMathOps;
 /// * (ggT(n,modul),x,y)
 /// Ein tripel aus dem groessten gemeinsamen Teiler einer Zahl `n` und dem `modul`,
 /// sowie den zwei Faktoren `x` und `y`.
-pub struct ExtendedEuclid {
-    n: BigInt,
-    modul: BigInt,
-}
-
-impl RapidMathOps<(BigInt, BigInt, BigInt)> for ExtendedEuclid {
-    fn fast(&self) -> (BigInt, BigInt, BigInt) {
-        let e = self.n.extended_gcd(&self.modul);
-        (e.gcd, e.x, e.y)
-    }
-
-    fn own(&self) -> (BigInt, BigInt, BigInt) {
-        self.extended_euclid(&self.n, &self.modul)
-    }
-}
+pub struct ExtendedEuclid {}
 
 impl ExtendedEuclid {
-    /// Erstellt eine neue Instanz von ExtendedEuclid.
+    /// Führt den erweiterten euklidischen Algorithmus aus.
     ///
     /// # Argumente
     ///
     /// * `n` - Die Zahl, welche mit dem Modul verechnet werden soll.
     /// * `modul` - Die Modulo-Zahl, gegen die der Algorithmus durchgeführt wird.
-    pub fn new(n: BigInt, modul: BigInt) -> Self {
-        ExtendedEuclid {
-            n,
-            modul,
-        }
+    /// * `use_fast` - Gibt an, ob die eigene Implementation oder die von `num` verwendet werden soll.
+    pub fn calculate(n: &BigInt, modul: &BigInt, use_fast: bool) -> (BigInt, BigInt, BigInt) {
+        return if use_fast {
+            ExtendedEuclid::fast(n, modul)
+        } else {
+            ExtendedEuclid::own(n, modul)
+        };
     }
 
-    /// Setzt das n neu, um kein neues Objekt erstellen zu müssen.
-    pub fn setN(&mut self,
+    fn fast(n: &BigInt, modul: &BigInt) -> (BigInt, BigInt, BigInt) {
+        let e = n.extended_gcd(modul);
+        (e.gcd, e.x, e.y)
+    }
 
-    /// Eigene Implementation des erweiterten Euklischen Algorithmus.
-    fn extended_euclid(n: &BigInt, modul: &BigInt) -> (BigInt, BigInt, BigInt) {
+    fn own(n: &BigInt, modul: &BigInt) -> (BigInt, BigInt, BigInt) {
         //rotierendes Array, zur Berechnung und Speicherung der Faktoren `x` und `y`
         let mut xy = [BigInt::one(), BigInt::zero(), BigInt::zero(), BigInt::one()];
         let mut m = modul.clone();

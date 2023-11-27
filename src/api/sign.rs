@@ -13,7 +13,7 @@ pub(crate) async fn sign(req_body: Json<SignRequest>) -> impl Responder {
     let plaintext = req_body.plaintext;
     let private_key = req_body.key_pair.to_private_key();
 
-    let signature = private_key.sign(&plaintext);
+    let signature = private_key.sign(&plaintext, false); //TODO UseFast einbauen
     let response = SingleStringResponse {
         message: signature
     };

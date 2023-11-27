@@ -4,10 +4,10 @@ use log::{debug, trace};
 
 use crate::big_i;
 use crate::encryption::math_functions::number_theory::extended_euclid::ExtendedEuclid;
+use crate::encryption::math_functions::number_theory::modulo_inverse::ModuloInverse;
 use crate::encryption::math_functions::number_theory::primality_test::PrimalityTest;
 use crate::encryption::math_functions::random_elsner::RandomElsner;
 use crate::encryption::math_functions::traits::increment::Increment;
-use crate::encryption::math_functions::traits::rapid_math_ops::RapidMathOps;
 use crate::encryption::rsa::keys::{PrivateKey, PublicKey};
 
 ///
@@ -50,6 +50,7 @@ impl RsaKeygenService {
         miller_rabin_iterations: u32,
         random_seed: u32,
         g_base: u32,
+        use_fast: bool,
     ) -> (PublicKey, PrivateKey) {
         debug!(
             "Generiere Schlüsselpaar mit key_size {} und Miller-Rabin-Iterations {}",
@@ -58,14 +59,14 @@ impl RsaKeygenService {
         let random_generator = &mut RandomElsner::new(&big_i!(random_seed));
 
         let (prime_one, prime_two) =
-            self.get_distinct_primes(miller_rabin_iterations, random_generator);
+            self.get_distinct_primes(miller_rabin_iterations, random_generator, use_fast);
 
         let n = &prime_one * &prime_two;
         debug!("n ist {}", n);
 
         let phi = (&prime_one - BigInt::one()) * (&prime_two - BigInt::one());
-        let e = self.generate_e(&phi, random_generator);
-        let d = self.generate_d(&e, &phi);
+        let e = self.generate_e(&phi, random_generator, use_fast);
+        let d = self.generate_d(&e, &phi, use_fast);
         let public_key = PublicKey::new(e, n.clone(), g_base);
         let private_key = PrivateKey::new(d, n, g_base);
         debug!("Schlüsselpaar generiert");
@@ -79,14 +80,15 @@ impl RsaKeygenService {
         &self,
         miller_rabin_iterations: u32,
         random_generator: &mut RandomElsner,
+        use_fast: bool,
     ) -> (BigInt, BigInt) {
         let prim_size = self.key_size / 2;
 
         let n = &mut 1u128;
 
         let (prime_one, mut prime_two) = (
-            self.generate_prime(prim_size, miller_rabin_iterations, random_generator, n),
-            self.generate_prime(prim_size, miller_rabin_iterations, random_generator, n),
+            self.generate_prime(prim_size, miller_rabin_iterations, random_generator, n, use_fast),
+            self.generate_prime(prim_size, miller_rabin_iterations, random_generator, n, use_fast),
         );
         while prime_one == prime_two {
             trace!(
@@ -94,7 +96,7 @@ impl RsaKeygenService {
                 prime_one,
                 prime_two
             );
-            prime_two = self.generate_prime(prim_size, miller_rabin_iterations, random_generator, n);
+            prime_two = self.generate_prime(prim_size, miller_rabin_iterations, random_generator, n, use_fast);
         }
         (prime_one, prime_two)
     }
@@ -118,6 +120,7 @@ impl RsaKeygenService {
         miller_rabin_iterations: u32,
         random_generator: &RandomElsner,
         index_for_random_generator: &mut u128,
+        use_fast: bool,
     ) -> BigInt {
         debug!(
             "Generiere eine Primzahl mit size {} und Miller-Rabin-Iterations {}",
@@ -127,16 +130,14 @@ impl RsaKeygenService {
         let upper_bound = &big_i!(2).pow(size);
         let lower_bound = &big_i!(2).pow(size - 1);
 
-        let prime_candidate = random_generator.take_uneven(lower_bound, upper_bound, index_for_random_generator);
-        let mut prime_tester = PrimalityTest::new(prime_candidate.clone(), miller_rabin_iterations, random_generator);
+        let mut prime_candidate = random_generator.take_uneven(lower_bound, upper_bound, index_for_random_generator);
 
-        while !prime_tester.calculate(false) { // TODO useFast durchreichen
+        while !PrimalityTest::calculate(&prime_candidate, miller_rabin_iterations, random_generator, use_fast) {
             trace!(
                 "Generierter Primkandidat {} ist keine Primzahl",
                 prime_candidate
             );
-            let new_prime_candidate = random_generator.take_uneven(lower_bound, upper_bound, index_for_random_generator);
-            prime_tester.set_prime_candidate(new_prime_candidate)
+            prime_candidate = random_generator.take_uneven(lower_bound, upper_bound, index_for_random_generator);
         }
         debug!(
             "Generierter Primkandidat {} ist eine Primzahl",
@@ -156,20 +157,18 @@ impl RsaKeygenService {
     ///
     /// Die generierte Zahl `e`.
     ///
-    fn generate_e(&self, phi: &BigInt, random_generator: &RandomElsner) -> BigInt {
+    fn generate_e(&self, phi: &BigInt, random_generator: &RandomElsner, use_fast: bool) -> BigInt {
         debug!("Generiere e mit phi {}", phi);
 
         let mut e = random_generator.take(&big_i!(3u8), &phi.decrement(), &mut 1);
-        let mut extended_euclid = ExtendedEuclid::new(e.clone(), phi.clone());
         while e < *phi {
-            let euclid = &extended_euclid.calculate(false).0; //TODO useFast durchreichen
-            if euclid.is_one() {
+            let ggt = ExtendedEuclid::calculate(&e, phi, use_fast).0;
+            if ggt.is_one() {
                 debug!("Generierter e {} ist relativ prim zu phi {}", e, phi);
                 return e;
             }
             trace!("Generierter e {} ist nicht relativ prim zu phi {}", e, phi);
             e.increment_assign();
-            extended_euclid.
         }
         panic!("Kein e gefunden, das relativ prim zu phi {} ist", phi);
     }
@@ -187,9 +186,9 @@ impl RsaKeygenService {
     ///
     /// Die generierte Zahl `d`.
     ///
-    fn generate_d(&self, e: &BigInt, phi: &BigInt) -> BigInt {
+    fn generate_d(&self, e: &BigInt, phi: &BigInt, use_fast: bool) -> BigInt {
         trace!("Generiere d mit e {} und phi {}", e, phi);
-        let d = match modulo_inverse(e, phi) {
+        let d = match ModuloInverse::calculate(e, phi, use_fast) {
             Ok(d) => d,
             Err(_) => panic!("Kein d gefunden, das e * d = 1 mod phi erfüllt"),
         };

@@ -14,7 +14,7 @@ pub(crate) async fn verify(req_body: Json<VerifyRequest>) -> impl Responder {
     let signature = req_body.signature;
     let public_key = req_body.key_pair.to_public_key();
 
-    let plaintext = public_key.verify(&signature, &plaintext);
+    let plaintext = public_key.verify(&signature, &plaintext, false); //TODO UseFast einbauen
     let response = SingleStringResponse {
         message: plaintext.to_string()
     };

@@ -14,7 +14,7 @@ pub(crate) async fn encrypt(req_body: Json<EncryptDecryptRequest>) -> impl Respo
     let public_key = req_body.key_pair.to_public_key();
     let number_system_base = req_body.number_system_base;
 
-    let ciphertext = public_key.encrypt(&plaintext, number_system_base);
+    let ciphertext = public_key.encrypt(&plaintext, number_system_base, false); //TODO UseFast einbauen
     let response = SingleStringResponse {
         message: ciphertext
     };

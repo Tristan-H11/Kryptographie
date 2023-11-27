@@ -18,7 +18,7 @@ pub(crate) async fn create_key_pair(req_body: Json<CreateKeyPairRequest>) -> imp
     let req_body: CreateKeyPairRequest = req_body.into_inner();
 
     let key_gen_service = RsaKeygenService::new(req_body.modulus_width);
-    let (public_key, private_key) = key_gen_service.generate_keypair(req_body.miller_rabin_rounds, req_body.random_seed, req_body.number_system_base);
+    let (public_key, private_key) = key_gen_service.generate_keypair(req_body.miller_rabin_rounds, req_body.random_seed, req_body.number_system_base, false); //TODO UseFast einbauen
 
     let key_pair_response = KeyPair {
         modulus: public_key.get_n_as_str(),
