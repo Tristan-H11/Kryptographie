@@ -26,7 +26,8 @@ import {StateManagementService} from "./services/management/state-management.ser
 	styleUrls: ["./app.component.scss"]
 })
 export class AppComponent implements OnInit {
-	title = "RSA-Encryption-Tool";
+
+	public isServerReachable: boolean = false;
 
 	constructor(private backendRequestService: BackendRequestService,
 				private stateService: StateManagementService,
@@ -36,6 +37,10 @@ export class AppComponent implements OnInit {
 	ngOnInit(): void {
 		this.stateService.createClient("Alice");
 		this.stateService.createClient("Bob");
+
+		this.backendRequestService.checkHealth().then((result) => {
+			this.isServerReachable = result;
+		});
 	}
 
 

@@ -22,6 +22,7 @@
   width: 100%;
   margin-bottom: 1vh;
 }
+
 .sidenav-content {
   height: 96vh;
   width: 77vw;
@@ -67,4 +68,11 @@
   flex-direction: column;
   row-gap: 1vh;
   justify-content: flex-end;
+}
+
+.big-server-not-reachable-text {
+  font-size: 2.5vh;
+  font-weight: bold;
+  text-align: center;
+  margin-top: 40vh;
 }
