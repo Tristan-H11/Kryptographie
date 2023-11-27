@@ -2,11 +2,11 @@
  * Darstellung der Clients.
  */
 export class Client {
-    public name = "";
-    public sendingTo: Client | undefined;
-    public receivedFrom: Client | undefined;
+	public name = "";
+	public sendingTo: Client | undefined;
+	public receivedFrom: Client | undefined;
 
-    constructor(name: string) {
-        this.name = name;
-    }
+	constructor(name: string) {
+		this.name = name;
+	}
 }

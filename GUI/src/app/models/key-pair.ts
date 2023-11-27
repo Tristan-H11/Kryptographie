@@ -1,35 +1,22 @@
 /**
  * Schnittstelle für ein KeyPair-Objekt.
  */
-export interface KeyPair {
-  modulus: string;
-  e: string;
-  d: string;
-  block_size_pub: string;
-  block_size_priv: string;
-}
+export class KeyPair {
+	modulus: string;
+	e: string;
+	d: string;
+	block_size_pub: string;
+	block_size_priv: string;
 
-/**
- * Erstellt ein neues KeyPair-Objekt aus den übergebenen Parametern.
- * @param modulus Modulus
- * @param e Exponent
- * @param d Privater Exponent
- * @param block_size_pub Blockgröße für den öffentlichen Schlüssel
- * @param block_size_priv Blockgröße für den privaten Schlüssel
- */
-export function createKeyPairFrom(modulus: string, e: string, d: string, block_size_pub: string, block_size_priv: string): KeyPair {
-  return {
-    modulus: modulus,
-    e: e,
-    block_size_pub: block_size_pub,
-    d: d,
-    block_size_priv: block_size_priv
-  }
-}
+	constructor(modulus: string, e: string, d: string, block_size_pub: string, block_size_priv: string) {
+		this.modulus = modulus;
+		this.e = e;
+		this.d = d;
+		this.block_size_pub = block_size_pub;
+		this.block_size_priv = block_size_priv;
+	}
 
-/**
- * Erstellt ein leeres KeyPair-Objekt.
- */
-export function createEmptyKeyPair() {
-  return createKeyPairFrom("", "", "", "", "");
+	public static createEmptyKeyPair() {
+		return new KeyPair("", "", "", "", "");
+	}
 }

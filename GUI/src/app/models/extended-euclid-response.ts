@@ -1,13 +1,11 @@
-export interface ExtendedEuclidResponse {
-    ggt: string;
-    x: string;
-    y: string;
-}
+export class ExtendedEuclidResponse {
+	ggt: string;
+	x: string;
+	y: string;
 
-export function createExtendedEuclidResponseFrom(ggt: string, x: string, y: string): ExtendedEuclidResponse {
-    return {
-        ggt: ggt,
-        x: x,
-        y: y
-    }
+	constructor(ggt: string, x: string, y: string) {
+		this.ggt = ggt;
+		this.x = x;
+		this.y = y;
+	}
 }

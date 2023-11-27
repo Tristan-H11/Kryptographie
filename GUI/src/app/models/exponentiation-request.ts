@@ -1,16 +1,14 @@
 /**
  * Modell für die Anfrage der Berechnung einer Exponentiation.
  */
-export interface ExponentiationRequest {
-  exponent: string;
-  base: string;
-  modulus: string;
-}
+export class ExponentiationRequest {
+	exponent: string;
+	base: string;
+	modulus: string;
 
-export function createExponentiationRequestFrom(exponent: string, base: string, modulus: string): ExponentiationRequest {
-  return {
-    exponent: exponent,
-    base: base,
-    modulus: modulus
-  }
+	constructor(exponent: string, base: string, modulus: string) {
+		this.exponent = exponent;
+		this.base = base;
+		this.modulus = modulus;
+	}
 }

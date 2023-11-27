@@ -1,37 +1,24 @@
 /**
  * ConfigurationData stellt die Datenstruktur für die Konfiguration der wichtigen RSA Eigenschaften bereit.
  */
-export interface ConfigurationData {
-  modulus_width: number;
-  miller_rabin_rounds: number;
-  random_seed: number;
-  number_system_base: number;
+export class ConfigurationData {
+	modulus_width: number;
+	miller_rabin_rounds: number;
+	random_seed: number;
+	number_system_base: number;
+
+	constructor(modulus_width: number,
+				miller_rabin_rounds: number,
+				random_seed: number,
+				number_system_base: number) {
+		this.modulus_width = modulus_width;
+		this.miller_rabin_rounds = miller_rabin_rounds;
+		this.random_seed = random_seed;
+		this.number_system_base = number_system_base;
+	}
+
+	public static createDefaultConfigurationData(): ConfigurationData {
+		return new ConfigurationData(4096, 100, 13, 55296);
+	}
 }
 
-/**
- * Erstellt ein ConfigurationData-Objekt.
- */
-export function createConfigurationDataFrom(modulus_width: number,
-                                            miller_rabin_rounds: number,
-                                            random_seed: number,
-                                            number_system_base: number
-): ConfigurationData {
-  return {
-    modulus_width,
-    miller_rabin_rounds,
-    random_seed,
-    number_system_base
-  };
-}
-
-/**
- * Erstellt ein leeres ConfigurationData-Objekt.
- */
-export function createDefaultConfigurationData(): ConfigurationData {
-  return {
-    modulus_width: 4096,
-    miller_rabin_rounds: 100,
-    random_seed: 13,
-    number_system_base: 55296
-  };
-}
