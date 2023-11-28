@@ -4,6 +4,7 @@ mod decrypt;
 mod encrypt;
 mod exponentiation;
 mod extended_euclid;
+mod modular_inverse;
 mod serializable_models;
 mod shanks;
 mod sign;

@@ -1,0 +1,45 @@
+<mat-accordion multi>
+    <mat-expansion-panel expanded>
+        <mat-expansion-panel-header>
+            <mat-panel-title>
+                Parameter für Modular-Inverse Berechnung
+            </mat-panel-title>
+            <mat-panel-description>
+                Berechnungen des modularen Inversen
+            </mat-panel-description>
+        </mat-expansion-panel-header>
+
+        <mat-form-field appearance="outline" class="width-100">
+            <mat-label>Basis</mat-label>
+            <textarea matInput placeholder="Die Zahl für das Modular Inverse"
+                      [(ngModel)]="n"></textarea>
+        </mat-form-field>
+        <mat-form-field appearance="outline" class="width-100">
+            <mat-label>Modul</mat-label>
+            <textarea matInput placeholder="Der Modul für das Modular Inverse"
+                      [(ngModel)]="modul"></textarea>
+        </mat-form-field>
+
+        <mat-action-row>
+            <button mat-raised-button color="primary" (click)="calculate()">Berechnen</button>
+        </mat-action-row>
+    </mat-expansion-panel>
+
+    <mat-expansion-panel expanded>
+        <mat-expansion-panel-header>
+            <mat-panel-title>
+                Ergebnis
+            </mat-panel-title>
+            <mat-panel-description>
+                Das Ergebnis des modular Inversen
+            </mat-panel-description>
+        </mat-expansion-panel-header>
+
+        <mat-form-field appearance="outline" class="width-100">
+            <mat-label>Basis</mat-label>
+            <textarea matInput placeholder="Wird automatisch berechnet."
+                      [(ngModel)]="result"></textarea>
+        </mat-form-field>
+
+    </mat-expansion-panel>
+</mat-accordion>

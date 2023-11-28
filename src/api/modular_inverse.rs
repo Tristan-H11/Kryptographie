@@ -5,28 +5,27 @@ use actix_web::{HttpResponse, Responder};
 use bigdecimal::num_bigint::BigInt;
 use log::info;
 
-use crate::api::serializable_models::{ShanksRequest, SingleStringResponse, UseFastQuery};
-use crate::encryption::math_functions::babystep_giantstep::shanks;
-use crate::encryption::math_functions::number_theory::extended_euclid::ExtendedEuclid;
+use crate::api::serializable_models::{ModulInverseRequest, SingleStringResponse, UseFastQuery};
+use crate::encryption::math_functions::number_theory::modulo_inverse::ModuloInverse;
 
 /**
- * Führt den erweiterten Euklidischen Algorithmus aus
+ *
  */
-pub(crate) async fn shanks_endpoint(
-    req_body: Json<ShanksRequest>,
+pub(crate) async fn modular_inverse_endpoint(
+    req_body: Json<ModulInverseRequest>,
     query: Query<UseFastQuery>,
 ) -> impl Responder {
     info!(
-        "Endpunkt /math/shanks wurde aufgerufen, use_fast: {}",
+        "Endpunkt /math/modular_inverse wurde aufgerufen, use_fast: {}",
         query.use_fast
     );
-    let req_body: ShanksRequest = req_body.into_inner();
+    let req_body: ModulInverseRequest = req_body.into_inner();
     let use_fast = query.use_fast;
-
-    let base = BigInt::from_str(&req_body.base).unwrap();
-    let element = BigInt::from_str(&req_body.element).unwrap();
+    let n = BigInt::from_str(&req_body.n).unwrap();
     let modul = BigInt::from_str(&req_body.modul).unwrap();
-    let result = shanks(&base, &element, &modul, use_fast);
+
+    let result = ModuloInverse::calculate(&n, &modul, use_fast);
+
     match result {
         Ok(x) => {
             let response = SingleStringResponse {

@@ -13,6 +13,7 @@ import {ExtendedEuclidRequest} from "../../models/extended-euclid-request";
 import {ExtendedEuclidResponse} from "../../models/extended-euclid-response";
 import {StateManagementService} from "../management/state-management.service";
 import {ShanksRequest} from "../../models/shanks-request";
+import {ModularInversRequest} from "../../models/modular-invers-request";
 
 @Injectable({
     providedIn: "root"
@@ -125,5 +126,13 @@ export class BackendRequestService {
     private getParams(): HttpParams {
         return new HttpParams()
             .set("use_fast", this.stateService.getUseFastMath()());
+    }
+
+    public async modularInverse(body: ModularInversRequest): Promise<SingleMessageModel> {
+        const params = this.getParams();
+        const options = {params};
+        return firstValueFrom(
+            this.http.post<SingleMessageModel>(this.endpointsService.getModularInverseEndpoint(), body, options)
+        );
     }
 }
