@@ -1,8 +1,8 @@
 use std::collections::HashMap;
 use std::io::{Error, ErrorKind};
 
-use bigdecimal::{One, Zero};
 use bigdecimal::num_bigint::BigInt;
+use bigdecimal::{One, Zero};
 
 use crate::encryption::math_functions::number_theory::fast_exponentiation::FastExponentiation;
 use crate::encryption::math_functions::traits::increment::Increment;
@@ -27,7 +27,12 @@ use crate::encryption::math_functions::traits::increment::Increment;
 ///
 /// TODO: Liste sortieren nach Größe zweiter Komponente
 /// TODO: Error wenn falsche Eingabe (Modul keine Primzahl etc.)
-pub fn shanks(base: &BigInt, element: &BigInt, modul: &BigInt, use_fast: bool) -> Result<BigInt, Error> {
+pub fn shanks(
+    base: &BigInt,
+    element: &BigInt,
+    modul: &BigInt,
+    use_fast: bool,
+) -> Result<BigInt, Error> {
     //aufrundung: nachkommateil abschneiden (to_bigint) +1
     let mut m = (modul - BigInt::one()).sqrt();
     if (&m * &m) != (modul - BigInt::one()) {
@@ -46,8 +51,9 @@ pub fn shanks(base: &BigInt, element: &BigInt, modul: &BigInt, use_fast: bool) -
     let mut i = BigInt::zero();
     while i < m {
         j = BigInt::zero();
-        let babystep =
-            (element * FastExponentiation::calculate(base, &(modul - BigInt::one() - &i), modul, use_fast)) % modul;
+        let babystep = (element
+            * FastExponentiation::calculate(base, &(modul - BigInt::one() - &i), modul, use_fast))
+            % modul;
         while j < m {
             if hash.get(&j).unwrap() == &babystep {
                 return Ok((&m * &j + &i) % (modul - BigInt::one()));
@@ -66,7 +72,12 @@ pub fn shanks(base: &BigInt, element: &BigInt, modul: &BigInt, use_fast: bool) -
     return Err(no_exponent_error);
 }
 
-pub fn log_naiv(base: &BigInt, element: &BigInt, modul: &BigInt, use_fast: bool) -> Result<BigInt, Error> {
+pub fn log_naiv(
+    base: &BigInt,
+    element: &BigInt,
+    modul: &BigInt,
+    use_fast: bool,
+) -> Result<BigInt, Error> {
     let mut x = BigInt::one();
     while &x < modul {
         if &FastExponentiation::calculate(base, &x, modul, use_fast) == element {

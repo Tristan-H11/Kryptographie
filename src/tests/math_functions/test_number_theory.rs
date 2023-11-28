@@ -16,7 +16,10 @@ mod tests {
         let base = &big_i!(561563);
         let exponent = &big_i!(1300);
         let modul = &big_i!(564);
-        assert_eq!(FastExponentiation::calculate(base, exponent, modul, false), big_i!(205));
+        assert_eq!(
+            FastExponentiation::calculate(base, exponent, modul, false),
+            big_i!(205)
+        );
 
         let base = &big_i!(56156334590832345);
         let exponent = &big_i!(109458390583094852904812340);
@@ -32,7 +35,10 @@ mod tests {
         let base = &big_i!(561563);
         let exponent = &big_i!(1);
         let modul = &big_i!(564);
-        assert_eq!(FastExponentiation::calculate(base, exponent, modul, false), big_i!(383));
+        assert_eq!(
+            FastExponentiation::calculate(base, exponent, modul, false),
+            big_i!(383)
+        );
     }
 
     #[test]
@@ -40,7 +46,10 @@ mod tests {
         let base = &big_i!(561563);
         let exponent = &big_i!(0);
         let modul = &big_i!(564);
-        assert_eq!(FastExponentiation::calculate(base, exponent, modul, false), big_i!(1));
+        assert_eq!(
+            FastExponentiation::calculate(base, exponent, modul, false),
+            big_i!(1)
+        );
     }
 
     #[test]
@@ -48,7 +57,10 @@ mod tests {
         let base = &big_i!(0);
         let exponent = &big_i!(561563);
         let modul = &big_i!(564);
-        assert_eq!(FastExponentiation::calculate(base, exponent, modul, false), big_i!(0));
+        assert_eq!(
+            FastExponentiation::calculate(base, exponent, modul, false),
+            big_i!(0)
+        );
     }
 
     #[test]
@@ -56,7 +68,10 @@ mod tests {
         let base = &big_i!(3459860);
         let exponent = &big_i!(561563);
         let modul = &big_i!(1);
-        assert_eq!(FastExponentiation::calculate(base, exponent, modul, false), big_i!(0));
+        assert_eq!(
+            FastExponentiation::calculate(base, exponent, modul, false),
+            big_i!(0)
+        );
     }
 
     #[test]
@@ -86,7 +101,10 @@ mod tests {
     #[test]
     fn modulo_inverse_test() {
         //assert_eq!(ModuloInverse::calculate(&big_i!(1), &big_i!(3, false)).unwrap(), big_i!(1));
-        assert_eq!(ModuloInverse::calculate(&big_i!(5), &big_i!(11), false).unwrap(), big_i!(9));
+        assert_eq!(
+            ModuloInverse::calculate(&big_i!(5), &big_i!(11), false).unwrap(),
+            big_i!(9)
+        );
         assert_eq!(
             ModuloInverse::calculate(&big_i!(315), &big_i!(661643), false).unwrap(),
             big_i!(342374)
@@ -97,7 +115,7 @@ mod tests {
                 &BigInt::from_str("79617341660363802320192939486040130094939703771377").unwrap(),
                 false,
             )
-                .unwrap(),
+            .unwrap(),
             BigInt::from_str("7173228757438794445922076835963679049602847038123").unwrap()
         );
         assert!(ModuloInverse::calculate(&big_i!(78), &big_i!(99), false).is_err());
@@ -171,7 +189,10 @@ mod tests {
             ),
             false
         );
-        assert_eq!(PrimalityTest::calculate(&big_i!(2211), 40, random_generator, false), false);
+        assert_eq!(
+            PrimalityTest::calculate(&big_i!(2211), 40, random_generator, false),
+            false
+        );
         assert_eq!(
             PrimalityTest::calculate(
                 &BigInt::from_str("79617341660363802320192939486040130094939703771377").unwrap(),

@@ -1,5 +1,5 @@
-use actix_web::{HttpResponse, Responder};
 use actix_web::web::{Json, Query};
+use actix_web::{HttpResponse, Responder};
 use log::info;
 
 use crate::api::serializable_models::{SingleStringResponse, UseFastQuery, VerifyRequest};
@@ -7,8 +7,14 @@ use crate::api::serializable_models::{SingleStringResponse, UseFastQuery, Verify
 ///
 /// Verifiziert eine Signatur zu einer Nachricht.
 ///
-pub(crate) async fn verify(req_body: Json<VerifyRequest>, query: Query<UseFastQuery>) -> impl Responder {
-    info!("Endpunkt /rsa/verify wurde aufgerufen, use_fast: {}", query.use_fast);
+pub(crate) async fn verify(
+    req_body: Json<VerifyRequest>,
+    query: Query<UseFastQuery>,
+) -> impl Responder {
+    info!(
+        "Endpunkt /rsa/verify wurde aufgerufen, use_fast: {}",
+        query.use_fast
+    );
     let req_body: VerifyRequest = req_body.into_inner();
     let use_fast = query.use_fast;
 
@@ -18,7 +24,7 @@ pub(crate) async fn verify(req_body: Json<VerifyRequest>, query: Query<UseFastQu
 
     let plaintext = public_key.verify(&signature, &plaintext, use_fast);
     let response = SingleStringResponse {
-        message: plaintext.to_string()
+        message: plaintext.to_string(),
     };
 
     HttpResponse::Ok().json(response)

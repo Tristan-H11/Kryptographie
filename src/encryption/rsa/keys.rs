@@ -114,7 +114,10 @@ impl PublicKey {
     }
 
     pub(crate) fn verify(&self, signature: &str, message: &str, use_fast: bool) -> bool {
-        info!("Verifizieren der Nachricht {} mit Signatur {}", message, signature);
+        info!(
+            "Verifizieren der Nachricht {} mit Signatur {}",
+            message, signature
+        );
         let message_big_int = get_decimal_hash(message);
 
         // Signatur vom Partner in BigInt umwandeln
@@ -122,7 +125,8 @@ impl PublicKey {
             .expect("Die Signatur konnte nicht in einen BigInt umgewandelt werden");
 
         // Verifizierung durchführen: verifizierung = signatur ^ (öffentlicher key vom partner) mod n
-        let verification = FastExponentiation::calculate(&signature_big_int, &self.e, &self.n, use_fast);
+        let verification =
+            FastExponentiation::calculate(&signature_big_int, &self.e, &self.n, use_fast);
 
         // Überprüfen, ob die Verifizierung mit der gehashten Nachricht übereinstimmt
         verification == message_big_int

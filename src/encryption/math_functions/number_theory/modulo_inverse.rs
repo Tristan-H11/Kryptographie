@@ -1,7 +1,7 @@
 use std::io::{Error, ErrorKind};
 
-use num::{BigInt, One};
 use num::traits::Euclid;
+use num::{BigInt, One};
 
 use crate::encryption::math_functions::number_theory::extended_euclid::ExtendedEuclid;
 
@@ -33,7 +33,8 @@ impl ModuloInverse {
         let (ggt, _x, y) = ExtendedEuclid::calculate(modul, n, use_fast);
         // Wenn ggT nicht 1, existiert kein Inverse. -> Error
         if !ggt.is_one() {
-            let no_inverse_error = Error::new(ErrorKind::InvalidInput, format!("n hat keinen Inverse"));
+            let no_inverse_error =
+                Error::new(ErrorKind::InvalidInput, format!("n hat keinen Inverse"));
             return Err(no_inverse_error);
         }
         // Berechnet aus den letzten Faktoren das Inverse.

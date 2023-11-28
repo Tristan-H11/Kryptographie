@@ -42,9 +42,7 @@ impl RandomElsner {
                 None => panic!("Wurzel m konnte nicht berechnet werden."),
             }
         }
-        return Self {
-            sqrt_m,
-        };
+        return Self { sqrt_m };
     }
 
     ///
@@ -54,7 +52,12 @@ impl RandomElsner {
     /// * BigUint
     ///
     pub fn take(&self, a: &BigInt, b: &BigInt, n: &mut u128) -> BigInt {
-        trace!("Zufallszahl aus dem Bereich von {} bis {} mit n {}", a, b, n);
+        trace!(
+            "Zufallszahl aus dem Bereich von {} bis {} mit n {}",
+            a,
+            b,
+            n
+        );
 
         let factor = (big_d!(*n) * &self.sqrt_m) % BigDecimal::one();
         let range = big_d!(b - a + BigInt::one());

@@ -87,8 +87,20 @@ impl RsaKeygenService {
         let n = &mut 1u128;
 
         let (prime_one, mut prime_two) = (
-            self.generate_prime(prim_size, miller_rabin_iterations, random_generator, n, use_fast),
-            self.generate_prime(prim_size, miller_rabin_iterations, random_generator, n, use_fast),
+            self.generate_prime(
+                prim_size,
+                miller_rabin_iterations,
+                random_generator,
+                n,
+                use_fast,
+            ),
+            self.generate_prime(
+                prim_size,
+                miller_rabin_iterations,
+                random_generator,
+                n,
+                use_fast,
+            ),
         );
         while prime_one == prime_two {
             trace!(
@@ -96,7 +108,13 @@ impl RsaKeygenService {
                 prime_one,
                 prime_two
             );
-            prime_two = self.generate_prime(prim_size, miller_rabin_iterations, random_generator, n, use_fast);
+            prime_two = self.generate_prime(
+                prim_size,
+                miller_rabin_iterations,
+                random_generator,
+                n,
+                use_fast,
+            );
         }
         (prime_one, prime_two)
     }
@@ -130,14 +148,21 @@ impl RsaKeygenService {
         let upper_bound = &big_i!(2).pow(size);
         let lower_bound = &big_i!(2).pow(size - 1);
 
-        let mut prime_candidate = random_generator.take_uneven(lower_bound, upper_bound, index_for_random_generator);
+        let mut prime_candidate =
+            random_generator.take_uneven(lower_bound, upper_bound, index_for_random_generator);
 
-        while !PrimalityTest::calculate(&prime_candidate, miller_rabin_iterations, random_generator, use_fast) {
+        while !PrimalityTest::calculate(
+            &prime_candidate,
+            miller_rabin_iterations,
+            random_generator,
+            use_fast,
+        ) {
             trace!(
                 "Generierter Primkandidat {} ist keine Primzahl",
                 prime_candidate
             );
-            prime_candidate = random_generator.take_uneven(lower_bound, upper_bound, index_for_random_generator);
+            prime_candidate =
+                random_generator.take_uneven(lower_bound, upper_bound, index_for_random_generator);
         }
         debug!(
             "Generierter Primkandidat {} ist eine Primzahl",

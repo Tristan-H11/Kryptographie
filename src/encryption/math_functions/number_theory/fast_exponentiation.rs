@@ -1,5 +1,5 @@
-use num::{BigInt, One, Zero};
 use num::traits::Euclid;
+use num::{BigInt, One, Zero};
 
 use crate::encryption::math_functions::traits::divisible::Divisible;
 use crate::encryption::math_functions::traits::parity::Parity;
@@ -17,7 +17,6 @@ use crate::encryption::math_functions::traits::parity::Parity;
 /// fast_exponentiation(95, 130, 7) // => '4'
 /// ```
 pub struct FastExponentiation {}
-
 
 impl FastExponentiation {
     ///

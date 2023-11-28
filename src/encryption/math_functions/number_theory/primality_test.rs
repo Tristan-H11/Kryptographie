@@ -21,10 +21,14 @@ use crate::encryption::math_functions::traits::parity::Parity;
 ///
 pub struct PrimalityTest {}
 
-
 impl PrimalityTest {
     /// Prüft, ob `p` wahrscheinlich eine Primzahl ist.
-    pub fn calculate(p: &BigInt, repeats: u32, random_generator: &RandomElsner, use_fast: bool) -> bool {
+    pub fn calculate(
+        p: &BigInt,
+        repeats: u32,
+        random_generator: &RandomElsner,
+        use_fast: bool,
+    ) -> bool {
         return if use_fast {
             PrimalityTest::fast(p, repeats, random_generator)
         } else {
@@ -57,9 +61,9 @@ impl PrimalityTest {
 
         let small_primes = get_primes_to_500();
 
-        let prime_division_test = small_primes.into_par_iter().any(|prime| {
-            p.is_divisible_by(&big_i!(prime))
-        });
+        let prime_division_test = small_primes
+            .into_par_iter()
+            .any(|prime| p.is_divisible_by(&big_i!(prime)));
         //TODO Man könnte noch den fermatschen Primzahltest einbauen. Obs das aber schneller macht..?
         prime_division_test
     }
@@ -81,7 +85,12 @@ impl PrimalityTest {
     /// miller_rabin(11, 40) // => true
     /// miller_rabin(2211, 40) // => false
     /// ```
-    fn miller_rabin(p: &BigInt, repeats: u32, random_generator: &RandomElsner, use_fast: bool) -> bool {
+    fn miller_rabin(
+        p: &BigInt,
+        repeats: u32,
+        random_generator: &RandomElsner,
+        use_fast: bool,
+    ) -> bool {
         let mut d = p.decrement();
         let mut s = BigInt::zero();
 

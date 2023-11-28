@@ -12,8 +12,7 @@ mod rsa_keys_test {
 
         let result = (0..range).into_par_iter().all(|_| {
             let keygen_service = RsaKeygenService::new(2048);
-            let (public_key, private_key) =
-                keygen_service.generate_keypair(40, 23, 55296, false); //TODO UseFast einbauen
+            let (public_key, private_key) = keygen_service.generate_keypair(40, 23, 55296, false); //TODO UseFast einbauen
 
             let encrypted_message = public_key.encrypt(message, 55296, false); //TODO UseFast einbauen
             println!("Verschlüsselte Nachricht: {}", encrypted_message);
@@ -28,8 +27,7 @@ mod rsa_keys_test {
     fn test_happy_flow_1024_var_2() {
         let message = "Hallo wie geht es dir?";
         let keygen_service = RsaKeygenService::new(1024);
-        let (public_key, private_key) =
-            keygen_service.generate_keypair(40, 13, 55296, false); //TODO UseFast einbauen;
+        let (public_key, private_key) = keygen_service.generate_keypair(40, 13, 55296, false); //TODO UseFast einbauen;
 
         let encrypted_message = public_key.encrypt(message, 55296, false); //TODO UseFast einbauen
         println!("Verschlüsselte Nachricht: {}", encrypted_message);

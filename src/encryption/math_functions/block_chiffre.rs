@@ -81,13 +81,7 @@ pub(crate) fn create_string_from_blocks_encrypt(
     // -- ziel ist es, eine einheitliche blocksize zu erhalten
     let strings: Vec<String> = strings
         .iter()
-        .map(|s| {
-            format!(
-                "{}{}",
-                "\u{0}".repeat(target_size - s.chars().count()),
-                s
-            )
-        })
+        .map(|s| format!("{}{}", "\u{0}".repeat(target_size - s.chars().count()), s))
         .collect();
     strings.join("")
 }

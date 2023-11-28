@@ -1,14 +1,13 @@
+mod api;
 mod encryption;
 mod tests;
-mod api;
 
+use crate::api::basic::config_app;
 use actix_cors::Cors;
-use actix_web::{App, HttpServer};
 use actix_web::middleware::Logger;
+use actix_web::{App, HttpServer};
 use log::LevelFilter;
 use simple_logger::SimpleLogger;
-use crate::api::basic::config_app;
-
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
@@ -18,14 +17,13 @@ async fn main() -> std::io::Result<()> {
         .init()
         .unwrap();
 
-
     HttpServer::new(|| {
         App::new()
             .configure(config_app)
             .wrap(Logger::default())
             .wrap(Cors::permissive())
     })
-        .bind(("127.0.0.1", 8080))?
-        .run()
-        .await
+    .bind(("127.0.0.1", 8080))?
+    .run()
+    .await
 }
