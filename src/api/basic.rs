@@ -3,14 +3,14 @@ use crate::api::decrypt::decrypt;
 use crate::api::encrypt::encrypt;
 use crate::api::exponentiation::exponentiation;
 use crate::api::extended_euclid::euclid_endpoint;
+use crate::api::shanks::shanks_endpoint;
 use crate::api::sign::sign;
 use crate::api::verify::verify;
+use crate::encryption::math_functions::babystep_giantstep::shanks;
 use actix_web::{web, HttpRequest, HttpResponse, Responder};
 use log::info;
 use serde::Serialize;
 use std::time::Instant;
-use crate::api::shanks::shanks_endpoint;
-use crate::encryption::math_functions::babystep_giantstep::shanks;
 
 #[derive(Serialize)]
 pub struct Response {

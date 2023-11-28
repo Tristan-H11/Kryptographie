@@ -5,7 +5,10 @@ use actix_web::{HttpResponse, Responder};
 use bigdecimal::num_bigint::BigInt;
 use log::info;
 
-use crate::api::serializable_models::{ExtendedEuclidRequest, ExtendedEuclidResponse, ShanksRequest, SingleStringResponse, UseFastQuery};
+use crate::api::serializable_models::{
+    ExtendedEuclidRequest, ExtendedEuclidResponse, ShanksRequest, SingleStringResponse,
+    UseFastQuery,
+};
 use crate::encryption::math_functions::babystep_giantstep::shanks;
 use crate::encryption::math_functions::number_theory::extended_euclid::ExtendedEuclid;
 
