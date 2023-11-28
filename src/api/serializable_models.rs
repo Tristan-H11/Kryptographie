@@ -50,6 +50,13 @@ pub struct ExtendedEuclidRequest {
     pub b: String,
 }
 
+#[derive(Deserialize)]
+pub struct ShanksRequest {
+    pub base: String,
+    pub element: String,
+    pub modul: String,
+}
+
 #[derive(Serialize)]
 pub struct ExtendedEuclidResponse {
     pub x: String,

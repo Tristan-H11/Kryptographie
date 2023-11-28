@@ -7,3 +7,4 @@ mod extended_euclid;
 mod serializable_models;
 mod sign;
 mod verify;
+mod shanks;

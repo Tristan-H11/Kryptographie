@@ -5,7 +5,7 @@
     <scripts>
       <script value="start" />
     </scripts>
-    <node-interpreter value="project" />
+    <node-interpreter value="$PROJECT_DIR$/../../../../Program Files/nodejs/node" />
     <envs />
     <method v="2" />
   </configuration>

@@ -12,6 +12,7 @@ import {ExponentiationRequest} from "../../models/exponentiation-request";
 import {ExtendedEuclidRequest} from "../../models/extended-euclid-request";
 import {ExtendedEuclidResponse} from "../../models/extended-euclid-response";
 import {StateManagementService} from "../management/state-management.service";
+import {ShanksRequest} from "../../models/shanks-request";
 
 @Injectable({
     providedIn: "root"
@@ -110,6 +111,14 @@ export class BackendRequestService {
         const options = {params};
         return firstValueFrom(
             this.http.post<ExtendedEuclidResponse>(this.endpointsService.getExtendedGcdEndpoint(), body, options)
+        );
+    }
+
+    public async shanks(body: ShanksRequest): Promise<SingleMessageModel> {
+        const params = this.getParams();
+        const options = {params};
+        return firstValueFrom(
+            this.http.post<SingleMessageModel>(this.endpointsService.getShanksEndpoint(), body, options)
         );
     }
 

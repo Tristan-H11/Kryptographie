@@ -9,6 +9,8 @@ use actix_web::{web, HttpRequest, HttpResponse, Responder};
 use log::info;
 use serde::Serialize;
 use std::time::Instant;
+use crate::api::shanks::shanks_endpoint;
+use crate::encryption::math_functions::babystep_giantstep::shanks;
 
 #[derive(Serialize)]
 pub struct Response {
@@ -28,7 +30,8 @@ pub fn config_app(cfg: &mut web::ServiceConfig) {
         .service(
             web::scope("/math")
                 .route("/exponentiation", web::post().to(exponentiation))
-                .route("/extended_euclid", web::post().to(euclid_endpoint)),
+                .route("/extended_euclid", web::post().to(euclid_endpoint))
+                .route("/shanks", web::post().to(shanks_endpoint)),
         )
         .default_service(web::route().to(not_found));
 }

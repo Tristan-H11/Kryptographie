@@ -70,4 +70,11 @@ export class EndpointsService {
     public getExtendedGcdEndpoint() {
         return this.domain + this.mathEndpoint + "/extended_euclid";
     }
+
+    /**
+     *
+     */
+    public getShanksEndpoint() {
+        return this.domain + this.mathEndpoint + "/shanks";
+    }
 }
