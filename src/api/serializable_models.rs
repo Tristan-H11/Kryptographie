@@ -45,6 +45,12 @@ pub struct ExponentiationRequest {
 }
 
 #[derive(Deserialize)]
+pub struct ModulInverseRequest {
+    pub n: String,
+    pub modul: String,
+}
+
+#[derive(Deserialize)]
 pub struct ExtendedEuclidRequest {
     pub a: String,
     pub b: String,

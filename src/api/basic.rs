@@ -11,6 +11,7 @@ use actix_web::{web, HttpRequest, HttpResponse, Responder};
 use log::info;
 use serde::Serialize;
 use std::time::Instant;
+use crate::api::modular_inverse::modular_inverse_endpoint;
 
 #[derive(Serialize)]
 pub struct Response {
@@ -31,7 +32,8 @@ pub fn config_app(cfg: &mut web::ServiceConfig) {
             web::scope("/math")
                 .route("/exponentiation", web::post().to(exponentiation))
                 .route("/extended_euclid", web::post().to(euclid_endpoint))
-                .route("/shanks", web::post().to(shanks_endpoint)),
+                .route("/shanks", web::post().to(shanks_endpoint))
+                .route("/modular_inverse", web::post().to(modular_inverse_endpoint))
         )
         .default_service(web::route().to(not_found));
 }

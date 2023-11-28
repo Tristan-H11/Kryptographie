@@ -65,16 +65,23 @@ export class EndpointsService {
     }
 
     /**
-     *
+     * Gibt den Endpoint zum Berechnen des erweiterten Euklidischen Algorithmus zurück.
      */
     public getExtendedGcdEndpoint() {
         return this.domain + this.mathEndpoint + "/extended_euclid";
     }
 
     /**
-     *
+     * Gibt den Endpoint zum Berechnen des Shanks-Algorithmus zurück.
      */
     public getShanksEndpoint() {
         return this.domain + this.mathEndpoint + "/shanks";
+    }
+
+    /**
+     * Gibt den Endpoint zum Berechnen des modularen Inversen zurück.
+     */
+    getModularInverseEndpoint() {
+        return this.domain + this.mathEndpoint + "/modular_inverse";
     }
 }
