@@ -7,31 +7,25 @@ on:
     branches: [ "master" ]
 
 jobs:
-  install:
+  build_and_test:
     runs-on: ubuntu-latest
+
     steps:
       - uses: actions/checkout@v3
-      - name: Set up Node.js v.21
+
+      - name: Set up Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: '21'
-      - name: Navigate to Angular project directory
-        run: cd GUI
-      - name: Install Dependencies
+          node-version: '16' # Ändern Sie dies in Ihre gewünschte Node.js-Version
+
+      - name: Install Angular project dependencies
         run: npm install
-  build:
-    name: build
-    runs-on: ubuntu-latest
-    needs:
-      - install
-    steps:
-      - name: Build Angular
-        run: ng build
-  test:
-    runs-on: ubuntu-latest
-    needs:
-      - build
-    steps:
-      - uses: actions/checkout@v3
-      - name: Unit testing Angular
-        run: ng test
+        working-directory: ./GUI
+
+      - name: Build Angular Project
+        run: npm run build
+        working-directory: ./GUI
+
+      - name: Run Angular Tests
+        run: npm run test
+        working-directory: ./GUI
