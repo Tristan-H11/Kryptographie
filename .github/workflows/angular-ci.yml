@@ -1,0 +1,35 @@
+name: Angular-CI
+
+on:
+  push:
+    branches: [ "master" ]
+  pull_request:
+    branches: [ "master" ]
+
+jobs:
+  install:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up Node.js v.21
+        uses: actions/setup-node@v3
+        with:
+          node-version: '21'
+      - name: Install Dependencies
+        run: npm install
+  build:
+    name: build
+    runs-on: ubuntu-latest
+    needs:
+      - install
+    steps:
+      - name: Build Angular
+        run: ng build
+  test:
+    runs-on: ubuntu-latest
+    needs:
+      - build
+    steps:
+      - uses: actions/checkout@v3
+      - name: Unit testing Angular
+        run: ng test

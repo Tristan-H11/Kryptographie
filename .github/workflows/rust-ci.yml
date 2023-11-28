@@ -1,4 +1,4 @@
-name: CI-Skript
+name: Rust-CI
 
 on:
   push:
@@ -13,19 +13,23 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v3
-    - name: Build
-      run: cargo build --verbose
+      - uses: actions/checkout@v3
+      - name: Build with cargo
+        run: cargo build --verbose
 
   test:
     runs-on: ubuntu-latest
+    needs:
+      - build
     steps:
-    - uses: actions/checkout@v3
-    - name: Unit tests
-      run: cargo test --verbose
+      - uses: actions/checkout@v3
+      - name: Unit testing Rust
+        run: cargo test --verbose
   fmt:
     name: fmt
     runs-on: ubuntu-latest
+    needs:
+      - build
     steps:
       - uses: actions/checkout@v4
         with:
@@ -34,5 +38,5 @@ jobs:
         uses: dtolnay/rust-toolchain@stable
         with:
           components: rustfmt
-      - name: cargo fmt --check
+      - name: Cargo fmt --check
         run: cargo fmt --check
