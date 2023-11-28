@@ -5,6 +5,6 @@ mod encrypt;
 mod exponentiation;
 mod extended_euclid;
 mod serializable_models;
+mod shanks;
 mod sign;
 mod verify;
-mod shanks;
