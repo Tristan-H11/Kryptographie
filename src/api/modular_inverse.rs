@@ -5,9 +5,7 @@ use actix_web::{HttpResponse, Responder};
 use bigdecimal::num_bigint::BigInt;
 use log::info;
 
-use crate::api::serializable_models::{
-    ModulInverseRequest, SingleStringResponse, UseFastQuery,
-};
+use crate::api::serializable_models::{ModulInverseRequest, SingleStringResponse, UseFastQuery};
 use crate::encryption::math_functions::number_theory::modulo_inverse::ModuloInverse;
 
 /**
