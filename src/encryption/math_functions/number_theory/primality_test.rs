@@ -139,3 +139,60 @@ impl PrimalityTest {
         return false;
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use std::str::FromStr;
+    use super::*;
+
+    #[test]
+    fn miller_rabin_test() {
+        let random_generator: &mut PseudoRandomNumberGenerator = &mut PseudoRandomNumberGenerator::new(&big_i!(11));
+        assert_eq!(
+            PrimalityTest::calculate(&big_i!(11), 40, random_generator, false),
+            true
+        );
+        assert_eq!(
+            PrimalityTest::calculate(
+                &BigInt::from_str("3884010174220797539108782582068795892283779").unwrap(),
+                40,
+                random_generator,
+                false,
+            ),
+            false
+        );
+
+        assert_eq!(
+            PrimalityTest::calculate(
+                &BigInt::from_str("3061046931436983206004510256116356531107241").unwrap(),
+                40,
+                random_generator,
+                false
+            ),
+            false
+        );
+
+        assert_eq!(
+            PrimalityTest::calculate(
+                &BigInt::from_str("3348205994756289303286119224981125339947473").unwrap(),
+                40,
+                random_generator,
+                false
+            ),
+            false
+        );
+        assert_eq!(
+            PrimalityTest::calculate(&big_i!(2211), 40, random_generator, false),
+            false
+        );
+        assert_eq!(
+            PrimalityTest::calculate(
+                &BigInt::from_str("79617341660363802320192939486040130094939703771377").unwrap(),
+                40,
+                random_generator,
+                false
+            ),
+            true
+        );
+    }
+}

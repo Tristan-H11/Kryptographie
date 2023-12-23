@@ -46,3 +46,33 @@ impl ModuloInverse {
         return Ok((modul + y).rem_euclid(modul));
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use std::str::FromStr;
+    use crate::big_i;
+    use super::*;
+
+    #[test]
+    fn modulo_inverse_test() {
+        //assert_eq!(ModuloInverse::calculate(&big_i!(1), &big_i!(3, false)).unwrap(), big_i!(1));
+        assert_eq!(
+            ModuloInverse::calculate(&big_i!(5), &big_i!(11), false).unwrap(),
+            big_i!(9)
+        );
+        assert_eq!(
+            ModuloInverse::calculate(&big_i!(315), &big_i!(661643), false).unwrap(),
+            big_i!(342374)
+        );
+        assert_eq!(
+            ModuloInverse::calculate(
+                &BigInt::from_str("485398853520739824211578869461").unwrap(),
+                &BigInt::from_str("79617341660363802320192939486040130094939703771377").unwrap(),
+                false,
+            )
+                .unwrap(),
+            BigInt::from_str("7173228757438794445922076835963679049602847038123").unwrap()
+        );
+        assert!(ModuloInverse::calculate(&big_i!(78), &big_i!(99), false).is_err());
+    }
+}

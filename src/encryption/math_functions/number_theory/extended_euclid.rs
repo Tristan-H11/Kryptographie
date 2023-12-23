@@ -57,3 +57,41 @@ impl ExtendedEuclid {
         (n.clone(), xy[0].clone(), xy[1].clone())
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use std::str::FromStr;
+    use crate::big_i;
+    use super::*;
+    #[test]
+    fn extended_euclid_test() {
+        assert_eq!(
+            ExtendedEuclid::calculate(&big_i!(6), &big_i!(11), false),
+            (big_i!(1), big_i!(2), big_i!(-1))
+        );
+        assert_eq!(
+            ExtendedEuclid::calculate(&big_i!(78), &big_i!(99), false),
+            (big_i!(3), big_i!(14), big_i!(-11))
+        );
+        assert_eq!(
+            ExtendedEuclid::calculate(&big_i!(315), &big_i!(661643), false),
+            (big_i!(1), big_i!(-319269), big_i!(152))
+        );
+        assert_eq!(
+            ExtendedEuclid::calculate(&big_i!(315), &big_i!(661643), false),
+            (big_i!(1), big_i!(-319269), big_i!(152))
+        );
+        assert_eq!(
+            ExtendedEuclid::calculate(
+                &BigInt::from_str("485398853520739824211578869461").unwrap(),
+                &BigInt::from_str("79617341660363802320192939486040130094939703771377").unwrap(),
+                false,
+            ),
+            (
+                big_i!(1),
+                BigInt::from_str("7173228757438794445922076835963679049602847038123").unwrap(),
+                big_i!(-43732645957409398462249346726)
+            )
+        );
+    }
+}
