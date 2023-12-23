@@ -4,7 +4,7 @@ mod tests {
 
     use crate::big_i;
     use crate::encryption::math_functions::block_chiffre::{
-        big_int_to_u32, create_blocks_from_string_decrypt, create_blocks_from_string_encrypt,
+        big_int_to_u32, create_blocks_from_string_decrypt, encode_string_to_blocks,
         create_string_from_blocks_decrypt, create_string_from_blocks_encrypt, split_into_blocks,
         string_to_int_vec, sums_vec_to_string_vec, to_sum_vec, u32_to_c,
     };
@@ -29,7 +29,7 @@ mod tests {
             let message = "bbbbbbbbbbbbbbb  äääääääääääääää  !&    ";
             let _basis_length = 55296u32;
 
-            let result = create_blocks_from_string_encrypt(
+            let result = encode_string_to_blocks(
                 message,
                 public_key.get_block_size(),
                 true,
@@ -77,7 +77,7 @@ mod tests {
         let block_size = 8;
         let _basis_length = 55296 as u32;
         let encoded = create_string_from_blocks_encrypt(
-            create_blocks_from_string_encrypt(m, block_size, true, 55296),
+            encode_string_to_blocks(m, block_size, true, 55296),
             block_size + 1,
             55296,
         );
@@ -90,7 +90,7 @@ mod tests {
         let m = "Da苉 ist eine Testnachricht";
         let block_size = 6;
         let encoded = create_string_from_blocks_encrypt(
-            create_blocks_from_string_encrypt(m, block_size, true, 55296),
+            encode_string_to_blocks(m, block_size, true, 55296),
             block_size + 1,
             55296,
         );
@@ -103,7 +103,7 @@ mod tests {
         let m = "Da苉 ist eine Testnachricht";
         let block_size = 47;
         let encoded = create_string_from_blocks_encrypt(
-            create_blocks_from_string_encrypt(m, block_size, true, 55296),
+            encode_string_to_blocks(m, block_size, true, 55296),
             block_size + 1,
             55296,
         );
@@ -116,7 +116,7 @@ mod tests {
         let m = "Da苉 ist eine Testnachricht";
         let block_size = 3;
         let encoded = create_string_from_blocks_encrypt(
-            create_blocks_from_string_encrypt(m, block_size, true, 55296),
+            encode_string_to_blocks(m, block_size, true, 55296),
             block_size + 1,
             55296,
         );
@@ -132,7 +132,7 @@ mod tests {
         let message = "Da苉 ist eine Testnachricht";
         let block_size = 7;
         let _basis_length = 55296 as u32;
-        let result = create_blocks_from_string_encrypt(message, block_size, true, 55296);
+        let result = encode_string_to_blocks(message, block_size, true, 55296);
         let expected_result = vec![
             big_i!(1943938337267550087026074257524),
             big_i!(914822981356602019800946507860),
