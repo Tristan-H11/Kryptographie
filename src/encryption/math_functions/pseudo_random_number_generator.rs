@@ -10,11 +10,11 @@ use crate::encryption::math_functions::traits::increment::Increment;
 /// Iterator für einen Zufallswert nach dem Schema aus dem Skript.
 ///
 #[derive(Clone)]
-pub struct RandomElsner {
+pub struct PseudoRandomNumberGenerator {
     sqrt_m: BigDecimal,
 }
 
-impl RandomElsner {
+impl PseudoRandomNumberGenerator {
     ///
     /// Erstellt eine neue Instanz von RandomElsner.
     ///

@@ -9,7 +9,7 @@ mod tests {
     use crate::encryption::math_functions::number_theory::fast_exponentiation::FastExponentiation;
     use crate::encryption::math_functions::number_theory::modulo_inverse::ModuloInverse;
     use crate::encryption::math_functions::number_theory::primality_test::PrimalityTest;
-    use crate::encryption::math_functions::random_elsner::RandomElsner;
+    use crate::encryption::math_functions::pseudo_random_number_generator::PseudoRandomNumberGenerator;
 
     #[test]
     fn fast_exponentiation_happy_flow() {
@@ -155,7 +155,7 @@ mod tests {
 
     #[test]
     fn miller_rabin_test() {
-        let random_generator: &mut RandomElsner = &mut RandomElsner::new(&big_i!(11));
+        let random_generator: &mut PseudoRandomNumberGenerator = &mut PseudoRandomNumberGenerator::new(&big_i!(11));
         assert_eq!(
             PrimalityTest::calculate(&big_i!(11), 40, random_generator, false),
             true
