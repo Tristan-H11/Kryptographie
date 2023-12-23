@@ -7,7 +7,6 @@ use log::info;
 
 use crate::api::serializable_models::{ShanksRequest, SingleStringResponse, UseFastQuery};
 use crate::encryption::math_functions::babystep_giantstep::shanks;
-use crate::encryption::math_functions::number_theory::extended_euclid::ExtendedEuclid;
 
 /**
  * Führt den erweiterten Euklidischen Algorithmus aus
