@@ -24,11 +24,9 @@ impl PublicKey {
     /// Erstellt eine neue Instanz des PublicKey.
     ///
     /// # Argumente
-    ///
     /// * `e` - Der öffentliche Exponent.
     /// * `n` - Das Produkt der beiden Primzahlen.
     /// * `g_base` - Die Basis, in der die Nachricht verschlüsselt werden soll.
-    ///
     pub fn new(e: BigInt, n: BigInt, g_base: u32) -> PublicKey {
         // Maximale Blockbreite = log_g(n).
         let block_size = n.log(&big_i!(g_base));
@@ -40,11 +38,9 @@ impl PublicKey {
     /// Erstellt eine neue Instanz des PublicKey.
     ///
     /// # Argumente
-    ///
     /// * `e` - Der öffentliche Exponent.
     /// * `n` - Das Produkt der beiden Primzahlen.
     /// * `block_size` - Die Blockgröße.
-    ///
     pub fn new_with_blocksize(e: BigInt, n: BigInt, block_size: usize) -> PublicKey {
         // Maximale Blockbreite = log_g(n).
         debug!("Blocksize in der PublicKey-Erstellung: {}", block_size);
@@ -91,14 +87,13 @@ impl PublicKey {
     /// Verschlüsselt eine Nachricht mit dem öffentlichen Schlüssel.
     ///
     /// # Argumente
-    ///
-    /// * `message` - Die zu verschlüsselnde Nachricht. **ACHTUNG**: Leerzeichen am Ende werden entfernt!
-    /// * `base_length` - Die Basis, in der die Nachricht verschlüsselt werden soll.
+    /// * `message` - Die zu verschlüsselnde Nachricht.
+    /// **ACHTUNG**: Leerzeichen am Ende werden entfernt!
+    /// * `g_base` - Die Basis, in der die Nachricht verschlüsselt werden soll.
+    /// * `use_fast` - Gibt an, ob der schnelle Algorithmus verwendet werden soll.
     ///
     /// # Rückgabe
-    ///
     /// * `String` - Die verschlüsselte Nachricht.
-    ///
     pub(crate) fn encrypt(&self, message: &str, g_base: u32, use_fast: bool) -> String {
         info!("Verschlüsseln mit blockgröße {}", self.block_size);
 
@@ -113,6 +108,15 @@ impl PublicKey {
         create_string_from_blocks_encrypt(encrypted_chunks, self.block_size + 1, g_base)
     }
 
+    /// Verifiziert eine Nachricht mit der Signatur.
+    ///
+    /// # Argumente
+    /// * `signature` - Die Signatur.
+    /// * `message` - Die Nachricht.
+    /// * `use_fast` - Gibt an, ob der schnelle Algorithmus verwendet werden soll.
+    ///
+    /// # Rückgabe
+    /// * `bool` - Gibt an, ob die Verifizierung erfolgreich war.
     pub(crate) fn verify(&self, signature: &str, message: &str, use_fast: bool) -> bool {
         info!(
             "Verifizieren der Nachricht {} mit Signatur {}",
@@ -120,7 +124,7 @@ impl PublicKey {
         );
         let message_big_int = get_decimal_hash(message);
 
-        // Signatur vom Partner in BigInt umwandeln
+        // Signatur in BigInt umwandeln
         let signature_big_int = BigInt::parse_bytes(signature.as_bytes(), 10)
             .expect("Die Signatur konnte nicht in einen BigInt umgewandelt werden");
 
@@ -147,11 +151,9 @@ impl PrivateKey {
     /// Erstellt eine neue Instanz des PrivateKey.
     ///
     /// # Argumente
-    ///
     /// * `d` - Der private Exponent.
     /// * `n` - Das Produkt der beiden Primzahlen.
     /// * `g_base` - Die Basis, in der die Nachricht verschlüsselt werden soll.
-    ///
     pub fn new(d: BigInt, n: BigInt, g_base: u32) -> PrivateKey {
         // Die Größe der verschlüsselten Blöcke ist immer um 1 größer als die Klartextgröße.
         let block_size = n.log(&big_i!(g_base)) + 1;
@@ -163,11 +165,9 @@ impl PrivateKey {
     /// Erstellt eine neue Instanz des PrivateKey.
     ///
     /// # Argumente
-    ///
     /// * `d` - Der private Exponent.
     /// * `n` - Das Produkt der beiden Primzahlen.
     /// * `block_size` - Die Blockgröße.
-    ///
     pub fn new_with_blocksize(d: BigInt, n: BigInt, block_size: usize) -> PrivateKey {
         // Die Größe der verschlüsselten Blöcke ist immer um 1 größer als die Klartextgröße.
         debug!("Blocksize in der PrivateKey-Erstellung: {}", block_size);
@@ -214,14 +214,12 @@ impl PrivateKey {
     /// Entschlüsselt eine Nachricht mit dem privaten Schlüssel.
     ///
     /// # Argumente
-    ///
     /// * `message` - Die zu entschlüsselnde Nachricht.
-    /// * `base_length` - Die Basis, in der die Nachricht verschlüsselt wurde.
+    /// * `g_base` - Die Basis, in der die Nachricht verschlüsselt wurde.
+    /// * `use_fast` - Gibt an, ob der schnelle Algorithmus verwendet werden soll.
     ///
     /// # Rückgabe
-    ///
     /// * `String` - Die entschlüsselte Nachricht.
-    ///
     pub(crate) fn decrypt(&self, message: &str, g_base: u32, use_fast: bool) -> String {
         info!("Entschlüsseln mit blockgröße {}", self.block_size);
 
@@ -234,6 +232,14 @@ impl PrivateKey {
         create_string_from_blocks_decrypt(decrypted_chunks, g_base)
     }
 
+    /// Signiert eine Nachricht mit dem privaten Schlüssel.
+    ///
+    /// # Argumente
+    /// * `message` - Die zu signierende Nachricht.
+    /// * `use_fast` - Gibt an, ob der schnelle Algorithmus verwendet werden soll.
+    ///
+    /// # Rückgabe
+    /// * `String` - Die Signatur.
     pub(crate) fn sign(&self, message: &str, use_fast: bool) -> String {
         info!("Signieren der Nachricht {}", message);
         let message_big_int = get_decimal_hash(message);
@@ -246,6 +252,13 @@ impl PrivateKey {
     }
 }
 
+/// Diese Methode berechnet den Hash einer Nachricht.
+///
+/// # Argumente
+/// * `message` - Die Nachricht.
+///
+/// # Rückgabe
+/// * `BigInt` - Der Hash.
 pub(crate) fn get_decimal_hash(message: &str) -> BigInt {
     debug!("Hashen der Nachricht {} mit SHA256", message);
     let mut hasher = Sha256::new();
