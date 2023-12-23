@@ -3,7 +3,7 @@ mod tests {
     use bigdecimal::num_bigint::BigInt;
 
     use crate::big_i;
-    use crate::encryption::math_functions::random_elsner::RandomElsner;
+    use crate::encryption::math_functions::pseudo_random_number_generator::PseudoRandomNumberGenerator;
     use crate::encryption::math_functions::traits::divisible::Divisible;
 
     #[test]
@@ -11,7 +11,7 @@ mod tests {
         let a: BigInt = 1u32.into();
         let b: BigInt = 997u32.into();
 
-        let random = RandomElsner::new(&big_i!(13));
+        let random = PseudoRandomNumberGenerator::new(&big_i!(13));
 
         let n = &mut 1;
 
@@ -29,7 +29,7 @@ mod tests {
         let a: BigInt = 500u32.into();
         let b: BigInt = 6000u32.into();
 
-        let random = RandomElsner::new(&big_i!(40));
+        let random = PseudoRandomNumberGenerator::new(&big_i!(40));
 
         for _ in 1..500 {
             let random = random.take(&a, &b, n);
@@ -42,7 +42,7 @@ mod tests {
         let a: BigInt = 500u32.into();
         let b: BigInt = 6000u32.into();
 
-        let random = RandomElsner::new(&big_i!(23));
+        let random = PseudoRandomNumberGenerator::new(&big_i!(23));
 
         let n = &mut 1;
 

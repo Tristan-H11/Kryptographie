@@ -6,7 +6,7 @@ use crate::big_i;
 use crate::encryption::math_functions::number_theory::extended_euclid::ExtendedEuclid;
 use crate::encryption::math_functions::number_theory::modulo_inverse::ModuloInverse;
 use crate::encryption::math_functions::number_theory::primality_test::PrimalityTest;
-use crate::encryption::math_functions::random_elsner::RandomElsner;
+use crate::encryption::math_functions::pseudo_random_number_generator::PseudoRandomNumberGenerator;
 use crate::encryption::math_functions::traits::increment::Increment;
 use crate::encryption::rsa::keys::{PrivateKey, PublicKey};
 
@@ -56,7 +56,7 @@ impl RsaKeygenService {
             "Generiere Schlüsselpaar mit key_size {} und Miller-Rabin-Iterations {}",
             self.key_size, miller_rabin_iterations
         );
-        let random_generator = &mut RandomElsner::new(&big_i!(random_seed));
+        let random_generator = &mut PseudoRandomNumberGenerator::new(&big_i!(random_seed));
 
         let (prime_one, prime_two) =
             self.get_distinct_primes(miller_rabin_iterations, random_generator, use_fast);
@@ -79,7 +79,7 @@ impl RsaKeygenService {
     fn get_distinct_primes(
         &self,
         miller_rabin_iterations: u32,
-        random_generator: &mut RandomElsner,
+        random_generator: &mut PseudoRandomNumberGenerator,
         use_fast: bool,
     ) -> (BigInt, BigInt) {
         let prim_size = self.key_size / 2;
@@ -136,7 +136,7 @@ impl RsaKeygenService {
         &self,
         size: u32,
         miller_rabin_iterations: u32,
-        random_generator: &RandomElsner,
+        random_generator: &PseudoRandomNumberGenerator,
         index_for_random_generator: &mut u128,
         use_fast: bool,
     ) -> BigInt {
@@ -182,7 +182,7 @@ impl RsaKeygenService {
     ///
     /// Die generierte Zahl `e`.
     ///
-    fn generate_e(&self, phi: &BigInt, random_generator: &RandomElsner, use_fast: bool) -> BigInt {
+    fn generate_e(&self, phi: &BigInt, random_generator: &PseudoRandomNumberGenerator, use_fast: bool) -> BigInt {
         debug!("Generiere e mit phi {}", phi);
 
         let mut e = random_generator.take(&big_i!(3u8), &phi.decrement(), &mut 1);
