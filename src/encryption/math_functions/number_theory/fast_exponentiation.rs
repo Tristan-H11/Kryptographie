@@ -4,30 +4,35 @@ use num::{BigInt, One, Zero};
 use crate::encryption::math_functions::traits::divisible::Divisible;
 use crate::encryption::math_functions::traits::parity::Parity;
 
-///
-/// Berechnet die schnelle Exponentiation der Potenz und Reduzierung um einen Modul.
-///
-/// # Argumente
-/// * `base` - Die Basis, von welcher die Potenz berechnet werden soll.
-/// * `exponent`- Der Exponent zur Berechnung der Potenz.
-/// * `modul` - Der Modul, durch den reduziert werden soll.
-///
-/// # Beispiel
-/// ```
-/// fast_exponentiation(95, 130, 7) // => '4'
-/// ```
+/// Implementiert den Schnellexponentiationsalgorithmus.
 pub struct FastExponentiation {}
 
 impl FastExponentiation {
-    ///
-    /// Berechnet die schnelle Exponentiation der Potenz und Reduzierung um einen Modul.
+    /// Berechnet die Schnellexponentiation für eine Basis `base`, einen Exponent `exponent`
+    /// und einen Modulus `modul`.
     ///
     /// # Argumente
     ///
-    /// * `base` - Die Basis, von welcher die Potenz berechnet werden soll.
-    /// * `exponent`- Der Exponent zur Berechnung der Potenz.
-    /// * `modul` - Der Modul, durch den reduziert werden soll.
+    /// * `base` - Die Basis.
+    /// * `exponent` - Der Exponent.
+    /// * `modul` - Der Modulus.
+    /// * `use_fast` - Gibt an, ob die schnelle Implementierung verwendet werden soll.
     ///
+    /// # Rückgabewert
+    ///
+    /// * Das Ergebnis der Schnellexponentiation.
+    ///
+    /// # Beispiel
+    ///
+    /// ```rust
+    /// let base = BigInt::from(2);
+    /// let exponent = BigInt::from(3);
+    /// let modulus = BigInt::from(5);
+    ///
+    /// let result = FastExponentiation::calculate(&base, &exponent, &modulus, true);
+    ///
+    /// assert_eq!(result, BigInt::from(3));
+    /// ```
     pub fn calculate(base: &BigInt, exponent: &BigInt, modul: &BigInt, use_fast: bool) -> BigInt {
         return if use_fast {
             FastExponentiation::fast(base, exponent, modul)
