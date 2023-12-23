@@ -7,7 +7,7 @@ use crate::encryption::math_functions::traits::divisible::Divisible;
 use crate::encryption::math_functions::traits::increment::Increment;
 
 ///
-/// Iterator für einen Zufallswert nach dem Schema aus dem Skript.
+/// Iterator für eine deterministische Zufallszahlfolge.
 ///
 #[derive(Clone)]
 pub struct PseudoRandomNumberGenerator {
@@ -16,15 +16,15 @@ pub struct PseudoRandomNumberGenerator {
 
 impl PseudoRandomNumberGenerator {
     ///
-    /// Erstellt eine neue Instanz von RandomElsner.
+    /// Erstellt eine neue Instanz des PseudoRandomNumberGenerator.
     ///
     /// # Argumente
     /// * `a` - Die untere Grenze des Bereichs.
     /// * `b` - Die obere Grenze des Bereichs.
-    /// * `random_seed` - Seed für die Zufallszahlen. Darf keine Quadratzahl sein
+    /// * `random_seed` - Seed für die Zufallszahlfolge.
     ///
     /// # Rückgabe
-    /// * RandomElsner
+    /// * PseudoRandomNumberGenerator
     ///
     pub fn new(random_seed: &BigInt) -> Self {
         let mut initial_random = random_seed.clone();
@@ -45,12 +45,15 @@ impl PseudoRandomNumberGenerator {
         return Self { sqrt_m };
     }
 
+    /// Diese Methode gibt eine Zufallszahl im Bereich von a bis b zurück.
     ///
-    /// Gibt eine zufällige Zahl im Bereich von a bis b zurück.
+    /// # Argumente
+    /// * `a` - Die untere Grenze des Bereichs.
+    /// * `b` - Die obere Grenze des Bereichs.
+    /// * `n` - Index des Elementes aus der Zufallsfolge.
     ///
     /// # Rückgabe
     /// * BigUint
-    ///
     pub fn take(&self, a: &BigInt, b: &BigInt, n: usize) -> BigInt {
         trace!(
             "Zufallszahl aus dem Bereich von {} bis {} mit n {}",
@@ -66,8 +69,12 @@ impl PseudoRandomNumberGenerator {
         a + (factor * range).to_bigint().unwrap()
     }
 
+    /// Diese Methode gibt eine ungerade Zufallszahl im Bereich von a bis b zurück.
     ///
-    /// Gibt eine zufällige ungerade Zahl im Bereich von a bis b zurück.
+    /// # Argumente
+    /// * `a` - Die untere Grenze des Bereichs.
+    /// * `b` - Die obere Grenze des Bereichs.
+    /// * `n` - Index des Elementes aus der Zufallsfolge.
     ///
     /// # Rückgabe
     /// * BigUint
