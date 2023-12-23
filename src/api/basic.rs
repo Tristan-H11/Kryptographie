@@ -7,11 +7,9 @@ use crate::api::modular_inverse::modular_inverse_endpoint;
 use crate::api::shanks::shanks_endpoint;
 use crate::api::sign::sign;
 use crate::api::verify::verify;
-use crate::encryption::math_functions::babystep_giantstep::shanks;
-use actix_web::{web, HttpRequest, HttpResponse, Responder};
+use actix_web::{web, HttpResponse, Responder};
 use log::info;
 use serde::Serialize;
-use std::time::Instant;
 
 #[derive(Serialize)]
 pub struct Response {
