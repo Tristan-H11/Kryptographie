@@ -1,29 +1,31 @@
 use num::{BigInt, Integer, One, Zero};
 
 /// Implementiert den erweiterten euklidischen Algorithmus.
-///
-/// Der erweiterte euklidische Algorithmus wird verwendet, um das Inverse-Element
-/// einer Zahl in einem Restklassenring zu finden. Er arbeitet rekursiv und berechnet
-/// die Faktoren `x` und `y` in der Bézout'schen Identität, so dass `x * n + y * modul = ggT(n, modul)`
-///
-/// # Argumente
-/// * `n` - Die Zahl, welche mit dem Modul verechnet werden soll.
-/// * `modul` - Die Modulo-Zahl, gegen die der Algorithmus durchgeführt wird.
-///
-/// # Rückgabe
-/// * (ggT(n,modul),x,y)
-/// Ein tripel aus dem groessten gemeinsamen Teiler einer Zahl `n` und dem `modul`,
-/// sowie den zwei Faktoren `x` und `y`.
 pub struct ExtendedEuclid {}
 
 impl ExtendedEuclid {
-    /// Führt den erweiterten euklidischen Algorithmus aus.
+
+    /// Berechnet den erweiterten euklidischen Algorithmus für zwei Zahlen.
     ///
     /// # Argumente
     ///
-    /// * `n` - Die Zahl, welche mit dem Modul verechnet werden soll.
-    /// * `modul` - Die Modulo-Zahl, gegen die der Algorithmus durchgeführt wird.
-    /// * `use_fast` - Gibt an, ob die eigene Implementation oder die von `num` verwendet werden soll.
+    /// * `a` - Die erste Zahl.
+    /// * `b` - Die zweite Zahl.
+    /// * `use_fast` - Wenn `true`, wird die schnelle Implementierung verwendet.
+    ///
+    /// # Rückgabewert
+    ///
+    /// * Ein Tripel aus dem größten gemeinsamen Teiler (`ggT`), dem Faktor `x` und dem Faktor `y`.
+    ///
+    /// # Beispiel
+    ///
+    /// ```rust
+    /// let (ggT, x, y) = ExtendedEuclid::calculate(&BigInt::from(12), &BigInt::from(30));
+    ///
+    /// assert_eq!(ggT, BigInt::from(6));
+    /// assert_eq!(x, BigInt::from(2));
+    /// assert_eq!(y, BigInt::from(1));
+    /// ```
     pub fn calculate(a: &BigInt, b: &BigInt, use_fast: bool) -> (BigInt, BigInt, BigInt) {
         return if use_fast {
             ExtendedEuclid::fast(a, b)
