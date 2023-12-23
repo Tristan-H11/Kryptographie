@@ -1,6 +1,5 @@
 mod api;
 mod encryption;
-mod tests;
 
 use crate::api::basic::config_app;
 use actix_cors::Cors;

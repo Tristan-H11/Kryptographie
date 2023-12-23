@@ -269,3 +269,74 @@ pub(crate) fn get_decimal_hash(message: &str) -> BigInt {
     let message_big_int = BigInt::from_bytes_be(Sign::Plus, &hashed_message);
     message_big_int
 }
+
+#[cfg(test)]
+mod rsa_keys_test {
+    use rayon::prelude::{IntoParallelIterator, ParallelIterator};
+    use crate::encryption::rsa::rsa_keygen_service::RsaKeygenService;
+
+    #[test]
+    fn test_happy_flow_1024() {
+        // Intensiver Test, der die Verschlüsselung und Entschlüsselung wiederholt testet.
+        let message = "bbbbbbbbbbbbbbb  äääääääääääääää  !&    ";
+        let range = 2; // TODO hochstellen, wenn nötig
+
+        let result = (0..range).into_par_iter().all(|_| {
+            let keygen_service = RsaKeygenService::new(2048);
+            let (public_key, private_key) = keygen_service.generate_keypair(40, 23, 55296, false); //TODO UseFast einbauen
+
+            let encrypted_message = public_key.encrypt(message, 55296, false); //TODO UseFast einbauen
+            println!("Verschlüsselte Nachricht: {}", encrypted_message);
+
+            let decrypted_message = private_key.decrypt(&encrypted_message, 55296, false); //TODO UseFast einbauen
+            message.trim_end() == decrypted_message
+        });
+        assert!(result);
+    }
+
+    #[test]
+    fn test_happy_flow_1024_var_2() {
+        let message = "Hallo wie geht es dir?";
+        let keygen_service = RsaKeygenService::new(1024);
+        let (public_key, private_key) = keygen_service.generate_keypair(40, 13, 55296, false); //TODO UseFast einbauen;
+
+        let encrypted_message = public_key.encrypt(message, 55296, false); //TODO UseFast einbauen
+        println!("Verschlüsselte Nachricht: {}", encrypted_message);
+
+        let decrypted_message = private_key.decrypt(&encrypted_message, 55296, false); //TODO UseFast einbauen
+
+        assert_eq!(message.trim_end(), decrypted_message);
+    }
+
+    #[test]
+    fn test_sign_and_verify_lowest_possible_happy_flow() {
+        let keygen = RsaKeygenService::new(258);
+
+        let g_base = 55296;
+
+        let (public_key, private_key) = keygen.generate_keypair(10, 17, g_base, false); //TODO UseFast einbauen
+
+        let message = "Die Nachricht soll signiert werden.";
+
+        let signature = private_key.sign(&message, false); //TODO UseFast einbauen
+
+        let is_valid = public_key.verify(&signature, &message, false); //TODO UseFast einbauen
+        assert!(is_valid);
+    }
+
+    #[test]
+    fn test_sign_and_verify_highest_unhappy_flow() {
+        let keygen = RsaKeygenService::new(256);
+
+        let g_base = 55296;
+
+        let (public_key, private_key) = keygen.generate_keypair(10, 13, g_base, false); //TODO UseFast einbauen
+
+        let message = "Die Nachricht soll signiert werden.";
+
+        let signature = private_key.sign(&message, false); //TODO UseFast einbauen
+
+        let is_valid = public_key.verify(&signature, &message, false); //TODO UseFast einbauen
+        assert!(!is_valid);
+    }
+}
