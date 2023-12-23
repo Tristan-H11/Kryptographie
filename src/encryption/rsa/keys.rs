@@ -282,7 +282,7 @@ mod rsa_keys_test {
         let range = 2; // TODO hochstellen, wenn nötig
 
         let result = (0..range).into_par_iter().all(|_| {
-            let keygen_service = RsaKeygenService::new(2048);
+            let keygen_service = RsaKeygenService::new(1024);
             let (public_key, private_key) = keygen_service.generate_keypair(40, 23, 55296, false); //TODO UseFast einbauen
 
             let encrypted_message = public_key.encrypt(message, 55296, false); //TODO UseFast einbauen

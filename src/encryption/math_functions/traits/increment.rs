@@ -47,6 +47,7 @@ impl<T: One + Clone + Add<Output = T> + Sub<Output = T>> Increment for T {
 #[cfg(test)]
 mod tests {
     use crate::big_u;
+    use num::BigUint;
     use super::*;
 
     #[test]

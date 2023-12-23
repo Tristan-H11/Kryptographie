@@ -98,6 +98,7 @@ pub fn log_naiv(
 #[cfg(test)]
 mod tests {
     use crate::big_i;
+    use num::BigInt;
     use super::*;
 
     #[test]

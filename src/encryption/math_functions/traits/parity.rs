@@ -29,6 +29,7 @@ impl Parity for BigInt {
 mod tests {
     use super::*;
     use crate::big_i;
+    use num::BigInt;
 
     #[test]
     fn test_is_even() {
