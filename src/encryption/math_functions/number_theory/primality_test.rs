@@ -1,11 +1,11 @@
-use std::sync::{Arc, Mutex};
+use atomic_counter::{AtomicCounter, RelaxedCounter};
 
 use num::{BigInt, One, Zero};
 use rayon::prelude::{IntoParallelIterator, ParallelIterator};
 
 use crate::big_i;
 use crate::encryption::math_functions::number_theory::fast_exponentiation::FastExponentiation;
-use crate::encryption::math_functions::number_theory::small_primes::get_primes_to_500;
+use crate::encryption::math_functions::number_theory::small_primes::get_primes_to_300;
 use crate::encryption::math_functions::random_elsner::RandomElsner;
 use crate::encryption::math_functions::traits::divisible::Divisible;
 use crate::encryption::math_functions::traits::increment::Increment;
@@ -59,12 +59,11 @@ impl PrimalityTest {
             return true;
         }
 
-        let small_primes = get_primes_to_500();
+        let small_primes = get_primes_to_300();
 
         let prime_division_test = small_primes
             .into_par_iter()
             .any(|prime| p.is_divisible_by(&big_i!(prime)));
-        //TODO Man könnte noch den fermatschen Primzahltest einbauen. Obs das aber schneller macht..?
         prime_division_test
     }
 
@@ -99,15 +98,11 @@ impl PrimalityTest {
             s.increment_assign();
         }
 
-        let n_arc = Arc::new(Mutex::new(1u128));
+        // Zähler für den Zugriff auf das Element der Zufallsfolge.
+        let n_count = RelaxedCounter::new(0);
 
         (0..repeats).into_par_iter().all(|_| {
-            // TODO Tristan: Hübsch machen
-            let n = {
-                let mut n = n_arc.lock().unwrap();
-                n.increment_assign();
-                &mut n.clone()
-            };
+            let n = n_count.add(1);
             let mut a = random_generator.take(&big_i!(2), &p, n);
             while p.is_divisible_by(&a) {
                 a = random_generator.take(&big_i!(2), &p, n);

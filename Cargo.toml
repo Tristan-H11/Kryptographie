@@ -14,7 +14,7 @@ actix-web = "4.4.0"
 actix-cors = "0.6.4"
 serde = { version = "1.0.192", features = ["derive"] }
 
-
+atomic-counter = "1.0.1"
 log = "0.4.20"
 simple_logger = "4.2.0"
 rayon = "1.8.0"
