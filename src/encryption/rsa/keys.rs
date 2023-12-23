@@ -4,7 +4,7 @@ use sha2::{Digest, Sha256};
 
 use crate::big_i;
 use crate::encryption::math_functions::block_chiffre::{
-    create_blocks_from_string_decrypt, encode_string_to_blocks,
+    encode_string_to_blocks,
     create_string_from_blocks_decrypt, create_string_from_blocks_encrypt,
 };
 use crate::encryption::math_functions::number_theory::fast_exponentiation::FastExponentiation;
@@ -225,7 +225,7 @@ impl PrivateKey {
     pub(crate) fn decrypt(&self, message: &str, g_base: u32, use_fast: bool) -> String {
         info!("Entschlüsseln mit blockgröße {}", self.block_size);
 
-        let chunks = create_blocks_from_string_decrypt(message, true, g_base, self.block_size);
+        let chunks = encode_string_to_blocks(message, self.block_size, true, g_base);
         let decrypted_chunks = chunks
             .iter()
             .map(|chunk| FastExponentiation::calculate(chunk, &self.d, &self.n, use_fast))
