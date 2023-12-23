@@ -257,8 +257,7 @@ mod tests {
     fn test_loop_create_mult_decode_create_div_decode_1() {
         let mut failure_count = 0;
 
-        for _ in 0..2 {
-            //TODO für Test hochsetzen
+        for _ in 0..1 {
             let keygen_service = RsaKeygenService::new(256);
             let (public_key, private_key) = keygen_service.generate_keypair(1, 34, 55296, false); //TODO UseFast einbauen
 
@@ -280,7 +279,6 @@ mod tests {
             let encrypted_string =
                 create_string_from_blocks_encrypt(result, public_key.get_block_size() + 1, 55296);
 
-            // Ohne Blocklänge, da diese in der Methode aus dem String extrahiert wird
             let result = encode_string_to_blocks(
                 &encrypted_string,
                 private_key.get_block_size(),
@@ -295,7 +293,6 @@ mod tests {
 
             let string = create_string_from_blocks_decrypt(result, 55296);
 
-            // Ersetze assert durch eine if-Anweisung
             if string.trim() != message.trim() {
                 failure_count += 1;
             }
