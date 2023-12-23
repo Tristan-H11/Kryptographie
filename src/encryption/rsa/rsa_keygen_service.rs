@@ -84,7 +84,7 @@ impl RsaKeygenService {
     ) -> (BigInt, BigInt) {
         let prim_size = self.key_size / 2;
 
-        let n = &mut 1u128;
+        let n = 0;
 
         let (prime_one, mut prime_two) = (
             self.generate_prime(
@@ -137,7 +137,7 @@ impl RsaKeygenService {
         size: u32,
         miller_rabin_iterations: u32,
         random_generator: &PseudoRandomNumberGenerator,
-        index_for_random_generator: &mut u128,
+        index_for_random_generator: usize,
         use_fast: bool,
     ) -> BigInt {
         debug!(
@@ -185,7 +185,7 @@ impl RsaKeygenService {
     fn generate_e(&self, phi: &BigInt, random_generator: &PseudoRandomNumberGenerator, use_fast: bool) -> BigInt {
         debug!("Generiere e mit phi {}", phi);
 
-        let mut e = random_generator.take(&big_i!(3u8), &phi.decrement(), &mut 1);
+        let mut e = random_generator.take(&big_i!(3u8), &phi.decrement(), 1);
         while e < *phi {
             let ggt = ExtendedEuclid::calculate(&e, phi, use_fast).0;
             if ggt.is_one() {
