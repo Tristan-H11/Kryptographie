@@ -51,7 +51,7 @@ impl RandomElsner {
     /// # Rückgabe
     /// * BigUint
     ///
-    pub fn take(&self, a: &BigInt, b: &BigInt, n: &mut u128) -> BigInt {
+    pub fn take(&self, a: &BigInt, b: &BigInt, n: usize) -> BigInt {
         trace!(
             "Zufallszahl aus dem Bereich von {} bis {} mit n {}",
             a,
@@ -61,8 +61,6 @@ impl RandomElsner {
 
         let factor = (big_d!(*n) * &self.sqrt_m) % BigDecimal::one();
         let range = big_d!(b - a + BigInt::one());
-
-        n.increment_assign();
 
         // Das unwrap() wird niemals fehlschlagen, weil die Implementation von to_bigint() nur
         // Some, aber niemals None zurückgibt. Es ist unklar, warum es überhaupt Option ist.
@@ -74,7 +72,7 @@ impl RandomElsner {
     ///
     /// # Rückgabe
     /// * BigUint
-    pub fn take_uneven(&self, a: &BigInt, b: &BigInt, n: &mut u128) -> BigInt {
+    pub fn take_uneven(&self, a: &BigInt, b: &BigInt, n: usize) -> BigInt {
         self.take(a, b, n) | BigInt::one()
     }
 }
