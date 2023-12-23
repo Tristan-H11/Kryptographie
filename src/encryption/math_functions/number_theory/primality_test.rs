@@ -6,27 +6,31 @@ use rayon::prelude::{IntoParallelIterator, ParallelIterator};
 use crate::big_i;
 use crate::encryption::math_functions::number_theory::fast_exponentiation::FastExponentiation;
 use crate::encryption::math_functions::number_theory::small_primes::get_primes_to_300;
-use crate::encryption::math_functions::random_elsner::RandomElsner;
+use crate::encryption::math_functions::pseudo_random_number_generator::PseudoRandomNumberGenerator;
 use crate::encryption::math_functions::traits::divisible::Divisible;
 use crate::encryption::math_functions::traits::increment::Increment;
 use crate::encryption::math_functions::traits::parity::Parity;
 
-///
-/// Führt einen Primzahltest auf Basis des Miller-Rabin-Tests durch.
-///
-/// # Argumente
-/// * `p` - Die zu testende Zahl >= 11.
-/// * `repeats` - Die Anzahl der Testrunden (Je mehr Runden, desto zuverlässiger).
-/// * `random_generator` - Generator für gleichverteilte Zufallszahlen.
-///
+/// Diese Struktur stellt Methoden zur Verfügung, um die Primzahleigenschaft eines
+/// Integers zu testen.
 pub struct PrimalityTest {}
 
 impl PrimalityTest {
-    /// Prüft, ob `p` wahrscheinlich eine Primzahl ist.
+    /// Diese Methode führt einen probabilistischen Primzahltest für den angegebenen Integer durch.
+    ///
+    /// # Argumente
+    /// * `p`: Der Integer, für den der Primzahltest durchgeführt werden soll.
+    /// * `repeats`: Die Anzahl der Wiederholungen des Tests.
+    /// * `random_generator`: Ein Pseudozufallszahlengenerator, der für die Erzeugung
+    ///   der Zufallszahlen verwendet wird.
+    /// * `use_fast`: Gibt an, ob der schnelle Primzahltest verwendet werden soll.
+    ///
+    /// # Rückgabe
+    /// * `true`, wenn der Integer eine Primzahl ist, `false`, wenn nicht.
     pub fn calculate(
         p: &BigInt,
         repeats: u32,
-        random_generator: &RandomElsner,
+        random_generator: &PseudoRandomNumberGenerator,
         use_fast: bool,
     ) -> bool {
         return if use_fast {
@@ -36,7 +40,7 @@ impl PrimalityTest {
         };
     }
 
-    fn fast(p: &BigInt, repeats: u32, random_generator: &RandomElsner) -> bool {
+    fn fast(p: &BigInt, repeats: u32, random_generator: &PseudoRandomNumberGenerator) -> bool {
         // Enthält noch einige weitere Tests, die für slow nicht vorgesehen sind.
         if PrimalityTest::fails_primitive_prime_checks(p) {
             return false;
@@ -45,7 +49,7 @@ impl PrimalityTest {
         PrimalityTest::miller_rabin(p, repeats, random_generator, true)
     }
 
-    fn own(p: &BigInt, repeats: u32, random_generator: &RandomElsner) -> bool {
+    fn own(p: &BigInt, repeats: u32, random_generator: &PseudoRandomNumberGenerator) -> bool {
         PrimalityTest::miller_rabin(p, repeats, random_generator, false)
     }
 
@@ -67,27 +71,21 @@ impl PrimalityTest {
         prime_division_test
     }
 
-    /// Führt den Miller-Rabin-Primzahltest auf `p` mit `repeats` Runden aus.
+    /// Diese Methode führt einen Miller-Rabin-Primzahltest für den angegebenen Integer durch.
     ///
-    /// # Argumente
-    /// * `p` - Die zu testende Zahl >= 11.
-    /// * `repeats` - Die Anzahl der Testrunden (Je mehr Runden, desto zuverlässiger).
-    /// * `random_generator` - Generator für gleichverteilte Zufallszahlen.
+    /// # Arguments
+    /// * `p`: Der Integer, für den der Primzahltest durchgeführt werden soll.
+    /// * `repeats`: Die Anzahl der Wiederholungen des Tests.
+    /// * `random_generator`: Ein Pseudozufallszahlengenerator, der für die Erzeugung
+    ///   der Zufallszahlen verwendet wird.
+    /// * `use_fast`: Gibt an, ob der schnelle Miller-Rabin-Test verwendet werden soll.
     ///
     /// # Rückgabe
-    /// `true`, wenn `p` wahrscheinlich eine Primzahl ist, andernfalls `false`.
-    ///
-    /// Wahrscheinlichkeit: >= 1 - (1/4)^repeats
-    ///
-    /// # Beispiel
-    /// ```
-    /// miller_rabin(11, 40) // => true
-    /// miller_rabin(2211, 40) // => false
-    /// ```
+    /// * `true`, wenn der Integer wahrscheinlich eine Primzahl ist, `false`, wenn nicht.
     fn miller_rabin(
         p: &BigInt,
         repeats: u32,
-        random_generator: &RandomElsner,
+        random_generator: &PseudoRandomNumberGenerator,
         use_fast: bool,
     ) -> bool {
         let mut d = p.decrement();
@@ -107,15 +105,22 @@ impl PrimalityTest {
             while p.is_divisible_by(&a) {
                 a = random_generator.take(&big_i!(2), &p, n);
             }
-            PrimalityTest::miller_rabin_test(p, &s, &d, &a, use_fast)
+            PrimalityTest::miller_rabin_iteration(p, &s, &d, &a, use_fast)
         })
     }
 
+    /// Diese Methode führt eine Iteration des Miller-Rabin-Primzahltests für den angegebenen Integer durch.
     ///
-    /// Führt eine Iteration des Miller-Rabin-Tests aus. Gibt zurück, ob die Zahl vermutlich
-    /// eine Primzahl ist.
+    /// # Arguments
+    /// * `p`: Der Integer, für den der Primzahltest durchgeführt werden soll.
+    /// * `s`: Der Exponent 's' des Miller-Rabin-Tests.
+    /// * `d`: Der Defekt des Integers 'p'.
+    /// * `a`: Die Zufallszahl, die für den Test verwendet wird.
+    /// * `use_fast`: Gibt an, ob der schnelle Miller-Rabin-Test verwendet werden soll.
     ///
-    fn miller_rabin_test(p: &BigInt, s: &BigInt, d: &BigInt, a: &BigInt, use_fast: bool) -> bool {
+    /// # Rückgabe
+    /// * `true`, wenn der Integer wahrscheinlich eine Primzahl ist, `false`, wenn nicht.
+    fn miller_rabin_iteration(p: &BigInt, s: &BigInt, d: &BigInt, a: &BigInt, use_fast: bool) -> bool {
         let mut x = FastExponentiation::calculate(a, d, p, use_fast);
 
         if x.is_one() || x == p.decrement() {
