@@ -67,6 +67,7 @@ impl<
 #[cfg(test)]
 mod tests {
     use crate::big_u;
+    use num::BigUint;
     use super::*;
 
     #[test]

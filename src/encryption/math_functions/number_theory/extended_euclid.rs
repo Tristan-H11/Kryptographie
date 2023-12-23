@@ -62,6 +62,7 @@ impl ExtendedEuclid {
 mod tests {
     use std::str::FromStr;
     use crate::big_i;
+    use num::BigInt;
     use super::*;
     #[test]
     fn extended_euclid_test() {

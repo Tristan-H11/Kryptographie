@@ -69,6 +69,7 @@ impl FastExponentiation {
 mod tests {
     use std::str::FromStr;
     use crate::big_i;
+    use num::BigInt;
     use super::*;
     #[test]
     fn fast_exponentiation_happy_flow() {

@@ -143,6 +143,7 @@ impl PrimalityTest {
 #[cfg(test)]
 mod tests {
     use std::str::FromStr;
+    use num::BigInt;
     use super::*;
 
     #[test]

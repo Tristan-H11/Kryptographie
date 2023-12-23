@@ -51,6 +51,7 @@ impl ModuloInverse {
 mod tests {
     use std::str::FromStr;
     use crate::big_i;
+    use num::BigInt;
     use super::*;
 
     #[test]

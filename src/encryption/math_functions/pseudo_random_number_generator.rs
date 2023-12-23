@@ -102,14 +102,23 @@ mod tests {
         let mut n = 1;
 
         assert_eq!(random.take(&a, &b, n), 604u32.into());
+        n.increment_assign();
         assert_eq!(random.take(&a, &b, n), 211u32.into());
+        n.increment_assign();
         assert_eq!(random.take(&a, &b, n), 815u32.into());
+        n.increment_assign();
         assert_eq!(random.take(&a, &b, n), 421u32.into());
+        n.increment_assign();
         assert_eq!(random.take(&a, &b, n), 28u32.into());
+        n.increment_assign();
         assert_eq!(random.take(&a, &b, n), 632u32.into());
+        n.increment_assign();
         assert_eq!(random.take(&a, &b, n), 239u32.into());
+        n.increment_assign();
         assert_eq!(random.take(&a, &b, n), 842u32.into());
+        n.increment_assign();
         assert_eq!(random.take(&a, &b, n), 449u32.into());
+        n.increment_assign();
         assert_eq!(random.take(&a, &b, n), 56u32.into());
 
         let a: BigInt = 500u32.into();
