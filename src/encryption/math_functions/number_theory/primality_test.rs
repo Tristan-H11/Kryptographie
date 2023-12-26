@@ -1,5 +1,5 @@
-use std::sync::atomic::{AtomicUsize, Ordering};
-use atomic_counter::{AtomicCounter, RelaxedCounter};
+
+use atomic_counter::{RelaxedCounter};
 
 use num::{BigInt, One, Zero};
 use rayon::prelude::{IntoParallelIterator, ParallelIterator};
