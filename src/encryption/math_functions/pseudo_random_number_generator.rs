@@ -4,7 +4,6 @@ use bigdecimal::{BigDecimal, One};
 use log::trace;
 
 use crate::big_d;
-use crate::encryption::math_functions::traits::divisible::Divisible;
 use crate::encryption::math_functions::traits::increment::Increment;
 
 ///
@@ -27,13 +26,13 @@ impl PseudoRandomNumberGenerator {
     /// # Rückgabe
     /// * PseudoRandomNumberGenerator
     ///
-    pub fn new(random_seed: &BigInt) -> Self {
-        let mut initial_random = random_seed.clone();
+    pub fn new(random_seed: u32) -> Self {
+        let mut initial_random = random_seed;
         let sqrt_m;
         loop {
-            match big_d!(initial_random.clone()).sqrt() {
+            match big_d!(initial_random).sqrt() {
                 Some(sqrt) => {
-                    if sqrt.is_not_divisible_by(&BigDecimal::one()) {
+                    if sqrt.is_integer() {
                         sqrt_m = sqrt;
                         break;
                     } else {
@@ -91,7 +90,6 @@ mod tests {
     use atomic_counter::RelaxedCounter;
     use bigdecimal::num_bigint::BigInt;
 
-    use crate::big_i;
     use crate::encryption::math_functions::pseudo_random_number_generator::PseudoRandomNumberGenerator;
     use crate::encryption::math_functions::traits::divisible::Divisible;
 
@@ -100,7 +98,7 @@ mod tests {
         let a: BigInt = 1u32.into();
         let b: BigInt = 997u32.into();
 
-        let random = PseudoRandomNumberGenerator::new(&big_i!(13));
+        let random = PseudoRandomNumberGenerator::new(13);
 
         let n = RelaxedCounter::new(1);
 
@@ -118,7 +116,7 @@ mod tests {
         let a: BigInt = 500u32.into();
         let b: BigInt = 6000u32.into();
 
-        let random = PseudoRandomNumberGenerator::new(&big_i!(40));
+        let random = PseudoRandomNumberGenerator::new(40);
 
         for _ in 1..500 {
             let random = random.take(&a, &b, &n);
@@ -131,7 +129,7 @@ mod tests {
         let a: BigInt = 500u32.into();
         let b: BigInt = 6000u32.into();
 
-        let random = PseudoRandomNumberGenerator::new(&big_i!(23));
+        let random = PseudoRandomNumberGenerator::new(23);
 
         let n = RelaxedCounter::new(1);
 
