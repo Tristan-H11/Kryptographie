@@ -55,7 +55,7 @@ impl RsaKeygenService {
             "Generiere Schlüsselpaar mit key_size {} und Miller-Rabin-Iterations {}",
             self.key_size, miller_rabin_iterations
         );
-        let random_generator = &PseudoRandomNumberGenerator::new(&big_i!(random_seed));
+        let random_generator = &PseudoRandomNumberGenerator::new(random_seed);
 
         let (prime_one, prime_two) =
             self.get_distinct_primes(miller_rabin_iterations, random_generator, use_fast);
