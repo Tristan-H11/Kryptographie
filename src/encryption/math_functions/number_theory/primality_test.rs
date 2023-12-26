@@ -104,6 +104,7 @@ impl PrimalityTest {
             n.increment_assign();
             let mut a = random_generator.take(&big_i!(2), &p, n);
             while p.is_divisible_by(&a) {
+                n.increment_assign();
                 a = random_generator.take(&big_i!(2), &p, n);
             }
             PrimalityTest::miller_rabin_iteration(p, &s, &d, &a, use_fast)
@@ -149,52 +150,52 @@ mod tests {
 
     #[test]
     fn miller_rabin_test() {
-        let random_generator: &mut PseudoRandomNumberGenerator = &mut PseudoRandomNumberGenerator::new(&big_i!(11));
+        let random_generator: &PseudoRandomNumberGenerator = &PseudoRandomNumberGenerator::new(&big_i!(11));
         assert_eq!(
-            PrimalityTest::calculate(&big_i!(11), 3, random_generator, false),
+            PrimalityTest::calculate(&big_i!(11), 20, random_generator, false),
             true
         );
-        // assert_eq!(
-        //     PrimalityTest::calculate(
-        //         &BigInt::from_str("3884010174220797539108782582068795892283779").unwrap(),
-        //         40,
-        //         random_generator,
-        //         false,
-        //     ),
-        //     false
-        // );
-        //
-        // assert_eq!(
-        //     PrimalityTest::calculate(
-        //         &BigInt::from_str("3061046931436983206004510256116356531107241").unwrap(),
-        //         40,
-        //         random_generator,
-        //         false
-        //     ),
-        //     false
-        // );
-        //
-        // assert_eq!(
-        //     PrimalityTest::calculate(
-        //         &BigInt::from_str("3348205994756289303286119224981125339947473").unwrap(),
-        //         40,
-        //         random_generator,
-        //         false
-        //     ),
-        //     false
-        // );
-        // assert_eq!(
-        //     PrimalityTest::calculate(&big_i!(2211), 40, random_generator, false),
-        //     false
-        // );
-        // assert_eq!(
-        //     PrimalityTest::calculate(
-        //         &BigInt::from_str("79617341660363802320192939486040130094939703771377").unwrap(),
-        //         40,
-        //         random_generator,
-        //         false
-        //     ),
-        //     true
-        // );
+        assert_eq!(
+            PrimalityTest::calculate(
+                &BigInt::from_str("3884010174220797539108782582068795892283779").unwrap(),
+                40,
+                random_generator,
+                false,
+            ),
+            false
+        );
+
+        assert_eq!(
+            PrimalityTest::calculate(
+                &BigInt::from_str("3061046931436983206004510256116356531107241").unwrap(),
+                40,
+                random_generator,
+                false
+            ),
+            false
+        );
+
+        assert_eq!(
+            PrimalityTest::calculate(
+                &BigInt::from_str("3348205994756289303286119224981125339947473").unwrap(),
+                40,
+                random_generator,
+                false
+            ),
+            false
+        );
+        assert_eq!(
+            PrimalityTest::calculate(&big_i!(2211), 40, random_generator, false),
+            false
+        );
+        assert_eq!(
+            PrimalityTest::calculate(
+                &BigInt::from_str("79617341660363802320192939486040130094939703771377").unwrap(),
+                40,
+                random_generator,
+                false
+            ),
+            true
+        );
     }
 }
