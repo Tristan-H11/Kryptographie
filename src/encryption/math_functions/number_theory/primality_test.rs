@@ -98,14 +98,14 @@ impl PrimalityTest {
         }
 
         // Zähler für den Zugriff auf das Element der Zufallsfolge.
-        let mut n = 0;
- // TODO WArum kann der hier 3 Iterationen? Ist der Test auf 0..2, läuft es. 0..3 geht nicht???
-        (0..repeats).into_iter().all(|_| {
-            n.increment_assign();
-            let mut a = random_generator.take(&big_i!(2), &p, n);
+        let n = RelaxedCounter::new(0);
+
+        (0..repeats).into_par_iter().all(|_| {
+            n.inc();
+            let mut a = random_generator.take(&big_i!(2), &p, n.get());
             while p.is_divisible_by(&a) {
-                n.increment_assign();
-                a = random_generator.take(&big_i!(2), &p, n);
+                n.inc();
+                a = random_generator.take(&big_i!(2), &p, n.get());
             }
             PrimalityTest::miller_rabin_iteration(p, &s, &d, &a, use_fast)
         })
@@ -152,7 +152,7 @@ mod tests {
     fn miller_rabin_test() {
         let random_generator: &PseudoRandomNumberGenerator = &PseudoRandomNumberGenerator::new(&big_i!(11));
         assert_eq!(
-            PrimalityTest::calculate(&big_i!(11), 20, random_generator, false),
+            PrimalityTest::calculate(&big_i!(11), 100, random_generator, false),
             true
         );
         assert_eq!(
