@@ -13,7 +13,7 @@ impl ModuloInverse {
     ///
     /// # Argumente
     ///
-    /// * `n` - Die Zahl, für die das inverse berechnet werden soll.
+    /// * `n` - Die Zahl, für die das Inverse berechnet werden soll.
     /// * `modul` - Der Modulus.
     /// * `use_fast` - Gibt an, ob die schnelle Implementierung verwendet werden soll.
     ///
