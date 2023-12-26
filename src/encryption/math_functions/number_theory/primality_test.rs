@@ -55,9 +55,12 @@ impl PrimalityTest {
 
     ///
     /// Primitive Prüfung auf eine zusammengesetzte Zahl.
-    /// **Achtung: Funktioniert nur für Prime-Kandidaten größer 500**
+    /// **Achtung: Funktioniert nur für Prim-Kandidaten größer 300**
     ///
     fn fails_primitive_prime_checks(p: &BigInt) -> bool {
+        if p < &big_i!(300) {
+            panic!("Primitive Primzahltests nur für p > 300 implementiert.");
+        }
         // Gerade Zahlen sind nie prim.
         if p.is_even() {
             return true;
@@ -152,7 +155,7 @@ mod tests {
     use std::str::FromStr;
 
     #[test]
-    fn miller_rabin_test() {
+    fn miller_rabin_test_own() {
         let random_generator: &PseudoRandomNumberGenerator =
             &PseudoRandomNumberGenerator::new(&big_i!(11));
         assert_eq!(
@@ -198,6 +201,70 @@ mod tests {
                 400,
                 random_generator,
                 false
+            ),
+            true
+        );
+    }
+
+    #[test]
+    #[should_panic]
+    fn test_panic_fast_with_small_p() {
+        let random_generator: &PseudoRandomNumberGenerator =
+            &PseudoRandomNumberGenerator::new(&big_i!(11));
+        PrimalityTest::calculate(&big_i!(11), 100, random_generator, true);
+    }
+
+    #[test]
+    fn test_no_panic_own_with_small_p() {
+        let random_generator: &PseudoRandomNumberGenerator =
+            &PseudoRandomNumberGenerator::new(&big_i!(11));
+        PrimalityTest::calculate(&big_i!(11), 100, random_generator, false);
+    }
+
+    #[test]
+    fn miller_rabin_test_fast() {
+        let random_generator: &PseudoRandomNumberGenerator =
+            &PseudoRandomNumberGenerator::new(&big_i!(11));
+
+        assert_eq!(
+            PrimalityTest::calculate(
+                &BigInt::from_str("3884010174220797539108782582068795892283779").unwrap(),
+                40,
+                random_generator,
+                true,
+            ),
+            false
+        );
+
+        assert_eq!(
+            PrimalityTest::calculate(
+                &BigInt::from_str("3061046931436983206004510256116356531107241").unwrap(),
+                40,
+                random_generator,
+                true
+            ),
+            false
+        );
+
+        assert_eq!(
+            PrimalityTest::calculate(
+                &BigInt::from_str("3348205994756289303286119224981125339947473").unwrap(),
+                40,
+                random_generator,
+                true
+            ),
+            false
+        );
+        assert_eq!(
+            PrimalityTest::calculate(&big_i!(2211), 40, random_generator, false),
+            false
+        );
+        assert_eq!(
+            PrimalityTest::calculate(
+                &BigInt::from_str("79617341660363802320192939486040130094939703771377").unwrap(),
+                400,
+                random_generator,
+                true
             ),
             true
         );
