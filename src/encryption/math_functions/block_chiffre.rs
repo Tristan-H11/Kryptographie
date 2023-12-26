@@ -21,7 +21,10 @@ pub(crate) fn encode_string_to_blocks(
     fill_blocks: bool,
     g_base: u32,
 ) -> Vec<BigInt> {
-    debug!("Erstelle Vektor von Blocksummen mit Blockgröße {} und Basis {}", block_size, g_base);
+    debug!(
+        "Erstelle Vektor von Blocksummen mit Blockgröße {} und Basis {}",
+        block_size, g_base
+    );
     let b = split_into_blocks(m, block_size, fill_blocks);
     let i_vec = string_to_int_vec(b);
     to_sum_vec(i_vec, &big_i!(g_base))
@@ -43,7 +46,10 @@ pub(crate) fn create_string_from_blocks_encrypt(
     target_size: usize,
     g_base: u32,
 ) -> String {
-    debug!("Erstelle String aus Vektor von Summen. Vektorgröße: {}", sums.len());
+    debug!(
+        "Erstelle String aus Vektor von Summen. Vektorgröße: {}",
+        sums.len()
+    );
     let strings = sums_vec_to_string_vec(sums, &big_i!(g_base));
     debug!("Chiffrierter Vector: {:?}", strings);
 
@@ -64,7 +70,10 @@ pub(crate) fn create_string_from_blocks_encrypt(
 /// # Rückgabe
 /// * Der resultierende String.
 pub(crate) fn create_string_from_blocks_decrypt(sums: Vec<BigInt>, g_base: u32) -> String {
-    debug!("Erstelle String aus Vektor von Summen. Vektorgröße: {}", sums.len());
+    debug!(
+        "Erstelle String aus Vektor von Summen. Vektorgröße: {}",
+        sums.len()
+    );
     let strings = sums_vec_to_string_vec(sums, &big_i!(g_base));
     debug!("Chiffrierter Vector: {:?}", strings);
 
@@ -240,9 +249,9 @@ mod tests {
 
     use crate::big_i;
     use crate::encryption::math_functions::block_chiffre::{
-        big_int_to_u32, encode_string_to_blocks,
-        create_string_from_blocks_decrypt, create_string_from_blocks_encrypt, split_into_blocks,
-        string_to_int_vec, sums_vec_to_string_vec, to_sum_vec, u32_to_c,
+        big_int_to_u32, create_string_from_blocks_decrypt, create_string_from_blocks_encrypt,
+        encode_string_to_blocks, split_into_blocks, string_to_int_vec, sums_vec_to_string_vec,
+        to_sum_vec, u32_to_c,
     };
     use crate::encryption::math_functions::number_theory::fast_exponentiation::FastExponentiation;
     use crate::encryption::rsa::rsa_keygen_service::RsaKeygenService;
@@ -264,15 +273,15 @@ mod tests {
             let message = "bbbbbbbbbbbbbbb  äääääääääääääää  !&    ";
             let _basis_length = 55296u32;
 
-            let result = encode_string_to_blocks(
-                message,
-                public_key.get_block_size(),
-                true,
-                55296,
-            )
+            let result = encode_string_to_blocks(message, public_key.get_block_size(), true, 55296)
                 .iter()
                 .map(|x| {
-                    FastExponentiation::calculate(x, &public_key.get_e(), &public_key.get_n(), false)
+                    FastExponentiation::calculate(
+                        x,
+                        &public_key.get_e(),
+                        &public_key.get_n(),
+                        false,
+                    )
                 }) //TODO UseFast einbauen
                 .collect::<Vec<BigInt>>();
 
@@ -284,12 +293,11 @@ mod tests {
                 private_key.get_block_size(),
                 true,
                 55296,
-            )
-                .iter()
-                .map(|x| {
-                    FastExponentiation::calculate(x, &private_key.get_d(), &private_key.get_n(), false)
-                }) //TODO UseFast einbauen
-                .collect();
+            ).iter()
+            .map(|x| {
+                FastExponentiation::calculate(x, &private_key.get_d(), &private_key.get_n(), false)
+            }) //TODO UseFast einbauen
+            .collect();
 
             let string = create_string_from_blocks_decrypt(result, 55296);
 

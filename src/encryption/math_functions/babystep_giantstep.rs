@@ -97,9 +97,9 @@ pub fn log_naiv(
 
 #[cfg(test)]
 mod tests {
+    use super::*;
     use crate::big_i;
     use num::BigInt;
-    use super::*;
 
     #[test]
     fn shanks_test() {

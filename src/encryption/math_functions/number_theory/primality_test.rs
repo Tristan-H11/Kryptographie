@@ -1,5 +1,4 @@
-
-use atomic_counter::{RelaxedCounter};
+use atomic_counter::RelaxedCounter;
 
 use num::{BigInt, One, Zero};
 use rayon::prelude::{IntoParallelIterator, ParallelIterator};
@@ -120,7 +119,13 @@ impl PrimalityTest {
     ///
     /// # Rückgabe
     /// * `true`, wenn der Integer wahrscheinlich eine Primzahl ist, `false`, wenn nicht.
-    fn miller_rabin_iteration(p: &BigInt, s: &BigInt, d: &BigInt, a: &BigInt, use_fast: bool) -> bool {
+    fn miller_rabin_iteration(
+        p: &BigInt,
+        s: &BigInt,
+        d: &BigInt,
+        a: &BigInt,
+        use_fast: bool,
+    ) -> bool {
         let mut x = FastExponentiation::calculate(a, d, p, use_fast);
 
         if x.is_one() || x == p.decrement() {
@@ -142,13 +147,14 @@ impl PrimalityTest {
 
 #[cfg(test)]
 mod tests {
-    use std::str::FromStr;
-    use num::BigInt;
     use super::*;
+    use num::BigInt;
+    use std::str::FromStr;
 
     #[test]
     fn miller_rabin_test() {
-        let random_generator: &PseudoRandomNumberGenerator = &PseudoRandomNumberGenerator::new(&big_i!(11));
+        let random_generator: &PseudoRandomNumberGenerator =
+            &PseudoRandomNumberGenerator::new(&big_i!(11));
         assert_eq!(
             PrimalityTest::calculate(&big_i!(11), 100, random_generator, false),
             true

@@ -67,10 +67,10 @@ impl FastExponentiation {
 
 #[cfg(test)]
 mod tests {
-    use std::str::FromStr;
+    use super::*;
     use crate::big_i;
     use num::BigInt;
-    use super::*;
+    use std::str::FromStr;
     #[test]
     fn fast_exponentiation_happy_flow() {
         let base = &big_i!(561563);

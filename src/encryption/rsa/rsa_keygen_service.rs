@@ -1,4 +1,4 @@
-use atomic_counter::{RelaxedCounter};
+use atomic_counter::RelaxedCounter;
 use bigdecimal::num_bigint::BigInt;
 use bigdecimal::One;
 use log::{debug, trace};
@@ -86,21 +86,21 @@ impl RsaKeygenService {
     ) -> (BigInt, BigInt) {
         let prim_size = self.key_size / 2;
         let n_counter = RelaxedCounter::new(1);
-        let prime_one =
-            self.generate_prime(
-                prim_size,
-                miller_rabin_iterations,
-                random_generator,
-                &n_counter,
-                use_fast,
-            );
+        let prime_one = self.generate_prime(
+            prim_size,
+            miller_rabin_iterations,
+            random_generator,
+            &n_counter,
+            use_fast,
+        );
         // Vor diesem Aufruf ist n_counter schon von generate_prime inkrementiert worden.
         let mut prime_two = self.generate_prime(
             prim_size,
             miller_rabin_iterations,
             random_generator,
             &n_counter,
-            use_fast);
+            use_fast,
+        );
 
         while prime_one == prime_two {
             trace!(
@@ -146,8 +146,7 @@ impl RsaKeygenService {
         let upper_bound = &big_i!(2).pow(size);
         let lower_bound = &big_i!(2).pow(size - 1);
 
-        let mut prime_candidate =
-            random_generator.take_uneven(lower_bound, upper_bound, n_counter);
+        let mut prime_candidate = random_generator.take_uneven(lower_bound, upper_bound, n_counter);
 
         while !PrimalityTest::calculate(
             &prime_candidate,
@@ -155,10 +154,16 @@ impl RsaKeygenService {
             random_generator,
             use_fast,
         ) {
-            trace!("Generierter Primkandidat {} ist keine Primzahl", prime_candidate);
+            trace!(
+                "Generierter Primkandidat {} ist keine Primzahl",
+                prime_candidate
+            );
             prime_candidate = random_generator.take_uneven(lower_bound, upper_bound, n_counter);
         }
-        debug!("Generierter Primkandidat {} ist eine Primzahl", prime_candidate);
+        debug!(
+            "Generierter Primkandidat {} ist eine Primzahl",
+            prime_candidate
+        );
         prime_candidate
     }
 
@@ -171,7 +176,12 @@ impl RsaKeygenService {
     ///
     /// # Rückgabe
     /// Die generierte Zahl `e`.
-    fn generate_e(&self, phi: &BigInt, random_generator: &PseudoRandomNumberGenerator, use_fast: bool) -> BigInt {
+    fn generate_e(
+        &self,
+        phi: &BigInt,
+        random_generator: &PseudoRandomNumberGenerator,
+        use_fast: bool,
+    ) -> BigInt {
         debug!("Generiere e mit phi {}", phi);
 
         let n_counter = RelaxedCounter::new(1);
