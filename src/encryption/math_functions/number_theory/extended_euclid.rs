@@ -4,7 +4,6 @@ use num::{BigInt, Integer, One, Zero};
 pub struct ExtendedEuclid {}
 
 impl ExtendedEuclid {
-
     /// Berechnet den erweiterten euklidischen Algorithmus für zwei Zahlen.
     ///
     /// # Argumente
@@ -60,10 +59,10 @@ impl ExtendedEuclid {
 
 #[cfg(test)]
 mod tests {
-    use std::str::FromStr;
+    use super::*;
     use crate::big_i;
     use num::BigInt;
-    use super::*;
+    use std::str::FromStr;
     #[test]
     fn extended_euclid_test() {
         assert_eq!(

@@ -49,10 +49,10 @@ impl ModuloInverse {
 
 #[cfg(test)]
 mod tests {
-    use std::str::FromStr;
+    use super::*;
     use crate::big_i;
     use num::BigInt;
-    use super::*;
+    use std::str::FromStr;
 
     #[test]
     fn modulo_inverse_test() {
@@ -71,7 +71,7 @@ mod tests {
                 &BigInt::from_str("79617341660363802320192939486040130094939703771377").unwrap(),
                 false,
             )
-                .unwrap(),
+            .unwrap(),
             BigInt::from_str("7173228757438794445922076835963679049602847038123").unwrap()
         );
         assert!(ModuloInverse::calculate(&big_i!(78), &big_i!(99), false).is_err());

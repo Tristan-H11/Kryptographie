@@ -4,8 +4,7 @@ use sha2::{Digest, Sha256};
 
 use crate::big_i;
 use crate::encryption::math_functions::block_chiffre::{
-    encode_string_to_blocks,
-    create_string_from_blocks_decrypt, create_string_from_blocks_encrypt,
+    create_string_from_blocks_decrypt, create_string_from_blocks_encrypt, encode_string_to_blocks,
 };
 use crate::encryption::math_functions::number_theory::fast_exponentiation::FastExponentiation;
 use crate::encryption::math_functions::traits::logarithm::Logarithm;
@@ -97,8 +96,7 @@ impl PublicKey {
     pub(crate) fn encrypt(&self, message: &str, g_base: u32, use_fast: bool) -> String {
         info!("Verschlüsseln mit blockgröße {}", self.block_size);
 
-        let chunks =
-            encode_string_to_blocks(message.trim_end(), self.block_size, true, g_base);
+        let chunks = encode_string_to_blocks(message.trim_end(), self.block_size, true, g_base);
         let encrypted_chunks = chunks
             .iter()
             .map(|chunk| FastExponentiation::calculate(chunk, &self.e, &self.n, use_fast))
@@ -272,8 +270,8 @@ pub(crate) fn get_decimal_hash(message: &str) -> BigInt {
 
 #[cfg(test)]
 mod rsa_keys_test {
-    use rayon::prelude::{IntoParallelIterator, ParallelIterator};
     use crate::encryption::rsa::rsa_keygen_service::RsaKeygenService;
+    use rayon::prelude::{IntoParallelIterator, ParallelIterator};
 
     #[test]
     fn test_happy_flow_1024() {

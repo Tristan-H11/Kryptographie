@@ -37,9 +37,9 @@ impl<T: One + Clone + Mul<Output = T> + PartialOrd> Logarithm for T {
 
 #[cfg(test)]
 mod tests {
+    use super::*;
     use crate::big_i;
     use num::BigInt;
-    use super::*;
 
     #[test]
     fn test_log_base_g() {

@@ -66,9 +66,9 @@ impl<
 
 #[cfg(test)]
 mod tests {
+    use super::*;
     use crate::big_u;
     use num::BigUint;
-    use super::*;
 
     #[test]
     fn test_divides() {
