@@ -1,4 +1,4 @@
-use atomic_counter::{AtomicCounter, RelaxedCounter};
+use atomic_counter::{RelaxedCounter};
 use bigdecimal::num_bigint::BigInt;
 use bigdecimal::One;
 use log::{debug, trace};
