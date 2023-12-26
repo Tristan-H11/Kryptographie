@@ -53,7 +53,7 @@ impl ExtendedEuclid {
             m = tmp;
             xy.rotate_right(2);
         }
-        (n.clone(), xy[0].clone(), xy[1].clone())
+        (n, xy[0].clone(), xy[1].clone())
     }
 }
 
