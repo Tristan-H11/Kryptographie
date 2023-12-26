@@ -98,14 +98,12 @@ impl PrimalityTest {
         }
 
         // Zähler für den Zugriff auf das Element der Zufallsfolge.
-        let n = RelaxedCounter::new(0);
+        let n_counter = RelaxedCounter::new(0);
 
         (0..repeats).into_par_iter().all(|_| {
-            n.inc();
-            let mut a = random_generator.take(&big_i!(2), &p, n.get());
+            let mut a = random_generator.take(&big_i!(2), &p, &n_counter);
             while p.is_divisible_by(&a) {
-                n.inc();
-                a = random_generator.take(&big_i!(2), &p, n.get());
+                a = random_generator.take(&big_i!(2), &p, &n_counter);
             }
             PrimalityTest::miller_rabin_iteration(p, &s, &d, &a, use_fast)
         })
@@ -191,7 +189,7 @@ mod tests {
         assert_eq!(
             PrimalityTest::calculate(
                 &BigInt::from_str("79617341660363802320192939486040130094939703771377").unwrap(),
-                40,
+                400,
                 random_generator,
                 false
             ),

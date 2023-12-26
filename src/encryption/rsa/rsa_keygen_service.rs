@@ -1,3 +1,4 @@
+use atomic_counter::{AtomicCounter, RelaxedCounter};
 use bigdecimal::num_bigint::BigInt;
 use bigdecimal::One;
 use log::{debug, trace};
@@ -84,23 +85,22 @@ impl RsaKeygenService {
         use_fast: bool,
     ) -> (BigInt, BigInt) {
         let prim_size = self.key_size / 2;
-        let n = 0;
-        let (prime_one, mut prime_two) = (
+        let n_counter = RelaxedCounter::new(1);
+        let prime_one =
             self.generate_prime(
                 prim_size,
                 miller_rabin_iterations,
                 random_generator,
-                n,
+                &n_counter,
                 use_fast,
-            ),
-            self.generate_prime(
-                prim_size,
-                miller_rabin_iterations,
-                random_generator,
-                n,
-                use_fast,
-            ),
-        );
+            );
+        // Vor diesem Aufruf ist n_counter schon von generate_prime inkrementiert worden.
+        let mut prime_two = self.generate_prime(
+            prim_size,
+            miller_rabin_iterations,
+            random_generator,
+            &n_counter,
+            use_fast);
 
         while prime_one == prime_two {
             trace!(
@@ -112,7 +112,7 @@ impl RsaKeygenService {
                 prim_size,
                 miller_rabin_iterations,
                 random_generator,
-                n,
+                &n_counter,
                 use_fast,
             );
         }
@@ -135,7 +135,7 @@ impl RsaKeygenService {
         size: u32,
         miller_rabin_iterations: u32,
         random_generator: &PseudoRandomNumberGenerator,
-        index_for_random_generator: usize,
+        n_counter: &RelaxedCounter,
         use_fast: bool,
     ) -> BigInt {
         debug!(
@@ -147,7 +147,7 @@ impl RsaKeygenService {
         let lower_bound = &big_i!(2).pow(size - 1);
 
         let mut prime_candidate =
-            random_generator.take_uneven(lower_bound, upper_bound, index_for_random_generator);
+            random_generator.take_uneven(lower_bound, upper_bound, n_counter);
 
         while !PrimalityTest::calculate(
             &prime_candidate,
@@ -155,17 +155,10 @@ impl RsaKeygenService {
             random_generator,
             use_fast,
         ) {
-            trace!(
-                "Generierter Primkandidat {} ist keine Primzahl",
-                prime_candidate
-            );
-            prime_candidate =
-                random_generator.take_uneven(lower_bound, upper_bound, index_for_random_generator);
+            trace!("Generierter Primkandidat {} ist keine Primzahl", prime_candidate);
+            prime_candidate = random_generator.take_uneven(lower_bound, upper_bound, n_counter);
         }
-        debug!(
-            "Generierter Primkandidat {} ist eine Primzahl",
-            prime_candidate
-        );
+        debug!("Generierter Primkandidat {} ist eine Primzahl", prime_candidate);
         prime_candidate
     }
 
@@ -181,7 +174,9 @@ impl RsaKeygenService {
     fn generate_e(&self, phi: &BigInt, random_generator: &PseudoRandomNumberGenerator, use_fast: bool) -> BigInt {
         debug!("Generiere e mit phi {}", phi);
 
-        let mut e = random_generator.take(&big_i!(3u8), &phi.decrement(), 1);
+        let n_counter = RelaxedCounter::new(1);
+
+        let mut e = random_generator.take(&big_i!(3u8), &phi.decrement(), &n_counter);
         while e < *phi {
             let ggt = ExtendedEuclid::calculate(&e, phi, use_fast).0;
             if ggt.is_one() {
