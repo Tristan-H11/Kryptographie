@@ -125,7 +125,7 @@ impl RsaKeygenService {
     /// * `size` - Die Breite der Primzahl.
     /// * `miller_rabin_iterations` - Die Anzahl der Iterationen für den Miller-Rabin-Test.
     /// * `random_generator` - Der Pseudo-Zufallszahlengenerator.
-    /// * `index_for_random_generator` - Der Index der Zufallszahl, welche der Folge entnommen werden soll.
+    /// * `n_counter` - Der Zähler für den Zugriff auf die Zufallsfolge. Achtung: Der Zähler wird inkrementiert!
     /// * `use_fast` - Gibt an, ob die schnellen Varianten der Algorithmen verwendet werden sollen.
     ///
     /// # Rückgabe
