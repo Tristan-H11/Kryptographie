@@ -32,7 +32,7 @@ impl PseudoRandomNumberGenerator {
         loop {
             match big_d!(initial_random).sqrt() {
                 Some(sqrt) => {
-                    if sqrt.is_integer() {
+                    if !sqrt.is_integer() {
                         sqrt_m = sqrt;
                         break;
                     } else {
