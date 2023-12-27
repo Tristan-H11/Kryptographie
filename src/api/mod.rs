@@ -1,11 +1,4 @@
 pub mod basic;
-mod create_key_pair;
-mod decrypt;
-mod encrypt;
-mod exponentiation;
-mod extended_euclid;
-mod modular_inverse;
+
 mod serializable_models;
-mod shanks;
-mod sign;
-mod verify;
+mod endpoints;
