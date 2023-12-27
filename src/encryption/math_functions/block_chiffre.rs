@@ -51,15 +51,18 @@ pub(crate) fn create_string_from_blocks_encrypt(
         "Erstelle String aus Vektor von Summen. Vektorgröße: {}",
         sums.len()
     );
-    let strings = sums_vec_to_string_vec(sums, &big_i!(g_base));
-    debug!("Chiffrierter Vector: {:?}", strings);
 
-    // Füllt jeden String vorne mit "0", um die maximale Länge zu erreichen
-    let strings: Vec<String> = strings
-        .iter()
-        .map(|s| format!("{}{}", "\u{0}".repeat(target_size - s.chars().count()), s))
-        .collect();
-    strings.join("")
+    let mut result = String::new();
+    for sum in sums {
+        let string = helper_fun_sum_to_string(&sum, &big_i!(g_base));
+        debug!("Chiffrierter Vector: {:?}", string);
+
+        // Füllt jeden String vorne mit "0", um die maximale Länge zu erreichen
+        let padded_string = format!("{}{}", "\u{0}".repeat(target_size - string.chars().count()), string);
+        result.push_str(&padded_string);
+    }
+
+    result
 }
 
 /// Methode, um eine Menge von gleich großen Blöcken in Dezimalform in einen String zu überführen.
