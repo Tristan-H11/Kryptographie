@@ -106,6 +106,18 @@ impl PublicKey {
         create_string_from_blocks_encrypt(encrypted_chunks, self.block_size + 1, g_base)
     }
 
+    /// Diese Methode verschlüsselt eine Zahl in Dezimaldarstellung mit dem öffentlichen Schlüssel.
+    ///
+    /// # Argumente
+    /// * `input` - Die zu verschlüsselnde Zahl.
+    /// * `use_fast` - Gibt an, ob der schnelle Algorithmus verwendet werden soll.
+    ///
+    /// # Rückgabe
+    /// * `BigInt` - Die verschlüsselte Zahl.
+    pub(crate) fn encrypt_number(&self, input: &BigInt, use_fast: bool) -> BigInt {
+        FastExponentiation::calculate(input, &self.e, &self.n, use_fast)
+    }
+
     /// Verifiziert eine Nachricht mit der Signatur.
     ///
     /// # Argumente
@@ -230,6 +242,18 @@ impl PrivateKey {
         create_string_from_blocks_decrypt(decrypted_chunks, g_base)
     }
 
+    /// Diese Methode entschlüsselt eine Zahl in Dezimaldarstellung mit dem privaten Schlüssel.
+    ///
+    /// # Argumente
+    /// * `input` - Die zu entschlüsselnde Zahl.
+    /// * `use_fast` - Gibt an, ob der schnelle Algorithmus verwendet werden soll.
+    ///
+    /// # Rückgabe
+    /// * `BigInt` - Die entschlüsselte Zahl.
+    pub(crate) fn decrypt_number(&self, input: &BigInt, use_fast: bool) -> BigInt {
+        FastExponentiation::calculate(input, &self.d, &self.n, use_fast)
+    }
+
     /// Signiert eine Nachricht mit dem privaten Schlüssel.
     ///
     /// # Argumente
@@ -270,8 +294,69 @@ pub(crate) fn get_decimal_hash(message: &str) -> BigInt {
 
 #[cfg(test)]
 mod rsa_keys_test {
+    use std::str::FromStr;
+    use num::BigInt;
     use crate::encryption::rsa::rsa_keygen_service::RsaKeygenService;
     use rayon::prelude::{IntoParallelIterator, ParallelIterator};
+    use crate::big_i;
+    use crate::encryption::math_functions::number_theory::fast_exponentiation::FastExponentiation;
+
+    #[test]
+    fn test_encrypt_number() {
+        let keygen = RsaKeygenService::new(256);
+
+        let g_base = 55296;
+
+        let (public_key, private_key) = keygen.generate_keypair(10, 19, g_base, false); //TODO UseFast einbauen
+
+        let message = BigInt::from_str("123456789").unwrap();
+
+        let encrypted_message = public_key.encrypt_number(&message, false); //TODO UseFast einbauen
+
+        let decrypted_message = private_key.decrypt_number(&encrypted_message, false); //TODO UseFast einbauen
+
+        assert_eq!(message, decrypted_message);
+    }
+
+    #[test]
+    fn square_encrypted_numbers() {
+        let keygen = RsaKeygenService::new(256);
+
+        let g_base = 55296;
+
+        let (public_key, private_key) = keygen.generate_keypair(10, 19, g_base, false); //TODO UseFast einbauen
+
+        let message = BigInt::from_str("48153454374561835379").unwrap();
+
+        let encrypted_message = public_key.encrypt_number(&message, false); //TODO UseFast einbauen
+
+        let squared_encrypted_message = FastExponentiation::calculate(&encrypted_message, &big_i!(2), &public_key.get_n(), false);
+
+        let decrypted_message = private_key.decrypt_number(&squared_encrypted_message, false); //TODO UseFast einbauen
+        assert_eq!(message.pow(2), decrypted_message);
+    }
+
+    #[test]
+    fn multiply_different_encrypted_numbers() {
+        let keygen = RsaKeygenService::new(256);
+
+        let g_base = 55296;
+
+        let (public_key, private_key) = keygen.generate_keypair(10, 19, g_base, false); //TODO UseFast einbauen
+
+        let message_one = BigInt::from_str("123456789").unwrap();
+
+        let message_two = BigInt::from_str("987654321").unwrap();
+
+        let encrypted_message_one = public_key.encrypt_number(&message_one, false); //TODO UseFast einbauen
+        let encrypted_message_two = public_key.encrypt_number(&message_two, false); //TODO UseFast einbauen
+
+        let multiplied_encrypted_message = encrypted_message_one * encrypted_message_two;
+
+        let decrypted_message = private_key.decrypt_number(&multiplied_encrypted_message, false); //TODO UseFast einbauen
+
+        assert_eq!(message_one * message_two, decrypted_message);
+    }
 
     #[test]
     fn test_happy_flow_1024() {
