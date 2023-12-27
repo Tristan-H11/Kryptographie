@@ -8,6 +8,7 @@ use crate::api::endpoints::encrypt::encrypt;
 use crate::api::endpoints::exponentiation::exponentiation;
 use crate::api::endpoints::extended_euclid::euclid_endpoint;
 use crate::api::endpoints::modular_inverse::modular_inverse_endpoint;
+use crate::api::endpoints::multiplication::multiplication;
 use crate::api::endpoints::shanks::shanks_endpoint;
 use crate::api::endpoints::sign::sign;
 use crate::api::endpoints::verify::verify;
@@ -25,7 +26,8 @@ pub fn config_app(cfg: &mut web::ServiceConfig) {
                 .route("/encrypt", web::post().to(encrypt))
                 .route("/decrypt", web::post().to(decrypt))
                 .route("/sign", web::post().to(sign))
-                .route("/verify", web::post().to(verify)),
+                .route("/verify", web::post().to(verify))
+                .route("/multiplication", web::post().to(multiplication)),
         )
         .service(
             web::scope("/math")
