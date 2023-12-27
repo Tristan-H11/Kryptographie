@@ -58,7 +58,11 @@ pub(crate) fn create_string_from_blocks_encrypt(
         debug!("Chiffrierter Vector: {:?}", string);
 
         // Füllt jeden String vorne mit "0", um die maximale Länge zu erreichen
-        let padded_string = format!("{}{}", "\u{0}".repeat(target_size - string.chars().count()), string);
+        let padded_string = format!(
+            "{}{}",
+            "\u{0}".repeat(target_size - string.chars().count()),
+            string
+        );
         result.push_str(&padded_string);
     }
 
@@ -297,7 +301,8 @@ mod tests {
                 private_key.get_block_size(),
                 true,
                 55296,
-            ).iter()
+            )
+            .iter()
             .map(|x| {
                 FastExponentiation::calculate(x, &private_key.get_d(), &private_key.get_n(), false)
             }) //TODO UseFast einbauen

@@ -294,12 +294,12 @@ pub(crate) fn get_decimal_hash(message: &str) -> BigInt {
 
 #[cfg(test)]
 mod rsa_keys_test {
-    use std::str::FromStr;
-    use num::BigInt;
-    use crate::encryption::rsa::rsa_keygen_service::RsaKeygenService;
-    use rayon::prelude::{IntoParallelIterator, ParallelIterator};
     use crate::big_i;
     use crate::encryption::math_functions::number_theory::fast_exponentiation::FastExponentiation;
+    use crate::encryption::rsa::rsa_keygen_service::RsaKeygenService;
+    use num::BigInt;
+    use rayon::prelude::{IntoParallelIterator, ParallelIterator};
+    use std::str::FromStr;
 
     #[test]
     fn test_encrypt_number() {
@@ -330,7 +330,12 @@ mod rsa_keys_test {
 
         let encrypted_message = public_key.encrypt_number(&message, false); //TODO UseFast einbauen
 
-        let squared_encrypted_message = FastExponentiation::calculate(&encrypted_message, &big_i!(2), &public_key.get_n(), false);
+        let squared_encrypted_message = FastExponentiation::calculate(
+            &encrypted_message,
+            &big_i!(2),
+            &public_key.get_n(),
+            false,
+        );
 
         let decrypted_message = private_key.decrypt_number(&squared_encrypted_message, false); //TODO UseFast einbauen
         assert_eq!(message.pow(2), decrypted_message);

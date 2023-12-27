@@ -1,11 +1,13 @@
-use std::str::FromStr;
-use actix_web::{HttpResponse, HttpResponseBuilder, Responder};
 use actix_web::http::StatusCode;
 use actix_web::web::{Json, Query};
+use actix_web::{HttpResponse, HttpResponseBuilder, Responder};
 use bigdecimal::num_bigint::BigInt;
 use log::info;
+use std::str::FromStr;
 
-use crate::api::serializable_models::{MultiplicationRequest, MultiplicationResponse, SingleStringResponse, UseFastQuery};
+use crate::api::serializable_models::{
+    MultiplicationRequest, MultiplicationResponse, SingleStringResponse, UseFastQuery,
+};
 use crate::encryption::math_functions::number_theory::fast_exponentiation::FastExponentiation;
 use crate::encryption::rsa::rsa_keygen_service::RsaKeygenService;
 
@@ -44,8 +46,11 @@ pub(crate) async fn multiplication(
     // TODO: Will man das wirklich haben oder ist die Interpreation dem nutzer überlassen? Sonst halt
     // nen Feld in der Resposne für "could be wrong" oder so einfügen.
     if (factor_one * factor_two) != result {
-        return HttpResponseBuilder::new(StatusCode::INTERNAL_SERVER_ERROR)
-            .json(SingleStringResponse { message: "Multiplikation fehlgeschlagen: Produkt größer als Modulus!".to_string() });
+        return HttpResponseBuilder::new(StatusCode::INTERNAL_SERVER_ERROR).json(
+            SingleStringResponse {
+                message: "Multiplikation fehlgeschlagen: Produkt größer als Modulus!".to_string(),
+            },
+        );
     }
 
     HttpResponse::Ok().json(response)

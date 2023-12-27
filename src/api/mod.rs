@@ -1,4 +1,4 @@
 pub mod basic;
 
-mod serializable_models;
 mod endpoints;
+mod serializable_models;

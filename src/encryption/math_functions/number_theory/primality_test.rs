@@ -156,8 +156,7 @@ mod tests {
 
     #[test]
     fn miller_rabin_test_own() {
-        let random_generator: &PseudoRandomNumberGenerator =
-            &PseudoRandomNumberGenerator::new(11);
+        let random_generator: &PseudoRandomNumberGenerator = &PseudoRandomNumberGenerator::new(11);
         assert_eq!(
             PrimalityTest::calculate(&big_i!(11), 100, random_generator, false),
             true
@@ -209,22 +208,19 @@ mod tests {
     #[test]
     #[should_panic]
     fn test_panic_fast_with_small_p() {
-        let random_generator: &PseudoRandomNumberGenerator =
-            &PseudoRandomNumberGenerator::new(11);
+        let random_generator: &PseudoRandomNumberGenerator = &PseudoRandomNumberGenerator::new(11);
         PrimalityTest::calculate(&big_i!(11), 100, random_generator, true);
     }
 
     #[test]
     fn test_no_panic_own_with_small_p() {
-        let random_generator: &PseudoRandomNumberGenerator =
-            &PseudoRandomNumberGenerator::new(11);
+        let random_generator: &PseudoRandomNumberGenerator = &PseudoRandomNumberGenerator::new(11);
         PrimalityTest::calculate(&big_i!(11), 100, random_generator, false);
     }
 
     #[test]
     fn miller_rabin_test_fast() {
-        let random_generator: &PseudoRandomNumberGenerator =
-            &PseudoRandomNumberGenerator::new(11);
+        let random_generator: &PseudoRandomNumberGenerator = &PseudoRandomNumberGenerator::new(11);
 
         assert_eq!(
             PrimalityTest::calculate(
