@@ -67,21 +67,6 @@ impl PublicKey {
         self.block_size.to_string()
     }
 
-    #[cfg(test)]
-    pub fn get_e(&self) -> BigInt {
-        self.e.clone()
-    }
-
-    #[cfg(test)]
-    pub fn get_n(&self) -> BigInt {
-        self.n.clone()
-    }
-
-    #[cfg(test)]
-    pub fn get_block_size(&self) -> usize {
-        self.block_size.clone()
-    }
-
     ///
     /// Verschlüsselt eine Nachricht mit dem öffentlichen Schlüssel.
     ///
@@ -191,21 +176,6 @@ impl PrivateKey {
     ///
     pub fn get_block_size_as_str(&self) -> String {
         self.block_size.to_string()
-    }
-
-    #[cfg(test)]
-    pub fn get_d(&self) -> BigInt {
-        self.d.clone()
-    }
-
-    #[cfg(test)]
-    pub fn get_n(&self) -> BigInt {
-        self.n.clone()
-    }
-
-    #[cfg(test)]
-    pub fn get_block_size(&self) -> usize {
-        self.block_size.clone()
     }
 
     ///

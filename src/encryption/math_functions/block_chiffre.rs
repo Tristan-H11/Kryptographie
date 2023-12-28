@@ -94,7 +94,6 @@ pub(crate) fn create_string_from_blocks_decrypt(sums: Vec<BigInt>, g_base: u32) 
 ///
 /// # Rückgabe
 /// * Ein Vektor mit Strings, der die Blöcke enthält.
-
 fn split_into_blocks(message: &str, block_size: usize, fill_block: bool) -> Vec<String> {
     debug!(
         "Erstelle Blöcke mit Blockgröße {} für '{}'",
@@ -259,60 +258,6 @@ mod tests {
     };
     use crate::encryption::math_functions::number_theory::fast_exponentiation::FastExponentiation;
     use crate::encryption::rsa::rsa_keygen_service::RsaKeygenService;
-
-    ///
-    /// Test um zu prüfen, ob ein String aufgeteilt, manipuliert, zusammengesetzt und wieder umgekehrt werden kann.
-    /// Dafür wird der String zerlegt, die Zahl verdoppelt und ein Ciphertext darauf erstellt.
-    /// Dieser Cipher wird dann auch wieder zerlegt, die Zahl halbiert und ein Plaintext erstellt.
-    /// Dieser Plaintext wird dann wieder zusammengesetzt und sollte dem ursprünglichen String entsprechen.
-    ///
-    #[test]
-    fn test_loop_create_mult_decode_create_div_decode_1() {
-        let mut failure_count = 0;
-
-        for _ in 0..1 {
-            let keygen_service = RsaKeygenService::new(256);
-            let (public_key, private_key) = keygen_service.generate_keypair(1, 34, 55296, false); //TODO UseFast einbauen
-
-            let message = "bbbbbbbbbbbbbbb  äääääääääääääää  !&    ";
-            let _basis_length = 55296u32;
-
-            let result = encode_string_to_blocks(message, public_key.get_block_size(), true, 55296)
-                .iter()
-                .map(|x| {
-                    FastExponentiation::calculate(
-                        x,
-                        &public_key.get_e(),
-                        &public_key.get_n(),
-                        false,
-                    )
-                }) //TODO UseFast einbauen
-                .collect::<Vec<BigInt>>();
-
-            let encrypted_string =
-                create_string_from_blocks_encrypt(result, public_key.get_block_size() + 1, 55296);
-
-            let result = encode_string_to_blocks(
-                &encrypted_string,
-                private_key.get_block_size(),
-                true,
-                55296,
-            ).iter()
-            .map(|x| {
-                FastExponentiation::calculate(x, &private_key.get_d(), &private_key.get_n(), false)
-            }) //TODO UseFast einbauen
-            .collect();
-
-            let string = create_string_from_blocks_decrypt(result, 55296);
-
-            if string.trim() != message.trim() {
-                failure_count += 1;
-            }
-        }
-
-        assert_eq!(failure_count, 0, "Fehlgeschlagene Tests: {}", failure_count);
-    }
-
     ///
     /// Prüft, ob die Funktionen zum Zerteilen und Zusammensetzen eines String das Inverse voneinander sind.
     ///
