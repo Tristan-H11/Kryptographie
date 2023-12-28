@@ -35,7 +35,12 @@ use crate::encryption::math_functions::traits::increment::Increment;
 ///
 /// assert_eq!(result, Ok(BigInt::from(4)));
 /// ```
-pub fn shanks(base: &BigInt, element: &BigInt, modul: &BigInt, use_fast: bool) -> Result<BigInt, Error> {
+pub fn shanks(
+    base: &BigInt,
+    element: &BigInt,
+    modul: &BigInt,
+    use_fast: bool,
+) -> Result<BigInt, Error> {
     //aufrundung: nachkommateil abschneiden (to_bigint) +1
     let mut m = (modul - BigInt::one()).sqrt();
     if (&m * &m) != (modul - BigInt::one()) {
@@ -56,7 +61,9 @@ pub fn shanks(base: &BigInt, element: &BigInt, modul: &BigInt, use_fast: bool) -
     let mut i = BigInt::zero();
     while i < m {
         j = BigInt::zero();
-        let babystep = (element * FastExponentiation::calculate(base, &(modul - BigInt::one() - &i), modul, use_fast)) % modul;
+        let babystep = (element
+            * FastExponentiation::calculate(base, &(modul - BigInt::one() - &i), modul, use_fast))
+            % modul;
         while j < m {
             if hash.get(&j).unwrap() == &babystep {
                 return Ok((&m * &j + &i) % (modul - BigInt::one()));
