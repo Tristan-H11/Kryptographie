@@ -50,7 +50,6 @@ impl Shanks {
         base: &BigInt,
         element: &BigInt,
         modul: &BigInt,
-        use_fast: bool,
     ) -> Result<BigInt, Error> {
         //aufrundung: nachkommateil abschneiden (to_bigint) +1
         let mut m = (modul - BigInt::one()).sqrt();
@@ -102,28 +101,37 @@ mod tests {
     use num::BigInt;
 
     use crate::big_i;
+    use crate::encryption::math_functions::number_theory::number_theory_service::NumberTheoryServiceSpeed::{Fast, Slow};
 
     use super::*;
 
+    fn run_test_for_all_services(test: impl Fn(NumberTheoryService)) {
+        test(NumberTheoryService::new(Slow)); // Langsame, eigene Implementierung
+        test(NumberTheoryService::new(Fast)); // Schnelle, externe Implementierung
+    }
+
     #[test]
     fn shanks_test() {
-        assert_eq!(
-            Shanks::calculate(&big_i!(8), &big_i!(555), &big_i!(677), false).unwrap(), //TODO UseFast einbauen
-            big_i!(134)
-        );
-        assert_eq!(
-            Shanks::calculate(&big_i!(11), &big_i!(3), &big_i!(29), false).unwrap(), //TODO UseFast einbauen
-            big_i!(17)
-        );
-        assert_eq!(
-            Shanks::calculate(&big_i!(10), &big_i!(25), &big_i!(97), false).unwrap(), //TODO UseFast einbauen
-            big_i!(22)
-        );
-        assert_eq!(
-            Shanks::calculate(&big_i!(3), &big_i!(4), &big_i!(7), false).unwrap(), //TODO UseFast einbauen
-            big_i!(4)
-        );
-        assert!(Shanks::calculate(&big_i!(4), &big_i!(6), &big_i!(7), false).is_err());
-        //Da Base nicht primitive Wurzel! //TODO UseFast einbauen
+        run_test_for_all_services(|service| {
+            let shanks_service = Shanks::new(service);
+            assert_eq!(
+                shanks_service.calculate(&big_i!(8), &big_i!(555), &big_i!(677)).unwrap(),
+                big_i!(134)
+            );
+            assert_eq!(
+                shanks_service.calculate(&big_i!(11), &big_i!(3), &big_i!(29)).unwrap(),
+                big_i!(17)
+            );
+            assert_eq!(
+                shanks_service.calculate(&big_i!(10), &big_i!(25), &big_i!(97)).unwrap(),
+                big_i!(22)
+            );
+            assert_eq!(
+                shanks_service.calculate(&big_i!(3), &big_i!(4), &big_i!(7)).unwrap(),
+                big_i!(4)
+            );
+            assert!(shanks_service.calculate(&big_i!(4), &big_i!(6), &big_i!(7)).is_err());
+            //Da Base nicht primitive Wurzel!
+        });
     }
 }
