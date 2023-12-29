@@ -244,10 +244,8 @@ mod tests {
 
     #[test]
     fn is_probably_prime_test() {
-
         let slow_service = NumberTheoryService::new(Slow);
-        let random_generator: &PseudoRandomNumberGenerator =
-            &PseudoRandomNumberGenerator::new(11);
+        let random_generator: &PseudoRandomNumberGenerator = &PseudoRandomNumberGenerator::new(11);
         assert_eq!(
             slow_service.is_probably_prime(&11.into(), 100, random_generator),
             true
