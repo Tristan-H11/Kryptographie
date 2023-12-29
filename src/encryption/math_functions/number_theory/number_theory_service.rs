@@ -13,7 +13,7 @@ pub enum NumberTheoryServiceSpeed {
 }
 
 /// Diese Struktur stellt Implementierungen zur Verfügung, um die Zahlentheorie zu berechnen.
-#[derive(Clone)]
+#[derive(Clone, Copy)]
 pub enum NumberTheoryService {
     FastService(FastNumberTheoryService),
     SlowService(SlowNumberTheoryService),
