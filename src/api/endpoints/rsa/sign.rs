@@ -1,14 +1,26 @@
 use actix_web::{HttpResponse, Responder};
 use actix_web::web::{Json, Query};
 use log::info;
+use serde::Deserialize;
 
-use crate::api::serializable_models::{SignRequest, SingleStringResponse, UseFastQuery};
+use crate::api::serializable_models::{KeyPair, SingleStringResponse, UseFastQuery};
 use crate::encryption::math_functions::number_theory::number_theory_service::NumberTheoryService;
 use crate::encryption::math_functions::number_theory::number_theory_service::NumberTheoryServiceSpeed::{Fast, Slow};
 
-///
-/// Signiert eine Nachricht.
-///
+#[derive(Deserialize)]
+pub struct SignRequest {
+    pub plaintext: String,
+    pub key_pair: KeyPair,
+}
+
+/// Endpunkt zum Signieren einer Nachricht mit RSA.
+/// 
+/// # Argumente
+/// * `req_body` - Die Anfrage, die den zu signierenden Text und den privaten Schlüssel enthält.
+/// * `query` - Die Abfrage, ob der schnelle oder der langsame Algorithmus verwendet werden soll.
+/// 
+/// # Rückgabe
+/// * `HttpResponse` - Die Antwort, die die Signatur enthält.
 pub(crate) async fn sign(
     req_body: Json<SignRequest>,
     query: Query<UseFastQuery>,

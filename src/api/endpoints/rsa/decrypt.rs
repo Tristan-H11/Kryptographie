@@ -6,9 +6,13 @@ use crate::api::serializable_models::{EncryptDecryptRequest, SingleStringRespons
 use crate::encryption::math_functions::number_theory::number_theory_service::NumberTheoryService;
 use crate::encryption::math_functions::number_theory::number_theory_service::NumberTheoryServiceSpeed::{Fast, Slow};
 
-///
-/// Entschlüsselt eine Nachricht.
-///
+/// Endpunkt zum Entschlüsseln einer Nachricht mit RSA.
+/// # Argumente
+/// * `req_body` - Die Anfrage, die den verschlüsselten Text und den privaten Schlüssel enthält.
+/// * `query` - Die Abfrage, ob der schnelle oder der langsame Algorithmus verwendet werden soll.
+/// 
+/// # Rückgabe
+/// * `HttpResponse` - Die Antwort, die den entschlüsselten Text enthält.
 pub(crate) async fn decrypt(
     req_body: Json<EncryptDecryptRequest>,
     query: Query<UseFastQuery>,

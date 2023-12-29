@@ -1,9 +1,5 @@
-pub mod create_key_pair;
-pub mod decrypt;
-pub mod verify;
-pub mod sign;
 pub mod shanks;
 pub mod modular_inverse;
 pub mod extended_euclid;
 pub mod exponentiation;
-pub mod encrypt;
+pub mod rsa;

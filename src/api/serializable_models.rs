@@ -37,32 +37,6 @@ pub struct SingleStringResponse {
     pub message: String,
 }
 
-#[derive(Deserialize)]
-pub struct ExponentiationRequest {
-    pub exponent: String,
-    pub base: String,
-    pub modulus: String,
-}
-
-#[derive(Deserialize)]
-pub struct ModulInverseRequest {
-    pub n: String,
-    pub modul: String,
-}
-
-#[derive(Deserialize)]
-pub struct ExtendedEuclidRequest {
-    pub a: String,
-    pub b: String,
-}
-
-#[derive(Deserialize)]
-pub struct ShanksRequest {
-    pub base: String,
-    pub element: String,
-    pub modul: String,
-}
-
 #[derive(Serialize)]
 pub struct ExtendedEuclidResponse {
     pub x: String,
@@ -71,31 +45,10 @@ pub struct ExtendedEuclidResponse {
 }
 
 #[derive(Deserialize)]
-pub struct CreateKeyPairRequest {
-    pub modulus_width: u32,
-    pub miller_rabin_rounds: u32,
-    pub random_seed: u32,
-    pub number_system_base: u32,
-}
-
-#[derive(Deserialize)]
 pub struct EncryptDecryptRequest {
     pub message: String,
     pub key_pair: KeyPair,
     pub number_system_base: u32,
-}
-
-#[derive(Deserialize)]
-pub struct SignRequest {
-    pub plaintext: String,
-    pub key_pair: KeyPair,
-}
-
-#[derive(Deserialize)]
-pub struct VerifyRequest {
-    pub plaintext: String,
-    pub signature: String,
-    pub key_pair: KeyPair,
 }
 
 #[derive(Deserialize)]

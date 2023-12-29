@@ -4,14 +4,27 @@ use actix_web::{HttpResponse, Responder};
 use actix_web::web::{Json, Query};
 use bigdecimal::num_bigint::BigInt;
 use log::info;
+use serde::Deserialize;
 
-use crate::api::serializable_models::{ModulInverseRequest, SingleStringResponse, UseFastQuery};
+use crate::api::serializable_models::{SingleStringResponse, UseFastQuery};
 use crate::encryption::math_functions::number_theory::number_theory_service::{NumberTheoryService, NumberTheoryServiceTrait};
 use crate::encryption::math_functions::number_theory::number_theory_service::NumberTheoryServiceSpeed::{Fast, Slow};
 
-/**
- *
- */
+#[derive(Deserialize)]
+pub struct ModulInverseRequest {
+    pub n: String,
+    pub modul: String,
+}
+
+
+/// Berechnet das modulare Inverse.
+/// 
+/// # Arguments
+/// * `req_body` - Die Anfrage, die die Parameter für die modulare Inverse enthält.
+/// * `query` - Die Abfrage, ob der schnelle oder der langsame Algorithmus verwendet werden soll.
+/// 
+/// # Returns
+/// * `HttpResponse` - Die Antwort, die das Ergebnis der modularen Inverse enthält.
 pub(crate) async fn modular_inverse_endpoint(
     req_body: Json<ModulInverseRequest>,
     query: Query<UseFastQuery>,

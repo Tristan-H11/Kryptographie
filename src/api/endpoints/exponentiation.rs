@@ -4,14 +4,27 @@ use actix_web::web::{Json, Query};
 use actix_web::{HttpResponse, Responder};
 use bigdecimal::num_bigint::BigInt;
 use log::info;
+use serde::Deserialize;
 
-use crate::api::serializable_models::{ExponentiationRequest, SingleStringResponse, UseFastQuery};
+use crate::api::serializable_models::{SingleStringResponse, UseFastQuery};
 use crate::encryption::math_functions::number_theory::number_theory_service::{NumberTheoryService, NumberTheoryServiceTrait};
 use crate::encryption::math_functions::number_theory::number_theory_service::NumberTheoryServiceSpeed::{Fast, Slow};
 
-/**
- * Führt die Exponentiation aus
- */
+#[derive(Deserialize)]
+pub struct ExponentiationRequest {
+    pub exponent: String,
+    pub base: String,
+    pub modulus: String,
+}
+
+/// Berechnet die Exponentiation.
+/// 
+/// # Arguments
+/// * `req_body` - Die Anfrage, die die Parameter für die Exponentiation enthält.
+/// * `query` - Die Abfrage, ob der schnelle oder der langsame Algorithmus verwendet werden soll.
+/// 
+/// # Returns
+/// * `HttpResponse` - Die Antwort, die das Ergebnis der Exponentiation enthält.
 pub(crate) async fn exponentiation(
     req_body: Json<ExponentiationRequest>,
     query: Query<UseFastQuery>,

@@ -1,13 +1,21 @@
-use actix_web::web::{Json, Query};
 use actix_web::{HttpResponse, Responder};
+use actix_web::web::{Json, Query};
 use log::info;
+use serde::Deserialize;
 
-use crate::api::serializable_models::{CreateKeyPairRequest, KeyPair, UseFastQuery};
+use crate::api::serializable_models::{KeyPair, UseFastQuery};
 use crate::encryption::math_functions::number_theory::number_theory_service::NumberTheoryService;
 use crate::encryption::math_functions::number_theory::number_theory_service::NumberTheoryServiceSpeed::{Fast, Slow};
 use crate::encryption::rsa::rsa_keygen_service::RsaKeygenService;
 
-///
+#[derive(Deserialize)]
+pub struct CreateKeyPairRequest {
+    pub modulus_width: u32,
+    pub miller_rabin_rounds: u32,
+    pub random_seed: u32,
+    pub number_system_base: u32,
+}
+
 /// Erstellt ein neues Schlüsselpaar.
 ///
 /// # Arguments

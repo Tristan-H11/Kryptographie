@@ -4,15 +4,28 @@ use actix_web::web::{Json, Query};
 use actix_web::{HttpResponse, Responder};
 use bigdecimal::num_bigint::BigInt;
 use log::info;
+use serde::Deserialize;
 
-use crate::api::serializable_models::{ShanksRequest, SingleStringResponse, UseFastQuery};
+use crate::api::serializable_models::{SingleStringResponse, UseFastQuery};
 use crate::encryption::math_functions::babystep_giantstep::Shanks;
 use crate::encryption::math_functions::number_theory::number_theory_service::NumberTheoryService;
 use crate::encryption::math_functions::number_theory::number_theory_service::NumberTheoryServiceSpeed::{Fast, Slow};
 
-/**
- * Führt den erweiterten Euklidischen Algorithmus aus
- */
+#[derive(Deserialize)]
+pub struct ShanksRequest {
+    pub base: String,
+    pub element: String,
+    pub modul: String,
+}
+
+/// Berechnet den diskreten Logarithmus.
+/// 
+/// # Arguments
+/// * `req_body` - Die Anfrage, die die Parameter für die Berechnung des diskreten Logarithmus enthält.
+/// * `query` - Die Abfrage, ob der schnelle oder der langsame Algorithmus verwendet werden soll.
+/// 
+/// # Returns
+/// * `HttpResponse` - Die Antwort, die das Ergebnis des diskreten Logarithmus enthält.
 pub(crate) async fn shanks_endpoint(
     req_body: Json<ShanksRequest>,
     query: Query<UseFastQuery>,
