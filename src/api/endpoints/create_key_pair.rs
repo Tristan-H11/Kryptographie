@@ -39,11 +39,11 @@ pub(crate) async fn create_key_pair(
     );
 
     let key_pair_response = KeyPair {
-        modulus: public_key.get_n_as_str(),
-        e: public_key.get_e_as_str(),
-        d: private_key.get_d_as_str(),
-        block_size_pub: public_key.get_block_size_as_str(),
-        block_size_priv: private_key.get_block_size_as_str(),
+        modulus: public_key.n.to_str_radix(10),
+        e: public_key.e.to_str_radix(10),
+        d: private_key.d.to_str_radix(10),
+        block_size_pub: public_key.block_size.to_string(),
+        block_size_priv: private_key.block_size.to_string(),
     };
 
     HttpResponse::Ok().json(key_pair_response)
