@@ -6,7 +6,9 @@ use bigdecimal::num_bigint::BigInt;
 use log::info;
 
 use crate::api::serializable_models::{ShanksRequest, SingleStringResponse, UseFastQuery};
-use crate::encryption::math_functions::babystep_giantstep::shanks;
+use crate::encryption::math_functions::babystep_giantstep::Shanks;
+use crate::encryption::math_functions::number_theory::number_theory_service::NumberTheoryService;
+use crate::encryption::math_functions::number_theory::number_theory_service::NumberTheoryServiceSpeed::{Fast, Slow};
 
 /**
  * Führt den erweiterten Euklidischen Algorithmus aus
@@ -22,10 +24,18 @@ pub(crate) async fn shanks_endpoint(
     let req_body: ShanksRequest = req_body.into_inner();
     let use_fast = query.use_fast;
 
+    let number_theory_service = match use_fast {
+        true => NumberTheoryService::new(Fast),
+        false => NumberTheoryService::new(Slow),
+    };
+
+    let shanks_service = Shanks::new(number_theory_service);
+
     let base = BigInt::from_str(&req_body.base).unwrap();
     let element = BigInt::from_str(&req_body.element).unwrap();
     let modul = BigInt::from_str(&req_body.modul).unwrap();
-    let result = shanks(&base, &element, &modul, use_fast);
+
+    let result = shanks_service.calculate(&base, &element, &modul);
     match result {
         Ok(x) => {
             let response = SingleStringResponse {
