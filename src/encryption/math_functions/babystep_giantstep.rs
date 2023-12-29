@@ -115,23 +115,28 @@ mod tests {
     fn shanks_test() {
         run_test_for_all_services(|service| {
             let shanks_service = Shanks::new(service);
+            let result = shanks_service.calculate(&big_i!(8), &big_i!(555), &big_i!(677)).unwrap();
             assert_eq!(
-                shanks_service.calculate(&big_i!(8), &big_i!(555), &big_i!(677)).unwrap(),
+                result,
                 big_i!(134)
             );
+            let result = shanks_service.calculate(&big_i!(11), &big_i!(3), &big_i!(29)).unwrap();
             assert_eq!(
-                shanks_service.calculate(&big_i!(11), &big_i!(3), &big_i!(29)).unwrap(),
+                result,
                 big_i!(17)
             );
+            let result = shanks_service.calculate(&big_i!(10), &big_i!(25), &big_i!(97)).unwrap();
             assert_eq!(
-                shanks_service.calculate(&big_i!(10), &big_i!(25), &big_i!(97)).unwrap(),
+                result,
                 big_i!(22)
             );
+            let result = shanks_service.calculate(&big_i!(3), &big_i!(4), &big_i!(7)).unwrap();
             assert_eq!(
-                shanks_service.calculate(&big_i!(3), &big_i!(4), &big_i!(7)).unwrap(),
+                result,
                 big_i!(4)
             );
-            assert!(shanks_service.calculate(&big_i!(4), &big_i!(6), &big_i!(7)).is_err());
+            let result = shanks_service.calculate(&big_i!(4), &big_i!(6), &big_i!(7));
+            assert!(result.is_err());
             //Da Base nicht primitive Wurzel!
         });
     }
