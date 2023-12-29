@@ -1,12 +1,13 @@
 use std::str::FromStr;
 
-use actix_web::web::{Json, Query};
 use actix_web::{HttpResponse, Responder};
+use actix_web::web::{Json, Query};
 use bigdecimal::num_bigint::BigInt;
 use log::info;
 
 use crate::api::serializable_models::{ModulInverseRequest, SingleStringResponse, UseFastQuery};
-use crate::encryption::math_functions::number_theory::modulo_inverse::ModuloInverse;
+use crate::encryption::math_functions::number_theory::number_theory_service::{NumberTheoryService, NumberTheoryServiceTrait};
+use crate::encryption::math_functions::number_theory::number_theory_service::NumberTheoryServiceSpeed::{Fast, Slow};
 
 /**
  *
@@ -24,7 +25,13 @@ pub(crate) async fn modular_inverse_endpoint(
     let n = BigInt::from_str(&req_body.n).unwrap();
     let modul = BigInt::from_str(&req_body.modul).unwrap();
 
-    let result = ModuloInverse::calculate(&n, &modul, use_fast);
+    let number_theory_service = match use_fast {
+        true => NumberTheoryService::new(Fast),
+        false => NumberTheoryService::new(Slow),
+    };
+
+
+    let result = number_theory_service.modulo_inverse(&n, &modul);
 
     match result {
         Ok(x) => {

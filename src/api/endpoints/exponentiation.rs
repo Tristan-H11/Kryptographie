@@ -6,7 +6,8 @@ use bigdecimal::num_bigint::BigInt;
 use log::info;
 
 use crate::api::serializable_models::{ExponentiationRequest, SingleStringResponse, UseFastQuery};
-use crate::encryption::math_functions::number_theory::fast_exponentiation::FastExponentiation;
+use crate::encryption::math_functions::number_theory::number_theory_service::{NumberTheoryService, NumberTheoryServiceTrait};
+use crate::encryption::math_functions::number_theory::number_theory_service::NumberTheoryServiceSpeed::{Fast, Slow};
 
 /**
  * Führt die Exponentiation aus
@@ -26,7 +27,12 @@ pub(crate) async fn exponentiation(
     let base = &BigInt::from_str(&*req_body.base).unwrap();
     let modulus = &BigInt::from_str(&*req_body.modulus).unwrap();
 
-    let result = FastExponentiation::calculate(base, exponent, modulus, use_fast).to_str_radix(10);
+    let number_theory_service = match use_fast {
+        true => NumberTheoryService::new(Fast),
+        false => NumberTheoryService::new(Slow),
+    };
+
+    let result = number_theory_service.fast_exponentiation(base, exponent, modulus).to_str_radix(10);
 
     let response = SingleStringResponse { message: result };
 

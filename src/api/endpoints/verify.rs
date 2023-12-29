@@ -1,8 +1,10 @@
-use actix_web::web::{Json, Query};
 use actix_web::{HttpResponse, Responder};
+use actix_web::web::{Json, Query};
 use log::info;
 
 use crate::api::serializable_models::{SingleStringResponse, UseFastQuery, VerifyRequest};
+use crate::encryption::math_functions::number_theory::number_theory_service::NumberTheoryService;
+use crate::encryption::math_functions::number_theory::number_theory_service::NumberTheoryServiceSpeed::{Fast, Slow};
 
 ///
 /// Verifiziert eine Signatur zu einer Nachricht.
@@ -22,7 +24,14 @@ pub(crate) async fn verify(
     let signature = req_body.signature;
     let public_key = req_body.key_pair.to_public_key();
 
-    let plaintext = public_key.verify(&signature, &plaintext, use_fast);
+    let number_theory_service = match use_fast {
+        true => NumberTheoryService::new(Fast),
+        false => NumberTheoryService::new(Slow),
+    };
+
+    let rsa_service = crate::encryption::rsa::rsa_service::RsaService::new(number_theory_service);
+
+    let plaintext = rsa_service.verify(&signature, &plaintext, public_key);
     let response = SingleStringResponse {
         message: plaintext.to_string(),
     };

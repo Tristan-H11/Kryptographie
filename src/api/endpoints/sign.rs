@@ -1,8 +1,10 @@
-use actix_web::web::{Json, Query};
 use actix_web::{HttpResponse, Responder};
+use actix_web::web::{Json, Query};
 use log::info;
 
 use crate::api::serializable_models::{SignRequest, SingleStringResponse, UseFastQuery};
+use crate::encryption::math_functions::number_theory::number_theory_service::NumberTheoryService;
+use crate::encryption::math_functions::number_theory::number_theory_service::NumberTheoryServiceSpeed::{Fast, Slow};
 
 ///
 /// Signiert eine Nachricht.
@@ -21,7 +23,14 @@ pub(crate) async fn sign(
     let plaintext = req_body.plaintext;
     let private_key = req_body.key_pair.to_private_key();
 
-    let signature = private_key.sign(&plaintext, use_fast);
+    let number_theory_service = match use_fast {
+        true => NumberTheoryService::new(Fast),
+        false => NumberTheoryService::new(Slow),
+    };
+
+    let rsa_service = crate::encryption::rsa::rsa_service::RsaService::new(number_theory_service);
+
+    let signature = rsa_service.sign(&plaintext, private_key);
     let response = SingleStringResponse { message: signature };
 
     HttpResponse::Ok().json(response)
