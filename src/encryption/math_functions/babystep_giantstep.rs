@@ -7,6 +7,7 @@ use bigdecimal::num_bigint::BigInt;
 use crate::encryption::math_functions::number_theory::number_theory_service::{NumberTheoryService, NumberTheoryServiceTrait};
 use crate::encryption::math_functions::traits::increment::Increment;
 
+#[derive(Clone, Copy)]
 pub struct Shanks {
     number_theory_service: NumberTheoryService,
 }
