@@ -1,7 +1,6 @@
 use bigdecimal::num_bigint::BigInt;
 use log::debug;
 
-use crate::big_i;
 use crate::encryption::math_functions::traits::logarithm::Logarithm;
 
 ///
@@ -23,7 +22,7 @@ impl PublicKey {
     /// * `g_base` - Die Basis, in der die Nachricht verschlüsselt werden soll.
     pub fn new(e: BigInt, n: BigInt, g_base: u32) -> PublicKey {
         // Maximale Blockbreite = log_g(n).
-        let block_size = n.log(&big_i!(g_base));
+        let block_size = n.log(&g_base.into());
         debug!("Blocksize in der PublicKey-Erstellung: {}", block_size);
         PublicKey { e, n, block_size }
     }
@@ -61,7 +60,7 @@ impl PrivateKey {
     /// * `g_base` - Die Basis, in der die Nachricht verschlüsselt werden soll.
     pub fn new(d: BigInt, n: BigInt, g_base: u32) -> PrivateKey {
         // Die Größe der verschlüsselten Blöcke ist immer um 1 größer als die Klartextgröße.
-        let block_size = n.log(&big_i!(g_base)) + 1;
+        let block_size = n.log(&g_base.into()) + 1;
         debug!("Blocksize in der PrivateKey-Erstellung: {}", block_size);
         PrivateKey { d, n, block_size }
     }

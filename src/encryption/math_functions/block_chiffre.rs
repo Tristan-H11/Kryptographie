@@ -1,9 +1,7 @@
-use bigdecimal::num_bigint::BigInt;
 use bigdecimal::{One, Zero};
+use bigdecimal::num_bigint::BigInt;
 use log::{debug, trace};
 use num::Integer;
-
-use crate::big_i;
 
 /// Diese Methode erzeugt einen Vektor mit BigInts, der aus einem String mit einer
 /// bestimmten Blockgröße erstellt wurde.
@@ -28,7 +26,7 @@ pub(crate) fn encode_string_to_blocks(
     );
     let b = split_into_blocks(m, block_size, fill_blocks);
     let i_vec = string_to_int_vec(b);
-    to_sum_vec(i_vec, &big_i!(g_base))
+    to_sum_vec(i_vec, &g_base.into())
 }
 
 /// Diese Methode erzeugt einen String aus einem Vektor mit BigInts, die bereits verschlüsselt
@@ -54,7 +52,7 @@ pub(crate) fn create_string_from_blocks_encrypt(
 
     let mut result = String::new();
     for sum in sums {
-        let string = helper_fun_sum_to_string(&sum, &big_i!(g_base));
+        let string = helper_fun_sum_to_string(&sum, &g_base.into());
         debug!("Chiffrierter Vector: {:?}", string);
 
         // Füllt jeden String vorne mit "0", um die maximale Länge zu erreichen
@@ -82,7 +80,7 @@ pub(crate) fn create_string_from_blocks_decrypt(sums: Vec<BigInt>, g_base: u32) 
         "Erstelle String aus Vektor von Summen. Vektorgröße: {}",
         sums.len()
     );
-    let strings = sums_vec_to_string_vec(sums, &big_i!(g_base));
+    let strings = sums_vec_to_string_vec(sums, &g_base.into());
     debug!("Chiffrierter Vector: {:?}", strings);
 
     let result = strings.join("");
@@ -180,7 +178,8 @@ fn helper_fun_sum_for_digits(i_vec: &Vec<u32>, g_base: &BigInt) -> BigInt {
         (BigInt::zero(), BigInt::one()),
         |(acc_sum, acc_base), &digit| {
             trace!("Addiere {} * {} zu Summe", acc_base, digit);
-            (&acc_sum + &acc_base * big_i!(digit), acc_base * g_base)
+            let product: BigInt = &acc_base * digit;
+            (&acc_sum + product, acc_base * g_base)
         },
     );
 
@@ -253,8 +252,6 @@ fn big_int_to_u32(value: &BigInt) -> u32 {
 #[cfg(test)]
 mod tests {
     use bigdecimal::num_bigint::BigInt;
-
-    use crate::big_i;
     use crate::encryption::math_functions::block_chiffre::{
         big_int_to_u32, create_string_from_blocks_decrypt, create_string_from_blocks_encrypt,
         encode_string_to_blocks, split_into_blocks, string_to_int_vec, sums_vec_to_string_vec,
@@ -326,11 +323,11 @@ mod tests {
         let block_size = 7;
         let _basis_length = 55296 as u32;
         let result = encode_string_to_blocks(message, block_size, true, 55296);
-        let expected_result = vec![
-            big_i!(1943938337267550087026074257524),
-            big_i!(914822981356602019800946507860),
-            big_i!(2887304683313907978613082523752),
-            big_i!(3258925137110102081877384560672),
+        let expected_result: Vec<BigInt> = vec![
+            BigInt::from(1943938337267550087026074257524u128),
+            BigInt::from(914822981356602019800946507860u128),
+            BigInt::from(2887304683313907978613082523752u128),
+            BigInt::from(3258925137110102081877384560672u128),
         ];
         assert_eq!(result, expected_result);
     }
@@ -338,10 +335,10 @@ mod tests {
     #[test]
     fn test_decrypt_chiffre() {
         let sums = vec![
-            big_i!(1943938337267550087026074257524),
-            big_i!(914822981356602019800946507860),
-            big_i!(2887304683313907978613082523752),
-            big_i!(3258925137110102081877384560672),
+            BigInt::from(1943938337267550087026074257524u128),
+            BigInt::from(914822981356602019800946507860u128),
+            BigInt::from(2887304683313907978613082523752u128),
+            BigInt::from(3258925137110102081877384560672u128),
         ];
         let result = create_string_from_blocks_decrypt(sums, 55296);
         let expected_result = "Da苉 ist eine Testnachricht".to_string();
@@ -408,17 +405,17 @@ mod tests {
             vec!['h' as u32, 't' as u32, ' ' as u32, ' ' as u32],
         ];
 
-        let base = big_i!(55296);
+        let base = 55296.into();
         let result = to_sum_vec(digit_vectors, &base);
 
         let expected_result = vec![
-            big_i!(11497444858239008),
-            big_i!(17753298306195488),
-            big_i!(17076964999090277),
-            big_i!(5410678690363507),
-            big_i!(19613115525224547),
-            big_i!(17584219565365347),
-            big_i!(17584225676623904),
+            BigInt::from(11497444858239008u64),
+            BigInt::from(17753298306195488u64),
+            BigInt::from(17076964999090277u64),
+            BigInt::from(5410678690363507u64),
+            BigInt::from(19613115525224547u64),
+            BigInt::from(17584219565365347u64),
+            BigInt::from(17584225676623904u64),
         ];
         assert_eq!(result, expected_result);
     }
@@ -426,16 +423,16 @@ mod tests {
     #[test]
     fn test_sum_to_strings() {
         let sums = vec![
-            big_i!(11497444858239008),
-            big_i!(17753298306195488),
-            big_i!(17076964999090277),
-            big_i!(5410678690363507),
-            big_i!(19613115525224547),
-            big_i!(17584219565365347),
-            big_i!(17584225676623904),
+            BigInt::from(11497444858239008u64),
+            BigInt::from(17753298306195488u64),
+            BigInt::from(17076964999090277u64),
+            BigInt::from(5410678690363507u64),
+            BigInt::from(19613115525224547u64),
+            BigInt::from(17584219565365347u64),
+            BigInt::from(17584225676623904u64),
         ];
 
-        let base = big_i!(55296);
+        let base = 55296.into();
         let result = sums_vec_to_string_vec(sums, &base);
 
         let expected_result = vec![
@@ -496,7 +493,7 @@ mod tests {
 
     #[test]
     fn test_ubig_to_u32() {
-        let value = big_i!(12345);
+        let value = 12345.into();
         let result = big_int_to_u32(&value);
         assert_eq!(result, 12345);
     }

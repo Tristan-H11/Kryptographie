@@ -2,7 +2,6 @@ use atomic_counter::RelaxedCounter;
 use num::{BigInt, One, Zero};
 use rayon::prelude::{IntoParallelIterator, ParallelIterator};
 
-use crate::big_i;
 use crate::encryption::math_functions::number_theory::number_theory_service::NumberTheoryService;
 use crate::encryption::math_functions::number_theory::number_theory_service::NumberTheoryServiceTrait;
 use crate::encryption::math_functions::pseudo_random_number_generator::PseudoRandomNumberGenerator;
@@ -29,7 +28,7 @@ impl PrimalityTest {
     /// **Achtung: Funktioniert nur für Prim-Kandidaten größer 300**
     ///
     pub fn fails_primitive_prime_checks(p: &BigInt) -> bool {
-        if p < &big_i!(300) {
+        if p < &300.into() {
             panic!("Primitive Primzahltests nur für p > 300 implementiert.");
         }
         // Gerade Zahlen sind nie prim.
@@ -41,7 +40,7 @@ impl PrimalityTest {
 
         let prime_division_test = small_primes
             .into_par_iter()
-            .any(|prime| p.is_divisible_by(&big_i!(prime)));
+            .any(|prime| p.is_divisible_by(&prime.into()));
         prime_division_test
     }
 
@@ -74,7 +73,7 @@ impl PrimalityTest {
         let n_counter = RelaxedCounter::new(0);
 
         (0..repeats).into_par_iter().all(|_| {
-            let mut a = random_generator.take(&big_i!(2), &p, &n_counter);
+            let mut a = random_generator.take(&2.into(), &p, &n_counter);
             while p.is_divisible_by(&a) {
                 a = random_generator.take(&2.into(), &p, &n_counter);
             }
@@ -104,7 +103,7 @@ impl PrimalityTest {
         while &r < s {
             x = self
                 .number_theory_service
-                .fast_exponentiation(&x, &big_i!(2), p);
+                .fast_exponentiation(&x, &2.into(), p);
             if x == p.decrement() {
                 return true;
             }
@@ -125,18 +124,16 @@ fn get_primes_to_300() -> [u32; 61] {
 
 #[cfg(test)]
 mod tests {
-    use num::BigInt;
-
     use super::*;
 
     #[test]
     #[should_panic]
     fn test_panic_fast_with_small_p() {
-        PrimalityTest::fails_primitive_prime_checks(&big_i!(11));
+        PrimalityTest::fails_primitive_prime_checks(&11.into());
     }
 
     #[test]
     fn test_no_panic_with_big_p() {
-        PrimalityTest::fails_primitive_prime_checks(&big_i!(1001));
+        PrimalityTest::fails_primitive_prime_checks(&1001.into());
     }
 }

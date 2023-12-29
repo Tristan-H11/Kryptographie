@@ -38,25 +38,24 @@ impl<T: One + Clone + Mul<Output = T> + PartialOrd> Logarithm for T {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::big_i;
     use num::BigInt;
 
     #[test]
     fn test_log_base_g() {
-        let x1 = big_i!(16);
-        let base1 = big_i!(2);
+        let x1 = BigInt::from(16);
+        let base1 = BigInt::from(2);
         assert_eq!(x1.log(&base1), 4);
 
-        let x2 = big_i!(6);
-        let base2 = big_i!(4);
+        let x2 = BigInt::from(6);
+        let base2 = BigInt::from(4);
         assert_eq!(x2.log(&base2), 1);
 
-        let x3 = big_i!(7);
-        let base3 = big_i!(3);
+        let x3 = BigInt::from(7);
+        let base3 = BigInt::from(3);
         assert_eq!(x3.log(&base3), 1);
 
-        let x4 = big_i!(2).pow(256);
-        let base4 = big_i!(55296);
+        let x4 = BigInt::from(2).pow(256);
+        let base4 = BigInt::from(55296);
         assert_eq!(x4.log(&base4), 16);
     }
 }

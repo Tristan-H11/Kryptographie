@@ -3,7 +3,6 @@ use bigdecimal::num_bigint::BigInt;
 use bigdecimal::One;
 use log::{debug, trace};
 
-use crate::big_i;
 use crate::encryption::math_functions::number_theory::number_theory_service::{
     NumberTheoryService, NumberTheoryServiceTrait,
 };
@@ -141,8 +140,8 @@ impl RsaKeygenService {
             size, miller_rabin_iterations
         );
 
-        let upper_bound = &big_i!(2).pow(size);
-        let lower_bound = &big_i!(2).pow(size - 1);
+        let upper_bound = &BigInt::from(2).pow(size);
+        let lower_bound = &BigInt::from(2).pow(size - 1);
 
         let mut prime_candidate = random_generator.take_uneven(lower_bound, upper_bound, n_counter);
 
@@ -178,7 +177,7 @@ impl RsaKeygenService {
 
         let n_counter = RelaxedCounter::new(1);
 
-        let mut e = random_generator.take(&big_i!(3u8), &phi.decrement(), &n_counter);
+        let mut e = random_generator.take(&3.into(), &phi.decrement(), &n_counter);
         while e < *phi {
             let ggt = self.number_theory_service.extended_euclid(&e, phi).0;
             if ggt.is_one() {

@@ -28,19 +28,18 @@ impl Parity for BigInt {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::big_i;
     use num::BigInt;
 
     #[test]
     fn test_is_even() {
-        let big_int: BigInt = big_i!(34563u32);
+        let big_int: BigInt = BigInt::from(34563u32);
         assert_eq!(big_int.is_even(), false);
-        assert_eq!(big_i!(8564u32).is_even(), true);
+        assert_eq!(BigInt::from(8564u32).is_even(), true);
     }
 
     #[test]
     fn test_is_uneven() {
-        assert_eq!(big_i!(24390u32).is_odd(), false);
-        assert_eq!(big_i!(1435099u32).is_odd(), true);
+        assert_eq!(BigInt::from(24390u32).is_odd(), false);
+        assert_eq!(BigInt::from(1435099u32).is_odd(), true);
     }
 }

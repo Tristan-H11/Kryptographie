@@ -46,33 +46,32 @@ impl<T: One + Clone + Add<Output = T> + Sub<Output = T>> Increment for T {
 
 #[cfg(test)]
 mod tests {
+    use bigdecimal::num_bigint::BigInt;
     use super::*;
-    use crate::big_u;
-    use num::BigUint;
 
     #[test]
     fn test_increment() {
-        assert_eq!(big_u!(3u32).increment(), big_u!(4u32));
-        assert_eq!(big_u!(0u32).increment(), big_u!(1u32));
+        assert_eq!(BigInt::from(3).increment(), BigInt::from(4));
+        assert_eq!(BigInt::from(0).increment(), BigInt::from(1));
     }
 
     #[test]
     fn test_decrement() {
-        assert_eq!(big_u!(3u32).decrement(), big_u!(2u32));
-        assert_eq!(big_u!(1u32).decrement(), big_u!(0u32));
+        assert_eq!(BigInt::from(3).decrement(), BigInt::from(2));
+        assert_eq!(BigInt::from(1).decrement(), BigInt::from(0));
     }
 
     #[test]
     fn test_increment_assign() {
-        let mut uint = big_u!(3u32);
+        let mut uint = BigInt::from(3);
         uint.increment_assign();
-        assert_eq!(uint, big_u!(4u32));
+        assert_eq!(uint, BigInt::from(4));
     }
 
     #[test]
     fn test_decrement_assign() {
-        let mut uint = big_u!(3u32);
+        let mut uint = BigInt::from(3);
         uint.decrement_assign();
-        assert_eq!(uint, big_u!(2u32));
+        assert_eq!(uint, BigInt::from(2));
     }
 }

@@ -174,7 +174,6 @@ pub trait NumberTheoryServiceTrait {
 mod tests {
     use std::str::FromStr;
 
-    use crate::big_i;
     use crate::encryption::math_functions::number_theory::number_theory_service::NumberTheoryServiceSpeed::{Fast, Slow};
 
     use super::*;
@@ -188,16 +187,16 @@ mod tests {
     fn extended_euclid_test() {
         run_test_for_all_services(|service| {
             assert_eq!(
-                service.extended_euclid(&big_i!(6), &big_i!(11)),
-                (big_i!(1), big_i!(2), big_i!(-1))
+                service.extended_euclid(&6.into(), &11.into()),
+                (1.into(), 2.into(), BigInt::from(-1))
             );
             assert_eq!(
-                service.extended_euclid(&big_i!(78), &big_i!(99)),
-                (big_i!(3), big_i!(14), big_i!(-11))
+                service.extended_euclid(&78.into(), &99.into()),
+                (3.into(), 14.into(), BigInt::from(-11))
             );
             assert_eq!(
-                service.extended_euclid(&big_i!(315), &big_i!(661643)),
-                (big_i!(1), big_i!(-319269), big_i!(152))
+                service.extended_euclid(&315.into(), &661643.into()),
+                (1.into(), BigInt::from(-319269), 152.into())
             );
             assert_eq!(
                 service.extended_euclid(
@@ -206,9 +205,9 @@ mod tests {
                         .unwrap(),
                 ),
                 (
-                    big_i!(1),
+                    1.into(),
                     BigInt::from_str("7173228757438794445922076835963679049602847038123").unwrap(),
-                    big_i!(-43732645957409398462249346726)
+                    BigInt::from(-43732645957409398462249346726i128)
                 )
             );
         });
@@ -218,18 +217,18 @@ mod tests {
     fn modulo_inverse_test() {
         run_test_for_all_services(|service| {
             assert_eq!(
-                service.modulo_inverse(&big_i!(1), &big_i!(3)).unwrap(),
-                big_i!(1)
+                service.modulo_inverse(&1.into(), &3.into()).unwrap(),
+                1.into()
             );
             assert_eq!(
-                service.modulo_inverse(&big_i!(5), &big_i!(11)).unwrap(),
-                big_i!(9)
+                service.modulo_inverse(&5.into(), &11.into()).unwrap(),
+                9.into()
             );
             assert_eq!(
                 service
-                    .modulo_inverse(&big_i!(315), &big_i!(661643))
+                    .modulo_inverse(&315.into(), &661643.into())
                     .unwrap(),
-                big_i!(342374)
+                342374.into()
             );
             assert_eq!(
                 service
@@ -241,7 +240,7 @@ mod tests {
                     .unwrap(),
                 BigInt::from_str("7173228757438794445922076835963679049602847038123").unwrap()
             );
-            assert!(service.modulo_inverse(&big_i!(78), &big_i!(99)).is_err());
+            assert!(service.modulo_inverse(&78.into(), &99.into()).is_err());
         });
     }
 
@@ -251,7 +250,7 @@ mod tests {
             let random_generator: &PseudoRandomNumberGenerator =
                 &PseudoRandomNumberGenerator::new(11);
             assert_eq!(
-                service.is_probably_prime(&big_i!(11), 100, random_generator),
+                service.is_probably_prime(&11.into(), 100, random_generator),
                 true
             );
             assert_eq!(
@@ -281,7 +280,7 @@ mod tests {
                 false
             );
             assert_eq!(
-                service.is_probably_prime(&big_i!(2211), 40, random_generator),
+                service.is_probably_prime(&2211.into(), 40, random_generator),
                 false
             );
             assert_eq!(
@@ -299,20 +298,20 @@ mod tests {
     #[test]
     fn fast_exponentiation_happy_flow() {
         run_test_for_all_services(|service| {
-            let base = &big_i!(561563);
-            let exponent = &big_i!(1300);
-            let modul = &big_i!(564);
+            let base = &561563.into();
+            let exponent = &1300.into();
+            let modul = &564.into();
             assert_eq!(
                 service.fast_exponentiation(base, exponent, modul),
-                big_i!(205)
+                205.into()
             );
 
-            let base = &big_i!(56156334590832345);
-            let exponent = &big_i!(109458390583094852904812340);
-            let modul = &big_i!(564234859);
+            let base = &BigInt::from(56156334590832345u64);
+            let exponent = &BigInt::from(109458390583094852904812340u128);
+            let modul = &564234859.into();
             assert_eq!(
                 service.fast_exponentiation(base, exponent, modul),
-                big_i!(558376785)
+                558376785.into()
             );
         });
     }
@@ -320,12 +319,12 @@ mod tests {
     #[test]
     fn fast_exponentiation_exponent_one() {
         run_test_for_all_services(|service| {
-            let base = &big_i!(561563);
-            let exponent = &big_i!(1);
-            let modul = &big_i!(564);
+            let base = &561563.into();
+            let exponent = &1.into();
+            let modul = &564.into();
             assert_eq!(
                 service.fast_exponentiation(base, exponent, modul),
-                big_i!(383)
+                383.into()
             );
         });
     }
@@ -333,12 +332,12 @@ mod tests {
     #[test]
     fn fast_exponentiation_exponent_zero() {
         run_test_for_all_services(|service| {
-            let base = &big_i!(561563);
-            let exponent = &big_i!(0);
-            let modul = &big_i!(564);
+            let base = &561563.into();
+            let exponent = &0.into();
+            let modul = &564.into();
             assert_eq!(
                 service.fast_exponentiation(base, exponent, modul),
-                big_i!(1)
+                1.into()
             );
         });
     }
@@ -346,12 +345,12 @@ mod tests {
     #[test]
     fn fast_exponentiation_base_zero() {
         run_test_for_all_services(|service| {
-            let base = &big_i!(0);
-            let exponent = &big_i!(561563);
-            let modul = &big_i!(564);
+            let base = &0.into();
+            let exponent = &561563.into();
+            let modul = &564.into();
             assert_eq!(
                 service.fast_exponentiation(base, exponent, modul),
-                big_i!(0)
+                0.into()
             );
         });
     }
@@ -359,12 +358,12 @@ mod tests {
     #[test]
     fn fast_exponentiation_modul_one() {
         run_test_for_all_services(|service| {
-            let base = &big_i!(3459860);
-            let exponent = &big_i!(561563);
-            let modul = &big_i!(1);
+            let base = &3459860.into();
+            let exponent = &561563.into();
+            let modul = &1.into();
             assert_eq!(
                 service.fast_exponentiation(base, exponent, modul),
-                big_i!(0)
+                0.into()
             );
         });
     }
@@ -372,25 +371,26 @@ mod tests {
     #[test]
     fn fast_exponentiation_big_numbers() {
         run_test_for_all_services(|service| {
-            let base = &big_i!(3459860).pow(50);
-            let exponent = &big_i!(561563).pow(50);
-            let modul = &big_i!(345902).pow(50);
+            let base: &BigInt = &BigInt::from(3459860).pow(50);
+            let exponent = &BigInt::from(561563).pow(50);
+            let modul = &BigInt::from(345902).pow(50);
             assert_eq!(
                 service.fast_exponentiation(base, exponent, modul),
                 BigInt::from_str("8408769600151667634624424658533698267981486479206207837400880482584240253227309957477768628293816726387378101618036878012339908404810884160600885622896014991205830046127587869666780551862829518403374323613697514544975024376847169484921172903282824411000834600056510593848311808").unwrap()
             );
 
-            let base = &big_i!(5345890).pow(50);
-            let exponent = &big_i!(561563).pow(50);
-            let modul = &big_i!(402).pow(453);
+
+            let base: &BigInt = &BigInt::from(5345890).pow(50);
+            let exponent = &BigInt::from(561563).pow(50);
+            let modul = &BigInt::from(402).pow(50);
             assert_eq!(
                 service.fast_exponentiation(base, exponent, modul),
                 BigInt::from_str("3865812286670140244135659583582784422868607182053532234892119221318009519049840848928181595205903918350994052685502954280587622821049262028969781448838683538880584872202936321233747460151097175519490133290457481138503925299942681667894197628591512134856836351617429125260375231408269314105167853219462996964862842118589984098650391290176408417243048103776854044821474824889320850667507890395769983356345061882029969478502315374312501247186250351754934295084246986742329795390786311078628530440754856479205141409578653316171690967468840184450509388030981031737577810850620779725958417192948561835194773695941361612225803217565675522961705627046360944634654621872586535332182764197222888226270388954006295237642124544864715066176310557964933132099186352875757363791307327674799516376108738026266118794617758595269081482227829599835454778768141217737588053896979935711190022064516393010329090283156674631737792250605934457811116131051558041088439411741976788375428610551855415643131350851177642819664715803674680663207355557044121133492467414028969595889934382173724212977872023208326609954389561973252556941619801122899324611797790397387249251896640501121328429738301895459647520768").unwrap()
             );
 
             assert_eq!(
-                service.fast_exponentiation(&big_i!(37), &big_i!(2), &big_i!(89)),
-                big_i!(34)
+                service.fast_exponentiation(&37.into(), &2.into(), &89.into()),
+                34.into()
             )
         });
     }

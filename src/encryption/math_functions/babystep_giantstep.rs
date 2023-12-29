@@ -1,8 +1,8 @@
 use std::collections::HashMap;
 use std::io::{Error, ErrorKind};
 
-use bigdecimal::num_bigint::BigInt;
 use bigdecimal::{One, Zero};
+use bigdecimal::num_bigint::BigInt;
 
 use crate::encryption::math_functions::number_theory::number_theory_service::{
     NumberTheoryService, NumberTheoryServiceTrait,
@@ -106,9 +106,6 @@ impl Shanks {
 
 #[cfg(test)]
 mod tests {
-    use num::BigInt;
-
-    use crate::big_i;
     use crate::encryption::math_functions::number_theory::number_theory_service::NumberTheoryServiceSpeed::{Fast, Slow};
 
     use super::*;
@@ -123,22 +120,22 @@ mod tests {
         run_test_for_all_services(|service| {
             let shanks_service = Shanks::new(service);
             let result = shanks_service
-                .calculate(&big_i!(8), &big_i!(555), &big_i!(677))
+                .calculate(&8.into(), &555.into(), &677.into())
                 .unwrap();
-            assert_eq!(result, big_i!(134));
+            assert_eq!(result, 134.into());
             let result = shanks_service
-                .calculate(&big_i!(11), &big_i!(3), &big_i!(29))
+                .calculate(&11.into(), &3.into(), &29.into())
                 .unwrap();
-            assert_eq!(result, big_i!(17));
+            assert_eq!(result, 17.into());
             let result = shanks_service
-                .calculate(&big_i!(10), &big_i!(25), &big_i!(97))
+                .calculate(&10.into(), &25.into(), &97.into())
                 .unwrap();
-            assert_eq!(result, big_i!(22));
+            assert_eq!(result, 22.into());
             let result = shanks_service
-                .calculate(&big_i!(3), &big_i!(4), &big_i!(7))
+                .calculate(&3.into(), &4.into(), &7.into())
                 .unwrap();
-            assert_eq!(result, big_i!(4));
-            let result = shanks_service.calculate(&big_i!(4), &big_i!(6), &big_i!(7));
+            assert_eq!(result, 4.into());
+            let result = shanks_service.calculate(&4.into(), &6.into(), &7.into());
             assert!(result.is_err());
             //Da Base nicht primitive Wurzel!
         });

@@ -67,66 +67,65 @@ where
 
 #[cfg(test)]
 mod tests {
-    use num::BigUint;
-
-    use crate::big_u;
+    use bigdecimal::num_bigint::BigInt;
+    use bigdecimal::One;
 
     use super::*;
 
     #[test]
     fn test_divides() {
-        assert_eq!(big_u!(8u32).is_divisible_by(&big_u!(4u32)), true);
-        assert_eq!(big_u!(89893457u32).is_divisible_by(&big_u!(1u32)), true);
+        assert_eq!(BigInt::from(8).is_divisible_by(&4.into()), true);
+        assert_eq!(BigInt::from(89893457).is_divisible_by(&1.into()), true);
         assert_eq!(
-            big_u!(89893457u32).is_divisible_by(&big_u!(657831u32)),
+            BigInt::from(89893457).is_divisible_by(&657831.into()),
             false
         );
     }
 
     #[test]
     fn test_not_divides() {
-        assert_eq!(big_u!(8u32).is_not_divisible_by(&big_u!(4u32)), false);
+        assert_eq!(BigInt::from(8).is_not_divisible_by(&4.into()), false);
         assert_eq!(
-            big_u!(89893457u32).is_not_divisible_by(&big_u!(1u32)),
+            BigInt::from(89893457).is_not_divisible_by(&1.into()),
             false
         );
         assert_eq!(
-            big_u!(89893457u32).is_not_divisible_by(&big_u!(657831u32)),
+            BigInt::from(89893457).is_not_divisible_by(&657831.into()),
             true
         );
     }
 
     #[test]
     fn test_half() {
-        assert_eq!(big_u!(8u32).half(), big_u!(4u32));
-        assert_eq!(big_u!(1u32).half(), big_u!(0u32));
+        assert_eq!(BigInt::from(8).half(), 4.into());
+        assert_eq!(BigInt::one().half(), 0.into());
     }
 
     #[test]
     fn test_half_assign() {
-        let mut uint = big_u!(8u32);
-        uint.half_assign();
-        assert_eq!(uint, big_u!(4u32));
+        let mut x: BigInt = 8.into();
+        x.half_assign();
+        assert_eq!(x, 4.into());
 
-        let mut uint = big_u!(1u32);
-        uint.half_assign();
-        assert_eq!(uint, big_u!(0u32));
+        let mut y: BigInt = 1.into();
+        y.half_assign();
+        assert_eq!(y, 0.into());
     }
 
     #[test]
     fn test_double() {
-        assert_eq!(big_u!(8u32).double(), big_u!(16u32));
-        assert_eq!(big_u!(1u32).double(), big_u!(2u32));
+        assert_eq!(BigInt::from(8).double(), 16.into());
+        assert_eq!(BigInt::one().double(), 2.into());
     }
 
     #[test]
     fn test_double_assign() {
-        let mut uint = big_u!(8u32);
-        uint.double_assign();
-        assert_eq!(uint, big_u!(16u32));
+        let mut x: BigInt = 8.into();
+        x.double_assign();
+        assert_eq!(x, 16.into());
 
-        let mut uint = big_u!(1u32);
-        uint.double_assign();
-        assert_eq!(uint, big_u!(2u32));
+        let mut y: BigInt = 1.into();
+        y.double_assign();
+        assert_eq!(y, 2.into());
     }
 }
