@@ -43,7 +43,6 @@ impl RsaKeygenService {
     /// * `miller_rabin_iterations` - Die Anzahl der Iterationen für den Miller-Rabin-Test.
     /// * `random_seed` - Der Seed für die gleichverteilte Zufallszahlerzeugung.
     /// * `g_base` - Die Basis des Zeichensatzes, der für die Verschlüsselung verwendet wird.
-    /// * `use_fast` - Gibt an, ob die schnellen Varianten der Algorithmen verwendet werden sollen.
     ///
     /// # Rückgabe
     /// Ein Tupel aus dem öffentlichen und privaten Schlüssel.
@@ -79,7 +78,6 @@ impl RsaKeygenService {
     /// # Argumente
     /// * `miller_rabin_iterations` - Die Anzahl der Iterationen für den Miller-Rabin-Test.
     /// * `random_generator` - Der Pseudo-Zufallszahlengenerator.
-    /// * `use_fast` - Gibt an, ob die schnellen Varianten der Algorithmen verwendet werden sollen.
     fn get_distinct_primes(
         &self,
         miller_rabin_iterations: u32,
@@ -124,7 +122,6 @@ impl RsaKeygenService {
     /// * `miller_rabin_iterations` - Die Anzahl der Iterationen für den Miller-Rabin-Test.
     /// * `random_generator` - Der Pseudo-Zufallszahlengenerator.
     /// * `n_counter` - Der Zähler für den Zugriff auf die Zufallsfolge. Achtung: Der Zähler wird inkrementiert!
-    /// * `use_fast` - Gibt an, ob die schnellen Varianten der Algorithmen verwendet werden sollen.
     ///
     /// # Rückgabe
     /// Die generierte Primzahl.
@@ -168,7 +165,6 @@ impl RsaKeygenService {
     /// # Argumente
     /// * `phi` - Die Zahl `phi`.
     /// * `random_generator` - Der Pseudo-Zufallszahlengenerator.
-    /// * `use_fast` - Gibt an, ob die schnellen Varianten der Algorithmen verwendet werden sollen.
     ///
     /// # Rückgabe
     /// Die generierte Zahl `e`.
@@ -196,7 +192,6 @@ impl RsaKeygenService {
     /// # Argumente
     /// * `e` - Die Zahl `e`.
     /// * `phi` - Die Zahl `phi`.
-    /// * `use_fast` - Gibt an, ob die schnellen Varianten der Algorithmen verwendet werden sollen.
     ///
     /// # Rückgabe
     /// Die generierte Zahl `d`.

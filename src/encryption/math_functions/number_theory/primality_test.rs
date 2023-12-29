@@ -51,7 +51,6 @@ impl PrimalityTest {
     /// * `repeats`: Die Anzahl der Wiederholungen des Tests.
     /// * `random_generator`: Ein Pseudozufallszahlengenerator, der für die Erzeugung
     ///   der Zufallszahlen verwendet wird.
-    /// * `use_fast`: Gibt an, ob der schnelle Miller-Rabin-Test verwendet werden soll.
     ///
     /// # Rückgabe
     /// * `true`, wenn der Integer wahrscheinlich eine Primzahl ist, `false`, wenn nicht.
@@ -101,9 +100,7 @@ impl PrimalityTest {
         let mut r = BigInt::zero();
 
         while &r < s {
-            x = self
-                .number_theory_service
-                .fast_exponentiation(&x, &2.into(), p);
+            x = self.number_theory_service.fast_exponentiation(&x, &2.into(), p);
             if x == p.decrement() {
                 return true;
             }
