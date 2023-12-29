@@ -3,13 +3,11 @@ use bigdecimal::num_bigint::{BigInt, ToBigInt};
 use bigdecimal::{BigDecimal, One};
 use log::trace;
 
-use crate::big_d;
 use crate::encryption::math_functions::traits::increment::Increment;
 
 ///
 /// Iterator für eine deterministische Zufallszahlfolge.
 ///
-#[derive(Clone)]
 pub struct PseudoRandomNumberGenerator {
     sqrt_m: BigDecimal,
 }
@@ -30,7 +28,7 @@ impl PseudoRandomNumberGenerator {
         let mut initial_random = random_seed;
         let sqrt_m;
         loop {
-            match big_d!(initial_random).sqrt() {
+            match BigDecimal::from(initial_random).sqrt() {
                 Some(sqrt) => {
                     if !sqrt.is_integer() {
                         sqrt_m = sqrt;
@@ -62,8 +60,8 @@ impl PseudoRandomNumberGenerator {
             b,
             n_counter.get()
         );
-        let factor = (big_d!(n_counter.inc() as u64) * &self.sqrt_m) % BigDecimal::one();
-        let range = big_d!(b - a + BigInt::one());
+        let factor: BigDecimal = (BigDecimal::from(n_counter.inc() as u32) * &self.sqrt_m) % BigDecimal::one();
+        let range: BigDecimal = (b - a + BigInt::one()).into();
 
         // Das unwrap() wird niemals fehlschlagen, weil die Implementation von to_bigint() nur
         // Some, aber niemals None zurückgibt. Es ist unklar, warum es überhaupt Option ist.
