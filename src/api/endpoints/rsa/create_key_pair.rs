@@ -1,5 +1,5 @@
-use actix_web::{HttpResponse, Responder};
 use actix_web::web::{Json, Query};
+use actix_web::{HttpResponse, Responder};
 use log::info;
 use serde::Deserialize;
 

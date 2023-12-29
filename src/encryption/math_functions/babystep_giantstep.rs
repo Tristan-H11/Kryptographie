@@ -1,10 +1,12 @@
 use std::collections::HashMap;
 use std::io::{Error, ErrorKind};
 
-use bigdecimal::{One, Zero};
 use bigdecimal::num_bigint::BigInt;
+use bigdecimal::{One, Zero};
 
-use crate::encryption::math_functions::number_theory::number_theory_service::{NumberTheoryService, NumberTheoryServiceTrait};
+use crate::encryption::math_functions::number_theory::number_theory_service::{
+    NumberTheoryService, NumberTheoryServiceTrait,
+};
 use crate::encryption::math_functions::traits::increment::Increment;
 
 #[derive(Clone, Copy)]
@@ -59,11 +61,15 @@ impl Shanks {
         }
 
         //Berechnet Giantsteps und speichert sie
-        let g_ex_m = self.number_theory_service.fast_exponentiation(base, &m, modul);
+        let g_ex_m = self
+            .number_theory_service
+            .fast_exponentiation(base, &m, modul);
         let mut hash: HashMap<BigInt, BigInt> = HashMap::new();
         let mut j = BigInt::zero();
         while j < m {
-            let giantstep = self.number_theory_service.fast_exponentiation(&g_ex_m, &j, modul);
+            let giantstep = self
+                .number_theory_service
+                .fast_exponentiation(&g_ex_m, &j, modul);
             hash.insert(j.clone(), giantstep);
             j.increment_assign();
         }
@@ -72,12 +78,13 @@ impl Shanks {
         let mut i = BigInt::zero();
         while i < m {
             j = BigInt::zero();
-            let babystep =
-                (element * self.number_theory_service.fast_exponentiation(
+            let babystep = (element
+                * self.number_theory_service.fast_exponentiation(
                     base,
                     &(modul - BigInt::one() - &i),
                     modul,
-                )) % modul;
+                ))
+                % modul;
             while j < m {
                 if hash.get(&j).unwrap() == &babystep {
                     return Ok((&m * &j + &i) % (modul - BigInt::one()));
@@ -115,26 +122,22 @@ mod tests {
     fn shanks_test() {
         run_test_for_all_services(|service| {
             let shanks_service = Shanks::new(service);
-            let result = shanks_service.calculate(&big_i!(8), &big_i!(555), &big_i!(677)).unwrap();
-            assert_eq!(
-                result,
-                big_i!(134)
-            );
-            let result = shanks_service.calculate(&big_i!(11), &big_i!(3), &big_i!(29)).unwrap();
-            assert_eq!(
-                result,
-                big_i!(17)
-            );
-            let result = shanks_service.calculate(&big_i!(10), &big_i!(25), &big_i!(97)).unwrap();
-            assert_eq!(
-                result,
-                big_i!(22)
-            );
-            let result = shanks_service.calculate(&big_i!(3), &big_i!(4), &big_i!(7)).unwrap();
-            assert_eq!(
-                result,
-                big_i!(4)
-            );
+            let result = shanks_service
+                .calculate(&big_i!(8), &big_i!(555), &big_i!(677))
+                .unwrap();
+            assert_eq!(result, big_i!(134));
+            let result = shanks_service
+                .calculate(&big_i!(11), &big_i!(3), &big_i!(29))
+                .unwrap();
+            assert_eq!(result, big_i!(17));
+            let result = shanks_service
+                .calculate(&big_i!(10), &big_i!(25), &big_i!(97))
+                .unwrap();
+            assert_eq!(result, big_i!(22));
+            let result = shanks_service
+                .calculate(&big_i!(3), &big_i!(4), &big_i!(7))
+                .unwrap();
+            assert_eq!(result, big_i!(4));
             let result = shanks_service.calculate(&big_i!(4), &big_i!(6), &big_i!(7));
             assert!(result.is_err());
             //Da Base nicht primitive Wurzel!

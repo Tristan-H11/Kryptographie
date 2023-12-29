@@ -60,7 +60,8 @@ impl PseudoRandomNumberGenerator {
             b,
             n_counter.get()
         );
-        let factor: BigDecimal = (BigDecimal::from(n_counter.inc() as u32) * &self.sqrt_m) % BigDecimal::one();
+        let factor: BigDecimal =
+            (BigDecimal::from(n_counter.inc() as u32) * &self.sqrt_m) % BigDecimal::one();
         let range: BigDecimal = (b - a + BigInt::one()).into();
 
         // Das unwrap() wird niemals fehlschlagen, weil die Implementation von to_bigint() nur

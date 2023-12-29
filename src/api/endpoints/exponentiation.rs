@@ -18,11 +18,11 @@ pub struct ExponentiationRequest {
 }
 
 /// Berechnet die Exponentiation.
-/// 
+///
 /// # Arguments
 /// * `req_body` - Die Anfrage, die die Parameter für die Exponentiation enthält.
 /// * `query` - Die Abfrage, ob der schnelle oder der langsame Algorithmus verwendet werden soll.
-/// 
+///
 /// # Returns
 /// * `HttpResponse` - Die Antwort, die das Ergebnis der Exponentiation enthält.
 pub(crate) async fn exponentiation(
@@ -45,7 +45,9 @@ pub(crate) async fn exponentiation(
         false => NumberTheoryService::new(Slow),
     };
 
-    let result = number_theory_service.fast_exponentiation(base, exponent, modulus).to_str_radix(10);
+    let result = number_theory_service
+        .fast_exponentiation(base, exponent, modulus)
+        .to_str_radix(10);
 
     let response = SingleStringResponse { message: result };
 

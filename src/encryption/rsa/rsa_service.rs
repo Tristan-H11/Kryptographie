@@ -2,8 +2,12 @@ use bigdecimal::num_bigint::{BigInt, Sign};
 use log::{debug, info};
 use sha2::{Digest, Sha256};
 
-use crate::encryption::math_functions::block_chiffre::{create_string_from_blocks_decrypt, create_string_from_blocks_encrypt, encode_string_to_blocks};
-use crate::encryption::math_functions::number_theory::number_theory_service::{NumberTheoryService, NumberTheoryServiceTrait};
+use crate::encryption::math_functions::block_chiffre::{
+    create_string_from_blocks_decrypt, create_string_from_blocks_encrypt, encode_string_to_blocks,
+};
+use crate::encryption::math_functions::number_theory::number_theory_service::{
+    NumberTheoryService, NumberTheoryServiceTrait,
+};
 use crate::encryption::rsa::keys::{PrivateKey, PublicKey};
 
 pub struct RsaService {
@@ -12,7 +16,9 @@ pub struct RsaService {
 
 impl RsaService {
     pub fn new(number_theory_service: NumberTheoryService) -> RsaService {
-        RsaService { number_theory_service }
+        RsaService {
+            number_theory_service,
+        }
     }
 
     /// Verschlüsselt eine Nachricht mit dem öffentlichen Schlüssel.
@@ -28,10 +34,14 @@ impl RsaService {
     pub(crate) fn encrypt(&self, message: &str, g_base: u32, public_key: PublicKey) -> String {
         info!("Verschlüsseln mit blockgröße {}", public_key.block_size);
 
-        let chunks = encode_string_to_blocks(message.trim_end(), public_key.block_size, true, g_base);
+        let chunks =
+            encode_string_to_blocks(message.trim_end(), public_key.block_size, true, g_base);
         let encrypted_chunks = chunks
             .iter()
-            .map(|chunk| self.number_theory_service.fast_exponentiation(chunk, &public_key.e, &public_key.n))
+            .map(|chunk| {
+                self.number_theory_service
+                    .fast_exponentiation(chunk, &public_key.e, &public_key.n)
+            })
             .collect();
 
         // Die Größe der verschlüsselten Blöcke ist immer um 1 größer als die Klartextgröße.
@@ -59,8 +69,11 @@ impl RsaService {
             .expect("Die Signatur konnte nicht in einen BigInt umgewandelt werden");
 
         // Verifizierung durchführen: verifizierung = signatur ^ (öffentlicher key vom partner) mod n
-        let verification =
-            self.number_theory_service.fast_exponentiation(&signature_big_int, &public_key.e, &public_key.n);
+        let verification = self.number_theory_service.fast_exponentiation(
+            &signature_big_int,
+            &public_key.e,
+            &public_key.n,
+        );
 
         // Überprüfen, ob die Verifizierung mit der gehashten Nachricht übereinstimmt
         verification == message_big_int
@@ -81,7 +94,13 @@ impl RsaService {
         let chunks = encode_string_to_blocks(message, private_key.block_size, true, g_base);
         let decrypted_chunks = chunks
             .iter()
-            .map(|chunk| self.number_theory_service.fast_exponentiation(chunk, &private_key.d, &private_key.n))
+            .map(|chunk| {
+                self.number_theory_service.fast_exponentiation(
+                    chunk,
+                    &private_key.d,
+                    &private_key.n,
+                )
+            })
             .collect();
 
         create_string_from_blocks_decrypt(decrypted_chunks, g_base)
@@ -99,7 +118,11 @@ impl RsaService {
         let message_big_int = RsaService::get_decimal_hash(message);
 
         // Signatur berechnen: signatur = message^(eigener privater key) mod n
-        let signature = self.number_theory_service.fast_exponentiation(&message_big_int, &private_key.d, &private_key.n);
+        let signature = self.number_theory_service.fast_exponentiation(
+            &message_big_int,
+            &private_key.d,
+            &private_key.n,
+        );
 
         // Signatur als String zurückgeben
         signature.to_str_radix(10)

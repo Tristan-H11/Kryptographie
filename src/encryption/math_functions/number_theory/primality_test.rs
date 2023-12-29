@@ -20,7 +20,7 @@ impl PrimalityTest {
     /// Erstellt eine neue Instanz des PrimalityTest.
     pub fn new(number_theory_service: NumberTheoryService) -> PrimalityTest {
         PrimalityTest {
-            number_theory_service
+            number_theory_service,
         }
     }
 
@@ -92,13 +92,7 @@ impl PrimalityTest {
     ///
     /// # Rückgabe
     /// * `true`, wenn der Integer wahrscheinlich eine Primzahl ist, `false`, wenn nicht.
-    fn miller_rabin_iteration(
-        &self,
-        p: &BigInt,
-        s: &BigInt,
-        d: &BigInt,
-        a: &BigInt,
-    ) -> bool {
+    fn miller_rabin_iteration(&self, p: &BigInt, s: &BigInt, d: &BigInt, a: &BigInt) -> bool {
         let mut x = self.number_theory_service.fast_exponentiation(a, d, p);
 
         if x.is_one() || x == p.decrement() {
@@ -108,7 +102,9 @@ impl PrimalityTest {
         let mut r = BigInt::zero();
 
         while &r < s {
-            x = self.number_theory_service.fast_exponentiation(&x, &big_i!(2), p);
+            x = self
+                .number_theory_service
+                .fast_exponentiation(&x, &big_i!(2), p);
             if x == p.decrement() {
                 return true;
             }
@@ -120,9 +116,10 @@ impl PrimalityTest {
 
 fn get_primes_to_300() -> [u32; 61] {
     return [
-        3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47, 53, 59, 61, 67, 71, 73, 79, 83, 89, 97,
-        101, 103, 107, 109, 113, 127, 131, 137, 139, 149, 151, 157, 163, 167, 173, 179, 181, 191, 193,
-        197, 199, 211, 223, 227, 229, 233, 239, 241, 251, 257, 263, 269, 271, 277, 281, 283, 293,
+        3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47, 53, 59, 61, 67, 71, 73, 79, 83, 89,
+        97, 101, 103, 107, 109, 113, 127, 131, 137, 139, 149, 151, 157, 163, 167, 173, 179, 181,
+        191, 193, 197, 199, 211, 223, 227, 229, 233, 239, 241, 251, 257, 263, 269, 271, 277, 281,
+        283, 293,
     ];
 }
 

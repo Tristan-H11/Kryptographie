@@ -1,7 +1,7 @@
 use std::str::FromStr;
 
-use actix_web::{HttpResponse, Responder};
 use actix_web::web::{Json, Query};
+use actix_web::{HttpResponse, Responder};
 use bigdecimal::num_bigint::BigInt;
 use log::info;
 use serde::Deserialize;
@@ -17,11 +17,11 @@ pub struct ExtendedEuclidRequest {
 }
 
 /// Berechnet den erweiterten Euklidischen Algorithmus.
-/// 
+///
 /// # Arguments
 /// * `req_body` - Die Anfrage, die die Parameter für die Berechnung des erweiterten Euklidischen Algorithmus enthält.
 /// * `query` - Die Abfrage, ob der schnelle oder der langsame Algorithmus verwendet werden soll.
-/// 
+///
 /// # Returns
 /// * `HttpResponse` - Die Antwort, die die Ergebnisse des erweiterten Euklidischen Algorithmus enthält.
 pub(crate) async fn euclid_endpoint(
@@ -42,7 +42,6 @@ pub(crate) async fn euclid_endpoint(
         true => NumberTheoryService::new(Fast),
         false => NumberTheoryService::new(Slow),
     };
-
 
     let (ggt, x, y) = number_theory_service.extended_euclid(a, b);
 

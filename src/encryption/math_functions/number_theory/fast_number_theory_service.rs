@@ -33,15 +33,19 @@ impl NumberTheoryServiceTrait for FastNumberTheoryService {
         let number_theory_service = FastNumberTheoryService::new();
         let (ggt, _x, y) = number_theory_service.extended_euclid(modul, n);
         if !ggt.is_one() {
-            let no_inverse_error =
-                Error::new(ErrorKind::InvalidInput, "n hat keinen Inverse");
+            let no_inverse_error = Error::new(ErrorKind::InvalidInput, "n hat keinen Inverse");
             return Err(no_inverse_error);
         }
         // Berechnet aus den letzten Faktoren das Inverse.
         return Ok((modul + y).rem_euclid(modul));
     }
 
-    fn is_probably_prime(&self, p: &BigInt, repeats: u32, random_generator: &PseudoRandomNumberGenerator) -> bool {
+    fn is_probably_prime(
+        &self,
+        p: &BigInt,
+        repeats: u32,
+        random_generator: &PseudoRandomNumberGenerator,
+    ) -> bool {
         let primality_test = PrimalityTest::new(NumberTheoryService::new(Fast));
 
         // Enthält noch einige weitere Tests, die für slow nicht vorgesehen sind.

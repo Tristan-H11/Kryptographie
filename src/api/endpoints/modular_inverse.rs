@@ -1,7 +1,7 @@
 use std::str::FromStr;
 
-use actix_web::{HttpResponse, Responder};
 use actix_web::web::{Json, Query};
+use actix_web::{HttpResponse, Responder};
 use bigdecimal::num_bigint::BigInt;
 use log::info;
 use serde::Deserialize;
@@ -16,13 +16,12 @@ pub struct ModulInverseRequest {
     pub modul: String,
 }
 
-
 /// Berechnet das modulare Inverse.
-/// 
+///
 /// # Arguments
 /// * `req_body` - Die Anfrage, die die Parameter für die modulare Inverse enthält.
 /// * `query` - Die Abfrage, ob der schnelle oder der langsame Algorithmus verwendet werden soll.
-/// 
+///
 /// # Returns
 /// * `HttpResponse` - Die Antwort, die das Ergebnis der modularen Inverse enthält.
 pub(crate) async fn modular_inverse_endpoint(
@@ -42,7 +41,6 @@ pub(crate) async fn modular_inverse_endpoint(
         true => NumberTheoryService::new(Fast),
         false => NumberTheoryService::new(Slow),
     };
-
 
     let result = number_theory_service.modulo_inverse(&n, &modul);
 

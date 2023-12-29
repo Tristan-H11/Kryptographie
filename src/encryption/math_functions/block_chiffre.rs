@@ -1,5 +1,5 @@
-use bigdecimal::{One, Zero};
 use bigdecimal::num_bigint::BigInt;
+use bigdecimal::{One, Zero};
 use log::{debug, trace};
 use num::Integer;
 
@@ -58,7 +58,11 @@ pub(crate) fn create_string_from_blocks_encrypt(
         debug!("Chiffrierter Vector: {:?}", string);
 
         // Füllt jeden String vorne mit "0", um die maximale Länge zu erreichen
-        let padded_string = format!("{}{}", "\u{0}".repeat(target_size - string.chars().count()), string);
+        let padded_string = format!(
+            "{}{}",
+            "\u{0}".repeat(target_size - string.chars().count()),
+            string
+        );
         result.push_str(&padded_string);
     }
 

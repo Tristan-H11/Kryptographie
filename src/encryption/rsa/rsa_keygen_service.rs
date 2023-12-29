@@ -4,7 +4,9 @@ use bigdecimal::One;
 use log::{debug, trace};
 
 use crate::big_i;
-use crate::encryption::math_functions::number_theory::number_theory_service::{NumberTheoryService, NumberTheoryServiceTrait};
+use crate::encryption::math_functions::number_theory::number_theory_service::{
+    NumberTheoryService, NumberTheoryServiceTrait,
+};
 use crate::encryption::math_functions::pseudo_random_number_generator::PseudoRandomNumberGenerator;
 use crate::encryption::math_functions::traits::increment::Increment;
 use crate::encryption::rsa::keys::{PrivateKey, PublicKey};
@@ -29,7 +31,10 @@ impl RsaKeygenService {
             "Erstellen eines neuen RsaKeygenService mit key_size {}",
             key_size
         );
-        RsaKeygenService { key_size, number_theory_service }
+        RsaKeygenService {
+            key_size,
+            number_theory_service,
+        }
     }
 
     ///
@@ -168,11 +173,7 @@ impl RsaKeygenService {
     ///
     /// # Rückgabe
     /// Die generierte Zahl `e`.
-    fn generate_e(
-        &self,
-        phi: &BigInt,
-        random_generator: &PseudoRandomNumberGenerator,
-    ) -> BigInt {
+    fn generate_e(&self, phi: &BigInt, random_generator: &PseudoRandomNumberGenerator) -> BigInt {
         debug!("Generiere e mit phi {}", phi);
 
         let n_counter = RelaxedCounter::new(1);

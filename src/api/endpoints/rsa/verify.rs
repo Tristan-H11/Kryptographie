@@ -1,5 +1,5 @@
-use actix_web::{HttpResponse, Responder};
 use actix_web::web::{Json, Query};
+use actix_web::{HttpResponse, Responder};
 use log::info;
 use serde::Deserialize;
 
@@ -15,11 +15,11 @@ pub struct VerifyRequest {
 }
 
 /// Endpunkt zum Verifizieren einer Nachricht mit RSA.
-/// 
+///
 /// # Argumente
 /// * `req_body` - Die Anfrage, die den zu verifizierenden Text, die Signatur und den öffentlichen Schlüssel enthält.
 /// * `query` - Die Abfrage, ob der schnelle oder der langsame Algorithmus verwendet werden soll.
-/// 
+///
 /// # Rückgabe
 /// * `HttpResponse` - Die Antwort, die den verifizierten Text enthält.
 pub(crate) async fn verify(

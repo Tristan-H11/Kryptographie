@@ -22,8 +22,12 @@ pub enum NumberTheoryService {
 impl NumberTheoryService {
     pub fn new(speed: NumberTheoryServiceSpeed) -> NumberTheoryService {
         match speed {
-            NumberTheoryServiceSpeed::Fast => NumberTheoryService::FastService(FastNumberTheoryService::new()),
-            NumberTheoryServiceSpeed::Slow => NumberTheoryService::SlowService(SlowNumberTheoryService::new()),
+            NumberTheoryServiceSpeed::Fast => {
+                NumberTheoryService::FastService(FastNumberTheoryService::new())
+            }
+            NumberTheoryServiceSpeed::Slow => {
+                NumberTheoryService::SlowService(SlowNumberTheoryService::new())
+            }
         }
     }
 }
@@ -38,8 +42,12 @@ impl NumberTheoryServiceTrait for NumberTheoryService {
 
     fn fast_exponentiation(&self, base: &BigInt, exponent: &BigInt, modul: &BigInt) -> BigInt {
         match self {
-            NumberTheoryService::FastService(service) => service.fast_exponentiation(base, exponent, modul),
-            NumberTheoryService::SlowService(service) => service.fast_exponentiation(base, exponent, modul),
+            NumberTheoryService::FastService(service) => {
+                service.fast_exponentiation(base, exponent, modul)
+            }
+            NumberTheoryService::SlowService(service) => {
+                service.fast_exponentiation(base, exponent, modul)
+            }
         }
     }
 
@@ -50,10 +58,19 @@ impl NumberTheoryServiceTrait for NumberTheoryService {
         }
     }
 
-    fn is_probably_prime(&self, p: &BigInt, repeats: u32, random_generator: &PseudoRandomNumberGenerator) -> bool {
+    fn is_probably_prime(
+        &self,
+        p: &BigInt,
+        repeats: u32,
+        random_generator: &PseudoRandomNumberGenerator,
+    ) -> bool {
         match self {
-            NumberTheoryService::FastService(service) => service.is_probably_prime(p, repeats, random_generator),
-            NumberTheoryService::SlowService(service) => service.is_probably_prime(p, repeats, random_generator),
+            NumberTheoryService::FastService(service) => {
+                service.is_probably_prime(p, repeats, random_generator)
+            }
+            NumberTheoryService::SlowService(service) => {
+                service.is_probably_prime(p, repeats, random_generator)
+            }
         }
     }
 }
@@ -145,7 +162,12 @@ pub trait NumberTheoryServiceTrait {
     ///
     /// # Rückgabe
     /// * `true`, wenn der Integer eine vermutlich Primzahl ist, `false`, wenn nicht.
-    fn is_probably_prime(&self, p: &BigInt, repeats: u32, random_generator: &PseudoRandomNumberGenerator) -> bool;
+    fn is_probably_prime(
+        &self,
+        p: &BigInt,
+        repeats: u32,
+        random_generator: &PseudoRandomNumberGenerator,
+    ) -> bool;
 }
 
 #[cfg(test)]
@@ -180,7 +202,8 @@ mod tests {
             assert_eq!(
                 service.extended_euclid(
                     &BigInt::from_str("485398853520739824211578869461").unwrap(),
-                    &BigInt::from_str("79617341660363802320192939486040130094939703771377").unwrap(),
+                    &BigInt::from_str("79617341660363802320192939486040130094939703771377")
+                        .unwrap(),
                 ),
                 (
                     big_i!(1),
@@ -194,20 +217,28 @@ mod tests {
     #[test]
     fn modulo_inverse_test() {
         run_test_for_all_services(|service| {
-            assert_eq!(service.modulo_inverse(&big_i!(1), &big_i!(3)).unwrap(), big_i!(1));
+            assert_eq!(
+                service.modulo_inverse(&big_i!(1), &big_i!(3)).unwrap(),
+                big_i!(1)
+            );
             assert_eq!(
                 service.modulo_inverse(&big_i!(5), &big_i!(11)).unwrap(),
                 big_i!(9)
             );
             assert_eq!(
-                service.modulo_inverse(&big_i!(315), &big_i!(661643)).unwrap(),
+                service
+                    .modulo_inverse(&big_i!(315), &big_i!(661643))
+                    .unwrap(),
                 big_i!(342374)
             );
             assert_eq!(
-                service.modulo_inverse(
-                    &BigInt::from_str("485398853520739824211578869461").unwrap(),
-                    &BigInt::from_str("79617341660363802320192939486040130094939703771377").unwrap(),
-                ).unwrap(),
+                service
+                    .modulo_inverse(
+                        &BigInt::from_str("485398853520739824211578869461").unwrap(),
+                        &BigInt::from_str("79617341660363802320192939486040130094939703771377")
+                            .unwrap(),
+                    )
+                    .unwrap(),
                 BigInt::from_str("7173228757438794445922076835963679049602847038123").unwrap()
             );
             assert!(service.modulo_inverse(&big_i!(78), &big_i!(99)).is_err());
@@ -255,7 +286,8 @@ mod tests {
             );
             assert_eq!(
                 service.is_probably_prime(
-                    &BigInt::from_str("79617341660363802320192939486040130094939703771377").unwrap(),
+                    &BigInt::from_str("79617341660363802320192939486040130094939703771377")
+                        .unwrap(),
                     400,
                     random_generator,
                 ),

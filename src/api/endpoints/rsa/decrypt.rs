@@ -10,7 +10,7 @@ use crate::encryption::math_functions::number_theory::number_theory_service::Num
 /// # Argumente
 /// * `req_body` - Die Anfrage, die den verschlüsselten Text und den privaten Schlüssel enthält.
 /// * `query` - Die Abfrage, ob der schnelle oder der langsame Algorithmus verwendet werden soll.
-/// 
+///
 /// # Rückgabe
 /// * `HttpResponse` - Die Antwort, die den entschlüsselten Text enthält.
 pub(crate) async fn decrypt(

@@ -37,7 +37,9 @@ pub trait Divisible {
 }
 
 impl<T> Divisible for T
-    where T: Zero + Rem<Output=T> + PartialEq + Clone + Div<Output=T> + Mul<Output=T> + From<u8> {
+where
+    T: Zero + Rem<Output = T> + PartialEq + Clone + Div<Output = T> + Mul<Output = T> + From<u8>,
+{
     fn is_divisible_by(&self, divisor: &Self) -> bool {
         self.clone() % divisor.clone() == T::zero()
     }

@@ -19,11 +19,11 @@ pub struct ShanksRequest {
 }
 
 /// Berechnet den diskreten Logarithmus.
-/// 
+///
 /// # Arguments
 /// * `req_body` - Die Anfrage, die die Parameter für die Berechnung des diskreten Logarithmus enthält.
 /// * `query` - Die Abfrage, ob der schnelle oder der langsame Algorithmus verwendet werden soll.
-/// 
+///
 /// # Returns
 /// * `HttpResponse` - Die Antwort, die das Ergebnis des diskreten Logarithmus enthält.
 pub(crate) async fn shanks_endpoint(

@@ -1,5 +1,5 @@
-use actix_web::{HttpResponse, Responder};
 use actix_web::web::{Json, Query};
+use actix_web::{HttpResponse, Responder};
 use log::info;
 use serde::Deserialize;
 
@@ -14,11 +14,11 @@ pub struct SignRequest {
 }
 
 /// Endpunkt zum Signieren einer Nachricht mit RSA.
-/// 
+///
 /// # Argumente
 /// * `req_body` - Die Anfrage, die den zu signierenden Text und den privaten Schlüssel enthält.
 /// * `query` - Die Abfrage, ob der schnelle oder der langsame Algorithmus verwendet werden soll.
-/// 
+///
 /// # Rückgabe
 /// * `HttpResponse` - Die Antwort, die die Signatur enthält.
 pub(crate) async fn sign(
