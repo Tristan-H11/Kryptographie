@@ -1,5 +1,6 @@
-use bigdecimal::Zero;
 use std::ops::{Div, Mul, Rem};
+
+use bigdecimal::Zero;
 
 pub trait Divisible {
     ///
@@ -35,10 +36,8 @@ pub trait Divisible {
     fn double_assign(&mut self);
 }
 
-impl<
-        T: Zero + Rem<Output = T> + PartialEq + Clone + Div<Output = T> + Mul<Output = T> + From<u8>,
-    > Divisible for T
-{
+impl<T> Divisible for T
+    where T: Zero + Rem<Output=T> + PartialEq + Clone + Div<Output=T> + Mul<Output=T> + From<u8> {
     fn is_divisible_by(&self, divisor: &Self) -> bool {
         self.clone() % divisor.clone() == T::zero()
     }
@@ -66,9 +65,11 @@ impl<
 
 #[cfg(test)]
 mod tests {
-    use super::*;
-    use crate::big_u;
     use num::BigUint;
+
+    use crate::big_u;
+
+    use super::*;
 
     #[test]
     fn test_divides() {
