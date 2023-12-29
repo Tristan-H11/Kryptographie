@@ -91,7 +91,6 @@ impl RsaService {
     ///
     /// # Argumente
     /// * `message` - Die zu signierende Nachricht.
-    /// * `use_fast` - Gibt an, ob der schnelle Algorithmus verwendet werden soll.
     ///
     /// # Rückgabe
     /// * `String` - Die Signatur.
@@ -127,5 +126,64 @@ impl RsaService {
 
 #[cfg(test)]
 mod tests {
-    // TODO Tristan: Tests aus keys.rs übertragen und richtig machen.
+    use crate::encryption::math_functions::number_theory::number_theory_service::NumberTheoryServiceSpeed::{Fast, Slow};
+    use crate::encryption::rsa::rsa_keygen_service::RsaKeygenService;
+    use super::*;
+
+    fn run_test_for_all_services(test: impl Fn(NumberTheoryService)) {
+        test(NumberTheoryService::new(Slow)); // Langsame, eigene Implementierung
+        test(NumberTheoryService::new(Fast)); // Schnelle, externe Implementierung
+    }
+
+    #[test]
+    fn test_happy_flow_1024() {
+        run_test_for_all_services(|service| {
+            let message = "bbbbbbbbbbbbbbb  äääääääääääääää  !&    ";
+
+            let keygen_service = RsaKeygenService::new(1024, service.clone());
+            let (public_key, private_key) = keygen_service.generate_keypair(40, 23, 55296);
+
+            let rsa_service = RsaService::new(service);
+
+            let encrypted_message = rsa_service.encrypt(message, 55296, public_key);
+            println!("Verschlüsselte Nachricht: {}", encrypted_message);
+
+            let decrypted_message = rsa_service.decrypt(&encrypted_message, 55296, private_key);
+            assert_eq!(message.trim_end(), decrypted_message);
+        });
+    }
+
+    #[test]
+    fn test_sign_and_verify_lowest_possible_happy_flow() {
+        run_test_for_all_services(|service| {
+            let message = "Das ist eine ganz interessante Testnachricht für die Signatur!    ";
+
+            let keygen_service = RsaKeygenService::new(258, service.clone());
+            let (public_key, private_key) = keygen_service.generate_keypair(40, 23, 55296);
+
+            let rsa_service = RsaService::new(service);
+
+            let signature = rsa_service.sign(&message, private_key);
+
+            let is_valid = rsa_service.verify(&signature, &message, public_key);
+            assert!(is_valid);
+        });
+    }
+
+    #[test]
+    fn test_sign_and_verify_highest_unhappy_flow() {
+        run_test_for_all_services(|service| {
+            let message = "Das ist eine ganz interessante Testnachricht für die Signatur!    ";
+
+            let keygen_service = RsaKeygenService::new(256, service.clone());
+            let (public_key, private_key) = keygen_service.generate_keypair(40, 23, 55296);
+
+            let rsa_service = RsaService::new(service);
+
+            let signature = rsa_service.sign(&message, private_key);
+
+            let is_valid = rsa_service.verify(&signature, &message, public_key);
+            assert!(!is_valid);
+        });
+    }
 }
