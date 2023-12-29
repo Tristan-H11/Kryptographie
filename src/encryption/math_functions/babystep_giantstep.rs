@@ -1,15 +1,22 @@
 use std::collections::HashMap;
 use std::io::{Error, ErrorKind};
 
-use bigdecimal::num_bigint::BigInt;
 use bigdecimal::{One, Zero};
+use bigdecimal::num_bigint::BigInt;
 
-use crate::encryption::math_functions::number_theory::fast_exponentiation::FastExponentiation;
+use crate::encryption::math_functions::number_theory::number_theory_service::{NumberTheoryService, NumberTheoryServiceTrait};
 use crate::encryption::math_functions::traits::increment::Increment;
 
-pub struct Shanks {}
+pub struct Shanks {
+    number_theory_service: NumberTheoryService,
+}
 
 impl Shanks {
+    pub fn new(number_theory_service: NumberTheoryService) -> Shanks {
+        Shanks {
+            number_theory_service,
+        }
+    }
     /// Berechnet den Logarithmus der Basis `base` von einem Element `element` einer Restklasse
     /// reduziert durch den Modulus `modul`. Der Modulus muss prim sein!
     ///
@@ -39,6 +46,7 @@ impl Shanks {
     /// assert_eq!(result, Ok(BigInt::from(4)));
     /// ```
     pub fn calculate(
+        self,
         base: &BigInt,
         element: &BigInt,
         modul: &BigInt,
@@ -51,11 +59,11 @@ impl Shanks {
         }
 
         //Berechnet Giantsteps und speichert sie
-        let g_ex_m = FastExponentiation::calculate(base, &m, modul, use_fast);
+        let g_ex_m = self.number_theory_service.fast_exponentiation(base, &m, modul);
         let mut hash: HashMap<BigInt, BigInt> = HashMap::new();
         let mut j = BigInt::zero();
         while j < m {
-            let giantstep = FastExponentiation::calculate(&g_ex_m, &j, modul, use_fast);
+            let giantstep = self.number_theory_service.fast_exponentiation(&g_ex_m, &j, modul);
             hash.insert(j.clone(), giantstep);
             j.increment_assign();
         }
@@ -64,14 +72,12 @@ impl Shanks {
         let mut i = BigInt::zero();
         while i < m {
             j = BigInt::zero();
-            let babystep = (element
-                * FastExponentiation::calculate(
+            let babystep =
+                (element * self.number_theory_service.fast_exponentiation(
                     base,
                     &(modul - BigInt::one() - &i),
                     modul,
-                    use_fast,
-                ))
-                % modul;
+                )) % modul;
             while j < m {
                 if hash.get(&j).unwrap() == &babystep {
                     return Ok((&m * &j + &i) % (modul - BigInt::one()));
@@ -90,11 +96,14 @@ impl Shanks {
         return Err(no_exponent_error);
     }
 }
+
 #[cfg(test)]
 mod tests {
-    use super::*;
-    use crate::big_i;
     use num::BigInt;
+
+    use crate::big_i;
+
+    use super::*;
 
     #[test]
     fn shanks_test() {
