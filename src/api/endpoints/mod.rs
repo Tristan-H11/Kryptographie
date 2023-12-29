@@ -1,2 +1,2 @@
-pub mod rsa;
 pub mod math;
+pub mod rsa;

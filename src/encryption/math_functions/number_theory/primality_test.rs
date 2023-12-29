@@ -100,7 +100,9 @@ impl PrimalityTest {
         let mut r = BigInt::zero();
 
         while &r < s {
-            x = self.number_theory_service.fast_exponentiation(&x, &2.into(), p);
+            x = self
+                .number_theory_service
+                .fast_exponentiation(&x, &2.into(), p);
             if x == p.decrement() {
                 return true;
             }

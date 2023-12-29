@@ -46,8 +46,8 @@ impl<T: One + Clone + Add<Output = T> + Sub<Output = T>> Increment for T {
 
 #[cfg(test)]
 mod tests {
-    use bigdecimal::num_bigint::BigInt;
     use super::*;
+    use bigdecimal::num_bigint::BigInt;
 
     #[test]
     fn test_increment() {

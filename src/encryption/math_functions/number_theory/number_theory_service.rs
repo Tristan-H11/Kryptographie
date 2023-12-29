@@ -225,9 +225,7 @@ mod tests {
                 9.into()
             );
             assert_eq!(
-                service
-                    .modulo_inverse(&315.into(), &661643.into())
-                    .unwrap(),
+                service.modulo_inverse(&315.into(), &661643.into()).unwrap(),
                 342374.into()
             );
             assert_eq!(
@@ -335,10 +333,7 @@ mod tests {
             let base = &561563.into();
             let exponent = &0.into();
             let modul = &564.into();
-            assert_eq!(
-                service.fast_exponentiation(base, exponent, modul),
-                1.into()
-            );
+            assert_eq!(service.fast_exponentiation(base, exponent, modul), 1.into());
         });
     }
 
@@ -348,10 +343,7 @@ mod tests {
             let base = &0.into();
             let exponent = &561563.into();
             let modul = &564.into();
-            assert_eq!(
-                service.fast_exponentiation(base, exponent, modul),
-                0.into()
-            );
+            assert_eq!(service.fast_exponentiation(base, exponent, modul), 0.into());
         });
     }
 
@@ -361,10 +353,7 @@ mod tests {
             let base = &3459860.into();
             let exponent = &561563.into();
             let modul = &1.into();
-            assert_eq!(
-                service.fast_exponentiation(base, exponent, modul),
-                0.into()
-            );
+            assert_eq!(service.fast_exponentiation(base, exponent, modul), 0.into());
         });
     }
 
@@ -378,7 +367,6 @@ mod tests {
                 service.fast_exponentiation(base, exponent, modul),
                 BigInt::from_str("8408769600151667634624424658533698267981486479206207837400880482584240253227309957477768628293816726387378101618036878012339908404810884160600885622896014991205830046127587869666780551862829518403374323613697514544975024376847169484921172903282824411000834600056510593848311808").unwrap()
             );
-
 
             let base: &BigInt = &BigInt::from(5345890).pow(50);
             let exponent = &BigInt::from(561563).pow(50);

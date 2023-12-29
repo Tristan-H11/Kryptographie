@@ -85,10 +85,7 @@ mod tests {
     #[test]
     fn test_not_divides() {
         assert_eq!(BigInt::from(8).is_not_divisible_by(&4.into()), false);
-        assert_eq!(
-            BigInt::from(89893457).is_not_divisible_by(&1.into()),
-            false
-        );
+        assert_eq!(BigInt::from(89893457).is_not_divisible_by(&1.into()), false);
         assert_eq!(
             BigInt::from(89893457).is_not_divisible_by(&657831.into()),
             true
