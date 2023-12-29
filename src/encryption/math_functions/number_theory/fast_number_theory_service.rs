@@ -10,6 +10,7 @@ use crate::encryption::math_functions::number_theory::number_theory_service::Num
 use crate::encryption::math_functions::number_theory::primality_test::PrimalityTest;
 use crate::encryption::math_functions::pseudo_random_number_generator::PseudoRandomNumberGenerator;
 
+#[derive(Clone)]
 pub struct FastNumberTheoryService;
 
 impl FastNumberTheoryService {

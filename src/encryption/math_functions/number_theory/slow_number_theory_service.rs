@@ -11,6 +11,7 @@ use crate::encryption::math_functions::pseudo_random_number_generator::PseudoRan
 use crate::encryption::math_functions::traits::divisible::Divisible;
 use crate::encryption::math_functions::traits::parity::Parity;
 
+#[derive(Clone)]
 pub struct SlowNumberTheoryService;
 
 impl SlowNumberTheoryService {
