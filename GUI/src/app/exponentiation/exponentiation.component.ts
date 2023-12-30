@@ -1,6 +1,5 @@
 import {Component} from "@angular/core";
 import {CommonModule} from "@angular/common";
-import {ExponentiationRoutingModule} from "./exponentiation-routing.module";
 import {MatExpansionModule} from "@angular/material/expansion";
 import {MatFormFieldModule} from "@angular/material/form-field";
 import {MatInputModule} from "@angular/material/input";
@@ -12,7 +11,7 @@ import {ExponentiationRequest} from "../models/exponentiation-request";
 @Component({
 	selector: "app-exponentiation",
 	standalone: true,
-	imports: [CommonModule, ExponentiationRoutingModule, MatExpansionModule, MatFormFieldModule, MatInputModule, ReactiveFormsModule, FormsModule, MatButtonModule],
+	imports: [CommonModule, MatExpansionModule, MatFormFieldModule, MatInputModule, ReactiveFormsModule, FormsModule, MatButtonModule],
 	templateUrl: "./exponentiation.component.html",
 	styleUrl: "./exponentiation.component.scss"
 })

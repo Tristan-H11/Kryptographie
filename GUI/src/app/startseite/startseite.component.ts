@@ -4,7 +4,6 @@ import {MatInputModule} from "@angular/material/input";
 import {MatFormFieldModule} from "@angular/material/form-field";
 import {MatButtonModule} from "@angular/material/button";
 import {FormsModule} from "@angular/forms";
-import {StartseiteRoutingModule} from "./startseite-routing.module";
 import {Client} from "../models/client";
 import {ConfigurationData} from "../models/configuration-data";
 import {MatSnackBar} from "@angular/material/snack-bar";
@@ -21,7 +20,6 @@ import {BackendRequestService} from "../services/backend-api/backend-request.ser
     selector: "app-startseite",
     standalone: true,
     imports: [
-        StartseiteRoutingModule,
         MatExpansionModule,
         MatFormFieldModule,
         MatInputModule,

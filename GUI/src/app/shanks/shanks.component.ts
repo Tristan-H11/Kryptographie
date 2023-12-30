@@ -1,6 +1,5 @@
 import {Component} from "@angular/core";
 import {CommonModule} from "@angular/common";
-import {ShanksRoutingModule} from "./shanks-routing.module";
 import {BackendRequestService} from "../services/backend-api/backend-request.service";
 import {ShanksRequest} from "../models/shanks-request";
 import {FormsModule} from "@angular/forms";
@@ -12,7 +11,7 @@ import {MatInputModule} from "@angular/material/input";
 @Component({
 	selector: "app-shanks",
 	standalone: true,
-	imports: [CommonModule, ShanksRoutingModule, FormsModule, MatButtonModule, MatExpansionModule, MatFormFieldModule, MatInputModule],
+	imports: [CommonModule, FormsModule, MatButtonModule, MatExpansionModule, MatFormFieldModule, MatInputModule],
 	templateUrl: "./shanks.component.html",
 	styleUrl: "./shanks.component.scss"
 })
