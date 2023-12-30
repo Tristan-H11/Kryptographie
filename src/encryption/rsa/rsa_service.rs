@@ -145,12 +145,39 @@ impl RsaService {
         let message_big_int = BigInt::from_bytes_be(Sign::Plus, &hashed_message);
         message_big_int
     }
+
+    /// Diese Methode verschlüsselt eine Zahl in Dezimaldarstellung mit dem öffentlichen Schlüssel.
+    ///
+    /// # Argumente
+    /// * `input` - Die zu verschlüsselnde Zahl.
+    /// * `public_key` - Der öffentliche Schlüssel.
+    ///
+    /// # Rückgabe
+    /// * `BigInt` - Die verschlüsselte Zahl.
+    pub(crate) fn encrypt_number(&self, input: &BigInt, public_key: &PublicKey) -> BigInt {
+        self.number_theory_service.fast_exponentiation(input, &public_key.e, &public_key.n)
+    }
+
+    /// Diese Methode entschlüsselt eine Zahl in Dezimaldarstellung mit dem privaten Schlüssel.
+    ///
+    /// # Argumente
+    /// * `input` - Die zu entschlüsselnde Zahl.
+    /// * `use_fast` - Gibt an, ob der schnelle Algorithmus verwendet werden soll.
+    ///
+    /// # Rückgabe
+    /// * `BigInt` - Die entschlüsselte Zahl.
+    pub(crate) fn decrypt_number(&self, input: &BigInt, private_key: &PrivateKey) -> BigInt {
+        self.number_theory_service.fast_exponentiation(input, &private_key.d, &private_key.n)
+    }
 }
 
 #[cfg(test)]
 mod tests {
+    use std::str::FromStr;
+
     use crate::encryption::math_functions::number_theory::number_theory_service::NumberTheoryServiceSpeed::{Fast, Slow};
     use crate::encryption::rsa::rsa_keygen_service::RsaKeygenService;
+
     use super::*;
 
     fn run_test_for_all_services(test: impl Fn(NumberTheoryService)) {
@@ -207,6 +234,75 @@ mod tests {
 
             let is_valid = rsa_service.verify(&signature, &message, public_key);
             assert!(!is_valid);
+        });
+    }
+
+    #[test]
+    fn test_encrypt_number() {
+        run_test_for_all_services(|service| {
+            let keygen_service = RsaKeygenService::new(256, service);
+            let rsa_service = RsaService::new(service);
+
+            let g_base = 55296;
+
+            let (public_key, private_key) = &keygen_service.generate_keypair(10, 19, g_base);
+
+            let message = BigInt::from_str("123456789").unwrap();
+
+            let encrypted_message = rsa_service.encrypt_number(&message, public_key);
+
+            let decrypted_message = rsa_service.decrypt_number(&encrypted_message, private_key);
+
+            assert_eq!(message, decrypted_message);
+        });
+    }
+
+    #[test]
+    fn square_encrypted_numbers() {
+        run_test_for_all_services(|service| {
+            let keygen_service = RsaKeygenService::new(256, service);
+            let rsa_service = RsaService::new(service.clone());
+
+            let g_base = 55296;
+
+            let (public_key, private_key) = &keygen_service.generate_keypair(10, 19, g_base);
+
+            let message = BigInt::from_str("48153454374561835379").unwrap();
+
+            let encrypted_message = rsa_service.encrypt_number(&message, public_key);
+            let squared_encrypted_message = service.fast_exponentiation(
+                &encrypted_message,
+                &2.into(),
+                &public_key.n,
+            );
+
+            let decrypted_message = rsa_service.decrypt_number(&squared_encrypted_message, private_key);
+            assert_eq!(message.pow(2), decrypted_message);
+        });
+    }
+
+    #[test]
+    fn multiply_different_encrypted_numbers() {
+        run_test_for_all_services(|service| {
+            let keygen_service = RsaKeygenService::new(256, service);
+            let rsa_service = RsaService::new(service);
+
+            let g_base = 55296;
+
+            let (public_key, private_key) = &keygen_service.generate_keypair(10, 19, g_base);
+
+            let message_one = BigInt::from_str("123456789").unwrap();
+
+            let message_two = BigInt::from_str("987654321").unwrap();
+
+            let encrypted_message_one = rsa_service.encrypt_number(&message_one, public_key);
+            let encrypted_message_two = rsa_service.encrypt_number(&message_two, public_key);
+
+            let multiplied_encrypted_message = encrypted_message_one * encrypted_message_two;
+
+            let decrypted_message = rsa_service.decrypt_number(&multiplied_encrypted_message, private_key);
+
+            assert_eq!(message_one * message_two, decrypted_message);
         });
     }
 }
