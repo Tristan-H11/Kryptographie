@@ -58,8 +58,8 @@ mod tests {
         let base4 = BigInt::from(55296);
         assert_eq!(x4.log(&base4), 16);
 
-        let x5 = BigInt::from(1024);
+        let x5 = BigInt::from(2).pow(1024);
         let base5 = BigInt::from(55296);
-        assert_eq!(x5.log(&base5), 10);
+        assert_eq!(x5.log(&base5), 64);
     }
 }
