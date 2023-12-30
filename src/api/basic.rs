@@ -2,7 +2,6 @@ use crate::api::endpoints::math::exponentiation::exponentiation;
 use crate::api::endpoints::math::extended_euclid::euclid_endpoint;
 use crate::api::endpoints::math::modular_inverse::modular_inverse_endpoint;
 use crate::api::endpoints::math::shanks::shanks_endpoint;
-use crate::api::endpoints::multiplication::multiplication;
 use crate::api::endpoints::rsa::create_key_pair::create_key_pair;
 use crate::api::endpoints::rsa::decrypt::decrypt;
 use crate::api::endpoints::rsa::encrypt::encrypt;
@@ -11,6 +10,7 @@ use crate::api::endpoints::rsa::verify::verify;
 use actix_web::{web, HttpResponse, Responder};
 use log::info;
 use serde::Serialize;
+use crate::api::endpoints::math::multiplication::multiplication;
 
 #[derive(Serialize)]
 pub struct Response {

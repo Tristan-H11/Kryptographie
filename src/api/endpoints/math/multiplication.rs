@@ -8,8 +8,9 @@ use std::str::FromStr;
 use crate::api::serializable_models::{
     MultiplicationRequest, MultiplicationResponse, SingleStringResponse, UseFastQuery,
 };
-use crate::encryption::math_functions::number_theory::fast_exponentiation::FastExponentiation;
-use crate::encryption::rsa::rsa_keygen_service::RsaKeygenService;
+use crate::encryption::math_functions::number_theory::number_theory_service::NumberTheoryService;
+use crate::encryption::math_functions::number_theory::number_theory_service::NumberTheoryServiceSpeed::{Fast, Slow};
+use crate::encryption::rsa::rsa_service::RsaService;
 
 /// Multipliziert zwei Zahlen miteinander.
 pub(crate) async fn multiplication(
@@ -23,18 +24,25 @@ pub(crate) async fn multiplication(
     let req_body: MultiplicationRequest = req_body.into_inner();
     let use_fast = query.use_fast;
 
+    let number_theory_service = match use_fast {
+        true => NumberTheoryService::new(Fast),
+        false => NumberTheoryService::new(Slow),
+    };
+
+    let rsa_service = RsaService::new(number_theory_service);
+
     let factor_one = BigInt::from_str(&req_body.factor_one).unwrap();
     let factor_two = BigInt::from_str(&req_body.factor_two).unwrap();
 
     let public_key = req_body.key_pair.to_public_key();
     let private_key = req_body.key_pair.to_private_key();
 
-    let encrypted_factor_one = public_key.encrypt_number(&factor_one, use_fast);
-    let encrypted_factor_two = public_key.encrypt_number(&factor_two, use_fast);
+    let encrypted_factor_one = rsa_service.encrypt_number(&factor_one, &public_key);
+    let encrypted_factor_two = rsa_service.encrypt_number(&factor_two, &public_key);
 
     let encrypted_result = &encrypted_factor_one * &encrypted_factor_two;
 
-    let result = private_key.decrypt_number(&encrypted_result, use_fast);
+    let result = rsa_service.decrypt_number(&encrypted_result, &private_key);
 
     let response = MultiplicationResponse {
         encrypted_factor_one: encrypted_factor_one.to_str_radix(10),
@@ -43,8 +51,6 @@ pub(crate) async fn multiplication(
         decrypted_result: result.to_str_radix(10),
     };
 
-    // TODO: Will man das wirklich haben oder ist die Interpreation dem nutzer überlassen? Sonst halt
-    // nen Feld in der Resposne für "could be wrong" oder so einfügen.
     if (factor_one * factor_two) != result {
         return HttpResponseBuilder::new(StatusCode::INTERNAL_SERVER_ERROR).json(
             SingleStringResponse {
