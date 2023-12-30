@@ -35,7 +35,7 @@ pub(crate) async fn decrypt(
 
     let rsa_service = crate::encryption::rsa::rsa_service::RsaService::new(number_theory_service);
 
-    let plaintext = rsa_service.decrypt(&ciphertext, number_system_base, private_key);
+    let plaintext = rsa_service.decrypt(&ciphertext, number_system_base, &private_key);
     let response = SingleStringResponse { message: plaintext };
 
     HttpResponse::Ok().json(response)

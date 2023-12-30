@@ -31,7 +31,7 @@ pub(crate) async fn encrypt(
 
     let rsa_service = crate::encryption::rsa::rsa_service::RsaService::new(number_theory_service);
 
-    let ciphertext = rsa_service.encrypt(&plaintext, number_system_base, public_key);
+    let ciphertext = rsa_service.encrypt(&plaintext, number_system_base, &public_key);
     let response = SingleStringResponse {
         message: ciphertext,
     };

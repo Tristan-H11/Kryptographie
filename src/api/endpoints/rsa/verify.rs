@@ -44,7 +44,7 @@ pub(crate) async fn verify(
 
     let rsa_service = crate::encryption::rsa::rsa_service::RsaService::new(number_theory_service);
 
-    let plaintext = rsa_service.verify(&signature, &plaintext, public_key);
+    let plaintext = rsa_service.verify(&signature, &plaintext, &public_key);
     let response = SingleStringResponse {
         message: plaintext.to_string(),
     };
