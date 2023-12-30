@@ -35,7 +35,6 @@ impl PublicKey {
     /// * `n` - Das Produkt der beiden Primzahlen.
     /// * `block_size` - Die Blockgröße.
     pub fn new_with_blocksize(e: BigInt, n: BigInt, block_size: usize) -> PublicKey {
-        // Maximale Blockbreite = log_g(n).
         debug!("Blocksize in der PublicKey-Erstellung: {}", block_size);
         PublicKey { e, n, block_size }
     }
@@ -73,10 +72,57 @@ impl PrivateKey {
     /// * `n` - Das Produkt der beiden Primzahlen.
     /// * `block_size` - Die Blockgröße.
     pub fn new_with_blocksize(d: BigInt, n: BigInt, block_size: usize) -> PrivateKey {
-        // Die Größe der verschlüsselten Blöcke ist immer um 1 größer als die Klartextgröße.
         debug!("Blocksize in der PrivateKey-Erstellung: {}", block_size);
         PrivateKey { d, n, block_size }
     }
 }
 
-// TODO Tests (Konstruktor mit BlockSize bestimmung. Sonst keine Tests möglich, da keine Funktionen implementiert sind.)
+#[cfg(test)]
+mod tests {
+
+    use super::*;
+
+    #[test]
+    fn test_block_size_1024_55296() {
+        let n = BigInt::from(2).pow(1024);
+        let g_base = 55296;
+        let public_key = PublicKey::new(BigInt::from(3), n.clone(), g_base);
+        assert_eq!(public_key.block_size, 64);
+
+        let private_key = PrivateKey::new(BigInt::from(3), n, g_base);
+        assert_eq!(private_key.block_size, 65);
+    }
+
+    #[test]
+    fn test_block_size_2048_55296() {
+        let n = BigInt::from(2).pow(2048);
+        let g_base = 55296;
+        let public_key = PublicKey::new(BigInt::from(3), n.clone(), g_base);
+        assert_eq!(public_key.block_size, 129);
+
+        let private_key = PrivateKey::new(BigInt::from(3), n, g_base);
+        assert_eq!(private_key.block_size, 130);
+    }
+
+    #[test]
+    fn test_block_size_128_55296() {
+        let n = BigInt::from(2).pow(128);
+        let g_base = 55296;
+        let public_key = PublicKey::new(BigInt::from(3), n.clone(), g_base);
+        assert_eq!(public_key.block_size, 8);
+
+        let private_key = PrivateKey::new(BigInt::from(3), n, g_base);
+        assert_eq!(private_key.block_size, 9);
+    }
+
+    #[test]
+    fn test_block_size_512_55296() {
+        let n = BigInt::from(2).pow(512);
+        let g_base = 55296;
+        let public_key = PublicKey::new(BigInt::from(3), n.clone(), g_base);
+        assert_eq!(public_key.block_size, 32);
+
+        let private_key = PrivateKey::new(BigInt::from(3), n, g_base);
+        assert_eq!(private_key.block_size, 33);
+    }
+}
