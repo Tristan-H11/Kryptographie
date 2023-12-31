@@ -175,7 +175,7 @@ impl RsaKeygenService {
 
         let mut e = random_generator.take(&3.into(), &phi.decrement(), &n_counter);
         while e < *phi {
-            let ggt = self.number_theory_service.extended_euclid(&e, phi).0;
+            let ggt = self.number_theory_service.extended_euclid(&e, phi).ggt;
             if ggt.is_one() {
                 debug!("Generierter e {} ist relativ prim zu phi {}", e, phi);
                 return e;

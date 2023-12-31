@@ -4,9 +4,10 @@ use actix_web::web::{Json, Query};
 use actix_web::{HttpResponse, Responder};
 use bigdecimal::num_bigint::BigInt;
 use log::info;
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 
-use crate::api::serializable_models::{ExtendedEuclidResponse, UseFastQuery};
+use crate::api::serializable_models::{UseFastQuery};
+use crate::encryption::math_functions::number_theory::extended_euclid_result::ExtendedEuclidResult;
 use crate::encryption::math_functions::number_theory::number_theory_service::{NumberTheoryService, NumberTheoryServiceTrait};
 use crate::encryption::math_functions::number_theory::number_theory_service::NumberTheoryServiceSpeed::{Fast, Slow};
 
@@ -14,6 +15,24 @@ use crate::encryption::math_functions::number_theory::number_theory_service::Num
 pub struct ExtendedEuclidRequest {
     pub a: String,
     pub b: String,
+}
+
+#[derive(Serialize)]
+pub struct ExtendedEuclidResponse {
+    pub x: String,
+    pub y: String,
+    pub ggt: String,
+}
+
+impl ExtendedEuclidResponse {
+    /// Erstellt eine neue Instanz der ExtendedEuclidResponse anhand eines ExtendedEuclidResult.
+    fn from(result: ExtendedEuclidResult) -> ExtendedEuclidResponse {
+        ExtendedEuclidResponse {
+            x: result.x.to_string(),
+            y: result.y.to_string(),
+            ggt: result.ggt.to_string(),
+        }
+    }
 }
 
 /// Berechnet den erweiterten Euklidischen Algorithmus.
@@ -43,13 +62,9 @@ pub(crate) async fn euclid_endpoint(
         false => NumberTheoryService::new(Slow),
     };
 
-    let (ggt, x, y) = number_theory_service.extended_euclid(a, b);
+    let extended_euclid_result = number_theory_service.extended_euclid(a, b);
 
-    let response = ExtendedEuclidResponse {
-        x: x.to_str_radix(10),
-        y: y.to_str_radix(10),
-        ggt: ggt.to_str_radix(10),
-    };
+    let response = ExtendedEuclidResponse::from(extended_euclid_result);
 
     HttpResponse::Ok().json(response)
 }

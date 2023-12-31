@@ -37,13 +37,6 @@ pub struct SingleStringResponse {
     pub message: String,
 }
 
-#[derive(Serialize)]
-pub struct ExtendedEuclidResponse {
-    pub x: String,
-    pub y: String,
-    pub ggt: String,
-}
-
 #[derive(Deserialize)]
 pub struct EncryptDecryptRequest {
     pub message: String,

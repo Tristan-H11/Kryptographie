@@ -1,6 +1,7 @@
 use std::io::Error;
 
 use num::BigInt;
+use crate::encryption::math_functions::number_theory::extended_euclid_result::ExtendedEuclidResult;
 
 use crate::encryption::math_functions::number_theory::fast_number_theory_service::FastNumberTheoryService;
 use crate::encryption::math_functions::number_theory::slow_number_theory_service::SlowNumberTheoryService;
@@ -33,7 +34,7 @@ impl NumberTheoryService {
 }
 
 impl NumberTheoryServiceTrait for NumberTheoryService {
-    fn extended_euclid(&self, a: &BigInt, b: &BigInt) -> (BigInt, BigInt, BigInt) {
+    fn extended_euclid(&self, a: &BigInt, b: &BigInt) -> ExtendedEuclidResult {
         match self {
             NumberTheoryService::FastService(service) => service.extended_euclid(a, b),
             NumberTheoryService::SlowService(service) => service.extended_euclid(a, b),
@@ -86,18 +87,18 @@ pub trait NumberTheoryServiceTrait {
     ///
     /// # Rückgabewert
     ///
-    /// * Ein Tripel aus dem größten gemeinsamen Teiler (`ggT`), dem Faktor `x` und dem Faktor `y`.
+    /// * Ein ExtendedEuclidResult, das den ggT, x und y enthält.
     ///
     /// # Beispiel
     ///
     /// ```rust
-    /// let (ggT, x, y) = NumberTheoryService.extended_euclid(&BigInt::from(12), &BigInt::from(30));
+    /// let result = NumberTheoryService.extended_euclid(&BigInt::from(12), &BigInt::from(30));
     ///
-    /// assert_eq!(ggT, BigInt::from(6));
-    /// assert_eq!(x, BigInt::from(2));
-    /// assert_eq!(y, BigInt::from(1));
+    /// assert_eq!(result.ggT, BigInt::from(6));
+    /// assert_eq!(result.x, BigInt::from(2));
+    /// assert_eq!(result.y, BigInt::from(1));
     /// ```
-    fn extended_euclid(&self, a: &BigInt, b: &BigInt) -> (BigInt, BigInt, BigInt);
+    fn extended_euclid(&self, a: &BigInt, b: &BigInt) -> ExtendedEuclidResult;
 
     /// Berechnet die Schnellexponentiation für eine Basis `base`, einen Exponent `exponent`
     /// und einen Modulus `modul`.

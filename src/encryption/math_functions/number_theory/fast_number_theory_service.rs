@@ -4,6 +4,7 @@ use bigdecimal::num_bigint::BigInt;
 use bigdecimal::num_traits::Euclid;
 use bigdecimal::One;
 use num::Integer;
+use crate::encryption::math_functions::number_theory::extended_euclid_result::ExtendedEuclidResult;
 
 use crate::encryption::math_functions::number_theory::number_theory_service::{NumberTheoryService, NumberTheoryServiceTrait};
 use crate::encryption::math_functions::number_theory::number_theory_service::NumberTheoryServiceSpeed::Fast;
@@ -20,9 +21,9 @@ impl FastNumberTheoryService {
 }
 
 impl NumberTheoryServiceTrait for FastNumberTheoryService {
-    fn extended_euclid(&self, a: &BigInt, b: &BigInt) -> (BigInt, BigInt, BigInt) {
+    fn extended_euclid(&self, a: &BigInt, b: &BigInt) -> ExtendedEuclidResult {
         let e = a.extended_gcd(b);
-        (e.gcd, e.x, e.y)
+        ExtendedEuclidResult::new(e.gcd, e.x, e.y)
     }
 
     fn fast_exponentiation(&self, base: &BigInt, exponent: &BigInt, modul: &BigInt) -> BigInt {
@@ -31,13 +32,13 @@ impl NumberTheoryServiceTrait for FastNumberTheoryService {
 
     fn modulo_inverse(&self, n: &BigInt, modul: &BigInt) -> Result<BigInt, Error> {
         let number_theory_service = FastNumberTheoryService::new();
-        let (ggt, _x, y) = number_theory_service.extended_euclid(modul, n);
-        if !ggt.is_one() {
+        let extended_euclid_result = number_theory_service.extended_euclid(modul, n);
+        if !extended_euclid_result.ggt.is_one() {
             let no_inverse_error = Error::new(ErrorKind::InvalidInput, "n hat keinen Inverse");
             return Err(no_inverse_error);
         }
         // Berechnet aus den letzten Faktoren das Inverse.
-        return Ok((modul + y).rem_euclid(modul));
+        return Ok((modul + extended_euclid_result.y).rem_euclid(modul));
     }
 
     fn is_probably_prime(
