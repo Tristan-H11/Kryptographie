@@ -189,15 +189,15 @@ mod tests {
         run_test_for_all_services(|service| {
             assert_eq!(
                 service.extended_euclid(&6.into(), &11.into()),
-                (1.into(), 2.into(), BigInt::from(-1))
+                ExtendedEuclidResult::new(1.into(), 2.into(), BigInt::from(-1))
             );
             assert_eq!(
                 service.extended_euclid(&78.into(), &99.into()),
-                (3.into(), 14.into(), BigInt::from(-11))
+                ExtendedEuclidResult::new(3.into(), 14.into(), BigInt::from(-11))
             );
             assert_eq!(
                 service.extended_euclid(&315.into(), &661643.into()),
-                (1.into(), BigInt::from(-319269), 152.into())
+                ExtendedEuclidResult::new(1.into(), BigInt::from(-319269), 152.into())
             );
             assert_eq!(
                 service.extended_euclid(
@@ -205,7 +205,7 @@ mod tests {
                     &BigInt::from_str("79617341660363802320192939486040130094939703771377")
                         .unwrap(),
                 ),
-                (
+                ExtendedEuclidResult::new(
                     1.into(),
                     BigInt::from_str("7173228757438794445922076835963679049602847038123").unwrap(),
                     BigInt::from(-43732645957409398462249346726i128)
