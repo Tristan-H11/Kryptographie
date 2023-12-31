@@ -1,6 +1,7 @@
 use bigdecimal::num_bigint::BigInt;
 
 /// Das Ergebnis des erweiterten Euklidischen Algorithmus.
+#[derive(Debug, Clone)]
 pub struct ExtendedEuclidResult {
     pub ggt: BigInt,
     pub x: BigInt,
