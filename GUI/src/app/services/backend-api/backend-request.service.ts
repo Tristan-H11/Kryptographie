@@ -14,6 +14,8 @@ import {ExtendedEuclidResponse} from "../../models/extended-euclid-response";
 import {StateManagementService} from "../management/state-management.service";
 import {ShanksRequest} from "../../models/shanks-request";
 import {ModularInversRequest} from "../../models/modular-invers-request";
+import {MultiplicationRequest} from "../../models/multiplication-request";
+import {MultiplicationResponse} from "../../models/multiplication-response";
 
 @Injectable({
     providedIn: "root"
@@ -133,6 +135,14 @@ export class BackendRequestService {
         const options = {params};
         return firstValueFrom(
             this.http.post<SingleMessageModel>(this.endpointsService.getModularInverseEndpoint(), body, options)
+        );
+    }
+
+    public async rsaMultiplication(body: MultiplicationRequest): Promise<MultiplicationResponse> {
+        const params = this.getParams();
+        const options = {params};
+        return firstValueFrom(
+            this.http.post<MultiplicationResponse>(this.endpointsService.getRsaMultiplicationEndpoint(), body, options)
         );
     }
 }

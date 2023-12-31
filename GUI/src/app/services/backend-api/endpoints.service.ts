@@ -84,4 +84,11 @@ export class EndpointsService {
     getModularInverseEndpoint() {
         return this.domain + this.mathEndpoint + "/modular_inverse";
     }
+
+    /**
+     * Gibt den Endpoint zum RSA-Multiplizieren zweier Zahlen zurück.
+     */
+    getRsaMultiplicationEndpoint() {
+        return this.domain + this.rsaEndpoint + "/multiplication";
+    }
 }
