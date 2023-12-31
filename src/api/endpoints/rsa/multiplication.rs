@@ -4,13 +4,27 @@ use actix_web::{HttpResponse, HttpResponseBuilder, Responder};
 use bigdecimal::num_bigint::BigInt;
 use log::info;
 use std::str::FromStr;
+use serde::{Deserialize, Serialize};
 
-use crate::api::serializable_models::{
-    MultiplicationRequest, MultiplicationResponse, SingleStringResponse, UseFastQuery,
-};
+use crate::api::serializable_models::{KeyPair, SingleStringResponse, UseFastQuery};
 use crate::encryption::math_functions::number_theory::number_theory_service::NumberTheoryService;
 use crate::encryption::math_functions::number_theory::number_theory_service::NumberTheoryServiceSpeed::{Fast, Slow};
 use crate::encryption::rsa::rsa_service::RsaService;
+
+#[derive(Deserialize)]
+pub struct MultiplicationRequest {
+    pub factor_one: String,
+    pub factor_two: String,
+    pub key_pair: KeyPair,
+}
+
+#[derive(Serialize)]
+pub struct MultiplicationResponse {
+    pub encrypted_factor_one: String,
+    pub encrypted_factor_two: String,
+    pub encrypted_result: String,
+    pub decrypted_result: String,
+}
 
 /// Multipliziert zwei Zahlen miteinander.
 pub(crate) async fn multiplication(

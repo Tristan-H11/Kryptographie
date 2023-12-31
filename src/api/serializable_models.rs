@@ -45,21 +45,6 @@ pub struct EncryptDecryptRequest {
 }
 
 #[derive(Deserialize)]
-pub struct MultiplicationRequest {
-    pub factor_one: String,
-    pub factor_two: String,
-    pub key_pair: KeyPair,
-}
-
-#[derive(Serialize)]
-pub struct MultiplicationResponse {
-    pub encrypted_factor_one: String,
-    pub encrypted_factor_two: String,
-    pub encrypted_result: String,
-    pub decrypted_result: String,
-}
-
-#[derive(Deserialize)]
 pub struct UseFastQuery {
     pub use_fast: bool,
 }
