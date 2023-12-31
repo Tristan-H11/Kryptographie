@@ -1,14 +1,54 @@
+# RSA Implementation
+
 [![Rust-CI](https://github.com/Tristan-H11/RSA-Implementation/actions/workflows/rust-ci.yml/badge.svg)](https://github.com/Tristan-H11/RSA-Implementation/actions/workflows/rust-ci.yml)
 
-# RSA Implementation in Kryptographie 1
-Dieses Projekt entsteht im Integrationsprojekt Kryptografie 1 und hat eine professionelle Implementation von RSA und dem zugehörigen Signaturverfahren zum Ziel.
-### Was bereits in der ersten Woche programmiert werden kann:
-- Erweiterter Euklidischer Algorithmus
-- Schnelle Exponentiation
+Dieses Projekt ist eine Implementierung des RSA-Algorithmus in Rust und TypeScript.
 
-### Anforderungen
-- Für die Erzeugung von ganz großen Primzahlen soll die Finale Version nicht länger als eine Minute dauern.
+## Inhaltsverzeichnis
 
-### Programmierung
-Wenn der Checkstyle (Format) fehlschlägt, einfach auf der Konsole `cargo fmt` ausführen.
-`cargo fmt --check` zeigt die verstöße an, ohne die `--check`-Flag korrigiert er die Formatierung direkt.
+- [Technologien](#technologien)
+- [Installation](#installation)
+- [Verwendung](#verwendung)
+
+## Technologien
+
+Dieses Projekt wurde mit:
+
+- Rust 1.55.0
+- TypeScript 4.4
+- Angular 12.2
+- npm 7.21
+- Cargo 1.55
+
+## Installation
+
+Um dieses Projekt lokal zu installieren, führen Sie die folgenden Schritte aus:
+
+1. Klonen Sie das Repository:
+```
+git clone https://github.com/Tristan-H11/RSA-Implementation.git
+```
+2. Wechseln Sie in das Verzeichnis des Projekts:
+```
+cd RSA-Implementation
+```
+3. Installieren Sie die Abhängigkeiten:
+```
+npm install
+cargo build
+```
+
+## Verwendung
+
+Um das Projekt auszuführen, verwenden Sie die folgenden Befehle:
+
+Für Rust:
+```
+cargo run
+```
+
+Für Angular:
+```
+cd ./gui
+ng serve
+```
