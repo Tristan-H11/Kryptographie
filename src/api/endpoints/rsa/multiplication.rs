@@ -3,8 +3,8 @@ use actix_web::web::{Json, Query};
 use actix_web::{HttpResponse, HttpResponseBuilder, Responder};
 use bigdecimal::num_bigint::BigInt;
 use log::info;
-use std::str::FromStr;
 use serde::{Deserialize, Serialize};
+use std::str::FromStr;
 
 use crate::api::serializable_models::{KeyPair, SingleStringResponse, UseFastQuery};
 use crate::encryption::math_functions::number_theory::number_theory_service::NumberTheoryService;

@@ -1,7 +1,7 @@
 use std::io::Error;
 
-use num::BigInt;
 use crate::encryption::math_functions::number_theory::extended_euclid_result::ExtendedEuclidResult;
+use num::BigInt;
 
 use crate::encryption::math_functions::number_theory::fast_number_theory_service::FastNumberTheoryService;
 use crate::encryption::math_functions::number_theory::slow_number_theory_service::SlowNumberTheoryService;
