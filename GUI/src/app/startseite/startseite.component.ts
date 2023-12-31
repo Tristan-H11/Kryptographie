@@ -7,7 +7,7 @@ import {FormsModule} from "@angular/forms";
 import {Client} from "../models/client";
 import {ConfigurationData} from "../models/configuration-data";
 import {MatSnackBar} from "@angular/material/snack-bar";
-import {NgForOf} from "@angular/common";
+import {NgForOf, NgIf} from "@angular/common";
 import {MatIconModule} from "@angular/material/icon";
 import {MatDialog, MatDialogRef} from "@angular/material/dialog";
 import {SimpleDialogComponent} from "../simple-dialog/simple-dialog.component";
@@ -27,6 +27,7 @@ import {BackendRequestService} from "../services/backend-api/backend-request.ser
         FormsModule,
         NgForOf,
         MatIconModule,
+        NgIf,
     ],
     templateUrl: "./startseite.component.html",
     styleUrl: "./startseite.component.scss"
@@ -136,6 +137,11 @@ export class StartseiteComponent {
         }));
     }
 
+    public getBlockSizePub(client: Client): string {
+        const keyPairSignal = this.stateService.getClientKey(client);
+        return keyPairSignal().block_size_pub || "";
+    }
+
     /**
      * Gibt den BindingContext für die Schlüsselverwaltung dynamischer Clients zurück.
      */
@@ -153,7 +159,7 @@ export class StartseiteComponent {
             },
             set exponent(value) {
                 component.setExponent(client, value);
-            },
+            }
         };
     }
 

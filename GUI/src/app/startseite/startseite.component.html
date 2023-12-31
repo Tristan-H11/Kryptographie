@@ -40,16 +40,15 @@
     </mat-expansion-panel>
 
     <mat-expansion-panel *ngFor="let client of getClients()">
-
         <mat-expansion-panel-header>
             <mat-panel-title>
                 {{client.name}}
             </mat-panel-title>
             <mat-panel-description>
                 Die öffentlichen Schlüsselkomponenten von {{client.name}}
+                <span *ngIf="getBlockSizePub(client).length != 0"> (Blockgröße Verschlüsseln: {{getBlockSizePub(client)}})</span>
             </mat-panel-description>
         </mat-expansion-panel-header>
-
 
         <mat-form-field appearance="outline" class="width-100">
             <mat-label>Modul</mat-label>

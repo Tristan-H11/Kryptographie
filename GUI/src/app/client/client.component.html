@@ -34,6 +34,7 @@
             </mat-panel-title>
             <mat-panel-description>
                 Die Komponenten des privaten Schlüssels
+                <span *ngIf="clientKeyPair().block_size_priv.length != 0"> (Blockgröße Verschlüsseln: {{clientKeyPair().block_size_priv}})</span>
             </mat-panel-description>
         </mat-expansion-panel-header>
 
