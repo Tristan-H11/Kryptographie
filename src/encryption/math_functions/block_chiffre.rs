@@ -1,6 +1,6 @@
 use crate::encryption::math_functions::traits::logarithm::Logarithm;
 use bigdecimal::num_bigint::BigInt;
-use bigdecimal::{One, Zero};
+use bigdecimal::{One, ToPrimitive, Zero};
 use log::{debug, trace};
 use num::Integer;
 
@@ -266,15 +266,15 @@ fn u32_to_c(value: u32) -> char {
 /// # Rückgabe
 /// * Der resultierende u32 Wert.
 fn big_int_to_u32(value: &BigInt) -> u32 {
-    let (_, remainder) = value.to_u32_digits();
-    match remainder.first() {
-        Some(&digit) => digit,
+    match value.to_u32() {
+        Some(digit) => digit,
         None => panic!("Ungültiger u32 Wert: {}", value),
     }
 }
 
 #[cfg(test)]
 mod tests {
+    use std::str::FromStr;
     use crate::encryption::math_functions::block_chiffre::{
         big_int_to_u32, create_string_from_blocks_decrypt, create_string_from_blocks_encrypt,
         encode_string_to_blocks, split_into_blocks, string_to_int_vec, sums_vec_to_string_vec,
@@ -513,12 +513,18 @@ mod tests {
         assert_eq!(u32_to_c(57), '9');
         assert_eq!(u32_to_c(46), '.');
         assert_eq!(u32_to_c(44), ',');
+        assert_eq!(u32_to_c(0), '\u{0}');
     }
 
     #[test]
-    fn test_ubig_to_u32() {
-        let value = 12345.into();
-        let result = big_int_to_u32(&value);
-        assert_eq!(result, 12345);
+    fn test_big_int_to_u32() {
+        assert_eq!(big_int_to_u32(&12345.into()), 12345);
+        assert_eq!(big_int_to_u32(&0.into()), 0);
+    }
+
+    #[test]
+    #[should_panic]
+    fn test_big_int_to_u32_panics() {
+        big_int_to_u32(&BigInt::from_str("123456789012345678901234567890").unwrap());
     }
 }
