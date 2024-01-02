@@ -274,13 +274,13 @@ fn big_int_to_u32(value: &BigInt) -> u32 {
 
 #[cfg(test)]
 mod tests {
-    use std::str::FromStr;
     use crate::encryption::math_functions::block_chiffre::{
         big_int_to_u32, create_string_from_blocks_decrypt, create_string_from_blocks_encrypt,
         encode_string_to_blocks, split_into_blocks, string_to_int_vec, sums_vec_to_string_vec,
         to_sum_vec, u32_to_c,
     };
     use bigdecimal::num_bigint::BigInt;
+    use std::str::FromStr;
 
     ///
     /// Prüft, ob die Funktionen zum Zerteilen und Zusammensetzen eines String das Inverse voneinander sind.
