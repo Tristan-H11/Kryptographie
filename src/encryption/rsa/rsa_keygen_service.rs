@@ -2,6 +2,7 @@ use atomic_counter::RelaxedCounter;
 use bigdecimal::num_bigint::BigInt;
 use bigdecimal::One;
 use log::{debug, trace};
+use num::Integer;
 
 use crate::encryption::math_functions::number_theory::number_theory_service::{
     NumberTheoryService, NumberTheoryServiceTrait,
@@ -81,17 +82,20 @@ impl RsaKeygenService {
         miller_rabin_iterations: u32,
         random_generator: &PseudoRandomNumberGenerator,
     ) -> (BigInt, BigInt) {
-        let prim_size = self.key_size / 2;
+        let (prim_size_one, prim_size_two) = if self.key_size.is_even() {
+            (self.key_size / 2, self.key_size / 2)
+        } else {
+            (self.key_size / 2 + 1, self.key_size / 2)
+        };
         let n_counter = RelaxedCounter::new(1);
         let prime_one = self.generate_prime(
-            prim_size,
+            prim_size_one,
             miller_rabin_iterations,
             random_generator,
             &n_counter,
         );
-        // Vor diesem Aufruf ist n_counter schon von generate_prime inkrementiert worden.
         let mut prime_two = self.generate_prime(
-            prim_size,
+            prim_size_two,
             miller_rabin_iterations,
             random_generator,
             &n_counter,
@@ -99,12 +103,12 @@ impl RsaKeygenService {
 
         while prime_one == prime_two {
             trace!(
-                "Generierter prime_one {} ist gleich prime_two {}. Starte neuen Versuch",
-                prime_one,
-                prime_two
-            );
+            "Generierter prime_one {} ist gleich prime_two {}. Starte neuen Versuch",
+            prime_one,
+            prime_two
+        );
             prime_two = self.generate_prime(
-                prim_size,
+                prim_size_two,
                 miller_rabin_iterations,
                 random_generator,
                 &n_counter,

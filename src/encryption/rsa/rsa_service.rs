@@ -192,7 +192,7 @@ mod tests {
     }
 
     #[test]
-    fn test_happy_flow_1024() {
+    fn test_encrypt_decrypt_happy_flow_1024() {
         run_test_for_all_services(|service| {
             let message = "bbbbbbbbbbbbbbb  äääääääääääääää  !&    ";
 
@@ -210,11 +210,28 @@ mod tests {
     }
 
     #[test]
+    fn test_sign_verify_happy_flow_1024() {
+        run_test_for_all_services(|service| {
+            let message = "    Das ist eine ganz 456$§% / Testnachricht für die Signatur!    ";
+
+            let keygen_service = RsaKeygenService::new(1024, service.clone());
+            let (public_key, private_key) = &keygen_service.generate_keypair(40, 23);
+
+            let rsa_service = RsaService::new(service);
+
+            let signature = rsa_service.sign(message, private_key);
+
+            let is_valid = rsa_service.verify(&signature, message, public_key);
+            assert!(is_valid);
+        });
+    }
+
+    #[test]
     fn test_sign_and_verify_lowest_possible_happy_flow() {
         run_test_for_all_services(|service| {
             let message = "Das ist eine ganz interessante Testnachricht für die Signatur!    ";
 
-            let keygen_service = RsaKeygenService::new(258, service.clone());
+            let keygen_service = RsaKeygenService::new(257, service.clone());
             let (public_key, private_key) = &keygen_service.generate_keypair(40, 23);
 
             let rsa_service = RsaService::new(service);
