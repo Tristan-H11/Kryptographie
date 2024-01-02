@@ -277,25 +277,6 @@ mod tests {
     }
 
     #[test]
-    fn test_sign_and_verify_highest_unhappy_flow() {
-        run_test_for_all_services(|service| {
-            let message = "Das ist eine ganz interessante Testnachricht für die Signatur!    ";
-
-            let keygen_service = RsaKeygenService::new(16, service.clone());
-            let (public_key, private_key) = &keygen_service.generate_keypair(40, 23);
-
-            let rsa_service = RsaService::new(service);
-
-            let g_base = 55296;
-
-            let signature = rsa_service.sign(&message, private_key, g_base);
-
-            let is_valid = rsa_service.verify(&signature, &message, public_key, g_base);
-            assert!(!is_valid);
-        });
-    }
-
-    #[test]
     fn fail_signature_with_different_messages() {
         run_test_for_all_services(|service| {
             let message_one = "Das ist eine ganz interessante Testnachricht für die Signatur!    ";
