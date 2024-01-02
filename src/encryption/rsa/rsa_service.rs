@@ -22,13 +22,15 @@ impl RsaService {
         }
     }
 
-    /// Verschlüsselt eine Nachricht mit dem öffentlichen Schlüssel.
+    /// Verschlüsselt eine Nachricht. Die Nachricht wird in Blöcke der Größe `block_size` aufgeteilt und dann
+    /// verschlüsselt. Die verschlüsselten Blöcke werden dann zu einem String zusammengefügt.
+    /// Nicht-volle Blöcke werden mit führenden Nullen aufgefüllt.
     ///
     /// # Argumente
     /// * `message` - Die zu verschlüsselnde Nachricht.
     /// **ACHTUNG**: Leerzeichen am Ende werden entfernt!
-    /// * `g_base` - Die Basis, in der die Nachricht verschlüsselt werden soll.
-    /// * `public_key` - Der öffentliche Schlüssel.
+    /// * `g_base` - Die Basis des Zeichensatzes, in der die Nachricht verschlüsselt werden soll.
+    /// * `key` - Der zu verwendende Schlüssel.
     ///
     /// # Rückgabe
     /// * `String` - Die verschlüsselte Nachricht.
@@ -37,6 +39,43 @@ impl RsaService {
         info!("Verschlüsseln mit blockgröße {}", block_size);
 
         let chunks = encode_string_to_blocks(message.trim_end(), block_size, true, g_base);
+        let encrypted_chunks = self.exponentiation_each(&key, chunks);
+
+        // Die Größe der verschlüsselten Blöcke ist immer um 1 größer als die Klartextgröße.
+        create_string_from_blocks_encrypt(encrypted_chunks, block_size + 1, g_base)
+    }
+
+    /// Entschlüsselt eine Nachricht. Unterscheidet sich zur Funktion `encrypt` nur in der Hinsicht, dass hier angenommen
+    /// wird, dass die verschlüsselten Blöcke immer um 1 größer sind als die Klartextblöcke, in denen die übergebene
+    /// Nachricht verschlüsselt wurde.
+    ///
+    /// # Argumente
+    /// * `message` - Die zu entschlüsselnde Nachricht.
+    /// * `g_base` - Die Basis des Zeichensatzes, in der die Nachricht verschlüsselt wurde.
+    /// * `key` - Der zu verwendende Schlüssel.
+    ///
+    /// # Rückgabe
+    /// * `String` - Die entschlüsselte Nachricht.
+    pub(crate) fn decrypt(&self, message: &str, g_base: u32, key: &RsaKey) -> String {
+        let block_size = key.modulus().log(&g_base.into()) + 1;
+        info!("Entschlüsseln mit blockgröße {}", block_size);
+
+        let chunks = encode_string_to_blocks(message, block_size, true, g_base);
+        let decrypted_chunks = self.exponentiation_each(&key, chunks);
+
+        create_string_from_blocks_decrypt(decrypted_chunks, g_base)
+    }
+
+    /// Wendet die schnelle Exponentation auf jedes Element des Vektors an.
+    /// Dabei wird der Exponent und der Modul aus dem übergebenen Schlüssel bezogen.
+    ///
+    /// # Argumente
+    /// * `key` - Der Schlüssel mit den Parametern für die Exponentiation.
+    /// * `chunks` - Der Vektor mit den zu verrechnenden Elementen
+    ///
+    /// # Rückgabe
+    /// Ein Vektor gleicher Größe mit umgerechneten Werten.
+    fn exponentiation_each(&self, key: &&RsaKey, chunks: Vec<BigInt>) -> Vec<BigInt> {
         let encrypted_chunks = chunks
             .iter()
             .map(|chunk| {
@@ -47,37 +86,7 @@ impl RsaService {
                 )
             })
             .collect();
-
-        // Die Größe der verschlüsselten Blöcke ist immer um 1 größer als die Klartextgröße.
-        create_string_from_blocks_encrypt(encrypted_chunks, block_size + 1, g_base)
-    }
-
-    /// Entschlüsselt eine Nachricht mit dem privaten Schlüssel.
-    ///
-    /// # Argumente
-    /// * `message` - Die zu entschlüsselnde Nachricht.
-    /// * `g_base` - Die Basis, in der die Nachricht verschlüsselt wurde.
-    /// * `private_key` - Der private Schlüssel.
-    ///
-    /// # Rückgabe
-    /// * `String` - Die entschlüsselte Nachricht.
-    pub(crate) fn decrypt(&self, message: &str, g_base: u32, key: &RsaKey) -> String {
-        let block_size = key.modulus().log(&g_base.into()) + 1;
-        info!("Entschlüsseln mit blockgröße {}", block_size);
-
-        let chunks = encode_string_to_blocks(message, block_size, true, g_base);
-        let decrypted_chunks = chunks
-            .iter()
-            .map(|chunk| {
-                self.number_theory_service.fast_exponentiation(
-                    chunk,
-                    &key.exponent(),
-                    &key.modulus(),
-                )
-            })
-            .collect();
-
-        create_string_from_blocks_decrypt(decrypted_chunks, g_base)
+        encrypted_chunks
     }
 
     /// Signiert eine Nachricht mit dem privaten Schlüssel.
@@ -85,26 +94,20 @@ impl RsaService {
     /// # Argumente
     /// * `message` - Die zu signierende Nachricht.
     /// * `key` - Der private Schlüssel.
+    /// * `g_base` - Die Basis des Zeichensatzes, in der die Nachricht signiert werden soll.
     ///
     /// # Rückgabe
     /// * `String` - Die Signatur.
-    pub(crate) fn sign(&self, message: &str, key: &RsaKey) -> String {
+    pub(crate) fn sign(&self, message: &str, key: &RsaKey, g_base: u32) -> String {
         if key.key_type() != RsaKeyType::Private {
             panic!("Der Schlüssel muss privat sein, um eine Nachricht zu signieren!");
         }
         info!("Signieren der Nachricht {}", message);
-        let message_big_int = RsaService::get_decimal_hash(message);
+        let hashed_message = RsaService::get_decimal_hash(message);
 
-        // Signatur berechnen: signatur = message^(eigener privater key) mod n
-        let signature = self.number_theory_service.fast_exponentiation(
-            // TODO self.encrypt aufrufen.
-            &message_big_int,
-            &key.exponent(),
-            &key.modulus(),
-        );
+        let signature = self.encrypt(&hashed_message.to_str_radix(10), g_base, key);
 
-        // Signatur als String zurückgeben
-        signature.to_str_radix(10)
+        signature
     }
 
     /// Verifiziert eine Nachricht mit der Signatur.
@@ -113,10 +116,11 @@ impl RsaService {
     /// * `signature` - Die Signatur.
     /// * `message` - Die Nachricht.
     /// * `key` - Der öffentliche Schlüssel.
+    /// * `g_base` - Die Basis des Zeichensatzes, in der die Nachricht signiert werden soll.
     ///
     /// # Rückgabe
     /// * `bool` - Gibt an, ob die Verifizierung erfolgreich war.
-    pub(crate) fn verify(&self, signature: &str, message: &str, key: &RsaKey) -> bool {
+    pub(crate) fn verify(&self, signature: &str, message: &str, key: &RsaKey, g_base: u32) -> bool {
         if key.key_type() != RsaKeyType::Public {
             panic!("Der Schlüssel muss öffentlich sein, um eine Nachricht zu verifizieren!");
         }
@@ -124,21 +128,10 @@ impl RsaService {
             "Verifizieren der Nachricht {} mit Signatur {}",
             message, signature
         );
-        let message_big_int = RsaService::get_decimal_hash(message);
+        let message_big_int = RsaService::get_decimal_hash(message).to_str_radix(10);
 
-        // Signatur in BigInt umwandeln
-        let signature_big_int = BigInt::parse_bytes(signature.as_bytes(), 10)
-            .expect("Die Signatur konnte nicht in einen BigInt umgewandelt werden");
+        let verification = self.decrypt(signature, g_base, key);
 
-        // Verifizierung durchführen: verifizierung = signatur ^ (öffentlicher key vom partner) mod n
-        let verification = self.number_theory_service.fast_exponentiation(
-            // TODO self.decrypt aufrufen.
-            &signature_big_int,
-            &key.exponent(),
-            &key.modulus(),
-        );
-
-        // Überprüfen, ob die Verifizierung mit der gehashten Nachricht übereinstimmt
         verification == message_big_int
     }
 
@@ -194,10 +187,46 @@ mod tests {
     #[test]
     fn test_encrypt_decrypt_happy_flow_1024() {
         run_test_for_all_services(|service| {
-            let message = "bbbbbbbbbbbbbbb  äääääääääääääää  !&    ";
+            let message = "Das ist eine ganz interessante Testnachricht für die Signatur!";
 
             let keygen_service = RsaKeygenService::new(1024, service.clone());
             let (public_key, private_key) = &keygen_service.generate_keypair(40, 23);
+
+            let rsa_service = RsaService::new(service);
+
+            let encrypted_message = rsa_service.encrypt(message, 55296, public_key);
+            println!("Verschlüsselte Nachricht: {}", encrypted_message);
+
+            let decrypted_message = rsa_service.decrypt(&encrypted_message, 55296, private_key);
+            assert_eq!(message.trim_end(), decrypted_message);
+        });
+    }
+
+    #[test]
+    fn test_encrypt_decrypt_empty_string() {
+        run_test_for_all_services(|service| {
+            let message = "";
+
+            let keygen_service = RsaKeygenService::new(512, service.clone());
+            let (public_key, private_key) = &keygen_service.generate_keypair(100, 346);
+
+            let rsa_service = RsaService::new(service);
+
+            let encrypted_message = rsa_service.encrypt(message, 55296, public_key);
+            println!("Verschlüsselte Nachricht: {}", encrypted_message);
+
+            let decrypted_message = rsa_service.decrypt(&encrypted_message, 55296, private_key);
+            assert_eq!(message.trim_end(), decrypted_message);
+        });
+    }
+
+    #[test]
+    fn test_with_key_size_64() {
+        run_test_for_all_services(|service| {
+            let message = "afsöoilj4j ae fae lör e59afß3 2öadf 0";
+
+            let keygen_service = RsaKeygenService::new(64, service.clone());
+            let (public_key, private_key) = &keygen_service.generate_keypair(100, 2);
 
             let rsa_service = RsaService::new(service);
 
@@ -219,9 +248,11 @@ mod tests {
 
             let rsa_service = RsaService::new(service);
 
-            let signature = rsa_service.sign(message, private_key);
+            let g_base = 55296;
 
-            let is_valid = rsa_service.verify(&signature, message, public_key);
+            let signature = rsa_service.sign(message, private_key, g_base);
+
+            let is_valid = rsa_service.verify(&signature, message, public_key, g_base);
             assert!(is_valid);
         });
     }
@@ -236,9 +267,11 @@ mod tests {
 
             let rsa_service = RsaService::new(service);
 
-            let signature = rsa_service.sign(&message, private_key);
+            let g_base = 55296;
 
-            let is_valid = rsa_service.verify(&signature, &message, public_key);
+            let signature = rsa_service.sign(&message, private_key, g_base);
+
+            let is_valid = rsa_service.verify(&signature, &message, public_key, g_base);
             assert!(is_valid);
         });
     }
@@ -248,14 +281,36 @@ mod tests {
         run_test_for_all_services(|service| {
             let message = "Das ist eine ganz interessante Testnachricht für die Signatur!    ";
 
-            let keygen_service = RsaKeygenService::new(256, service.clone());
+            let keygen_service = RsaKeygenService::new(50, service.clone());
             let (public_key, private_key) = &keygen_service.generate_keypair(40, 23);
 
             let rsa_service = RsaService::new(service);
 
-            let signature = rsa_service.sign(&message, private_key);
+            let g_base = 55296;
 
-            let is_valid = rsa_service.verify(&signature, &message, public_key);
+            let signature = rsa_service.sign(&message, private_key, g_base);
+
+            let is_valid = rsa_service.verify(&signature, &message, public_key, g_base);
+            assert!(!is_valid);
+        });
+    }
+
+    #[test]
+    fn fail_signature_with_different_messages() {
+        run_test_for_all_services(|service| {
+            let message_one = "Das ist eine ganz interessante Testnachricht für die Signatur!    ";
+            let message_two = "Das ist eine andere Nachricht";
+
+            let keygen_service = RsaKeygenService::new(1024, service.clone());
+            let (public_key, private_key) = &keygen_service.generate_keypair(40, 24);
+
+            let rsa_service = RsaService::new(service);
+
+            let g_base = 55296;
+
+            let signature = rsa_service.sign(&message_one, private_key, g_base);
+
+            let is_valid = rsa_service.verify(&signature, &message_two, public_key, g_base);
             assert!(!is_valid);
         });
     }
