@@ -1,7 +1,31 @@
+use crate::encryption::math_functions::traits::logarithm::Logarithm;
 use bigdecimal::num_bigint::BigInt;
 use bigdecimal::{One, Zero};
 use log::{debug, trace};
 use num::Integer;
+
+/// Bestimmt die Blockgröße für die Verschlüsselung und Entschlüsselung.
+/// Die Blockgröße ist die Anzahl der Zeichen, die in einem Block verschlüsselt werden.
+///
+/// # Argumente
+/// * `modulus`: Das Modulus des RSA-Schlüssels.
+/// * `base`: Die Basis, in der die Blöcke kodiert werden sollen.
+/// * `is_encryption`: Gibt an, ob die Blockgröße für die Verschlüsselung oder Entschlüsselung bestimmt werden soll.
+///
+/// # Rückgabe
+/// * Die Blockgröße.
+pub(crate) fn determine_block_size(modulus: &BigInt, base: &BigInt, is_encryption: bool) -> usize {
+    // TODO Aufhübschen, wenn das Blockchiffre refactored wird.
+    debug!("Bestimme Blockgröße");
+
+    let block_size = match is_encryption {
+        true => modulus.log(base),
+        false => modulus.log(base) + 1,
+    };
+
+    debug!("Blockgröße bestimmt als: {}", block_size);
+    block_size
+}
 
 /// Diese Methode erzeugt einen Vektor mit BigInts, der aus einem String mit einer
 /// bestimmten Blockgröße erstellt wurde.

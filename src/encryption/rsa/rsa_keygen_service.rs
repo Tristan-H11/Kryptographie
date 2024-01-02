@@ -8,7 +8,7 @@ use crate::encryption::math_functions::number_theory::number_theory_service::{
 };
 use crate::encryption::math_functions::pseudo_random_number_generator::PseudoRandomNumberGenerator;
 use crate::encryption::math_functions::traits::increment::Increment;
-use crate::encryption::rsa::keys::{PrivateKey, PublicKey};
+use crate::encryption::rsa::keys::{RsaKey, RsaKeyType};
 
 ///
 /// Ein Service zum Generieren von Schlüsselpaaren für RSA.
@@ -42,7 +42,6 @@ impl RsaKeygenService {
     /// # Argumente
     /// * `miller_rabin_iterations` - Die Anzahl der Iterationen für den Miller-Rabin-Test.
     /// * `random_seed` - Der Seed für die gleichverteilte Zufallszahlerzeugung.
-    /// * `g_base` - Die Basis des Zeichensatzes, der für die Verschlüsselung verwendet wird.
     ///
     /// # Rückgabe
     /// Ein Tupel aus dem öffentlichen und privaten Schlüssel.
@@ -50,8 +49,7 @@ impl RsaKeygenService {
         &self,
         miller_rabin_iterations: u32,
         random_seed: u32,
-        g_base: u32,
-    ) -> (PublicKey, PrivateKey) {
+    ) -> (RsaKey, RsaKey) {
         debug!(
             "Generiere Schlüsselpaar mit key_size {} und Miller-Rabin-Iterations {}",
             self.key_size, miller_rabin_iterations
@@ -67,8 +65,8 @@ impl RsaKeygenService {
         let phi = (&prime_one - BigInt::one()) * (&prime_two - BigInt::one());
         let e = self.generate_e(&phi, random_generator);
         let d = self.generate_d(&e, &phi);
-        let public_key = PublicKey::new(e, n.clone(), g_base);
-        let private_key = PrivateKey::new(d, n, g_base);
+        let public_key = RsaKey::new(RsaKeyType::Public, e, n.clone());
+        let private_key = RsaKey::new(RsaKeyType::Private, d, n);
         debug!("Schlüsselpaar generiert");
         (public_key, private_key)
     }

@@ -1,7 +1,6 @@
+use crate::encryption::rsa::keys::{RsaKey, RsaKeyType};
 use log::debug;
 use serde::{Deserialize, Serialize};
-
-use crate::encryption::rsa::keys::{PrivateKey, PublicKey};
 
 #[derive(Serialize, Deserialize)]
 pub struct KeyPair {
@@ -13,21 +12,23 @@ pub struct KeyPair {
 }
 
 impl KeyPair {
-    pub(crate) fn to_private_key(&self) -> PrivateKey {
+    pub(crate) fn to_private_key(&self) -> RsaKey {
+        // TODO Serialiserungsfehler behandeln
         debug!("Serialisiere KeyPair zu PrivateKey");
-        PrivateKey::new_with_blocksize(
-            (&self).d.parse().unwrap(),
-            (&self).modulus.parse().unwrap(),
-            (&self.block_size_priv).parse().unwrap(),
+        RsaKey::new(
+            RsaKeyType::Private,
+            self.d.parse().unwrap(),
+            self.modulus.parse().unwrap(),
         )
     }
 
-    pub(crate) fn to_public_key(&self) -> PublicKey {
+    pub(crate) fn to_public_key(&self) -> RsaKey {
+        // TODO Serialiserungsfehler behandeln
         debug!("Serialisiere KeyPair zu PublicKey");
-        PublicKey::new_with_blocksize(
-            (&self).e.parse().unwrap(),
-            (&self).modulus.parse().unwrap(),
-            (&self.block_size_pub).parse().unwrap(),
+        RsaKey::new(
+            RsaKeyType::Public,
+            self.e.parse().unwrap(),
+            self.modulus.parse().unwrap(),
         )
     }
 }
