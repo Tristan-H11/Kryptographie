@@ -103,10 +103,10 @@ impl RsaKeygenService {
 
         while prime_one == prime_two {
             trace!(
-            "Generierter prime_one {} ist gleich prime_two {}. Starte neuen Versuch",
-            prime_one,
-            prime_two
-        );
+                "Generierter prime_one {} ist gleich prime_two {}. Starte neuen Versuch",
+                prime_one,
+                prime_two
+            );
             prime_two = self.generate_prime(
                 prim_size_two,
                 miller_rabin_iterations,

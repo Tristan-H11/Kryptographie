@@ -281,7 +281,7 @@ mod tests {
         run_test_for_all_services(|service| {
             let message = "Das ist eine ganz interessante Testnachricht für die Signatur!    ";
 
-            let keygen_service = RsaKeygenService::new(50, service.clone());
+            let keygen_service = RsaKeygenService::new(16, service.clone());
             let (public_key, private_key) = &keygen_service.generate_keypair(40, 23);
 
             let rsa_service = RsaService::new(service);

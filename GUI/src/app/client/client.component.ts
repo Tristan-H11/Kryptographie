@@ -208,6 +208,7 @@ export class ClientComponent implements OnInit {
         const requestBody = new SignRequest(
             this.plainText,
             this.clientKeyPair(),
+            this.configurationData().number_system_base
         );
         const start = Date.now();
         this.backendRequestService.sign(requestBody).then(r => {
@@ -224,6 +225,7 @@ export class ClientComponent implements OnInit {
         const requestBody = new SignRequest(
             this.cipherText,
             this.clientKeyPair(),
+            this.configurationData().number_system_base
         );
         const start = Date.now();
         this.backendRequestService.sign(requestBody).then(r => {
@@ -241,6 +243,7 @@ export class ClientComponent implements OnInit {
             this.plainText,
             this.signature,
             this.stateService.getClientKey(this.receivedFrom)(),
+            this.configurationData().number_system_base
         );
         const start = Date.now();
         this.backendRequestService.verify(requestBody).then(r => {
@@ -260,6 +263,7 @@ export class ClientComponent implements OnInit {
             this.cipherText,
             this.signature,
             this.stateService.getClientKey(this.receivedFrom)(),
+            this.configurationData().number_system_base
         );
         const start = Date.now();
         this.backendRequestService.verify(requestBody).then(r => {
