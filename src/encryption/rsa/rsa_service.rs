@@ -52,41 +52,6 @@ impl RsaService {
         create_string_from_blocks_encrypt(encrypted_chunks, block_size + 1, g_base)
     }
 
-    /// Verifiziert eine Nachricht mit der Signatur.
-    ///
-    /// # Argumente
-    /// * `signature` - Die Signatur.
-    /// * `message` - Die Nachricht.
-    /// * `key` - Der öffentliche Schlüssel.
-    ///
-    /// # Rückgabe
-    /// * `bool` - Gibt an, ob die Verifizierung erfolgreich war.
-    pub(crate) fn verify(&self, signature: &str, message: &str, key: &RsaKey) -> bool {
-        if key.key_type() != RsaKeyType::Public {
-            panic!("Der Schlüssel muss öffentlich sein, um eine Nachricht zu verifizieren!");
-        }
-        info!(
-            "Verifizieren der Nachricht {} mit Signatur {}",
-            message, signature
-        );
-        let message_big_int = RsaService::get_decimal_hash(message);
-
-        // Signatur in BigInt umwandeln
-        let signature_big_int = BigInt::parse_bytes(signature.as_bytes(), 10)
-            .expect("Die Signatur konnte nicht in einen BigInt umgewandelt werden");
-
-        // Verifizierung durchführen: verifizierung = signatur ^ (öffentlicher key vom partner) mod n
-        let verification = self.number_theory_service.fast_exponentiation(
-            // TODO self.decrypt aufrufen.
-            &signature_big_int,
-            &key.exponent(),
-            &key.modulus(),
-        );
-
-        // Überprüfen, ob die Verifizierung mit der gehashten Nachricht übereinstimmt
-        verification == message_big_int
-    }
-
     /// Entschlüsselt eine Nachricht mit dem privaten Schlüssel.
     ///
     /// # Argumente
@@ -140,6 +105,41 @@ impl RsaService {
 
         // Signatur als String zurückgeben
         signature.to_str_radix(10)
+    }
+
+    /// Verifiziert eine Nachricht mit der Signatur.
+    ///
+    /// # Argumente
+    /// * `signature` - Die Signatur.
+    /// * `message` - Die Nachricht.
+    /// * `key` - Der öffentliche Schlüssel.
+    ///
+    /// # Rückgabe
+    /// * `bool` - Gibt an, ob die Verifizierung erfolgreich war.
+    pub(crate) fn verify(&self, signature: &str, message: &str, key: &RsaKey) -> bool {
+        if key.key_type() != RsaKeyType::Public {
+            panic!("Der Schlüssel muss öffentlich sein, um eine Nachricht zu verifizieren!");
+        }
+        info!(
+            "Verifizieren der Nachricht {} mit Signatur {}",
+            message, signature
+        );
+        let message_big_int = RsaService::get_decimal_hash(message);
+
+        // Signatur in BigInt umwandeln
+        let signature_big_int = BigInt::parse_bytes(signature.as_bytes(), 10)
+            .expect("Die Signatur konnte nicht in einen BigInt umgewandelt werden");
+
+        // Verifizierung durchführen: verifizierung = signatur ^ (öffentlicher key vom partner) mod n
+        let verification = self.number_theory_service.fast_exponentiation(
+            // TODO self.decrypt aufrufen.
+            &signature_big_int,
+            &key.exponent(),
+            &key.modulus(),
+        );
+
+        // Überprüfen, ob die Verifizierung mit der gehashten Nachricht übereinstimmt
+        verification == message_big_int
     }
 
     /// Diese Methode berechnet den Hash einer Nachricht.
