@@ -125,11 +125,6 @@ export class BackendRequestService {
         );
     }
 
-    private getParams(): HttpParams {
-        return new HttpParams()
-            .set("use_fast", this.stateService.getUseFastMath()());
-    }
-
     public modularInverse(body: ModularInversRequest): Observable<SingleMessageModel> {
         const params = this.getParams();
         const options = {params};
@@ -140,5 +135,10 @@ export class BackendRequestService {
         const params = this.getParams();
         const options = {params};
         return this.http.post<MultiplicationResponse>(this.endpointsService.getRsaMultiplicationEndpoint(), body, options);
+    }
+
+    private getParams(): HttpParams {
+        return new HttpParams()
+            .set("use_fast", this.stateService.getUseFastMath()());
     }
 }
