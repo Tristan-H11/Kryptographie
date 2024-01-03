@@ -3,7 +3,7 @@ use actix_web::{HttpResponse, Responder};
 use log::info;
 use serde::Deserialize;
 
-use crate::api::serializable_models::{KeyPair, UseFastQuery};
+use crate::api::serializable_models::{KeyPair, SingleStringResponse, UseFastQuery};
 use crate::encryption::math_functions::block_chiffre::determine_block_size;
 use crate::encryption::math_functions::number_theory::number_theory_service::NumberTheoryService;
 use crate::encryption::math_functions::number_theory::number_theory_service::NumberTheoryServiceSpeed::{Fast, Slow};
@@ -44,7 +44,9 @@ pub(crate) async fn create_key_pair(
     let (public_key, private_key) =
         match key_gen_service.generate_keypair(req_body.miller_rabin_rounds, req_body.random_seed) {
             Ok(key_pair) => key_pair,
-            Err(_) => return HttpResponse::InternalServerError().body("Schlüsselerzeugung fehlgeschlagen."),
+            Err(_) => return HttpResponse::InternalServerError().json(SingleStringResponse{
+                message: "Schlüsselerzeugung fehlgeschlagen.".to_string(),
+            })
         };
 
     let block_size_pub = determine_block_size(
