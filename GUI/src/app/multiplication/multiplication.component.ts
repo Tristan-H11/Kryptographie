@@ -12,6 +12,8 @@ import {MatDialog, MatDialogRef} from "@angular/material/dialog";
 import {LoadingDialogComponent} from "../loading-dialog/loading-dialog.component";
 import {MatSnackBar} from "@angular/material/snack-bar";
 import {MultiplicationRequest} from "../models/multiplication-request";
+import {catchError, EMPTY} from "rxjs";
+import {ErrorDialogComponent} from "../error-dialog/error-dialog.component";
 
 @Component({
     selector: "app-multiplication",
@@ -94,8 +96,18 @@ export class MultiplicationComponent {
 
         const body = new MultiplicationRequest(this.parameterA, this.parameterB, this.keyPair);
 
-        this.backendRequestService.rsaMultiplication(body).then(
-            (result) => {
+        this.backendRequestService.rsaMultiplication(body).pipe(
+            catchError(
+                (error) => {
+                    loadingDialog.close();
+                    console.log(error.error.message)
+                    this.dialog.open(ErrorDialogComponent, {
+                        data: {message: error.error.message}
+                    })
+                    return EMPTY;
+                }
+            )
+        ).subscribe(result => {
                 const duration = Date.now() - startTime;
                 this.parameterAEncrypted = result.encrypted_factor_one;
                 this.parameterBEncrypted = result.encrypted_factor_two;
@@ -105,7 +117,7 @@ export class MultiplicationComponent {
                 this.snackBar.open("Berechnung durchgeführt. Dauer: " + duration + "ms", "Ok", {
                     duration: 5000,
                 });
-            }
+            },
         );
     }
 

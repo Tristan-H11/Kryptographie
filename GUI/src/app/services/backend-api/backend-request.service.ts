@@ -1,7 +1,7 @@
 import {Injectable} from "@angular/core";
 import {HttpClient, HttpParams} from "@angular/common/http";
 import {EndpointsService} from "./endpoints.service";
-import {firstValueFrom} from "rxjs";
+import {firstValueFrom, Observable} from "rxjs";
 import {ConfigurationData} from "../../models/configuration-data";
 import {KeyPair} from "../../models/key-pair";
 import {EncryptDecryptRequest} from "../../models/encrypt-decrypt-request";
@@ -138,11 +138,9 @@ export class BackendRequestService {
         );
     }
 
-    public async rsaMultiplication(body: MultiplicationRequest): Promise<MultiplicationResponse> {
+    public rsaMultiplication(body: MultiplicationRequest): Observable<MultiplicationResponse> {
         const params = this.getParams();
         const options = {params};
-        return firstValueFrom(
-            this.http.post<MultiplicationResponse>(this.endpointsService.getRsaMultiplicationEndpoint(), body, options)
-        );
+        return this.http.post<MultiplicationResponse>(this.endpointsService.getRsaMultiplicationEndpoint(), body, options);
     }
 }
