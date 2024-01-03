@@ -1,11 +1,12 @@
 use std::str::FromStr;
 
-use actix_web::web::{Json, Query};
 use actix_web::{HttpResponse, Responder};
+use actix_web::web::{Json, Query};
 use bigdecimal::num_bigint::BigInt;
 use log::info;
 use serde::Deserialize;
 
+use crate::api::basic::call_checked_with_parsed_big_ints;
 use crate::api::serializable_models::{SingleStringResponse, UseFastQuery};
 use crate::encryption::math_functions::number_theory::number_theory_service::{NumberTheoryService, NumberTheoryServiceTrait};
 use crate::encryption::math_functions::number_theory::number_theory_service::NumberTheoryServiceSpeed::{Fast, Slow};
@@ -36,29 +37,22 @@ pub(crate) async fn exponentiation(
     let req_body: ExponentiationRequest = req_body.into_inner();
     let use_fast = query.use_fast;
 
-    let exponent = &BigInt::from_str(&*req_body.exponent);
-    let base = &BigInt::from_str(&*req_body.base);
-    let modulus = &BigInt::from_str(&*req_body.modulus);
+    call_checked_with_parsed_big_ints(|| {
+        let exponent = &BigInt::from_str(&*req_body.exponent)?;
+        let base = &BigInt::from_str(&*req_body.base)?;
+        let modulus = &BigInt::from_str(&*req_body.modulus)?;
 
-    let number_theory_service = match use_fast {
-        true => NumberTheoryService::new(Fast),
-        false => NumberTheoryService::new(Slow),
-    };
+        let number_theory_service = match use_fast {
+            true => NumberTheoryService::new(Fast),
+            false => NumberTheoryService::new(Slow),
+        };
 
-    match (exponent, base, modulus) {
-        (Ok(exponent), Ok(base), Ok(modulus)) => {
-            let result = number_theory_service
-                .fast_exponentiation(base, exponent, modulus)
-                .to_str_radix(10);
+        let result = number_theory_service
+            .fast_exponentiation(base, exponent, modulus)
+            .to_str_radix(10);
 
-            let response = SingleStringResponse { message: result };
+        let response = SingleStringResponse { message: result };
 
-            HttpResponse::Ok().json(response)
-        }
-        _ => {
-            return HttpResponse::BadRequest().json(SingleStringResponse {
-                message: "Fehler beim Parsen der Parameter".to_string(),
-            })
-        }
-    }
+        Ok(HttpResponse::Ok().json(response))
+    })
 }
