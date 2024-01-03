@@ -34,25 +34,32 @@ pub(crate) async fn modular_inverse_endpoint(
     );
     let req_body: ModulInverseRequest = req_body.into_inner();
     let use_fast = query.use_fast;
-    let n = BigInt::from_str(&req_body.n).unwrap();
-    let modul = BigInt::from_str(&req_body.modul).unwrap();
+    let n = BigInt::from_str(&req_body.n);
+    let modul = BigInt::from_str(&req_body.modul);
 
     let number_theory_service = match use_fast {
         true => NumberTheoryService::new(Fast),
         false => NumberTheoryService::new(Slow),
     };
 
-    let result = number_theory_service.modulo_inverse(&n, &modul);
+    match (n, modul) {
+        (Ok(n), Ok(modul)) => {
+            let result = number_theory_service.modulo_inverse(&n, &modul);
 
-    match result {
-        Ok(x) => {
-            let response = SingleStringResponse {
-                message: x.to_string(),
-            };
-            HttpResponse::Ok().json(response)
-        }
-        Err(_) => HttpResponse::BadRequest().json(SingleStringResponse {
-            message: "Kein Ergebnis gefunden".to_string(),
+            match result {
+                Ok(x) => {
+                    let response = SingleStringResponse {
+                        message: x.to_string(),
+                    };
+                    HttpResponse::Ok().json(response)
+                }
+                Err(_) => HttpResponse::BadRequest().json(SingleStringResponse {
+                    message: "Kein Ergebnis gefunden".to_string(),
+                }),
+            }
+        },
+        _ => return HttpResponse::BadRequest().json(SingleStringResponse {
+            message: "Fehler beim Parsen der Parameter als Zahl".to_string(),
         }),
     }
 }
