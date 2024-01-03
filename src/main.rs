@@ -1,5 +1,6 @@
 mod api;
 mod encryption;
+mod shared;
 
 use crate::api::basic::config_app;
 use actix_cors::Cors;
