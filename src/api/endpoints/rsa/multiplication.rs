@@ -50,8 +50,8 @@ pub(crate) async fn multiplication(
         let factor_one = BigInt::from_str(&req_body.factor_one)?;
         let factor_two = BigInt::from_str(&req_body.factor_two)?;
 
-        let public_key = req_body.key_pair.to_public_key();
-        let private_key = req_body.key_pair.to_private_key();
+        let public_key = req_body.key_pair.to_public_key()?;
+        let private_key = req_body.key_pair.to_private_key()?;
 
         let encrypted_factor_one = rsa_service.encrypt_decrypt_number(&factor_one, &public_key);
         let encrypted_factor_two = rsa_service.encrypt_decrypt_number(&factor_two, &public_key);
