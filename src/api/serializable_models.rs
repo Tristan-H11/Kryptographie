@@ -1,3 +1,4 @@
+use bigdecimal::num_bigint::ParseBigIntError;
 use crate::encryption::rsa::keys::{RsaKey, RsaKeyType};
 use log::debug;
 use serde::{Deserialize, Serialize};
@@ -12,24 +13,36 @@ pub struct KeyPair {
 }
 
 impl KeyPair {
-    pub(crate) fn to_private_key(&self) -> RsaKey {
-        // TODO Serialiserungsfehler behandeln
+    /// Wandelt das serialisierte Schlüsselpaar in einen privaten Schlüssel um.
+    ///
+    /// # Rückgabe
+    /// * `RsaKey` - Der private Schlüssel.
+    ///
+    /// # Fehler
+    /// * `ParseBigIntError` - Falls die BigInts nicht geparst werden können.
+    pub(crate) fn to_private_key(&self) -> Result<RsaKey, ParseBigIntError> {
         debug!("Serialisiere KeyPair zu PrivateKey");
-        RsaKey::new(
+        Ok(RsaKey::new(
             RsaKeyType::Private,
-            self.d.parse().unwrap(),
-            self.modulus.parse().unwrap(),
-        )
+            self.d.parse()?,
+            self.modulus.parse()?,
+        ))
     }
 
-    pub(crate) fn to_public_key(&self) -> RsaKey {
-        // TODO Serialiserungsfehler behandeln
+    /// Wandelt das serialisierte Schlüsselpaar in einen öffentlichen Schlüssel um.
+    ///
+    /// # Rückgabe
+    /// * `RsaKey` - Der öffentliche Schlüssel.
+    ///
+    /// # Fehler
+    /// * `ParseBigIntError` - Falls die BigInts nicht geparst werden können.
+    pub(crate) fn to_public_key(&self) -> Result<RsaKey, ParseBigIntError> {
         debug!("Serialisiere KeyPair zu PublicKey");
-        RsaKey::new(
+        Ok(RsaKey::new(
             RsaKeyType::Public,
-            self.e.parse().unwrap(),
-            self.modulus.parse().unwrap(),
-        )
+            self.e.parse()?,
+            self.modulus.parse()?,
+        ))
     }
 }
 
