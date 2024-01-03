@@ -1,11 +1,10 @@
-use std::io::Error;
-
 use crate::encryption::math_functions::number_theory::extended_euclid_result::ExtendedEuclidResult;
 use num::BigInt;
 
 use crate::encryption::math_functions::number_theory::fast_number_theory_service::FastNumberTheoryService;
 use crate::encryption::math_functions::number_theory::slow_number_theory_service::SlowNumberTheoryService;
 use crate::encryption::math_functions::pseudo_random_number_generator::PseudoRandomNumberGenerator;
+use crate::shared::errors::ArithmeticError;
 
 /// Gibt an, ob die schnelle oder die langsame Implementierung des `NumberTheoryService` verwendet werden soll.
 pub enum NumberTheoryServiceSpeed {
@@ -52,7 +51,7 @@ impl NumberTheoryServiceTrait for NumberTheoryService {
         }
     }
 
-    fn modulo_inverse(&self, n: &BigInt, modul: &BigInt) -> Result<BigInt, Error> {
+    fn modulo_inverse(&self, n: &BigInt, modul: &BigInt) -> Result<BigInt, ArithmeticError> {
         match self {
             NumberTheoryService::FastService(service) => service.modulo_inverse(n, modul),
             NumberTheoryService::SlowService(service) => service.modulo_inverse(n, modul),
@@ -139,7 +138,7 @@ pub trait NumberTheoryServiceTrait {
     ///
     /// # Fehler
     ///
-    /// * `Error::InvalidInput` - Wenn `n` und `modul` nicht teilerfremd sind, dann existiert kein Inverses.
+    /// * `ArithmeticError::NoInverseError` - Wenn `n` und `modul` nicht teilerfremd sind, dann existiert kein Inverses.
     ///
     /// # Beispiel
     ///
@@ -151,7 +150,7 @@ pub trait NumberTheoryServiceTrait {
     ///
     /// assert_eq!(result, Ok(BigInt::from(3)));
     /// ```
-    fn modulo_inverse(&self, n: &BigInt, modul: &BigInt) -> Result<BigInt, Error>;
+    fn modulo_inverse(&self, n: &BigInt, modul: &BigInt) -> Result<BigInt, ArithmeticError>;
 
     /// Diese Methode führt einen probabilistischen Primzahltest für den angegebenen Integer durch.
     ///

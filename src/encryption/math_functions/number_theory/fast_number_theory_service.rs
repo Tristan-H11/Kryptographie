@@ -1,5 +1,3 @@
-use std::io::{Error, ErrorKind};
-
 use crate::encryption::math_functions::number_theory::extended_euclid_result::ExtendedEuclidResult;
 use bigdecimal::num_bigint::BigInt;
 use bigdecimal::num_traits::Euclid;
@@ -10,6 +8,7 @@ use crate::encryption::math_functions::number_theory::number_theory_service::{Nu
 use crate::encryption::math_functions::number_theory::number_theory_service::NumberTheoryServiceSpeed::Fast;
 use crate::encryption::math_functions::number_theory::primality_test::PrimalityTest;
 use crate::encryption::math_functions::pseudo_random_number_generator::PseudoRandomNumberGenerator;
+use crate::shared::errors::ArithmeticError;
 
 #[derive(Clone, Copy)]
 pub struct FastNumberTheoryService;
@@ -30,12 +29,11 @@ impl NumberTheoryServiceTrait for FastNumberTheoryService {
         base.modpow(exponent, modul)
     }
 
-    fn modulo_inverse(&self, n: &BigInt, modul: &BigInt) -> Result<BigInt, Error> {
+    fn modulo_inverse(&self, n: &BigInt, modul: &BigInt) -> Result<BigInt, ArithmeticError> {
         let number_theory_service = FastNumberTheoryService::new();
         let extended_euclid_result = number_theory_service.extended_euclid(modul, n);
         if !extended_euclid_result.ggt.is_one() {
-            let no_inverse_error = Error::new(ErrorKind::InvalidInput, "n hat keinen Inverse");
-            return Err(no_inverse_error);
+            return Err(ArithmeticError::NoInverseError(n.to_string(), modul.to_string()));
         }
         // Berechnet aus den letzten Faktoren das Inverse.
         return Ok((modul + extended_euclid_result.y).rem_euclid(modul));
