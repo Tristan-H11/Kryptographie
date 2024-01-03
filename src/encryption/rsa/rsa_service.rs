@@ -190,7 +190,7 @@ mod tests {
             let message = "Das ist eine ganz interessante Testnachricht für die Signatur!";
 
             let keygen_service = RsaKeygenService::new(1024, service.clone());
-            let (public_key, private_key) = &keygen_service.generate_keypair(40, 23);
+            let (public_key, private_key) = &keygen_service.generate_keypair(40, 23).unwrap();
 
             let rsa_service = RsaService::new(service);
 
@@ -208,7 +208,7 @@ mod tests {
             let message = "";
 
             let keygen_service = RsaKeygenService::new(512, service.clone());
-            let (public_key, private_key) = &keygen_service.generate_keypair(100, 346);
+            let (public_key, private_key) = &keygen_service.generate_keypair(100, 346).unwrap();
 
             let rsa_service = RsaService::new(service);
 
@@ -226,7 +226,7 @@ mod tests {
             let message = "afsöoilj4j ae fae lör e59afß3 2öadf 0";
 
             let keygen_service = RsaKeygenService::new(64, service.clone());
-            let (public_key, private_key) = &keygen_service.generate_keypair(100, 2);
+            let (public_key, private_key) = &keygen_service.generate_keypair(100, 2).unwrap();
 
             let rsa_service = RsaService::new(service);
 
@@ -244,7 +244,7 @@ mod tests {
             let message = "    Das ist eine ganz 456$§% / Testnachricht für die Signatur!    ";
 
             let keygen_service = RsaKeygenService::new(1024, service.clone());
-            let (public_key, private_key) = &keygen_service.generate_keypair(40, 23);
+            let (public_key, private_key) = &keygen_service.generate_keypair(40, 23).unwrap();
 
             let rsa_service = RsaService::new(service);
 
@@ -263,7 +263,7 @@ mod tests {
             let message = "Das ist eine ganz interessante Testnachricht für die Signatur!    ";
 
             let keygen_service = RsaKeygenService::new(257, service.clone());
-            let (public_key, private_key) = &keygen_service.generate_keypair(40, 23);
+            let (public_key, private_key) = &keygen_service.generate_keypair(40, 23).unwrap();
 
             let rsa_service = RsaService::new(service);
 
@@ -283,7 +283,7 @@ mod tests {
             let message_two = "Das ist eine andere Nachricht";
 
             let keygen_service = RsaKeygenService::new(1024, service.clone());
-            let (public_key, private_key) = &keygen_service.generate_keypair(40, 24);
+            let (public_key, private_key) = &keygen_service.generate_keypair(40, 24).unwrap();
 
             let rsa_service = RsaService::new(service);
 
@@ -302,7 +302,7 @@ mod tests {
             let keygen_service = RsaKeygenService::new(256, service);
             let rsa_service = RsaService::new(service);
 
-            let (public_key, private_key) = &keygen_service.generate_keypair(10, 19);
+            let (public_key, private_key) = &keygen_service.generate_keypair(10, 19).unwrap();
 
             let message = BigInt::from_str("123456789").unwrap();
 
@@ -321,7 +321,7 @@ mod tests {
             let keygen_service = RsaKeygenService::new(256, service);
             let rsa_service = RsaService::new(service.clone());
 
-            let (public_key, private_key) = &keygen_service.generate_keypair(10, 19);
+            let (public_key, private_key) = &keygen_service.generate_keypair(10, 19).unwrap();
 
             let message = BigInt::from_str("48153454374561835379").unwrap();
 
@@ -341,7 +341,7 @@ mod tests {
             let keygen_service = RsaKeygenService::new(256, service);
             let rsa_service = RsaService::new(service);
 
-            let (public_key, private_key) = &keygen_service.generate_keypair(10, 19);
+            let (public_key, private_key) = &keygen_service.generate_keypair(10, 19).unwrap();
 
             let message_one = BigInt::from_str("123456789").unwrap();
 
