@@ -117,12 +117,10 @@ export class BackendRequestService {
         );
     }
 
-    public async shanks(body: ShanksRequest): Promise<SingleMessageModel> {
+    public shanks(body: ShanksRequest): Observable<SingleMessageModel> {
         const params = this.getParams();
         const options = {params};
-        return firstValueFrom(
-            this.http.post<SingleMessageModel>(this.endpointsService.getShanksEndpoint(), body, options)
-        );
+        return this.http.post<SingleMessageModel>(this.endpointsService.getShanksEndpoint(), body, options);
     }
 
     public modularInverse(body: ModularInversRequest): Observable<SingleMessageModel> {
