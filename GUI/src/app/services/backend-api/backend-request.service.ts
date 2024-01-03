@@ -101,12 +101,10 @@ export class BackendRequestService {
         );
     }
 
-    public async exponentiation(body: ExponentiationRequest): Promise<SingleMessageModel> {
+    public exponentiation(body: ExponentiationRequest): Observable<SingleMessageModel> {
         const params = this.getParams();
         const options = {params};
-        return firstValueFrom(
-            this.http.post<SingleMessageModel>(this.endpointsService.getExponentiationEndpoint(), body, options)
-        );
+        return this.http.post<SingleMessageModel>(this.endpointsService.getExponentiationEndpoint(), body, options);
     }
 
     public extendedGcd(body: ExtendedEuclidRequest): Observable<ExtendedEuclidResponse> {

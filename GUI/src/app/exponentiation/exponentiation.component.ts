@@ -7,6 +7,9 @@ import {FormsModule, ReactiveFormsModule} from "@angular/forms";
 import {BackendRequestService} from "../services/backend-api/backend-request.service";
 import {MatButtonModule} from "@angular/material/button";
 import {ExponentiationRequest} from "../models/exponentiation-request";
+import {catchError, EMPTY} from "rxjs";
+import {ErrorDialogComponent} from "../error-dialog/error-dialog.component";
+import {MatDialog} from "@angular/material/dialog";
 
 @Component({
 	selector: "app-exponentiation",
@@ -22,7 +25,7 @@ export class ExponentiationComponent {
 	public modulus = "";
 	public result = "";
 
-	constructor(private backendRequestService: BackendRequestService) {
+	constructor(private backendRequestService: BackendRequestService, private dialog: MatDialog) {
 	}
 
 	/**
@@ -30,7 +33,16 @@ export class ExponentiationComponent {
 	 */
 	public calculate() {
 		let body = new ExponentiationRequest(this.exponent, this.base, this.modulus);
-		this.backendRequestService.exponentiation(body).then(result => {
+		this.backendRequestService.exponentiation(body).pipe(
+            catchError(
+                (error) => {
+                    this.dialog.open(ErrorDialogComponent, {
+                        data: {message: error.error.message}
+                    });
+                    return EMPTY;
+                }
+            )
+        ).subscribe(result => {
 			this.result = result.message;
 		});
 	}
