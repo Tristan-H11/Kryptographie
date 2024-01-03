@@ -1,4 +1,5 @@
 use actix_web::{web, HttpResponse, Responder};
+use bigdecimal::num_bigint::ParseBigIntError;
 use log::info;
 use serde::Serialize;
 
@@ -12,6 +13,7 @@ use crate::api::endpoints::rsa::encrypt::encrypt;
 use crate::api::endpoints::rsa::multiplication::multiplication;
 use crate::api::endpoints::rsa::sign::sign;
 use crate::api::endpoints::rsa::verify::verify;
+use crate::api::serializable_models::SingleStringResponse;
 
 #[derive(Serialize)]
 pub struct Response {
@@ -53,4 +55,13 @@ async fn not_found() -> HttpResponse {
         message: "Resource not found".to_string(),
     };
     HttpResponse::NotFound().json(response)
+}
+
+/// Nimmt eine Closure entgegen, die eine Antwort zurückgibt und ruft diese Funktion auf.
+/// Gibt die Antwort der Funktion zurück.
+/// Falls ein Fehler produziert wird, wird ein BadRequest zurückgegeben.
+pub fn call_checked_with_parsed_big_ints(func: impl Fn() -> Result<HttpResponse, ParseBigIntError>) -> HttpResponse {
+    func().unwrap_or_else(|_| HttpResponse::BadRequest().json(SingleStringResponse {
+        message: "Fehler beim Parsen der Parameter".to_string(),
+    }))
 }
