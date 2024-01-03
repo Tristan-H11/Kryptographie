@@ -36,20 +36,29 @@ pub(crate) async fn exponentiation(
     let req_body: ExponentiationRequest = req_body.into_inner();
     let use_fast = query.use_fast;
 
-    let exponent = &BigInt::from_str(&*req_body.exponent).unwrap();
-    let base = &BigInt::from_str(&*req_body.base).unwrap();
-    let modulus = &BigInt::from_str(&*req_body.modulus).unwrap();
+    let exponent = &BigInt::from_str(&*req_body.exponent);
+    let base = &BigInt::from_str(&*req_body.base);
+    let modulus = &BigInt::from_str(&*req_body.modulus);
 
     let number_theory_service = match use_fast {
         true => NumberTheoryService::new(Fast),
         false => NumberTheoryService::new(Slow),
     };
 
-    let result = number_theory_service
-        .fast_exponentiation(base, exponent, modulus)
-        .to_str_radix(10);
+    match (exponent, base, modulus) {
+        (Ok(exponent), Ok(base), Ok(modulus)) => {
+            let result = number_theory_service
+                .fast_exponentiation(base, exponent, modulus)
+                .to_str_radix(10);
 
-    let response = SingleStringResponse { message: result };
+            let response = SingleStringResponse { message: result };
 
-    HttpResponse::Ok().json(response)
+            HttpResponse::Ok().json(response)
+        }
+        _ => {
+            return HttpResponse::BadRequest().json(SingleStringResponse {
+                message: "Fehler beim Parsen der Parameter".to_string(),
+            })
+        }
+    }
 }
