@@ -60,8 +60,12 @@ async fn not_found() -> HttpResponse {
 /// Nimmt eine Closure entgegen, die eine Antwort zurückgibt und ruft diese Funktion auf.
 /// Gibt die Antwort der Funktion zurück.
 /// Falls ein Fehler produziert wird, wird ein BadRequest zurückgegeben.
-pub fn call_checked_with_parsed_big_ints(func: impl Fn() -> Result<HttpResponse, ParseBigIntError>) -> HttpResponse {
-    func().unwrap_or_else(|_| HttpResponse::BadRequest().json(SingleStringResponse {
-        message: "Fehler beim Parsen der Parameter".to_string(),
-    }))
+pub fn call_checked_with_parsed_big_ints(
+    func: impl Fn() -> Result<HttpResponse, ParseBigIntError>,
+) -> HttpResponse {
+    func().unwrap_or_else(|_| {
+        HttpResponse::BadRequest().json(SingleStringResponse {
+            message: "Fehler beim Parsen der Parameter".to_string(),
+        })
+    })
 }

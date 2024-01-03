@@ -1,7 +1,7 @@
+use crate::api::basic::call_checked_with_parsed_big_ints;
 use actix_web::web::{Json, Query};
 use actix_web::{HttpResponse, Responder};
 use log::info;
-use crate::api::basic::call_checked_with_parsed_big_ints;
 
 use crate::api::serializable_models::{EncryptDecryptRequest, SingleStringResponse, UseFastQuery};
 use crate::encryption::math_functions::number_theory::number_theory_service::NumberTheoryService;
@@ -35,7 +35,8 @@ pub(crate) async fn decrypt(
             false => NumberTheoryService::new(Slow),
         };
 
-        let rsa_service = crate::encryption::rsa::rsa_service::RsaService::new(number_theory_service);
+        let rsa_service =
+            crate::encryption::rsa::rsa_service::RsaService::new(number_theory_service);
 
         let plaintext = rsa_service.decrypt(&ciphertext, number_system_base, &private_key);
         let response = SingleStringResponse { message: plaintext };

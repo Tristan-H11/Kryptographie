@@ -1,8 +1,8 @@
+use crate::api::basic::call_checked_with_parsed_big_ints;
 use actix_web::web::{Json, Query};
 use actix_web::{HttpResponse, Responder};
 use log::info;
 use serde::Deserialize;
-use crate::api::basic::call_checked_with_parsed_big_ints;
 
 use crate::api::serializable_models::{KeyPair, SingleStringResponse, UseFastQuery};
 use crate::encryption::math_functions::number_theory::number_theory_service::NumberTheoryService;
@@ -45,12 +45,12 @@ pub(crate) async fn sign(
             false => NumberTheoryService::new(Slow),
         };
 
-        let rsa_service = crate::encryption::rsa::rsa_service::RsaService::new(number_theory_service);
+        let rsa_service =
+            crate::encryption::rsa::rsa_service::RsaService::new(number_theory_service);
 
         let signature = rsa_service.sign(&plaintext, &private_key, g_base);
         let response = SingleStringResponse { message: signature };
 
         Ok(HttpResponse::Ok().json(response))
     })
-
 }

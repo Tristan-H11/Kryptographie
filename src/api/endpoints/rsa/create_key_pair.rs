@@ -41,13 +41,16 @@ pub(crate) async fn create_key_pair(
     };
 
     let key_gen_service = RsaKeygenService::new(req_body.modulus_width, number_theory_service);
-    let (public_key, private_key) =
-        match key_gen_service.generate_keypair(req_body.miller_rabin_rounds, req_body.random_seed) {
-            Ok(key_pair) => key_pair,
-            Err(_) => return HttpResponse::InternalServerError().json(SingleStringResponse{
+    let (public_key, private_key) = match key_gen_service
+        .generate_keypair(req_body.miller_rabin_rounds, req_body.random_seed)
+    {
+        Ok(key_pair) => key_pair,
+        Err(_) => {
+            return HttpResponse::InternalServerError().json(SingleStringResponse {
                 message: "Schlüsselerzeugung fehlgeschlagen.".to_string(),
             })
-        };
+        }
+    };
 
     let block_size_pub = determine_block_size(
         &public_key.modulus(),

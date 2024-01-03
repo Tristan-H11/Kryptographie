@@ -33,7 +33,10 @@ impl NumberTheoryServiceTrait for FastNumberTheoryService {
         let number_theory_service = FastNumberTheoryService::new();
         let extended_euclid_result = number_theory_service.extended_euclid(modul, n);
         if !extended_euclid_result.ggt.is_one() {
-            return Err(ArithmeticError::NoInverseError(n.to_string(), modul.to_string()));
+            return Err(ArithmeticError::NoInverseError(
+                n.to_string(),
+                modul.to_string(),
+            ));
         }
         // Berechnet aus den letzten Faktoren das Inverse.
         return Ok((modul + extended_euclid_result.y).rem_euclid(modul));

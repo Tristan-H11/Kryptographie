@@ -1,8 +1,8 @@
+use crate::api::basic::call_checked_with_parsed_big_ints;
 use actix_web::web::{Json, Query};
 use actix_web::{HttpResponse, Responder};
 use log::info;
 use serde::Deserialize;
-use crate::api::basic::call_checked_with_parsed_big_ints;
 
 use crate::api::serializable_models::{KeyPair, SingleStringResponse, UseFastQuery};
 use crate::encryption::math_functions::number_theory::number_theory_service::NumberTheoryService;
@@ -39,7 +39,7 @@ pub(crate) async fn verify(
     let signature = req_body.signature;
     let g_base = req_body.g_base;
 
-    call_checked_with_parsed_big_ints(||{
+    call_checked_with_parsed_big_ints(|| {
         let public_key = req_body.key_pair.to_public_key()?;
 
         let number_theory_service = match use_fast {
@@ -47,7 +47,8 @@ pub(crate) async fn verify(
             false => NumberTheoryService::new(Slow),
         };
 
-        let rsa_service = crate::encryption::rsa::rsa_service::RsaService::new(number_theory_service);
+        let rsa_service =
+            crate::encryption::rsa::rsa_service::RsaService::new(number_theory_service);
 
         let plaintext = rsa_service.verify(&signature, &plaintext, &public_key, g_base);
         let response = SingleStringResponse {

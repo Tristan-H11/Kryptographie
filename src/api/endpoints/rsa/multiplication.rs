@@ -1,3 +1,4 @@
+use crate::api::basic::call_checked_with_parsed_big_ints;
 use actix_web::http::StatusCode;
 use actix_web::web::{Json, Query};
 use actix_web::{HttpResponse, HttpResponseBuilder, Responder};
@@ -5,7 +6,6 @@ use bigdecimal::num_bigint::BigInt;
 use log::info;
 use serde::{Deserialize, Serialize};
 use std::str::FromStr;
-use crate::api::basic::call_checked_with_parsed_big_ints;
 
 use crate::api::serializable_models::{KeyPair, SingleStringResponse, UseFastQuery};
 use crate::encryption::math_functions::number_theory::number_theory_service::NumberTheoryService;
@@ -68,11 +68,14 @@ pub(crate) async fn multiplication(
         };
 
         if (factor_one * factor_two) != result {
-            return Ok(HttpResponseBuilder::new(StatusCode::INTERNAL_SERVER_ERROR).json(
-                SingleStringResponse {
-                    message: "Multiplikation fehlgeschlagen: Produkt größer als Modulus!".to_string(),
-                },
-            ));
+            return Ok(
+                HttpResponseBuilder::new(StatusCode::INTERNAL_SERVER_ERROR).json(
+                    SingleStringResponse {
+                        message: "Multiplikation fehlgeschlagen: Produkt größer als Modulus!"
+                            .to_string(),
+                    },
+                ),
+            );
         }
 
         Ok(HttpResponse::Ok().json(response))

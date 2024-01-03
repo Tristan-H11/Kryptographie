@@ -20,8 +20,16 @@ pub enum ArithmeticError {
 impl fmt::Display for ArithmeticError {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match self {
-            ArithmeticError::NoInverseError(number, modulus) => write!(f, "No inverse error: number {} with modulus {}", number, modulus),
-            ArithmeticError::NoDiscreteLogarithmError(base, element) => write!(f, "No discrete logarithm error: base {} with element {}", base, element),
+            ArithmeticError::NoInverseError(number, modulus) => write!(
+                f,
+                "No inverse error: number {} with modulus {}",
+                number, modulus
+            ),
+            ArithmeticError::NoDiscreteLogarithmError(base, element) => write!(
+                f,
+                "No discrete logarithm error: base {} with element {}",
+                base, element
+            ),
         }
     }
 }
@@ -31,7 +39,7 @@ impl std::error::Error for ArithmeticError {}
 #[derive(Debug, Clone)]
 pub enum RsaError {
     /// Wird geworfen, wenn die Schlüsselerzeugung fehlschlägt.
-    KeyGenerationError
+    KeyGenerationError,
 }
 
 impl fmt::Display for RsaError {
