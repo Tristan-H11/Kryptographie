@@ -56,8 +56,6 @@ pub(crate) async fn shanks_endpoint(
             };
             HttpResponse::Ok().json(response)
         }
-        Err(_) => HttpResponse::BadRequest().json(SingleStringResponse {
-            message: "Kein Ergebnis gefunden".to_string(),
-        }),
+        Err(_) => HttpResponse::BadRequest().body("Berechnung mit übergebenen Parametern fehlgeschlagen."),
     }
 }

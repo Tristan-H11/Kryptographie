@@ -1,5 +1,4 @@
 use std::collections::HashMap;
-use std::io::{Error, ErrorKind};
 
 use bigdecimal::num_bigint::BigInt;
 use bigdecimal::{One, Zero};
@@ -8,6 +7,7 @@ use crate::encryption::math_functions::number_theory::number_theory_service::{
     NumberTheoryService, NumberTheoryServiceTrait,
 };
 use crate::encryption::math_functions::traits::increment::Increment;
+use crate::shared::errors::ArithmeticError;
 
 #[derive(Clone, Copy)]
 pub struct Shanks {
@@ -35,7 +35,7 @@ impl Shanks {
     ///
     /// # Fehler
     ///
-    /// * `ErrorKind::InvalidInput` - Wenn der Logarithmus nicht existiert.
+    /// * `ArithmeticError::NoDiscreteLogarithmError` - Wenn der Logarithmus nicht existiert.
     ///
     /// # Beispiel
     ///
@@ -53,7 +53,7 @@ impl Shanks {
         base: &BigInt,
         element: &BigInt,
         modul: &BigInt,
-    ) -> Result<BigInt, Error> {
+    ) -> Result<BigInt, ArithmeticError> {
         //aufrundung: nachkommateil abschneiden (to_bigint) +1
         let mut m = (modul - BigInt::one()).sqrt();
         if (&m * &m) != (modul - BigInt::one()) {
@@ -93,14 +93,10 @@ impl Shanks {
             }
             i.increment_assign();
         }
-        let no_exponent_error = Error::new(
-            ErrorKind::InvalidInput,
-            format!(
-                "kein Exponent 'x', sodass {}^x = {} mod {}",
-                base, element, modul
-            ),
-        );
-        return Err(no_exponent_error);
+        return Err(ArithmeticError::NoDiscreteLogarithmError(
+            base.to_str_radix(10),
+            element.to_str_radix(10),
+        ));
     }
 }
 
