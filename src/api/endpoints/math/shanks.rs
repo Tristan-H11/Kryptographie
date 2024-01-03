@@ -56,6 +56,8 @@ pub(crate) async fn shanks_endpoint(
             };
             HttpResponse::Ok().json(response)
         }
-        Err(_) => HttpResponse::BadRequest().body("Berechnung mit übergebenen Parametern fehlgeschlagen."),
+        Err(_) => HttpResponse::BadRequest().json(SingleStringResponse {
+            message: "Fehler beim Berechnen des diskreten Logarithmus".to_string(),
+        })
     }
 }
