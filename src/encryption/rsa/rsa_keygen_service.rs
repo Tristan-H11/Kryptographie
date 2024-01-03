@@ -10,6 +10,8 @@ use crate::encryption::math_functions::number_theory::number_theory_service::{
 use crate::encryption::math_functions::pseudo_random_number_generator::PseudoRandomNumberGenerator;
 use crate::encryption::math_functions::traits::increment::Increment;
 use crate::encryption::rsa::keys::{RsaKey, RsaKeyType};
+use crate::shared::errors::{ArithmeticError, RsaError};
+use crate::shared::errors::RsaError::KeyGenerationError;
 
 ///
 /// Ein Service zum Generieren von Schlüsselpaaren für RSA.
@@ -46,11 +48,14 @@ impl RsaKeygenService {
     ///
     /// # Rückgabe
     /// Ein Tupel aus dem öffentlichen und privaten Schlüssel.
+    ///
+    /// # Fehler
+    /// * `RsaError::KeyGenerationError` - Falls die Schlüsselerzeugung fehlschlägt.
     pub(crate) fn generate_keypair(
         &self,
         miller_rabin_iterations: u32,
         random_seed: u32,
-    ) -> (RsaKey, RsaKey) {
+    ) -> Result<(RsaKey, RsaKey), RsaError> {
         debug!(
             "Generiere Schlüsselpaar mit key_size {} und Miller-Rabin-Iterations {}",
             self.key_size, miller_rabin_iterations
@@ -66,10 +71,16 @@ impl RsaKeygenService {
         let phi = (&prime_one - BigInt::one()) * (&prime_two - BigInt::one());
         let e = self.generate_e(&phi, random_generator);
         let d = self.generate_d(&e, &phi);
-        let public_key = RsaKey::new(RsaKeyType::Public, e, n.clone());
-        let private_key = RsaKey::new(RsaKeyType::Private, d, n);
-        debug!("Schlüsselpaar generiert");
-        (public_key, private_key)
+
+        match d {
+            Ok(d) => {
+                let public_key = RsaKey::new(RsaKeyType::Public, e, n.clone());
+                let private_key = RsaKey::new(RsaKeyType::Private, d, n);
+                debug!("Schlüsselpaar generiert");
+                Ok((public_key, private_key))
+            },
+            Err(_) => Err(KeyGenerationError)
+        }
     }
 
     /// Generiert zwei verschiedene Primzahlen mit der angegebenen Breite.
@@ -197,13 +208,13 @@ impl RsaKeygenService {
     ///
     /// # Rückgabe
     /// Die generierte Zahl `d`.
-    fn generate_d(&self, e: &BigInt, phi: &BigInt) -> BigInt {
+    ///
+    /// # Fehler
+    /// * `ArithmeticError::NoInverseError` - Falls kein multiplikatives Inverses gefunden werden konnte.
+    fn generate_d(&self, e: &BigInt, phi: &BigInt) -> Result<BigInt, ArithmeticError> {
         trace!("Generiere d mit e {} und phi {}", e, phi);
-        let d = match self.number_theory_service.modulo_inverse(e, phi) {
-            Ok(d) => d,
-            Err(_) => panic!("Kein d gefunden, das e * d = 1 mod phi erfüllt"),
-        };
+        let d = self.number_theory_service.modulo_inverse(e, phi)?;
         debug!("d ist {}", d);
-        d
+        Ok(d)
     }
 }
