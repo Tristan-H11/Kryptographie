@@ -7,6 +7,9 @@ import {MatInputModule} from "@angular/material/input";
 import {FormsModule, ReactiveFormsModule} from "@angular/forms";
 import {BackendRequestService} from "../services/backend-api/backend-request.service";
 import {ExtendedEuclidRequest} from "../models/extended-euclid-request";
+import {catchError, EMPTY} from "rxjs";
+import {ErrorDialogComponent} from "../error-dialog/error-dialog.component";
+import {MatDialog} from "@angular/material/dialog";
 
 @Component({
 	selector: "app-extended-gcd",
@@ -22,7 +25,7 @@ export class ExtendedGcdComponent {
 	public coefficientX: string = "";
 	public coefficientY: string = "";
 
-	constructor(private backendRequestService: BackendRequestService) {
+	constructor(private backendRequestService: BackendRequestService, private dialog: MatDialog) {
 	}
 
 	/**
@@ -32,7 +35,16 @@ export class ExtendedGcdComponent {
 
 		const body = new ExtendedEuclidRequest(this.parameterA, this.parameterB);
 
-		this.backendRequestService.extendedGcd(body).then(result => {
+		this.backendRequestService.extendedGcd(body).pipe(
+            catchError(
+                (error) => {
+                    this.dialog.open(ErrorDialogComponent, {
+                        data: {message: error.error.message}
+                    });
+                    return EMPTY;
+                }
+            )
+        ).subscribe(result => {
 			this.ggT = result.ggt;
 			this.coefficientX = result.x;
 			this.coefficientY = result.y;

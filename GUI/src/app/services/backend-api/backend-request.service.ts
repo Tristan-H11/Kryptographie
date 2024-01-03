@@ -109,12 +109,10 @@ export class BackendRequestService {
         );
     }
 
-    public async extendedGcd(body: ExtendedEuclidRequest): Promise<ExtendedEuclidResponse> {
+    public extendedGcd(body: ExtendedEuclidRequest): Observable<ExtendedEuclidResponse> {
         const params = this.getParams();
         const options = {params};
-        return firstValueFrom(
-            this.http.post<ExtendedEuclidResponse>(this.endpointsService.getExtendedGcdEndpoint(), body, options)
-        );
+        return this.http.post<ExtendedEuclidResponse>(this.endpointsService.getExtendedGcdEndpoint(), body, options);
     }
 
     public shanks(body: ShanksRequest): Observable<SingleMessageModel> {
