@@ -100,7 +100,6 @@ export class MultiplicationComponent {
             catchError(
                 (error) => {
                     loadingDialog.close();
-                    console.log(error.error.message)
                     this.dialog.open(ErrorDialogComponent, {
                         data: {message: error.error.message}
                     })

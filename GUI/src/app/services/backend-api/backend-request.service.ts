@@ -130,12 +130,10 @@ export class BackendRequestService {
             .set("use_fast", this.stateService.getUseFastMath()());
     }
 
-    public async modularInverse(body: ModularInversRequest): Promise<SingleMessageModel> {
+    public modularInverse(body: ModularInversRequest): Observable<SingleMessageModel> {
         const params = this.getParams();
         const options = {params};
-        return firstValueFrom(
-            this.http.post<SingleMessageModel>(this.endpointsService.getModularInverseEndpoint(), body, options)
-        );
+        return this.http.post<SingleMessageModel>(this.endpointsService.getModularInverseEndpoint(), body, options);
     }
 
     public rsaMultiplication(body: MultiplicationRequest): Observable<MultiplicationResponse> {
