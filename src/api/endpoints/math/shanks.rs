@@ -44,20 +44,31 @@ pub(crate) async fn shanks_endpoint(
 
     let shanks_service = Shanks::new(number_theory_service);
 
-    let base = BigInt::from_str(&req_body.base).unwrap();
-    let element = BigInt::from_str(&req_body.element).unwrap();
-    let modul = BigInt::from_str(&req_body.modul).unwrap();
+    let base = BigInt::from_str(&req_body.base);
+    let element = BigInt::from_str(&req_body.element);
+    let modul = BigInt::from_str(&req_body.modul);
 
-    let result = shanks_service.calculate(&base, &element, &modul);
-    match result {
-        Ok(x) => {
-            let response = SingleStringResponse {
-                message: x.to_string(),
-            };
-            HttpResponse::Ok().json(response)
+    match (base, element, modul) {
+        (Ok(base), Ok(element), Ok(modul)) => {
+            let result = shanks_service.calculate(&base, &element, &modul);
+            match result {
+                Ok(x) => {
+                    let response = SingleStringResponse {
+                        message: x.to_string(),
+                    };
+                    HttpResponse::Ok().json(response)
+                }
+                Err(_) => HttpResponse::BadRequest().json(SingleStringResponse {
+                    message: "Fehler beim Berechnen des diskreten Logarithmus".to_string(),
+                })
+            }
         }
-        Err(_) => HttpResponse::BadRequest().json(SingleStringResponse {
-            message: "Fehler beim Berechnen des diskreten Logarithmus".to_string(),
-        })
+        _ => {
+            return HttpResponse::BadRequest().json(SingleStringResponse {
+                message: "Fehler beim Parsen der Parameter".to_string(),
+            })
+        }
     }
+
+
 }
