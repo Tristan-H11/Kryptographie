@@ -253,7 +253,7 @@ fn helper_fun_sum_to_string(sum: &BigInt, base: &BigInt) -> String {
 fn u32_to_c(value: u32) -> char {
     match char::from_u32(value) {
         Some(x) => x,
-        None => panic!("oben Ungültiger u32 Wert: {}", value),
+        None => panic!("oben Ungültiger u32 Wert: {}", value), //todo tristan
     }
 }
 
@@ -268,7 +268,7 @@ fn u32_to_c(value: u32) -> char {
 fn big_int_to_u32(value: &BigInt) -> u32 {
     match value.to_u32() {
         Some(digit) => digit,
-        None => panic!("Ungültiger u32 Wert: {}", value),
+        None => panic!("Ungültiger u32 Wert: {}", value), //todo tristan
     }
 }
 
