@@ -27,13 +27,11 @@ pub(crate) fn determine_block_size(modulus: &BigInt, base: &BigInt, is_encryptio
     block_size
 }
 
-/// Diese Methode erzeugt einen Vektor mit BigInts, der aus einem String mit einer
-/// bestimmten Blockgröße erstellt wurde.
+/// Diese Methode erzeugt einen Vektor mit BigInts, der aus einem String mit einer bestimmten Blockgröße erstellt wurde.
 ///
 /// # Argumente
 /// * `m`: Der String, der in Blöcke unterteilt werden soll.
 /// * `block_size`: Die Größe der Blöcke.
-/// * `fill_blocks`: Gibt an, ob der letzte Block mit Leerzeichen aufgefüllt werden sollen.
 /// * `g_base`: Die Basis, in der die Blöcke kodiert werden sollen.
 ///
 /// # Rückgabe
@@ -41,14 +39,13 @@ pub(crate) fn determine_block_size(modulus: &BigInt, base: &BigInt, is_encryptio
 pub(crate) fn encode_string_to_blocks(
     m: &str,
     block_size: usize,
-    fill_blocks: bool,
     g_base: u32,
 ) -> Vec<BigInt> {
     debug!(
         "Erstelle Vektor von Blocksummen mit Blockgröße {} und Basis {}",
         block_size, g_base
     );
-    let b = split_into_blocks(m, block_size, fill_blocks);
+    let b = split_into_blocks(m, block_size);
     let i_vec = string_to_int_vec(b);
     to_sum_vec(i_vec, &g_base.into())
 }
@@ -92,7 +89,6 @@ pub(crate) fn create_string_from_blocks_encrypt(
 }
 
 /// Methode, um eine Menge von gleich großen Blöcken in Dezimalform in einen String zu überführen.
-/// Entfernt Leerzeichen am Ende.
 ///
 /// # Argumente
 /// * `sums` - Die zu überführenden Summen.
@@ -108,7 +104,7 @@ pub(crate) fn create_string_from_blocks_decrypt(sums: Vec<BigInt>, g_base: u32) 
     debug!("Chiffrierter Vector: {:?}", strings);
 
     let result = strings.join("");
-    result.trim_end().to_string()
+    result
 }
 
 /// Diese Methode teilt einen String in Blöcke mit einer bestimmten Größe auf.
@@ -116,11 +112,10 @@ pub(crate) fn create_string_from_blocks_decrypt(sums: Vec<BigInt>, g_base: u32) 
 /// # Argumente
 /// * `message`: Der String, der in Blöcke unterteilt werden soll.
 /// * `block_size`: Die Größe der Blöcke.
-/// * `fill_block`: Gibt an, ob der letzte Block mit Leerzeichen aufgefüllt werden soll.
 ///
 /// # Rückgabe
 /// * Ein Vektor mit Strings, der die Blöcke enthält.
-fn split_into_blocks(message: &str, block_size: usize, fill_block: bool) -> Vec<String> {
+fn split_into_blocks(message: &str, block_size: usize) -> Vec<String> {
     debug!(
         "Erstelle Blöcke mit Blockgröße {} für '{}'",
         block_size, message
@@ -130,12 +125,7 @@ fn split_into_blocks(message: &str, block_size: usize, fill_block: bool) -> Vec<
         .collect::<Vec<char>>()
         .chunks(block_size)
         .map(|c| {
-            let mut b = c.iter().collect::<String>();
-            if fill_block {
-                while b.len() < block_size {
-                    b.push(' '); // Fügt Leerzeichen hinzu, um den letzten Block zu füllen
-                }
-            }
+            let b = c.iter().collect::<String>(); // TODO schöner machen möglich?
             trace!("Erstellte Block '{}'", b);
             b
         })
@@ -291,67 +281,67 @@ mod tests {
         let block_size = 8;
         let _basis_length = 55296 as u32;
         let encoded = create_string_from_blocks_encrypt(
-            encode_string_to_blocks(m, block_size, true, 55296),
+            encode_string_to_blocks(m, block_size, 55296),
             block_size + 1,
             55296,
         );
         let decoded = create_string_from_blocks_decrypt(
-            encode_string_to_blocks(&encoded, block_size + 1, true, 55296),
+            encode_string_to_blocks(&encoded, block_size + 1, 55296),
             55296,
         );
-        assert_eq!(decoded.trim(), m);
+        assert_eq!(decoded, m);
 
         let m = "Da苉 ist eine Testnachricht";
         let block_size = 6;
         let encoded = create_string_from_blocks_encrypt(
-            encode_string_to_blocks(m, block_size, true, 55296),
+            encode_string_to_blocks(m, block_size, 55296),
             block_size + 1,
             55296,
         );
         let decoded = create_string_from_blocks_decrypt(
-            encode_string_to_blocks(&encoded, block_size + 1, true, 55296),
+            encode_string_to_blocks(&encoded, block_size + 1, 55296),
             55296,
         );
-        assert_eq!(decoded.trim(), m);
+        assert_eq!(decoded, m);
 
         let m = "Da苉 ist eine Testnachricht";
         let block_size = 47;
         let encoded = create_string_from_blocks_encrypt(
-            encode_string_to_blocks(m, block_size, true, 55296),
+            encode_string_to_blocks(m, block_size, 55296),
             block_size + 1,
             55296,
         );
         let decoded = create_string_from_blocks_decrypt(
-            encode_string_to_blocks(&encoded, block_size + 1, true, 55296),
+            encode_string_to_blocks(&encoded, block_size + 1, 55296),
             55296,
         );
-        assert_eq!(decoded.trim(), m);
+        assert_eq!(decoded, m);
 
         let m = "Da苉 ist eine Testnachricht";
         let block_size = 3;
         let encoded = create_string_from_blocks_encrypt(
-            encode_string_to_blocks(m, block_size, true, 55296),
+            encode_string_to_blocks(m, block_size, 55296),
             block_size + 1,
             55296,
         );
         let decoded = create_string_from_blocks_decrypt(
-            encode_string_to_blocks(&encoded, block_size + 1, true, 55296),
+            encode_string_to_blocks(&encoded, block_size + 1, 55296),
             55296,
         );
-        assert_eq!(decoded.trim(), m);
+        assert_eq!(decoded, m);
     }
 
     #[test]
     fn test_create_chiffre() {
         let message = "Da苉 ist eine Testnachricht";
         let block_size = 7;
-        let _basis_length = 55296 as u32;
-        let result = encode_string_to_blocks(message, block_size, true, 55296);
+        let _basis_length = 55296;
+        let result = encode_string_to_blocks(message, block_size, 55296);
         let expected_result: Vec<BigInt> = vec![
             BigInt::from(1943938337267550087026074257524u128),
             BigInt::from(914822981356602019800946507860u128),
             BigInt::from(2887304683313907978613082523752u128),
-            BigInt::from(3258925137110102081877384560672u128),
+            BigInt::from(1065827572823258284148u128),
         ];
         assert_eq!(result, expected_result);
     }
@@ -365,7 +355,8 @@ mod tests {
             BigInt::from(3258925137110102081877384560672u128),
         ];
         let result = create_string_from_blocks_decrypt(sums, 55296);
-        let expected_result = "Da苉 ist eine Testnachricht".to_string();
+        // Ja, die Leerzeichen sind so gewollt. Die sind in der Summe oben enthalten.
+        let expected_result = "Da苉 ist eine Testnachricht  ".to_string();
         assert_eq!(result, expected_result);
     }
 
@@ -374,36 +365,37 @@ mod tests {
         // Testfall 1: Ein einfacher String wird in Blöcke der Größe 4 aufgeteilt.
         let message = String::from("Da苉 ist eine Testnachricht");
         let block_size = 4;
-        let result = split_into_blocks(&message, block_size, true);
+        let result = split_into_blocks(&message, block_size);
         assert_eq!(
             result,
-            vec!["Da苉 ", "ist ", "eine", " Tes", "tnac", "hric", "ht  "]
+            vec!["Da苉 ", "ist ", "eine", " Tes", "tnac", "hric", "ht"]
         );
 
         // Testfall 2: Ein String, der bereits eine Blockgröße hat, wird nicht verändert,
         // es kommt kein neuer leerer Block dazu.
         let message = String::from("123AB");
         let block_size = 5;
-        let result = split_into_blocks(&message, block_size, true);
+        let result = split_into_blocks(&message, block_size);
         assert_eq!(result, vec!["123AB"]);
 
         // Testfall 3: Ein leerer String wird in Blöcke der Größe 3 aufgeteilt.
         let message = String::from("   ");
         let block_size = 3;
-        let result = split_into_blocks(&message, block_size, true);
+        let result = split_into_blocks(&message, block_size);
         assert_eq!(result, vec!["   "]);
 
         // Testfall 4: Ein String wird in Blöcke der Größe 1 aufgeteilt.
         let message = String::from("abcdef");
         let block_size = 1;
-        let result = split_into_blocks(&message, block_size, true);
+        let result = split_into_blocks(&message, block_size);
         assert_eq!(result, vec!["a", "b", "c", "d", "e", "f"]);
     }
 
     #[test]
     fn test_string_to_int_vec() {
+        // Ja, das Leerzeichen am Ende ist gewollt.
         let message = "Da苉 ist eine Testnachricht ";
-        let blocks = split_into_blocks(&message, 4, true);
+        let blocks = split_into_blocks(&message, 4);
         let expected = vec![
             vec!['D' as u32, 'a' as u32, '苉' as u32, ' ' as u32],
             vec!['i' as u32, 's' as u32, 't' as u32, ' ' as u32],
@@ -411,7 +403,7 @@ mod tests {
             vec![' ' as u32, 'T' as u32, 'e' as u32, 's' as u32],
             vec!['t' as u32, 'n' as u32, 'a' as u32, 'c' as u32],
             vec!['h' as u32, 'r' as u32, 'i' as u32, 'c' as u32],
-            vec!['h' as u32, 't' as u32, ' ' as u32, ' ' as u32],
+            vec!['h' as u32, 't' as u32, ' ' as u32],
         ];
         let result = string_to_int_vec(blocks);
         assert_eq!(result, expected);

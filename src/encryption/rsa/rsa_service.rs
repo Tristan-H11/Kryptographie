@@ -38,7 +38,7 @@ impl RsaService {
         let block_size = key.modulus().log(&g_base.into());
         info!("Verschlüsseln mit blockgröße {}", block_size);
 
-        let chunks = encode_string_to_blocks(message.trim_end(), block_size, true, g_base);
+        let chunks = encode_string_to_blocks(message.trim_end(), block_size, g_base);
         let encrypted_chunks = self.exponentiation_each(&key, chunks);
 
         // Die Größe der verschlüsselten Blöcke ist immer um 1 größer als die Klartextgröße.
@@ -60,7 +60,7 @@ impl RsaService {
         let block_size = key.modulus().log(&g_base.into()) + 1;
         info!("Entschlüsseln mit blockgröße {}", block_size);
 
-        let chunks = encode_string_to_blocks(message, block_size, true, g_base);
+        let chunks = encode_string_to_blocks(message, block_size, g_base);
         let decrypted_chunks = self.exponentiation_each(&key, chunks);
 
         create_string_from_blocks_decrypt(decrypted_chunks, g_base)
@@ -209,7 +209,7 @@ mod tests {
             println!("Verschlüsselte Nachricht: {}", encrypted_message);
 
             let decrypted_message = rsa_service.decrypt(&encrypted_message, 55296, private_key);
-            assert_eq!(message.trim_end(), decrypted_message);
+            assert_eq!(message, decrypted_message);
         });
     }
 
@@ -245,7 +245,7 @@ mod tests {
             println!("Verschlüsselte Nachricht: {}", encrypted_message);
 
             let decrypted_message = rsa_service.decrypt(&encrypted_message, 55296, private_key);
-            assert_eq!(message.trim_end(), decrypted_message);
+            assert_eq!(message, decrypted_message);
         });
     }
 
