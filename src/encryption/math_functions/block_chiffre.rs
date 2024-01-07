@@ -121,7 +121,7 @@ fn split_into_blocks(message: &str, block_size: usize) -> Vec<String> {
         .collect::<Vec<char>>()
         .chunks(block_size)
         .map(|c| {
-            let b = c.iter().collect::<String>(); // TODO schöner machen möglich?
+            let b = c.iter().collect::<String>();
             trace!("Erstellte Block '{}'", b);
             b
         })
