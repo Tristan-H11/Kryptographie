@@ -28,7 +28,6 @@ impl RsaService {
     ///
     /// # Argumente
     /// * `message` - Die zu verschlüsselnde Nachricht.
-    /// **ACHTUNG**: Leerzeichen am Ende werden entfernt!
     /// * `g_base` - Die Basis des Zeichensatzes, in der die Nachricht verschlüsselt werden soll.
     /// * `key` - Der zu verwendende Schlüssel.
     ///
@@ -38,7 +37,7 @@ impl RsaService {
         let block_size = key.modulus().log(&g_base.into());
         info!("Verschlüsseln mit blockgröße {}", block_size);
 
-        let chunks = encode_string_to_blocks(message.trim_end(), block_size, g_base);
+        let chunks = encode_string_to_blocks(message, block_size, g_base);
         let encrypted_chunks = self.exponentiation_each(&key, chunks);
 
         // Die Größe der verschlüsselten Blöcke ist immer um 1 größer als die Klartextgröße.
