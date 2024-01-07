@@ -13,7 +13,7 @@ pub struct VerifyRequest {
     pub plaintext: String,
     pub signature: String,
     pub key_pair: KeyPair,
-    pub g_base: u32, // Ist aktuell enthalten, um später BlockChiffre für die Signatur zu implementieren.
+    pub g_base: u32,
 }
 
 /// Endpunkt zum Verifizieren einer Nachricht mit RSA.
@@ -37,6 +37,7 @@ pub(crate) async fn verify(
 
     let plaintext = req_body.plaintext;
     let signature = req_body.signature;
+    let g_base = req_body.g_base;
 
     call_checked_with_parsed_big_ints(|| {
         let public_key = req_body.key_pair.to_public_key()?;
@@ -49,7 +50,7 @@ pub(crate) async fn verify(
         let rsa_service =
             crate::encryption::rsa::rsa_service::RsaService::new(number_theory_service);
 
-        let plaintext = rsa_service.verify(&signature, &plaintext, &public_key);
+        let plaintext = rsa_service.verify(&signature, &plaintext, &public_key, g_base);
         let response = SingleStringResponse {
             message: plaintext.to_string(),
         };
