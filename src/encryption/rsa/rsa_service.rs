@@ -259,7 +259,8 @@ mod tests {
     #[test]
     fn test_sign_verify_with_line_break_end() {
         run_test_for_all_services(|service| {
-            let message = "Das ist eine ganz interessante Testnachricht für die Signatur!\r\n \n \n";
+            let message =
+                "Das ist eine ganz interessante Testnachricht für die Signatur!\r\n \n \n";
 
             let keygen_service = RsaKeygenService::new(512, service.clone());
             let (public_key, private_key) = &keygen_service.generate_keypair(40, 23).unwrap();

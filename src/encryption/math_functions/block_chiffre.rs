@@ -36,11 +36,7 @@ pub(crate) fn determine_block_size(modulus: &BigInt, base: &BigInt, is_encryptio
 ///
 /// # Rückgabe
 /// * Ein Vektor mit BigInts, der den g-adisch entwickelten Text enthält.
-pub(crate) fn encode_string_to_blocks(
-    m: &str,
-    block_size: usize,
-    g_base: u32,
-) -> Vec<BigInt> {
+pub(crate) fn encode_string_to_blocks(m: &str, block_size: usize, g_base: u32) -> Vec<BigInt> {
     debug!(
         "Erstelle Vektor von Blocksummen mit Blockgröße {} und Basis {}",
         block_size, g_base
