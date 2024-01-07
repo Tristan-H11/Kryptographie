@@ -94,33 +94,36 @@ impl RsaService {
     /// # Argumente
     /// * `message` - Die zu signierende Nachricht.
     /// * `key` - Der private Schlüssel.
-    /// * `g_base` - Die Basis des Zeichensatzes, in der die Nachricht signiert werden soll.
     ///
     /// # Rückgabe
-    /// * `String` - Die Signatur.
-    pub(crate) fn sign(&self, message: &str, key: &RsaKey, g_base: u32) -> String {
+    /// * `String` - Die Signatur in Dezimaldarstellung.
+    pub(crate) fn sign(&self, message: &str, key: &RsaKey) -> String {
         if key.key_type() != RsaKeyType::Private {
             panic!("Der Schlüssel muss privat sein, um eine Nachricht zu signieren!");
         }
         info!("Signieren der Nachricht {}", message);
-        let hashed_message = RsaService::get_decimal_hash(message);
+        let message_big_int = RsaService::get_decimal_hash(message);
 
-        let signature = self.encrypt(&hashed_message.to_str_radix(10), g_base, key);
+        // TODO BlockChiffre für die Signatur implementieren
+        let signature = self.number_theory_service.fast_exponentiation(
+            &message_big_int,
+            &key.exponent(),
+            &key.modulus(),
+        );
 
-        signature
+        signature.to_str_radix(10)
     }
 
     /// Verifiziert eine Nachricht mit der Signatur.
     ///
     /// # Argumente
-    /// * `signature` - Die Signatur.
+    /// * `signature` - Die Signatur in Dezimaldarstellung.
     /// * `message` - Die Nachricht.
     /// * `key` - Der öffentliche Schlüssel.
-    /// * `g_base` - Die Basis des Zeichensatzes, in der die Nachricht signiert werden soll.
     ///
     /// # Rückgabe
     /// * `bool` - Gibt an, ob die Verifizierung erfolgreich war.
-    pub(crate) fn verify(&self, signature: &str, message: &str, key: &RsaKey, g_base: u32) -> bool {
+    pub(crate) fn verify(&self, signature: &str, message: &str, key: &RsaKey) -> bool {
         if key.key_type() != RsaKeyType::Public {
             panic!("Der Schlüssel muss öffentlich sein, um eine Nachricht zu verifizieren!");
         }
@@ -128,9 +131,17 @@ impl RsaService {
             "Verifizieren der Nachricht {} mit Signatur {}",
             message, signature
         );
-        let message_big_int = RsaService::get_decimal_hash(message).to_str_radix(10);
+        let message_big_int = RsaService::get_decimal_hash(message);
 
-        let verification = self.decrypt(signature, g_base, key);
+        let signature_big_int = BigInt::parse_bytes(signature.as_bytes(), 10)
+            .expect("Die Signatur konnte nicht in einen BigInt umgewandelt werden");
+
+        // TODO BlockChiffre für die Signatur implementieren
+        let verification = self.number_theory_service.fast_exponentiation(
+            &signature_big_int,
+            &key.exponent(),
+            &key.modulus(),
+        );
 
         verification == message_big_int
     }
@@ -248,11 +259,9 @@ mod tests {
 
             let rsa_service = RsaService::new(service);
 
-            let g_base = 55296;
+            let signature = rsa_service.sign(message, private_key);
 
-            let signature = rsa_service.sign(message, private_key, g_base);
-
-            let is_valid = rsa_service.verify(&signature, message, public_key, g_base);
+            let is_valid = rsa_service.verify(&signature, message, public_key);
             assert!(is_valid);
         });
     }
@@ -267,11 +276,9 @@ mod tests {
 
             let rsa_service = RsaService::new(service);
 
-            let g_base = 55296;
+            let signature = rsa_service.sign(&message, private_key);
 
-            let signature = rsa_service.sign(&message, private_key, g_base);
-
-            let is_valid = rsa_service.verify(&signature, &message, public_key, g_base);
+            let is_valid = rsa_service.verify(&signature, &message, public_key);
             assert!(is_valid);
         });
     }
@@ -287,11 +294,9 @@ mod tests {
 
             let rsa_service = RsaService::new(service);
 
-            let g_base = 55296;
+            let signature = rsa_service.sign(&message_one, private_key);
 
-            let signature = rsa_service.sign(&message_one, private_key, g_base);
-
-            let is_valid = rsa_service.verify(&signature, &message_two, public_key, g_base);
+            let is_valid = rsa_service.verify(&signature, &message_two, public_key);
             assert!(!is_valid);
         });
     }
