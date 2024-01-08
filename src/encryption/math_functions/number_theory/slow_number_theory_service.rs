@@ -22,12 +22,12 @@ impl SlowNumberTheoryService {
 
 impl NumberTheoryServiceTrait for SlowNumberTheoryService {
     fn extended_euclid(&self, a: &BigInt, b: &BigInt) -> ExtendedEuclidResult {
-        //rotierendes Array, zur Berechnung und Speicherung der Faktoren `x` und `y`
-        let mut xy = [BigInt::one(), BigInt::zero(), BigInt::zero(), BigInt::one()];
         let mut m = b.clone();
         let mut n = a.clone();
+        //rotierendes Array, zur Berechnung und Speicherung der Faktoren `x` und `y`
+        let mut xy = [BigInt::one(), BigInt::zero(), BigInt::zero(), BigInt::one()];
         while !m.is_zero() {
-            // Berechnet die Faktoren und speichert sie in einem rotierenden Array.
+            //Berechnet die Faktoren und speichert sie in einem rotierenden Array.
             let div = &n / &m;
             xy[0] = &xy[0] - (&div * &xy[2]);
             xy[1] = &xy[1] - (&div * &xy[3]);

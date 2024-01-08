@@ -94,7 +94,7 @@ pub trait NumberTheoryServiceTrait {
     /// let result = NumberTheoryService.extended_euclid(&BigInt::from(12), &BigInt::from(30));
     ///
     /// assert_eq!(result.ggT, BigInt::from(6));
-    /// assert_eq!(result.x, BigInt::from(2));
+    /// assert_eq!(result.x, BigInt::from(-2));
     /// assert_eq!(result.y, BigInt::from(1));
     /// ```
     fn extended_euclid(&self, a: &BigInt, b: &BigInt) -> ExtendedEuclidResult;
