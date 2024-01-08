@@ -28,7 +28,6 @@ impl RsaService {
     ///
     /// # Argumente
     /// * `message` - Die zu verschlüsselnde Nachricht.
-    /// **ACHTUNG**: Leerzeichen am Ende werden entfernt!
     /// * `g_base` - Die Basis des Zeichensatzes, in der die Nachricht verschlüsselt werden soll.
     /// * `key` - Der zu verwendende Schlüssel.
     ///
@@ -38,7 +37,7 @@ impl RsaService {
         let block_size = key.modulus().log(&g_base.into());
         info!("Verschlüsseln mit blockgröße {}", block_size);
 
-        let chunks = encode_string_to_blocks(message.trim_end(), block_size, true, g_base);
+        let chunks = encode_string_to_blocks(message, block_size, g_base);
         let encrypted_chunks = self.exponentiation_each(&key, chunks);
 
         // Die Größe der verschlüsselten Blöcke ist immer um 1 größer als die Klartextgröße.
@@ -60,7 +59,7 @@ impl RsaService {
         let block_size = key.modulus().log(&g_base.into()) + 1;
         info!("Entschlüsseln mit blockgröße {}", block_size);
 
-        let chunks = encode_string_to_blocks(message, block_size, true, g_base);
+        let chunks = encode_string_to_blocks(message, block_size, g_base);
         let decrypted_chunks = self.exponentiation_each(&key, chunks);
 
         create_string_from_blocks_decrypt(decrypted_chunks, g_base)
@@ -198,7 +197,7 @@ mod tests {
             println!("Verschlüsselte Nachricht: {}", encrypted_message);
 
             let decrypted_message = rsa_service.decrypt(&encrypted_message, 55296, private_key);
-            assert_eq!(message.trim_end(), decrypted_message);
+            assert_eq!(message, decrypted_message);
         });
     }
 
@@ -216,7 +215,7 @@ mod tests {
             println!("Verschlüsselte Nachricht: {}", encrypted_message);
 
             let decrypted_message = rsa_service.decrypt(&encrypted_message, 55296, private_key);
-            assert_eq!(message.trim_end(), decrypted_message);
+            assert_eq!(message, decrypted_message);
         });
     }
 
@@ -234,7 +233,7 @@ mod tests {
             println!("Verschlüsselte Nachricht: {}", encrypted_message);
 
             let decrypted_message = rsa_service.decrypt(&encrypted_message, 55296, private_key);
-            assert_eq!(message.trim_end(), decrypted_message);
+            assert_eq!(message, decrypted_message);
         });
     }
 
@@ -244,6 +243,26 @@ mod tests {
             let message = "    Das ist eine ganz 456$§% / Testnachricht für die Signatur!    ";
 
             let keygen_service = RsaKeygenService::new(1024, service.clone());
+            let (public_key, private_key) = &keygen_service.generate_keypair(40, 23).unwrap();
+
+            let rsa_service = RsaService::new(service);
+
+            let g_base = 55296;
+
+            let signature = rsa_service.sign(message, private_key, g_base);
+
+            let is_valid = rsa_service.verify(&signature, message, public_key, g_base);
+            assert!(is_valid);
+        });
+    }
+
+    #[test]
+    fn test_sign_verify_with_line_break_end() {
+        run_test_for_all_services(|service| {
+            let message =
+                "Das ist eine ganz interessante Testnachricht für die Signatur!\r\n \n \n";
+
+            let keygen_service = RsaKeygenService::new(512, service.clone());
             let (public_key, private_key) = &keygen_service.generate_keypair(40, 23).unwrap();
 
             let rsa_service = RsaService::new(service);
