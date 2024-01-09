@@ -1,4 +1,4 @@
-use std::collections::HashMap;
+use std::collections::BTreeMap;
 
 use bigdecimal::num_bigint::BigInt;
 use bigdecimal::{One, Zero};
@@ -64,20 +64,19 @@ impl Shanks {
         let g_ex_m = self
             .number_theory_service
             .fast_exponentiation(base, &m, modul);
-        let mut hash: HashMap<BigInt, BigInt> = HashMap::new();
+        let mut map: BTreeMap<BigInt, BigInt> = BTreeMap::new();
         let mut j = BigInt::zero();
         while j < m {
             let giantstep = self
                 .number_theory_service
                 .fast_exponentiation(&g_ex_m, &j, modul);
-            hash.insert(j.clone(), giantstep);
+            map.insert(giantstep, j.clone());
             j.increment_assign();
         }
 
         //Berechnet Babysteps und vergleicht sie mit Giantsteps
         let mut i = BigInt::zero();
         while i < m {
-            j = BigInt::zero();
             let babystep = (element
                 * self.number_theory_service.fast_exponentiation(
                     base,
@@ -85,11 +84,9 @@ impl Shanks {
                     modul,
                 ))
                 % modul;
-            while j < m {
-                if hash.get(&j).unwrap() == &babystep {
-                    return Ok((&m * &j + &i) % (modul - BigInt::one()));
-                }
-                j.increment_assign();
+            let pair = map.get(&babystep);
+            if pair.is_some() {
+                return Ok((&m * pair.unwrap() + &i) % (modul - BigInt::one()));
             }
             i.increment_assign();
         }
