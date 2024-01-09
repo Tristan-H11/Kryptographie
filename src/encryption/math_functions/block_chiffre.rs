@@ -142,14 +142,14 @@ fn split_into_blocks(message: &str, block_size: usize) -> Vec<String> {
 /// ```rust
 /// string_to_int_vec("["Das ", "ist ", "eine", " Tes", "tnac", "hric", "ht  "]")
 /// vec![
-///             vec![char_to_u16('D'), char_to_u16('a'), char_to_u16('s'), char_to_u16(' ')],
-///             vec![char_to_u16('i'), char_to_u16('s'), char_to_u16('t'), char_to_u16(' ')],
-///             vec![char_to_u16('e'), char_to_u16('i'), char_to_u16('n'), char_to_u16('e')],
-///             vec![char_to_u16(' '), char_to_u16('T'), char_to_u16('e'), char_to_u16('s')],
-///             vec![char_to_u16('t'), char_to_u16('n'), char_to_u16('a'), char_to_u16('c')],
-///             vec![char_to_u16('h'), char_to_u16('r'), char_to_u16('i'), char_to_u16('c')],
-///             vec![char_to_u16('h'), char_to_u16('t'), char_to_u16(' '), char_to_u16(' ')],
-///         ];
+///     vec![char_to_u32('D'), char_to_u32('a'), char_to_u32('s'), char_to_u32(' ')],
+///     vec![char_to_u32('i'), char_to_u32('s'), char_to_u32('t'), char_to_u32(' ')],
+///     vec![char_to_u32('e'), char_to_u32('i'), char_to_u32('n'), char_to_u32('e')],
+///     vec![char_to_u32(' '), char_to_u32('T'), char_to_u32('e'), char_to_u32('s')],
+///     vec![char_to_u32('t'), char_to_u32('n'), char_to_u32('a'), char_to_u32('c')],
+///     vec![char_to_u32('h'), char_to_u32('r'), char_to_u32('i'), char_to_u32('c')],
+///     vec![char_to_u32('h'), char_to_u32('t'), char_to_u32(' '), char_to_u32(' ')],
+/// ];
 /// ```
 ///
 fn string_to_int_vec(b_vec: Vec<String>) -> Vec<Vec<u32>> {
