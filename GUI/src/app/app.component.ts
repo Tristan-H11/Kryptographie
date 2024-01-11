@@ -11,6 +11,7 @@ import {Client} from "./models/client";
 import {StateManagementService} from "./services/management/state-management.service";
 import {MatSlideToggleModule} from "@angular/material/slide-toggle";
 import {FormsModule} from "@angular/forms";
+import {MatInputModule} from "@angular/material/input";
 
 @Component({
 	selector: "app-root",
@@ -25,6 +26,7 @@ import {FormsModule} from "@angular/forms";
         MatButtonModule,
         MatSlideToggleModule,
         FormsModule,
+        MatInputModule,
     ],
 	templateUrl: "./app.component.html",
 	styleUrls: ["./app.component.scss"]
@@ -32,6 +34,7 @@ import {FormsModule} from "@angular/forms";
 export class AppComponent implements OnInit {
 
 	public isServerReachable: boolean = false;
+	public serverURL: string = this.stateService.getServerUrl()();
 
     public get isTurboMode(): boolean {
         return this.stateService.getUseFastMath()();
@@ -68,14 +71,22 @@ export class AppComponent implements OnInit {
 	public checkServerConnection() {
 		this.backendRequestService.checkHealth().then((result) => {
 			if (result) {
-				this.snackBar.open("Server is reachable!", "OK", {duration: 4000});
+				this.snackBar.open("Server ist erreichbar!", "OK", {duration: 4000});
 			} else {
-				this.snackBar.open("Server is not reachable!", "OK", {duration: 4000});
+				this.snackBar.open("Server ist nicht erreichbar!", "OK", {duration: 4000});
 			}
 		});
 	}
 
 	public getClients(): Set<Client> {
 		return this.stateService.getAllClients();
+	}
+
+	public saveServerURL() {
+		this.stateService.setServerUrl(this.serverURL);
+		this.snackBar.open("Server URL gespeichert!", "OK", {duration: 4000});
+		setTimeout(() => {
+			this.checkServerConnection();
+		}, 4000);
 	}
 }

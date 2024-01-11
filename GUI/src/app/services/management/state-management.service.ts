@@ -9,6 +9,8 @@ import {ConfigurationData} from "../../models/configuration-data";
 })
 export class StateManagementService {
 
+    private server_url = signal("http://krypto-server.tristan-hoermann.de");
+
     private configurationData = signal(ConfigurationData.createDefaultConfigurationData());
 
     private clientKeyMap = new Map<Client, WritableSignal<KeyPair>>();
@@ -20,6 +22,20 @@ export class StateManagementService {
     private use_fast_math = signal(false);
 
     constructor() {
+    }
+
+    /**
+     * Gibt die URL des Servers zurück.
+     */
+    public getServerUrl(): WritableSignal<string> {
+        return this.server_url;
+    }
+
+    /**
+     * Setzt die URL des Servers.
+     */
+    public setServerUrl(url: string): void {
+        this.server_url.update(value => url);
     }
 
     /**

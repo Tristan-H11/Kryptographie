@@ -1,4 +1,5 @@
 import {Injectable} from "@angular/core";
+import {StateManagementService} from "../management/state-management.service";
 
 @Injectable({
     providedIn: "root"
@@ -8,11 +9,11 @@ import {Injectable} from "@angular/core";
  */
 export class EndpointsService {
 
-    private domain: string = "http://localhost:8080";
+    private domain: string = this.stateService.getServerUrl()();
     private rsaEndpoint: string = "/rsa";
     private mathEndpoint: string = "/math";
 
-    constructor() {
+    constructor(private stateService: StateManagementService) {
     }
 
     /**

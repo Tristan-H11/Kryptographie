@@ -51,4 +51,13 @@
     Der Server ist derzeit nicht erreichbar.
     <br><br>
     Bitte starte den Server und lade die Seite neu.
+    <br><br>
+    <!-- Mat Textfeld für die Eingabe der server IP -->
+    <mat-form-field>
+        <mat-label>Server Adresse mit Port</mat-label>
+        <input matInput [(ngModel)]="serverURL" placeholder="Server IP">
+    </mat-form-field>
+    <!-- Button zum Speichern der server IP -->
+    <button mat-raised-button (click)="saveServerURL()">Speichern</button>
+
 </div>
