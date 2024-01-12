@@ -9,7 +9,7 @@ import {ConfigurationData} from "../../models/configuration-data";
 })
 export class StateManagementService {
 
-    private server_url = signal("http://krypto-server.tristan-hoermann.de");
+    private server_url = signal("https://krypto-server.tristan-hoermann.de");
 
     private configurationData = signal(ConfigurationData.createDefaultConfigurationData());
 
