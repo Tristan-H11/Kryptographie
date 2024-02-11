@@ -9,6 +9,7 @@ use crate::encryption::ecc::point::Point;
 /// y^2 = x^3 + ax + b, die die elliptische Kurve definiert.
 /// Um die Kurve über einem endlichen Körper zu definieren, wird auch der Modulus p benötigt.
 ///
+#[derive(Clone, PartialEq, Debug)]
 pub struct EllipticCurve {
     // Die Koeffizienten a und b der elliptischen Kurve
     pub a: BigInt,
@@ -49,28 +50,31 @@ impl EllipticCurve {
 
 #[cfg(test)]
 mod tests {
+    use std::rc::Rc;
     use super::*;
 
-    fn get_educational_curve() -> EllipticCurve {
-        let p = BigInt::from(17u32);
-        let a = BigInt::from(0u32);
-        let b = BigInt::from(7u32);
-        EllipticCurve::new(a, b, p)
+    fn get_educational_curve_rc() -> Rc<EllipticCurve> {
+        let p = 17.into();
+        let a = 0.into();
+        let b = 7.into();
+        Rc::new(EllipticCurve::new(a, b, p))
     }
 
     #[test]
     fn test_has_point_not() {
-        let curve = get_educational_curve();
+        let curve = get_educational_curve_rc();
         let point = Point::new(
-            BigInt::from(5u32),
-            BigInt::from(7u32),
+            5.into(),
+            7.into(),
+            Rc::clone(&curve),
         );
         // (5, 7) liegt nicht auf y^2 = x^3 + 7 (mod 17)
         assert!(!curve.has_point(&point));
 
         let point = Point::new(
-            BigInt::from(4u32),
-            BigInt::from(6u32),
+            4.into(),
+            6.into(),
+            Rc::clone(&curve),
         );
         // (4, 6) liegt nicht auf y^2 = x^3 + 7 (mod 17). Genaugenommen tut es keiner mit x=4.
         assert!(!curve.has_point(&point));
@@ -78,17 +82,19 @@ mod tests {
 
     #[test]
     fn test_has_point() {
-        let curve = get_educational_curve();
+        let curve = get_educational_curve_rc();
         let point = Point::new(
-            BigInt::from(5u32),
-            BigInt::from(8u32),
+            5.into(),
+            8.into(),
+            Rc::clone(&curve),
         );
         // (5, 8) liegt auf y^2 = x^3 + 7 (mod 17)
         assert!(curve.has_point(&point));
 
         let point = Point::new(
-            BigInt::from(5u32),
-            BigInt::from(9u32),
+            5.into(),
+            9.into(),
+            Rc::clone(&curve),
         );
         // (5, 8) liegt auf y^2 = x^3 + 7 (mod 17)
         assert!(curve.has_point(&point));
@@ -96,7 +102,7 @@ mod tests {
 
     #[test]
     fn test_is_not_singular() {
-        let curve = get_educational_curve();
+        let curve = get_educational_curve_rc();
         // 4 * 0^3 + 27 * 7^2 = 0 + 1323 = 1323 (mod 17)= 14 != 0
         assert!(!curve.is_singular());
     }
@@ -104,9 +110,9 @@ mod tests {
     #[test]
     fn test_is_singular_trivial() {
         let curve = EllipticCurve::new(
-            BigInt::from(0u32),
-            BigInt::from(0u32),
-            BigInt::from(17u32),
+            0.into(),
+            0.into(),
+            17.into(),
         );
         // 4 * 0^3 + 27 * 0^2 = 0 + 0 = 0 (mod 17) = 0
         assert!(curve.is_singular());
