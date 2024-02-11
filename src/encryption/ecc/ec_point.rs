@@ -105,11 +105,15 @@ mod tests {
         let p2 = EcPoint::new(5.into(), 9.into(), Rc::clone(&curve));
         let p3 = p1.add(p2);
         assert_eq!(p3, EcPoint::new(12.into(), 1.into(), Rc::clone(&curve)));
+        let has_point = curve.has_point(&p3);
+        assert!(has_point);
 
         let p1 = EcPoint::new(1.into(), 5.into(), Rc::clone(&curve));
         let p2 = EcPoint::new(2.into(), 10.into(), Rc::clone(&curve));
         let p3 = p1.add(p2);
-        assert_eq!(p3, EcPoint::new(5.into(), 9.into(), curve));
+        assert_eq!(p3, EcPoint::new(5.into(), 9.into(), Rc::clone(&curve)));
+        let has_point = curve.has_point(&p3);
+        assert!(has_point);
     }
 
     #[test]
@@ -130,17 +134,23 @@ mod tests {
         let p3 = p1.add(p2);
         // 2 * (1, 5) = (2, 10)
         assert_eq!(p3, EcPoint::new(2.into(), 10.into(), Rc::clone(&curve)));
+        let has_point = curve.has_point(&p3);
+        assert!(has_point);
 
         let p1 = EcPoint::new(6.into(), 6.into(), Rc::clone(&curve));
         let p2 = p1.clone();
         let p3 = p1.add(p2);
         // 2 * (6, 6) = (1, 5)
         assert_eq!(p3, EcPoint::new(1.into(), 5.into(), Rc::clone(&curve)));
+        let has_point = curve.has_point(&p3);
+        assert!(has_point);
 
         let p1 = EcPoint::new(15.into(), 4.into(), Rc::clone(&curve));
         let p2 = p1.clone();
         let p3 = p1.add(p2);
         // 2 * (6, 6) = (1, 5)
         assert_eq!(p3, EcPoint::new(2.into(), 7.into(), Rc::clone(&curve)));
+        let has_point = curve.has_point(&p3);
+        assert!(has_point);
     }
 }
