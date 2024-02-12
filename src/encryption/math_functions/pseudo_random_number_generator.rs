@@ -1,7 +1,9 @@
 use atomic_counter::{AtomicCounter, RelaxedCounter};
 use bigdecimal::num_bigint::{BigInt, ToBigInt};
 use bigdecimal::{BigDecimal, One};
-use log::trace;
+use log::{debug, trace};
+use crate::encryption::math_functions::number_theory::number_theory_service::{NumberTheoryService, NumberTheoryServiceTrait};
+use crate::encryption::math_functions::traits::divisible::Divisible;
 
 use crate::encryption::math_functions::traits::increment::Increment;
 
@@ -127,10 +129,11 @@ impl PseudoRandomNumberGenerator {
         prime_candidate
     }
 
-    /// Generiert eine sichere Primzahl mit der angegebenen Breite.
+    /// Generiert eine sichere Primzahl mit der angegebenen Breite und liefert eine passende
+    /// Primitivwurzel.
     /// Eine sichere Primzahl ist eine Primzahl p, bei der auch (p-1)/2 eine Primzahl ist.
-    /// Folglich geschieht die Berechnung über die Formel p = 2q + 1, wobei q eine Primzahl ist mit
-    /// anschließender Primzahlprüfung von p.
+    /// Eine Primitivwurzel ist ein Element g, welches jede Zahl aus der Menge {1, 2, ..., p-1}
+    /// als Potenz von g darstellen kann.
     ///
     /// # Argumente
     /// * `size` - Die Bit-Breite der Primzahl.
@@ -150,39 +153,61 @@ impl PseudoRandomNumberGenerator {
             size, miller_rabin_iterations
         );
 
-        let mut prime_candidate = self.generate_prime(size, miller_rabin_iterations, n_counter);
-        let mut source_prime = prime_candidate.decrement().half();
-
+        let mut prime_candidate: BigInt;
+        let mut source_prime: BigInt;
+        // Bestimmung der sicheren Primzahl
         loop {
+            prime_candidate = self.generate_prime(size, miller_rabin_iterations, n_counter);
+            source_prime = prime_candidate.decrement().half();
             if self.number_theory_service.is_probably_prime(
                 &source_prime,
                 miller_rabin_iterations,
                 self, // Ggf sollte hier eine neue Instanz mit zufälligem Seed übergeben werden?
             ) {
+                debug!(
+                    "Generierter Primkandidat {} ist eine sichere Primzahl",
+                     prime_candidate
+                );
                 break;
             }
             trace!(
                 "Generierter Primkandidat {} ist keine sichere Primzahl",
                 prime_candidate
             );
-            prime_candidate = self.generate_prime(size, miller_rabin_iterations, n_counter);
-            source_prime = prime_candidate.decrement().half();
         }
 
-        debug!(
-            "Generierter Primkandidat {} ist eine sichere Primzahl",
-            prime_candidate
-        );
         debug!(
             "Generiere Primitivwurzel für die sichere Primzahl {}",
             prime_candidate
         );
-
+        let mut primitive_root_candidate: BigInt;
+        // Bestimmung der Primitivwurzel
         loop {
-            let primitive_root_candidate = self.take(&2.into(), )
+            primitive_root_candidate = self.take(&2.into(), &(&prime_candidate - BigInt::from(2)), n_counter);
+            // Eine Zahl g ist eine Primitivwurzel, wenn g^(q) mod p = p - 1
+            // mit q = source_prime und p = prime_candidate
+            // Die Prüfung geschieht normalerweise mit -1, aber weil fast_exponentiation mit
+            // euklidischem Rest rechnet, muss hier p - 1 verwendet werden.
+            let is_primitive_root = self.number_theory_service.fast_exponentiation(
+                &primitive_root_candidate,
+                &source_prime,
+                &prime_candidate,
+            ) == prime_candidate.decrement();
+
+            if is_primitive_root {
+                debug!(
+                    "Generierter Primitivwurzelkandidat {} ist eine Primitivwurzel",
+                    primitive_root_candidate
+                );
+                break;
+            }
+            trace!(
+                "Generierter Primitivwurzelkandidat {} ist keine Primitivwurzel",
+                primitive_root_candidate
+            );
         }
 
-        prime_candidate
+        (prime_candidate, primitive_root_candidate)
     }
 
 }
