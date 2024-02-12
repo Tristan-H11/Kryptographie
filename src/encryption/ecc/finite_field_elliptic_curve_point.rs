@@ -4,7 +4,7 @@ use bigdecimal::num_bigint::BigInt;
 use bigdecimal::num_traits::Euclid;
 use bigdecimal::Zero;
 
-use crate::encryption::ecc::elliptic_curve::FiniteFieldEllipticCurve;
+use crate::encryption::ecc::finite_field_elliptic_curve::FiniteFieldEllipticCurve;
 use crate::encryption::math_functions::number_theory::number_theory_service::{NumberTheoryService, NumberTheoryServiceTrait};
 use crate::encryption::math_functions::number_theory::number_theory_service::NumberTheoryServiceSpeed::Fast;
 use crate::encryption::math_functions::traits::parity::Parity;
@@ -145,7 +145,7 @@ impl FiniteFieldEllipticCurvePoint {
 
 #[cfg(test)]
 mod tests {
-    use crate::encryption::ecc::elliptic_curve::{
+    use crate::encryption::ecc::finite_field_elliptic_curve::{
         get_educational_curve_rc, FiniteFieldEllipticCurve,
     };
 
