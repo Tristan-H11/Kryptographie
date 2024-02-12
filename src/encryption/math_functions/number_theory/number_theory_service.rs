@@ -246,13 +246,19 @@ mod tests {
     #[test]
     fn is_probably_prime_test() {
         let slow_service = NumberTheoryService::new(Slow);
-        let random_generator: &PseudoRandomNumberGenerator = &PseudoRandomNumberGenerator::new(11);
         assert_eq!(
-            slow_service.is_probably_prime(&11.into(), 100, random_generator),
+            slow_service.is_probably_prime(
+                &11.into(),
+                100,
+                &PseudoRandomNumberGenerator::new(11, slow_service)
+            ),
             true
         );
 
         run_test_for_all_services(|service| {
+            let random_generator: &PseudoRandomNumberGenerator =
+                &PseudoRandomNumberGenerator::new(11, service);
+
             assert_eq!(
                 service.is_probably_prime(
                     &BigInt::from_str("3884010174220797539108782582068795892283779").unwrap(),

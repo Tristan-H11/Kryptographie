@@ -1,9 +1,11 @@
+use crate::encryption::math_functions::number_theory::number_theory_service::{
+    NumberTheoryService, NumberTheoryServiceTrait,
+};
+use crate::encryption::math_functions::traits::divisible::Divisible;
 use atomic_counter::{AtomicCounter, RelaxedCounter};
 use bigdecimal::num_bigint::{BigInt, ToBigInt};
 use bigdecimal::{BigDecimal, One};
 use log::{debug, trace};
-use crate::encryption::math_functions::number_theory::number_theory_service::{NumberTheoryService, NumberTheoryServiceTrait};
-use crate::encryption::math_functions::traits::divisible::Divisible;
 
 use crate::encryption::math_functions::traits::increment::Increment;
 
@@ -43,7 +45,10 @@ impl PseudoRandomNumberGenerator {
                 None => panic!("Wurzel m konnte nicht berechnet werden."),
             }
         }
-        return Self { sqrt_m, number_theory_service };
+        return Self {
+            sqrt_m,
+            number_theory_service,
+        };
     }
 
     /// Diese Methode gibt eine Zufallszahl im Bereich von a bis b zurück.
@@ -166,7 +171,7 @@ impl PseudoRandomNumberGenerator {
             ) {
                 debug!(
                     "Generierter Primkandidat {} ist eine sichere Primzahl",
-                     prime_candidate
+                    prime_candidate
                 );
                 break;
             }
@@ -183,7 +188,8 @@ impl PseudoRandomNumberGenerator {
         let mut primitive_root_candidate: BigInt;
         // Bestimmung der Primitivwurzel
         loop {
-            primitive_root_candidate = self.take(&2.into(), &(&prime_candidate - BigInt::from(2)), n_counter);
+            primitive_root_candidate =
+                self.take(&2.into(), &(&prime_candidate - BigInt::from(2)), n_counter);
             // Eine Zahl g ist eine Primitivwurzel, wenn g^(q) mod p = p - 1
             // mit q = source_prime und p = prime_candidate
             // Die Prüfung geschieht normalerweise mit -1, aber weil fast_exponentiation mit
@@ -209,7 +215,6 @@ impl PseudoRandomNumberGenerator {
 
         (prime_candidate, primitive_root_candidate)
     }
-
 }
 
 #[cfg(test)]
@@ -222,17 +227,13 @@ mod tests {
     use crate::encryption::math_functions::pseudo_random_number_generator::PseudoRandomNumberGenerator;
     use crate::encryption::math_functions::traits::divisible::Divisible;
 
-    /*
-    Scope dieser Tests ist nicht der NumberTheoryService, also laufen alle Tests mit dem Schnellen.
-    Weil der Service stateless ist, kann er hier als Konstante definiert werden.
-     */
-    const SERVICE: NumberTheoryService = NumberTheoryService::new(Fast);
     #[test]
     fn test_happy_flow() {
+        let service: NumberTheoryService = NumberTheoryService::new(Fast);
         let a: BigInt = 1u32.into();
         let b: BigInt = 997u32.into();
 
-        let random = PseudoRandomNumberGenerator::new(13, SERVICE);
+        let random = PseudoRandomNumberGenerator::new(13, service);
 
         let n = RelaxedCounter::new(1);
 
@@ -250,7 +251,7 @@ mod tests {
         let a: BigInt = 500u32.into();
         let b: BigInt = 6000u32.into();
 
-        let random = PseudoRandomNumberGenerator::new(40, SERVICE);
+        let random = PseudoRandomNumberGenerator::new(40, service);
 
         for _ in 1..500 {
             let random = random.take(&a, &b, &n);
@@ -260,10 +261,11 @@ mod tests {
 
     #[test]
     fn test_take_uneven() {
+        let service: NumberTheoryService = NumberTheoryService::new(Fast);
         let a: BigInt = 500u32.into();
         let b: BigInt = 6000u32.into();
 
-        let random = PseudoRandomNumberGenerator::new(23, SERVICE);
+        let random = PseudoRandomNumberGenerator::new(23, service);
 
         let n = RelaxedCounter::new(1);
 

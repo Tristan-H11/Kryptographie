@@ -60,7 +60,8 @@ impl RsaKeygenService {
             "Generiere Schlüsselpaar mit key_size {} und Miller-Rabin-Iterations {}",
             self.key_size, miller_rabin_iterations
         );
-        let random_generator = &PseudoRandomNumberGenerator::new(random_seed, self.number_theory_service);
+        let random_generator =
+            &PseudoRandomNumberGenerator::new(random_seed, self.number_theory_service);
 
         let (prime_one, prime_two) =
             self.get_distinct_primes(miller_rabin_iterations, random_generator);
@@ -99,16 +100,10 @@ impl RsaKeygenService {
             (self.key_size / 2 + 1, self.key_size / 2)
         };
         let n_counter = RelaxedCounter::new(1);
-        let prime_one = random_generator.generate_prime(
-            prim_size_one,
-            miller_rabin_iterations,
-            &n_counter,
-        );
-        let mut prime_two = random_generator.generate_prime(
-            prim_size_two,
-            miller_rabin_iterations,
-            &n_counter,
-        );
+        let prime_one =
+            random_generator.generate_prime(prim_size_one, miller_rabin_iterations, &n_counter);
+        let mut prime_two =
+            random_generator.generate_prime(prim_size_two, miller_rabin_iterations, &n_counter);
 
         while prime_one == prime_two {
             trace!(
@@ -116,11 +111,8 @@ impl RsaKeygenService {
                 prime_one,
                 prime_two
             );
-            prime_two = random_generator.generate_prime(
-                prim_size_two,
-                miller_rabin_iterations,
-                &n_counter,
-            );
+            prime_two =
+                random_generator.generate_prime(prim_size_two, miller_rabin_iterations, &n_counter);
         }
         (prime_one, prime_two)
     }
