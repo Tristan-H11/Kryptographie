@@ -99,9 +99,17 @@ impl FiniteFieldEllipticCurvePoint {
     ///
     pub fn multiply(&self, scalar: &BigInt) -> Self {
         if scalar.is_zero() {
-            return FiniteFieldEllipticCurvePoint::new(BigInt::zero(), BigInt::zero(), Rc::clone(&self.curve));
+            return FiniteFieldEllipticCurvePoint::new(
+                BigInt::zero(),
+                BigInt::zero(),
+                Rc::clone(&self.curve),
+            );
         }
-        let mut result = FiniteFieldEllipticCurvePoint::new(BigInt::zero(), BigInt::zero(), Rc::clone(&self.curve));
+        let mut result = FiniteFieldEllipticCurvePoint::new(
+            BigInt::zero(),
+            BigInt::zero(),
+            Rc::clone(&self.curve),
+        );
         let mut addend = self.clone();
         let mut n = scalar.clone();
         while n > BigInt::zero() {
@@ -137,7 +145,9 @@ impl FiniteFieldEllipticCurvePoint {
 
 #[cfg(test)]
 mod tests {
-    use crate::encryption::ecc::elliptic_curve::{get_educational_curve_rc, FiniteFieldEllipticCurve};
+    use crate::encryption::ecc::elliptic_curve::{
+        get_educational_curve_rc, FiniteFieldEllipticCurve,
+    };
 
     use super::*;
 
@@ -164,7 +174,11 @@ mod tests {
     #[test]
     fn test_add_from_different_curves_gives_none() {
         let curve1 = get_educational_curve_rc();
-        let curve2 = Rc::new(FiniteFieldEllipticCurve::new((-5).into(), 1.into(), 19.into()));
+        let curve2 = Rc::new(FiniteFieldEllipticCurve::new(
+            (-5).into(),
+            1.into(),
+            19.into(),
+        ));
         let p1 = FiniteFieldEllipticCurvePoint::new(1.into(), 5.into(), Rc::clone(&curve1));
         let p2 = FiniteFieldEllipticCurvePoint::new(5.into(), 9.into(), Rc::clone(&curve2));
         assert_eq!(p1.add(&p2), None);
