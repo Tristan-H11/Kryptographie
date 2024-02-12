@@ -4,7 +4,7 @@ use bigdecimal::num_bigint::BigInt;
 use bigdecimal::num_traits::Euclid;
 use bigdecimal::Zero;
 
-use crate::encryption::ecc::ec_point::EcPoint;
+use crate::encryption::ecc::finite_field_elliptic_curve_point::FiniteFieldEllipticCurvePoint;
 
 ///
 /// Repräsentiert eine elliptische Kurve.
@@ -14,7 +14,7 @@ use crate::encryption::ecc::ec_point::EcPoint;
 /// Um die Kurve über einem endlichen Körper zu definieren, wird auch der Modulus p benötigt.
 ///
 #[derive(Clone, PartialEq, Debug)]
-pub struct EllipticCurve {
+pub struct FiniteFieldEllipticCurve {
     // Die Koeffizienten a und b der elliptischen Kurve
     pub a: BigInt,
     pub b: BigInt,
@@ -22,14 +22,14 @@ pub struct EllipticCurve {
     pub p: BigInt,
 }
 
-pub fn get_educational_curve_rc() -> Rc<EllipticCurve> {
+pub fn get_educational_curve_rc() -> Rc<FiniteFieldEllipticCurve> {
     let p = 17.into();
     let a = 0.into();
     let b = 7.into();
-    Rc::new(EllipticCurve::new(a, b, p))
+    Rc::new(FiniteFieldEllipticCurve::new(a, b, p))
 }
 
-impl EllipticCurve {
+impl FiniteFieldEllipticCurve {
     pub fn new(a: BigInt, b: BigInt, p: BigInt) -> Self {
         Self { a, b, p }
     }
@@ -37,7 +37,7 @@ impl EllipticCurve {
     ///
     /// Überprüft, ob ein Punkt auf der elliptischen Kurve liegt.
     ///
-    pub fn has_point(&self, point: &EcPoint) -> bool {
+    pub fn has_point(&self, point: &FiniteFieldEllipticCurvePoint) -> bool {
         let x_squared = &point.x.pow(2);
         let x_cubed = &point.x * x_squared;
         let y_squared = point.y.pow(2);
@@ -64,11 +64,11 @@ mod tests {
     #[test]
     fn test_has_point_not() {
         let curve = get_educational_curve_rc();
-        let point = EcPoint::new(5.into(), 7.into(), Rc::clone(&curve));
+        let point = FiniteFieldEllipticCurvePoint::new(5.into(), 7.into(), Rc::clone(&curve));
         // (5, 7) liegt nicht auf y^2 = x^3 + 7 (mod 17)
         assert!(!curve.has_point(&point));
 
-        let point = EcPoint::new(4.into(), 6.into(), Rc::clone(&curve));
+        let point = FiniteFieldEllipticCurvePoint::new(4.into(), 6.into(), Rc::clone(&curve));
         // (4, 6) liegt nicht auf y^2 = x^3 + 7 (mod 17). Genaugenommen tut es keiner mit x=4.
         assert!(!curve.has_point(&point));
     }
@@ -76,11 +76,11 @@ mod tests {
     #[test]
     fn test_has_point() {
         let curve = get_educational_curve_rc();
-        let point = EcPoint::new(5.into(), 8.into(), Rc::clone(&curve));
+        let point = FiniteFieldEllipticCurvePoint::new(5.into(), 8.into(), Rc::clone(&curve));
         // (5, 8) liegt auf y^2 = x^3 + 7 (mod 17)
         assert!(curve.has_point(&point));
 
-        let point = EcPoint::new(5.into(), 9.into(), Rc::clone(&curve));
+        let point = FiniteFieldEllipticCurvePoint::new(5.into(), 9.into(), Rc::clone(&curve));
         // (5, 8) liegt auf y^2 = x^3 + 7 (mod 17)
         assert!(curve.has_point(&point));
     }
@@ -94,14 +94,14 @@ mod tests {
 
     #[test]
     fn test_is_singular_trivial() {
-        let curve = EllipticCurve::new(0.into(), 0.into(), 17.into());
+        let curve = FiniteFieldEllipticCurve::new(0.into(), 0.into(), 17.into());
         // 4 * 0^3 + 27 * 0^2 = 0 + 0 = 0 (mod 17) = 0
         assert!(curve.is_singular());
     }
 
     #[test]
     fn test_is_singular_non_trivial() {
-        let curve = EllipticCurve::new(BigInt::from(-3), 2.into(), 17.into());
+        let curve = FiniteFieldEllipticCurve::new(BigInt::from(-3), 2.into(), 17.into());
         // 4 * (-3)^3 + 27 * 2^2 = -108 + 108 = 0 (mod 17) = 0
         assert!(curve.is_singular());
     }
