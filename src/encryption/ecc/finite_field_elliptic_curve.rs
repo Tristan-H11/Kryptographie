@@ -48,7 +48,7 @@ impl FiniteFieldEllipticCurve {
     }
 
     ///
-    /// Gibt zurück, ob die Kurve die Bedingung 4a^3 + 27b^2 != 0 erfüllt, also ob die Kurve singulär ist.
+    /// Gibt zurück, ob die Kurve die Bedingung 4a^3 + 27b^2 = 0 erfüllt, also ob die Kurve singulär ist.
     ///
     pub fn is_singular(&self) -> bool {
         let four_a_cubed = 4u32 * &self.a.pow(3);
