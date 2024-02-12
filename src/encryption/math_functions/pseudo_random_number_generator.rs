@@ -10,6 +10,7 @@ use crate::encryption::math_functions::traits::increment::Increment;
 ///
 pub struct PseudoRandomNumberGenerator {
     sqrt_m: BigDecimal,
+    number_theory_service: NumberTheoryService,
 }
 
 impl PseudoRandomNumberGenerator {
@@ -24,7 +25,7 @@ impl PseudoRandomNumberGenerator {
     /// # Rückgabe
     /// * PseudoRandomNumberGenerator
     ///
-    pub fn new(random_seed: u32) -> Self {
+    pub fn new(random_seed: u32, number_theory_service: NumberTheoryService) -> Self {
         let mut initial_random = random_seed;
         let sqrt_m;
         loop {
@@ -40,7 +41,7 @@ impl PseudoRandomNumberGenerator {
                 None => panic!("Wurzel m konnte nicht berechnet werden."),
             }
         }
-        return Self { sqrt_m };
+        return Self { sqrt_m, number_theory_service };
     }
 
     /// Diese Methode gibt eine Zufallszahl im Bereich von a bis b zurück.
@@ -82,22 +83,131 @@ impl PseudoRandomNumberGenerator {
     pub fn take_uneven(&self, a: &BigInt, b: &BigInt, n_counter: &RelaxedCounter) -> BigInt {
         self.take(a, b, n_counter) | BigInt::one()
     }
+
+    /// Generiert eine Primzahl mit der angegebenen Breite.
+    ///
+    /// # Argumente
+    /// * `size` - Die Bit-Breite der Primzahl.
+    /// * `miller_rabin_iterations` - Die Anzahl der Iterationen für den Miller-Rabin-Test.
+    /// * `n_counter` - Der Zähler für den Zugriff auf die Zufallsfolge. Achtung: Der Zähler wird inkrementiert!
+    ///
+    /// # Rückgabe
+    /// Die generierte Primzahl.
+    pub fn generate_prime(
+        &self,
+        size: u32,
+        miller_rabin_iterations: u32,
+        n_counter: &RelaxedCounter,
+    ) -> BigInt {
+        debug!(
+            "Generiere eine Primzahl mit size {} und Miller-Rabin-Iterations {}",
+            size, miller_rabin_iterations
+        );
+
+        let upper_bound = &BigInt::from(2).pow(size);
+        let lower_bound = &BigInt::from(2).pow(size - 1);
+
+        let mut prime_candidate = self.take_uneven(lower_bound, upper_bound, n_counter);
+
+        while !self.number_theory_service.is_probably_prime(
+            &prime_candidate,
+            miller_rabin_iterations,
+            self, // Ggf sollte hier eine neue Instanz mit zufälligem Seed übergeben werden?
+        ) {
+            trace!(
+                "Generierter Primkandidat {} ist keine Primzahl",
+                prime_candidate
+            );
+            prime_candidate = self.take_uneven(lower_bound, upper_bound, n_counter);
+        }
+        debug!(
+            "Generierter Primkandidat {} ist eine Primzahl",
+            prime_candidate
+        );
+        prime_candidate
+    }
+
+    /// Generiert eine sichere Primzahl mit der angegebenen Breite.
+    /// Eine sichere Primzahl ist eine Primzahl p, bei der auch (p-1)/2 eine Primzahl ist.
+    /// Folglich geschieht die Berechnung über die Formel p = 2q + 1, wobei q eine Primzahl ist mit
+    /// anschließender Primzahlprüfung von p.
+    ///
+    /// # Argumente
+    /// * `size` - Die Bit-Breite der Primzahl.
+    /// * `miller_rabin_iterations` - Die Anzahl der Iterationen für die Miller-Rabin-Tests.
+    /// * `n_counter` - Der Zähler für den Zugriff auf die Zufallsfolge. Achtung: Der Zähler wird inkrementiert!
+    ///
+    /// # Rückgabe
+    /// Die generierte sichere Primzahl und die Primitivwurzel.
+    pub fn generate_secure_prime_with_primitive_root(
+        &self,
+        size: u32,
+        miller_rabin_iterations: u32,
+        n_counter: &RelaxedCounter,
+    ) -> (BigInt, BigInt) {
+        debug!(
+            "Generiere eine sichere Primzahl mit size {} und Miller-Rabin-Iterations {}",
+            size, miller_rabin_iterations
+        );
+
+        let mut prime_candidate = self.generate_prime(size, miller_rabin_iterations, n_counter);
+        let mut source_prime = prime_candidate.decrement().half();
+
+        loop {
+            if self.number_theory_service.is_probably_prime(
+                &source_prime,
+                miller_rabin_iterations,
+                self, // Ggf sollte hier eine neue Instanz mit zufälligem Seed übergeben werden?
+            ) {
+                break;
+            }
+            trace!(
+                "Generierter Primkandidat {} ist keine sichere Primzahl",
+                prime_candidate
+            );
+            prime_candidate = self.generate_prime(size, miller_rabin_iterations, n_counter);
+            source_prime = prime_candidate.decrement().half();
+        }
+
+        debug!(
+            "Generierter Primkandidat {} ist eine sichere Primzahl",
+            prime_candidate
+        );
+        debug!(
+            "Generiere Primitivwurzel für die sichere Primzahl {}",
+            prime_candidate
+        );
+
+        loop {
+            let primitive_root_candidate = self.take(&2.into(), )
+        }
+
+        prime_candidate
+    }
+
 }
 
 #[cfg(test)]
 mod tests {
     use atomic_counter::RelaxedCounter;
     use bigdecimal::num_bigint::BigInt;
+    use crate::encryption::math_functions::number_theory::number_theory_service::NumberTheoryService;
+    use crate::encryption::math_functions::number_theory::number_theory_service::NumberTheoryServiceSpeed::Fast;
 
     use crate::encryption::math_functions::pseudo_random_number_generator::PseudoRandomNumberGenerator;
     use crate::encryption::math_functions::traits::divisible::Divisible;
 
+    /*
+    Scope dieser Tests ist nicht der NumberTheoryService, also laufen alle Tests mit dem Schnellen.
+    Weil der Service stateless ist, kann er hier als Konstante definiert werden.
+     */
+    const SERVICE: NumberTheoryService = NumberTheoryService::new(Fast);
     #[test]
     fn test_happy_flow() {
         let a: BigInt = 1u32.into();
         let b: BigInt = 997u32.into();
 
-        let random = PseudoRandomNumberGenerator::new(13);
+        let random = PseudoRandomNumberGenerator::new(13, SERVICE);
 
         let n = RelaxedCounter::new(1);
 
@@ -115,7 +225,7 @@ mod tests {
         let a: BigInt = 500u32.into();
         let b: BigInt = 6000u32.into();
 
-        let random = PseudoRandomNumberGenerator::new(40);
+        let random = PseudoRandomNumberGenerator::new(40, SERVICE);
 
         for _ in 1..500 {
             let random = random.take(&a, &b, &n);
@@ -128,7 +238,7 @@ mod tests {
         let a: BigInt = 500u32.into();
         let b: BigInt = 6000u32.into();
 
-        let random = PseudoRandomNumberGenerator::new(23);
+        let random = PseudoRandomNumberGenerator::new(23, SERVICE);
 
         let n = RelaxedCounter::new(1);
 

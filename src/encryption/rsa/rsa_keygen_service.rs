@@ -60,7 +60,7 @@ impl RsaKeygenService {
             "Generiere Schlüsselpaar mit key_size {} und Miller-Rabin-Iterations {}",
             self.key_size, miller_rabin_iterations
         );
-        let random_generator = &PseudoRandomNumberGenerator::new(random_seed);
+        let random_generator = &PseudoRandomNumberGenerator::new(random_seed, self.number_theory_service);
 
         let (prime_one, prime_two) =
             self.get_distinct_primes(miller_rabin_iterations, random_generator);
@@ -99,16 +99,14 @@ impl RsaKeygenService {
             (self.key_size / 2 + 1, self.key_size / 2)
         };
         let n_counter = RelaxedCounter::new(1);
-        let prime_one = self.generate_prime(
+        let prime_one = random_generator.generate_prime(
             prim_size_one,
             miller_rabin_iterations,
-            random_generator,
             &n_counter,
         );
-        let mut prime_two = self.generate_prime(
+        let mut prime_two = random_generator.generate_prime(
             prim_size_two,
             miller_rabin_iterations,
-            random_generator,
             &n_counter,
         );
 
@@ -118,59 +116,13 @@ impl RsaKeygenService {
                 prime_one,
                 prime_two
             );
-            prime_two = self.generate_prime(
+            prime_two = random_generator.generate_prime(
                 prim_size_two,
                 miller_rabin_iterations,
-                random_generator,
                 &n_counter,
             );
         }
         (prime_one, prime_two)
-    }
-
-    /// Generiert eine Primzahl mit der angegebenen Breite.
-    ///
-    /// # Argumente
-    /// * `size` - Die Breite der Primzahl.
-    /// * `miller_rabin_iterations` - Die Anzahl der Iterationen für den Miller-Rabin-Test.
-    /// * `random_generator` - Der Pseudo-Zufallszahlengenerator.
-    /// * `n_counter` - Der Zähler für den Zugriff auf die Zufallsfolge. Achtung: Der Zähler wird inkrementiert!
-    ///
-    /// # Rückgabe
-    /// Die generierte Primzahl.
-    fn generate_prime(
-        &self,
-        size: u32,
-        miller_rabin_iterations: u32,
-        random_generator: &PseudoRandomNumberGenerator,
-        n_counter: &RelaxedCounter,
-    ) -> BigInt {
-        debug!(
-            "Generiere eine Primzahl mit size {} und Miller-Rabin-Iterations {}",
-            size, miller_rabin_iterations
-        );
-
-        let upper_bound = &BigInt::from(2).pow(size);
-        let lower_bound = &BigInt::from(2).pow(size - 1);
-
-        let mut prime_candidate = random_generator.take_uneven(lower_bound, upper_bound, n_counter);
-
-        while !self.number_theory_service.is_probably_prime(
-            &prime_candidate,
-            miller_rabin_iterations,
-            random_generator,
-        ) {
-            trace!(
-                "Generierter Primkandidat {} ist keine Primzahl",
-                prime_candidate
-            );
-            prime_candidate = random_generator.take_uneven(lower_bound, upper_bound, n_counter);
-        }
-        debug!(
-            "Generierter Primkandidat {} ist eine Primzahl",
-            prime_candidate
-        );
-        prime_candidate
     }
 
     /// Generiert eine Zahl `e` mit `1 < e < phi` und `ggT(e, phi) = 1`.
