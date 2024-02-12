@@ -11,6 +11,7 @@ use crate::encryption::math_functions::traits::parity::Parity;
 
 ///
 /// Repräsentiert einen Punkt auf einer elliptischen Kurve.
+/// TODO: Handling von Punkten im Unendlichen und im Ursprung verbessern
 ///
 #[derive(Clone, PartialEq, Debug)]
 pub struct EcPoint {
@@ -21,6 +22,7 @@ pub struct EcPoint {
     pub curve: Rc<EllipticCurve>,
 }
 
+// TODO: Arithmetik von der Datenklasse des Punktes trennen
 impl EcPoint {
     pub fn new(x: BigInt, y: BigInt, curve: Rc<EllipticCurve>) -> Self {
         Self { x, y, curve }
