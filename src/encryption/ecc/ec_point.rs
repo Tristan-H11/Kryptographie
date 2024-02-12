@@ -7,6 +7,7 @@ use bigdecimal::Zero;
 use crate::encryption::ecc::elliptic_curve::EllipticCurve;
 use crate::encryption::math_functions::number_theory::number_theory_service::{NumberTheoryService, NumberTheoryServiceTrait};
 use crate::encryption::math_functions::number_theory::number_theory_service::NumberTheoryServiceSpeed::Fast;
+use crate::encryption::math_functions::traits::parity::Parity;
 
 ///
 /// Repräsentiert einen Punkt auf einer elliptischen Kurve.
@@ -85,6 +86,29 @@ impl EcPoint {
         let y_sum = (&slope * (&self.x - &x_sum) - &self.y).rem_euclid(p);
 
         EcPoint::new(x_sum, y_sum, Rc::clone(&self.curve)).normalize()
+    }
+
+    ///
+    /// Multipliziert einen Punkt mit einem Skalar.
+    /// Dabei wird die optimierte Berechnung in Form des Double-and-add Algorithmus verwendet.
+    /// Bei Multiplikation mit 0 wird der Punkt im Ursprung mit Bezug auf die ursprüngliche Kurve
+    /// zurückgegeben.
+    ///
+    pub fn multiply(&self, scalar: &BigInt) -> Self {
+        if scalar.is_zero() {
+            return EcPoint::new(BigInt::zero(), BigInt::zero(), Rc::clone(&self.curve));
+        }
+        let mut result = EcPoint::new(BigInt::zero(), BigInt::zero(), Rc::clone(&self.curve));
+        let mut addend = self.clone();
+        let mut n = scalar.clone();
+        while n > BigInt::zero() {
+            if n.is_odd() {
+                result = result.add(&addend).unwrap();
+            }
+            addend = addend.double();
+            n = n >> 1;
+        }
+        result
     }
 
     ///
@@ -178,5 +202,34 @@ mod tests {
         assert_eq!(p3, expected);
         let has_point = curve.has_point(&p3);
         assert!(has_point);
+    }
+
+    #[test]
+    fn test_multiply_trivial() {
+        let curve = get_educational_curve_rc();
+        let p1 = EcPoint::new(12.into(), 16.into(), Rc::clone(&curve));
+        let p2 = p1.multiply(&1.into());
+        assert_eq!(p1, p2);
+
+        let p3 = p1.multiply(&2.into());
+        let expected = EcPoint::new(1.into(), 5.into(), Rc::clone(&curve));
+        assert_eq!(p3, expected);
+
+        let p4 = p1.multiply(&8.into());
+        let expected = EcPoint::new(12.into(), 1.into(), Rc::clone(&curve));
+        assert_eq!(p4, expected);
+
+        let p5 = p1.multiply(&14.into());
+        let expected = EcPoint::new(2.into(), 7.into(), curve);
+        assert_eq!(p5, expected);
+    }
+
+    #[test]
+    fn test_multiply_with_zero() {
+        let curve = get_educational_curve_rc();
+        let p1 = EcPoint::new(12.into(), 16.into(), Rc::clone(&curve));
+        let p2 = p1.multiply(&0.into());
+        let expected = EcPoint::new(BigInt::zero(), BigInt::zero(), curve);
+        assert_eq!(p2, expected);
     }
 }
