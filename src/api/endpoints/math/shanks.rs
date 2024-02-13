@@ -8,9 +8,9 @@ use serde::Deserialize;
 
 use crate::api::basic::call_checked_with_parsed_big_ints;
 use crate::api::serializable_models::{SingleStringResponse, UseFastQuery};
-use crate::encryption::math_functions::babystep_giantstep::Shanks;
-use crate::encryption::math_functions::number_theory::number_theory_service::NumberTheoryService;
-use crate::encryption::math_functions::number_theory::number_theory_service::NumberTheoryServiceSpeed::{Fast, Slow};
+use crate::math_core::babystep_giantstep::Shanks;
+use crate::math_core::number_theory::number_theory_service::NumberTheoryService;
+use crate::math_core::number_theory::number_theory_service::NumberTheoryServiceSpeed::{Fast, Slow};
 
 #[derive(Deserialize)]
 pub struct ShanksRequest {

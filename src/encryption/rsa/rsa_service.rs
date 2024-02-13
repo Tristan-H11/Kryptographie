@@ -2,13 +2,13 @@ use bigdecimal::num_bigint::{BigInt, Sign};
 use log::{debug, info};
 use sha2::{Digest, Sha256};
 
-use crate::encryption::math_functions::block_chiffre::{
+use crate::math_core::block_chiffre::{
     create_string_from_blocks_decrypt, create_string_from_blocks_encrypt, encode_string_to_blocks,
 };
-use crate::encryption::math_functions::number_theory::number_theory_service::{
+use crate::math_core::number_theory::number_theory_service::{
     NumberTheoryService, NumberTheoryServiceTrait,
 };
-use crate::encryption::math_functions::traits::logarithm::Logarithm;
+use crate::math_core::traits::logarithm::Logarithm;
 use crate::encryption::rsa::keys::{RsaKey, RsaKeyType};
 
 pub struct RsaService {
@@ -173,7 +173,7 @@ impl RsaService {
 mod tests {
     use std::str::FromStr;
 
-    use crate::encryption::math_functions::number_theory::number_theory_service::NumberTheoryServiceSpeed::{Fast, Slow};
+    use crate::math_core::number_theory::number_theory_service::NumberTheoryServiceSpeed::{Fast, Slow};
     use crate::encryption::rsa::rsa_keygen_service::RsaKeygenService;
 
     use super::*;

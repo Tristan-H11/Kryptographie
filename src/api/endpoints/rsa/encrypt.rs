@@ -4,8 +4,8 @@ use actix_web::{HttpResponse, Responder};
 use log::info;
 
 use crate::api::serializable_models::{EncryptDecryptRequest, SingleStringResponse, UseFastQuery};
-use crate::encryption::math_functions::number_theory::number_theory_service::NumberTheoryService;
-use crate::encryption::math_functions::number_theory::number_theory_service::NumberTheoryServiceSpeed::{Fast, Slow};
+use crate::math_core::number_theory::number_theory_service::NumberTheoryService;
+use crate::math_core::number_theory::number_theory_service::NumberTheoryServiceSpeed::{Fast, Slow};
 
 ///
 /// Verschlüsselt eine Nachricht.

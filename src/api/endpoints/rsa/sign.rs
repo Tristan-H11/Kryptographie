@@ -5,8 +5,8 @@ use log::info;
 use serde::Deserialize;
 
 use crate::api::serializable_models::{KeyPair, SingleStringResponse, UseFastQuery};
-use crate::encryption::math_functions::number_theory::number_theory_service::NumberTheoryService;
-use crate::encryption::math_functions::number_theory::number_theory_service::NumberTheoryServiceSpeed::{Fast, Slow};
+use crate::math_core::number_theory::number_theory_service::NumberTheoryService;
+use crate::math_core::number_theory::number_theory_service::NumberTheoryServiceSpeed::{Fast, Slow};
 
 #[derive(Deserialize)]
 pub struct SignRequest {

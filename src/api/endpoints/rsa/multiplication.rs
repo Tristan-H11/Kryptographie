@@ -8,8 +8,8 @@ use serde::{Deserialize, Serialize};
 use std::str::FromStr;
 
 use crate::api::serializable_models::{KeyPair, SingleStringResponse, UseFastQuery};
-use crate::encryption::math_functions::number_theory::number_theory_service::NumberTheoryService;
-use crate::encryption::math_functions::number_theory::number_theory_service::NumberTheoryServiceSpeed::{Fast, Slow};
+use crate::math_core::number_theory::number_theory_service::NumberTheoryService;
+use crate::math_core::number_theory::number_theory_service::NumberTheoryServiceSpeed::{Fast, Slow};
 use crate::encryption::rsa::rsa_service::RsaService;
 
 #[derive(Deserialize)]

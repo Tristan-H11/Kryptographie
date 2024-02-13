@@ -4,11 +4,11 @@ use bigdecimal::One;
 use log::{debug, trace};
 use num::Integer;
 
-use crate::encryption::math_functions::number_theory::number_theory_service::{
+use crate::math_core::number_theory::number_theory_service::{
     NumberTheoryService, NumberTheoryServiceTrait,
 };
-use crate::encryption::math_functions::pseudo_random_number_generator::PseudoRandomNumberGenerator;
-use crate::encryption::math_functions::traits::increment::Increment;
+use crate::math_core::pseudo_random_number_generator::PseudoRandomNumberGenerator;
+use crate::math_core::traits::increment::Increment;
 use crate::encryption::rsa::keys::{RsaKey, RsaKeyType};
 use crate::shared::errors::RsaError::KeyGenerationError;
 use crate::shared::errors::{ArithmeticError, RsaError};

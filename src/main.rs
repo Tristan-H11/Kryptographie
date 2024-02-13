@@ -1,5 +1,6 @@
 mod api;
 mod encryption;
+mod math_core;
 mod shared;
 
 use crate::api::basic::config_app;

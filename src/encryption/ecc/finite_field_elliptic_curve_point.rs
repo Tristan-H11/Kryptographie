@@ -5,9 +5,9 @@ use bigdecimal::num_traits::Euclid;
 use bigdecimal::Zero;
 
 use crate::encryption::ecc::finite_field_elliptic_curve::FiniteFieldEllipticCurve;
-use crate::encryption::math_functions::number_theory::number_theory_service::{NumberTheoryService, NumberTheoryServiceTrait};
-use crate::encryption::math_functions::number_theory::number_theory_service::NumberTheoryServiceSpeed::Fast;
-use crate::encryption::math_functions::traits::parity::Parity;
+use crate::math_core::number_theory::number_theory_service::{NumberTheoryService, NumberTheoryServiceTrait};
+use crate::math_core::number_theory::number_theory_service::NumberTheoryServiceSpeed::Fast;
+use crate::math_core::traits::parity::Parity;
 
 ///
 /// Repräsentiert einen Punkt auf einer elliptischen Kurve.

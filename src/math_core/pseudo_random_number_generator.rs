@@ -1,13 +1,13 @@
-use crate::encryption::math_functions::number_theory::number_theory_service::{
+use crate::math_core::number_theory::number_theory_service::{
     NumberTheoryService, NumberTheoryServiceTrait,
 };
-use crate::encryption::math_functions::traits::divisible::Divisible;
+use crate::math_core::traits::divisible::Divisible;
 use atomic_counter::{AtomicCounter, RelaxedCounter};
 use bigdecimal::num_bigint::{BigInt, ToBigInt};
 use bigdecimal::{BigDecimal, One};
 use log::{debug, trace};
 
-use crate::encryption::math_functions::traits::increment::Increment;
+use crate::math_core::traits::increment::Increment;
 
 ///
 /// Iterator für eine deterministische Zufallszahlfolge.
@@ -221,11 +221,11 @@ impl PseudoRandomNumberGenerator {
 mod tests {
     use atomic_counter::RelaxedCounter;
     use bigdecimal::num_bigint::BigInt;
-    use crate::encryption::math_functions::number_theory::number_theory_service::NumberTheoryService;
-    use crate::encryption::math_functions::number_theory::number_theory_service::NumberTheoryServiceSpeed::Fast;
+    use crate::math_core::number_theory::number_theory_service::NumberTheoryService;
+    use crate::math_core::number_theory::number_theory_service::NumberTheoryServiceSpeed::Fast;
 
-    use crate::encryption::math_functions::pseudo_random_number_generator::PseudoRandomNumberGenerator;
-    use crate::encryption::math_functions::traits::divisible::Divisible;
+    use crate::math_core::pseudo_random_number_generator::PseudoRandomNumberGenerator;
+    use crate::math_core::traits::divisible::Divisible;
 
     #[test]
     fn test_happy_flow() {

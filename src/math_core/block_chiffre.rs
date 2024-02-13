@@ -1,4 +1,4 @@
-use crate::encryption::math_functions::traits::logarithm::Logarithm;
+use crate::math_core::traits::logarithm::Logarithm;
 use bigdecimal::num_bigint::BigInt;
 use bigdecimal::{One, ToPrimitive, Zero};
 use log::{debug, trace};
@@ -260,7 +260,7 @@ fn big_int_to_u32(value: &BigInt) -> u32 {
 
 #[cfg(test)]
 mod tests {
-    use crate::encryption::math_functions::block_chiffre::{
+    use crate::math_core::block_chiffre::{
         big_int_to_u32, create_string_from_blocks_decrypt, create_string_from_blocks_encrypt,
         encode_string_to_blocks, split_into_blocks, string_to_int_vec, sums_vec_to_string_vec,
         to_sum_vec, u32_to_c,

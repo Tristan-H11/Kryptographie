@@ -3,10 +3,10 @@ use std::collections::BTreeMap;
 use bigdecimal::num_bigint::BigInt;
 use bigdecimal::{One, Zero};
 
-use crate::encryption::math_functions::number_theory::number_theory_service::{
+use crate::math_core::number_theory::number_theory_service::{
     NumberTheoryService, NumberTheoryServiceTrait,
 };
-use crate::encryption::math_functions::traits::increment::Increment;
+use crate::math_core::traits::increment::Increment;
 use crate::shared::errors::ArithmeticError;
 
 #[derive(Clone, Copy)]
@@ -99,7 +99,7 @@ impl Shanks {
 
 #[cfg(test)]
 mod tests {
-    use crate::encryption::math_functions::number_theory::number_theory_service::NumberTheoryServiceSpeed::{Fast, Slow};
+    use crate::math_core::number_theory::number_theory_service::NumberTheoryServiceSpeed::{Fast, Slow};
 
     use super::*;
 

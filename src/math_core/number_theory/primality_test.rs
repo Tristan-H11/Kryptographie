@@ -2,12 +2,12 @@ use atomic_counter::RelaxedCounter;
 use num::{BigInt, One, Zero};
 use rayon::prelude::{IntoParallelIterator, ParallelIterator};
 
-use crate::encryption::math_functions::number_theory::number_theory_service::NumberTheoryService;
-use crate::encryption::math_functions::number_theory::number_theory_service::NumberTheoryServiceTrait;
-use crate::encryption::math_functions::pseudo_random_number_generator::PseudoRandomNumberGenerator;
-use crate::encryption::math_functions::traits::divisible::Divisible;
-use crate::encryption::math_functions::traits::increment::Increment;
-use crate::encryption::math_functions::traits::parity::Parity;
+use crate::math_core::number_theory::number_theory_service::NumberTheoryService;
+use crate::math_core::number_theory::number_theory_service::NumberTheoryServiceTrait;
+use crate::math_core::pseudo_random_number_generator::PseudoRandomNumberGenerator;
+use crate::math_core::traits::divisible::Divisible;
+use crate::math_core::traits::increment::Increment;
+use crate::math_core::traits::parity::Parity;
 
 /// Diese Struktur stellt Methoden zur Verfügung, um die Primzahleigenschaft eines
 /// Integers zu testen.

@@ -1,9 +1,9 @@
-use crate::encryption::math_functions::number_theory::extended_euclid_result::ExtendedEuclidResult;
+use crate::math_core::number_theory::extended_euclid_result::ExtendedEuclidResult;
 use num::BigInt;
 
-use crate::encryption::math_functions::number_theory::fast_number_theory_service::FastNumberTheoryService;
-use crate::encryption::math_functions::number_theory::slow_number_theory_service::SlowNumberTheoryService;
-use crate::encryption::math_functions::pseudo_random_number_generator::PseudoRandomNumberGenerator;
+use crate::math_core::number_theory::fast_number_theory_service::FastNumberTheoryService;
+use crate::math_core::number_theory::slow_number_theory_service::SlowNumberTheoryService;
+use crate::math_core::pseudo_random_number_generator::PseudoRandomNumberGenerator;
 use crate::shared::errors::ArithmeticError;
 
 /// Gibt an, ob die schnelle oder die langsame Implementierung des `NumberTheoryService` verwendet werden soll.
@@ -175,7 +175,7 @@ pub trait NumberTheoryServiceTrait {
 mod tests {
     use std::str::FromStr;
 
-    use crate::encryption::math_functions::number_theory::number_theory_service::NumberTheoryServiceSpeed::{Fast, Slow};
+    use crate::math_core::number_theory::number_theory_service::NumberTheoryServiceSpeed::{Fast, Slow};
 
     use super::*;
 
