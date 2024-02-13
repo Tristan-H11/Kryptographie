@@ -4,7 +4,7 @@ use bigdecimal::num_bigint::BigInt;
 use bigdecimal::num_traits::Euclid;
 use bigdecimal::Zero;
 
-use crate::encryption::ecc::finite_field_elliptic_curve_point::FiniteFieldEllipticCurvePoint;
+use crate::math_core::ecc::finite_field_elliptic_curve_point::FiniteFieldEllipticCurvePoint;
 
 ///
 /// Repräsentiert eine elliptische Kurve.
