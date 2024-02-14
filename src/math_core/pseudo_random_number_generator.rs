@@ -219,10 +219,10 @@ impl PseudoRandomNumberGenerator {
 
 #[cfg(test)]
 mod tests {
-    use atomic_counter::RelaxedCounter;
-    use bigdecimal::num_bigint::BigInt;
     use crate::math_core::number_theory::number_theory_service::NumberTheoryService;
     use crate::math_core::number_theory::number_theory_service::NumberTheoryServiceSpeed::Fast;
+    use atomic_counter::RelaxedCounter;
+    use bigdecimal::num_bigint::BigInt;
 
     use crate::math_core::pseudo_random_number_generator::PseudoRandomNumberGenerator;
     use crate::math_core::traits::divisible::Divisible;

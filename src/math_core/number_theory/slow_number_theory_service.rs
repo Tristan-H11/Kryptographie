@@ -3,8 +3,10 @@ use bigdecimal::num_bigint::BigInt;
 use bigdecimal::num_traits::Euclid;
 use bigdecimal::{One, Zero};
 
-use crate::math_core::number_theory::number_theory_service::{NumberTheoryService, NumberTheoryServiceTrait};
 use crate::math_core::number_theory::number_theory_service::NumberTheoryServiceSpeed::Slow;
+use crate::math_core::number_theory::number_theory_service::{
+    NumberTheoryService, NumberTheoryServiceTrait,
+};
 use crate::math_core::number_theory::primality_test::PrimalityTest;
 use crate::math_core::pseudo_random_number_generator::PseudoRandomNumberGenerator;
 use crate::math_core::traits::divisible::Divisible;

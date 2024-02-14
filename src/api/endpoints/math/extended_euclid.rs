@@ -9,8 +9,12 @@ use serde::{Deserialize, Serialize};
 use crate::api::basic::call_checked_with_parsed_big_ints;
 use crate::api::serializable_models::UseFastQuery;
 use crate::math_core::number_theory::extended_euclid_result::ExtendedEuclidResult;
-use crate::math_core::number_theory::number_theory_service::{NumberTheoryService, NumberTheoryServiceTrait};
-use crate::math_core::number_theory::number_theory_service::NumberTheoryServiceSpeed::{Fast, Slow};
+use crate::math_core::number_theory::number_theory_service::NumberTheoryServiceSpeed::{
+    Fast, Slow,
+};
+use crate::math_core::number_theory::number_theory_service::{
+    NumberTheoryService, NumberTheoryServiceTrait,
+};
 
 #[derive(Deserialize)]
 pub struct ExtendedEuclidRequest {

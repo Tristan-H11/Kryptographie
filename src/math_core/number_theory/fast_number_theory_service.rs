@@ -4,8 +4,10 @@ use bigdecimal::num_traits::Euclid;
 use bigdecimal::One;
 use num::Integer;
 
-use crate::math_core::number_theory::number_theory_service::{NumberTheoryService, NumberTheoryServiceTrait};
 use crate::math_core::number_theory::number_theory_service::NumberTheoryServiceSpeed::Fast;
+use crate::math_core::number_theory::number_theory_service::{
+    NumberTheoryService, NumberTheoryServiceTrait,
+};
 use crate::math_core::number_theory::primality_test::PrimalityTest;
 use crate::math_core::pseudo_random_number_generator::PseudoRandomNumberGenerator;
 use crate::shared::errors::ArithmeticError;

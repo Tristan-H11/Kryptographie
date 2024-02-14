@@ -5,8 +5,10 @@ use bigdecimal::num_traits::Euclid;
 use bigdecimal::Zero;
 
 use crate::math_core::ecc::finite_field_elliptic_curve::FiniteFieldEllipticCurve;
-use crate::math_core::number_theory::number_theory_service::{NumberTheoryService, NumberTheoryServiceTrait};
 use crate::math_core::number_theory::number_theory_service::NumberTheoryServiceSpeed::Fast;
+use crate::math_core::number_theory::number_theory_service::{
+    NumberTheoryService, NumberTheoryServiceTrait,
+};
 use crate::math_core::traits::parity::Parity;
 
 ///

@@ -5,7 +5,9 @@ use log::info;
 
 use crate::api::serializable_models::{EncryptDecryptRequest, SingleStringResponse, UseFastQuery};
 use crate::math_core::number_theory::number_theory_service::NumberTheoryService;
-use crate::math_core::number_theory::number_theory_service::NumberTheoryServiceSpeed::{Fast, Slow};
+use crate::math_core::number_theory::number_theory_service::NumberTheoryServiceSpeed::{
+    Fast, Slow,
+};
 
 ///
 /// Verschlüsselt eine Nachricht.

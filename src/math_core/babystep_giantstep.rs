@@ -99,7 +99,9 @@ impl Shanks {
 
 #[cfg(test)]
 mod tests {
-    use crate::math_core::number_theory::number_theory_service::NumberTheoryServiceSpeed::{Fast, Slow};
+    use crate::math_core::number_theory::number_theory_service::NumberTheoryServiceSpeed::{
+        Fast, Slow,
+    };
 
     use super::*;
 
