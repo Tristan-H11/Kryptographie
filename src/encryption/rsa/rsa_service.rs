@@ -1,6 +1,7 @@
 use bigdecimal::num_bigint::{BigInt, Sign};
 use log::{debug, info};
 use sha2::{Digest, Sha256};
+use crate::encryption::asymmetric_key_type::AsymmetricKeyType;
 
 use crate::math_core::block_chiffre::{
     create_string_from_blocks_decrypt, create_string_from_blocks_encrypt, encode_string_to_blocks,
@@ -9,7 +10,7 @@ use crate::math_core::number_theory::number_theory_service::{
     NumberTheoryService, NumberTheoryServiceTrait,
 };
 use crate::math_core::traits::logarithm::Logarithm;
-use crate::encryption::rsa::keys::{RsaKey, RsaKeyType};
+use crate::encryption::rsa::keys::RsaKey;
 
 pub struct RsaService {
     number_theory_service: NumberTheoryService,
@@ -98,7 +99,7 @@ impl RsaService {
     /// # Rückgabe
     /// * `String` - Die Signatur.
     pub(crate) fn sign(&self, message: &str, key: &RsaKey, g_base: u32) -> String {
-        if key.key_type() != RsaKeyType::Private {
+        if key.key_type() != AsymmetricKeyType::Private {
             panic!("Der Schlüssel muss privat sein, um eine Nachricht zu signieren!");
         }
         info!("Signieren der Nachricht {}", message);
@@ -120,7 +121,7 @@ impl RsaService {
     /// # Rückgabe
     /// * `bool` - Gibt an, ob die Verifizierung erfolgreich war.
     pub(crate) fn verify(&self, signature: &str, message: &str, key: &RsaKey, g_base: u32) -> bool {
-        if key.key_type() != RsaKeyType::Public {
+        if key.key_type() != AsymmetricKeyType::Public {
             panic!("Der Schlüssel muss öffentlich sein, um eine Nachricht zu verifizieren!");
         }
         info!(

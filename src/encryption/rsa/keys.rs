@@ -1,11 +1,6 @@
 use bigdecimal::num_bigint::BigInt;
+use crate::encryption::asymmetric_key_type::AsymmetricKeyType;
 
-/// Typ eines RSA-Schlüssels.
-#[derive(PartialEq)]
-pub enum RsaKeyType {
-    Public,
-    Private,
-}
 
 /// Ein RSA-Schlüssel.
 #[derive(Clone, Debug)]
@@ -14,15 +9,27 @@ pub enum RsaKey {
     PrivateKey(PrivateKey),
 }
 
+#[derive(Clone, Debug)]
+pub struct PublicKey {
+    pub e: BigInt,
+    pub n: BigInt,
+}
+
+#[derive(Clone, Debug)]
+pub struct PrivateKey {
+    pub d: BigInt,
+    pub n: BigInt,
+}
+
 impl RsaKey {
     /// Erzeugt einen neuen RSA-Schlüssel.
-    pub fn new(key_type: RsaKeyType, exponent: BigInt, modulus: BigInt) -> Self {
+    pub fn new(key_type: AsymmetricKeyType, exponent: BigInt, modulus: BigInt) -> Self {
         match key_type {
-            RsaKeyType::Public => RsaKey::PublicKey(PublicKey {
+            AsymmetricKeyType::Public => RsaKey::PublicKey(PublicKey {
                 e: exponent,
                 n: modulus,
             }),
-            RsaKeyType::Private => RsaKey::PrivateKey(PrivateKey {
+            AsymmetricKeyType::Private => RsaKey::PrivateKey(PrivateKey {
                 d: exponent,
                 n: modulus,
             }),
@@ -46,22 +53,10 @@ impl RsaKey {
     }
 
     /// Gibt den Typ des Schlüssels zurück.
-    pub fn key_type(&self) -> RsaKeyType {
+    pub fn key_type(&self) -> AsymmetricKeyType {
         match self {
-            RsaKey::PublicKey(_) => RsaKeyType::Public,
-            RsaKey::PrivateKey(_) => RsaKeyType::Private,
+            RsaKey::PublicKey(_) => AsymmetricKeyType::Public,
+            RsaKey::PrivateKey(_) => AsymmetricKeyType::Private,
         }
     }
-}
-
-#[derive(Clone, Debug)]
-pub struct PublicKey {
-    pub e: BigInt,
-    pub n: BigInt,
-}
-
-#[derive(Clone, Debug)]
-pub struct PrivateKey {
-    pub d: BigInt,
-    pub n: BigInt,
 }

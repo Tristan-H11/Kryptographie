@@ -3,13 +3,14 @@ use bigdecimal::num_bigint::BigInt;
 use bigdecimal::One;
 use log::{debug, trace};
 use num::Integer;
+use crate::encryption::asymmetric_key_type::AsymmetricKeyType;
+use crate::encryption::rsa::keys::RsaKey;
 
 use crate::math_core::number_theory::number_theory_service::{
     NumberTheoryService, NumberTheoryServiceTrait,
 };
 use crate::math_core::pseudo_random_number_generator::PseudoRandomNumberGenerator;
 use crate::math_core::traits::increment::Increment;
-use crate::encryption::rsa::keys::{RsaKey, RsaKeyType};
 use crate::shared::errors::RsaError::KeyGenerationError;
 use crate::shared::errors::{ArithmeticError, RsaError};
 
@@ -75,8 +76,8 @@ impl RsaKeygenService {
 
         match d {
             Ok(d) => {
-                let public_key = RsaKey::new(RsaKeyType::Public, e, n.clone());
-                let private_key = RsaKey::new(RsaKeyType::Private, d, n);
+                let public_key = RsaKey::new(AsymmetricKeyType::Public, e, n.clone());
+                let private_key = RsaKey::new(AsymmetricKeyType::Private, d, n);
                 debug!("Schlüsselpaar generiert");
                 Ok((public_key, private_key))
             }

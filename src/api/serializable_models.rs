@@ -1,7 +1,8 @@
-use crate::encryption::rsa::keys::{RsaKey, RsaKeyType};
+use crate::encryption::rsa::keys::RsaKey;
 use bigdecimal::num_bigint::ParseBigIntError;
 use log::debug;
 use serde::{Deserialize, Serialize};
+use crate::encryption::asymmetric_key_type::AsymmetricKeyType;
 
 #[derive(Serialize, Deserialize)]
 pub struct KeyPair {
@@ -23,7 +24,7 @@ impl KeyPair {
     pub(crate) fn to_private_key(&self) -> Result<RsaKey, ParseBigIntError> {
         debug!("Serialisiere KeyPair zu PrivateKey");
         Ok(RsaKey::new(
-            RsaKeyType::Private,
+            AsymmetricKeyType::Private,
             self.d.parse()?,
             self.modulus.parse()?,
         ))
@@ -39,7 +40,7 @@ impl KeyPair {
     pub(crate) fn to_public_key(&self) -> Result<RsaKey, ParseBigIntError> {
         debug!("Serialisiere KeyPair zu PublicKey");
         Ok(RsaKey::new(
-            RsaKeyType::Public,
+            AsymmetricKeyType::Public,
             self.e.parse()?,
             self.modulus.parse()?,
         ))
