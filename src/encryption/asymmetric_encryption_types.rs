@@ -5,44 +5,6 @@ use std::fmt::Debug;
 /// Ein asymmetrisches Verschlüsselungsschema.
 pub trait AsymmetricEncryptionScheme {}
 
-/// Ein Schlüsselgenerator für das asymmetrische Verschlüsselungsschema.
-///
-/// # Typen
-/// * `Public` - Der Typ des öffentlichen Schlüssels.
-/// * `Private` - Der Typ des privaten Schlüssels.
-/// * `Scheme` - Das asymmetrische Verschlüsselungsschema.
-///
-/// # Methoden
-/// * `generate_keypair` - Generiert ein Schlüsselpaar für das asymmetrische Verschlüsselungsschema.
-pub trait KeyGenerator<Public, Private, Scheme>
-where
-    Public: EncryptionKey<Scheme>,
-    Private: DecryptionKey<Scheme>,
-    Scheme: AsymmetricEncryptionScheme,
-{
-    type KeyPair: AsymmetricKeyPair<Public, Private, Scheme>;
-    /// Generiert ein Schlüsselpaar für das asymmetrische Verschlüsselungsschema.
-    ///
-    /// # Argumente
-    /// * `config` - Die Konfiguration für den Schlüsselgenerierungsvorgang.
-    ///
-    /// # Rückgabe
-    /// Ein Tupel aus dem öffentlichen und privaten Schlüssel.
-    fn generate_keypair(config: &impl KeyGenConfig) -> Self::KeyPair;
-}
-
-/// Die Konfiguration für die Schlüsselgenerierung für ein Verschlüsselungsschema.
-pub trait KeyGenConfig: Debug {
-    /// Typischerweise die Größe des Schlüssels oder des Moduls in Bits.
-    fn characteristic(&self) -> u32;
-    /// Die Anzahl der Iterationen für den Miller-Rabin-Test bei der Generierung von Primzahlen.
-    fn miller_rabin_iterations(&self) -> u32;
-    /// Der Seed für die gleichverteilte Zufallszahlerzeugung.
-    fn random_seed(&self) -> u32;
-    /// Der Service für die Zahlentheorie.
-    fn number_theory_service(&self) -> NumberTheoryService;
-}
-
 /// Ein asymmetrischer Schlüssel für das asymmetrische Verschlüsselungsschema.
 pub trait AsymmetricKey<T: AsymmetricEncryptionScheme> {}
 
@@ -82,6 +44,44 @@ where
 {
     fn public(&self) -> Public;
     fn private(&self) -> Private;
+}
+
+/// Ein Schlüsselgenerator für das asymmetrische Verschlüsselungsschema.
+///
+/// # Typen
+/// * `Public` - Der Typ des öffentlichen Schlüssels.
+/// * `Private` - Der Typ des privaten Schlüssels.
+/// * `Scheme` - Das asymmetrische Verschlüsselungsschema.
+///
+/// # Methoden
+/// * `generate_keypair` - Generiert ein Schlüsselpaar für das asymmetrische Verschlüsselungsschema.
+pub trait KeyGenerator<Public, Private, Scheme>
+    where
+        Public: EncryptionKey<Scheme>,
+        Private: DecryptionKey<Scheme>,
+        Scheme: AsymmetricEncryptionScheme,
+{
+    type KeyPair: AsymmetricKeyPair<Public, Private, Scheme>;
+    /// Generiert ein Schlüsselpaar für das asymmetrische Verschlüsselungsschema.
+    ///
+    /// # Argumente
+    /// * `config` - Die Konfiguration für den Schlüsselgenerierungsvorgang.
+    ///
+    /// # Rückgabe
+    /// Ein Tupel aus dem öffentlichen und privaten Schlüssel.
+    fn generate_keypair(config: &impl KeyGenConfig) -> Self::KeyPair;
+}
+
+/// Die Konfiguration für die Schlüsselgenerierung für ein Verschlüsselungsschema.
+pub trait KeyGenConfig: Debug {
+    /// Typischerweise die Größe des Schlüssels oder des Moduls in Bits.
+    fn characteristic(&self) -> u32;
+    /// Die Anzahl der Iterationen für den Miller-Rabin-Test bei der Generierung von Primzahlen.
+    fn miller_rabin_iterations(&self) -> u32;
+    /// Der Seed für die gleichverteilte Zufallszahlerzeugung.
+    fn random_seed(&self) -> u32;
+    /// Der Service für die Zahlentheorie.
+    fn number_theory_service(&self) -> NumberTheoryService;
 }
 
 /// Ein Verschlüsseler für das asymmetrische Verschlüsselungsschema.
