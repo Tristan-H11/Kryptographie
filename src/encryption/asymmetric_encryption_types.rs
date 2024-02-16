@@ -1,12 +1,13 @@
 use crate::math_core::number_theory::number_theory_service::NumberTheoryService;
 use bigdecimal::num_bigint::BigInt;
 use std::fmt::Debug;
+use crate::encryption::encryption_types::{Decryptor, EncryptionScheme, Encryptor, Key};
 
 /// Ein asymmetrisches Verschlüsselungsschema.
-pub trait AsymmetricEncryptionScheme {}
+pub trait AsymmetricEncryptionScheme: EncryptionScheme {}
 
 /// Ein asymmetrischer Schlüssel für das asymmetrische Verschlüsselungsschema.
-pub trait AsymmetricKey<T: AsymmetricEncryptionScheme> {}
+pub trait AsymmetricKey<T: AsymmetricEncryptionScheme>: Key<T> {}
 
 /// Ein öffentlicher Schlüssel für das asymmetrische Verschlüsselungsschema.
 pub trait PublicKey<T: AsymmetricEncryptionScheme>: AsymmetricKey<T> {}
@@ -85,8 +86,7 @@ pub trait KeyGenWithPrimeConfig: Debug {
 }
 
 /// Ein Verschlüsseler für das asymmetrische Verschlüsselungsschema.
-pub trait Encryptor<T: AsymmetricEncryptionScheme>: AsymmetricEncryptionScheme {
-    type Key: AsymmetricEncryptionKey<T>;
+pub trait AsymmetricEncryptor<T: AsymmetricEncryptionScheme>: Encryptor<T> {
     /// Verschlüsselt den gegebenen Klartext mit dem gegebenen Schlüssel.
     ///
     /// # Argumente
@@ -96,12 +96,11 @@ pub trait Encryptor<T: AsymmetricEncryptionScheme>: AsymmetricEncryptionScheme {
     ///
     /// # Rückgabe
     /// Der verschlüsselte Chiffretext.
-    fn encrypt(key: &Self::Key, plaintext: &BigInt, service: NumberTheoryService) -> BigInt;
+    fn encrypt(key: &Self::Key, plaintext: &Self::Input, service: NumberTheoryService) -> Self::Output;
 }
 
 /// Ein Entschlüsseler für das asymmetrische Verschlüsselungsschema.
-pub trait Decryptor<T: AsymmetricEncryptionScheme>: AsymmetricEncryptionScheme {
-    type Key: AsymmetricDecryptionKey<T>;
+pub trait AsymmetricDecryptor<T: AsymmetricEncryptionScheme>: Decryptor<T> {
     /// Entschlüsselt den gegebenen Chiffretext mit dem gegebenen Schlüssel.
     ///
     /// # Argumente
@@ -111,11 +110,13 @@ pub trait Decryptor<T: AsymmetricEncryptionScheme>: AsymmetricEncryptionScheme {
     ///
     /// # Rückgabe
     /// Der entschlüsselte Klartext.
-    fn decrypt(key: &Self::Key, ciphertext: &BigInt, service: NumberTheoryService) -> BigInt;
+    fn decrypt(key: &Self::Key, ciphertext: &Self::Input, service: NumberTheoryService) -> Self::Output;
 }
 
 /// Ein Signierer für das asymmetrische Verschlüsselungsschema.
-pub trait Signer<T: AsymmetricEncryptionScheme>: AsymmetricEncryptionScheme {
+pub trait Signer<T: AsymmetricEncryptionScheme> {
+    type Input;
+    type Output;
     type Key: SignatureKey<T>;
     /// Signiert die gegebene Nachricht mit dem gegebenen Schlüssel.
     ///
@@ -126,11 +127,13 @@ pub trait Signer<T: AsymmetricEncryptionScheme>: AsymmetricEncryptionScheme {
     ///
     /// # Rückgabe
     /// Die Signatur der Nachricht.
-    fn sign(key: &Self::Key, message: &BigInt, service: NumberTheoryService) -> BigInt;
+    fn sign(key: &Self::Key, message: &Self::Input, service: NumberTheoryService) -> Self::Output;
 }
 
 /// Ein Verifizierer für das asymmetrische Verschlüsselungsschema.
-pub trait Verifier<T: AsymmetricEncryptionScheme>: AsymmetricEncryptionScheme {
+pub trait Verifier<T: AsymmetricEncryptionScheme> {
+    type Input;
+    type Output;
     type Key: VerificationKey<T>;
     /// Überprüft die gegebene Signatur für die gegebene Nachricht mit dem gegebenen Schlüssel.
     ///
@@ -144,8 +147,8 @@ pub trait Verifier<T: AsymmetricEncryptionScheme>: AsymmetricEncryptionScheme {
     /// `true`, wenn die Signatur korrekt ist, ansonsten `false`.
     fn verify(
         key: &Self::Key,
-        signature: &BigInt,
-        message: &BigInt,
+        signature: &Self::Input,
+        message: &Self::Input,
         service: NumberTheoryService,
-    ) -> bool;
+    ) -> Self::Output;
 }

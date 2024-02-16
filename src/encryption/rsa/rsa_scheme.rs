@@ -1,5 +1,6 @@
 use crate::encryption::asymmetric_encryption_types::{
-    AsymmetricEncryptionScheme, Decryptor, Encryptor, KeyGenConfig, KeyGenerator, Signer, Verifier,
+    AsymmetricEncryptionScheme, AsymmetricDecryptor, AsymmetricEncryptor, KeyGenWithPrimeConfig, KeyGenerator, Signer,
+    Verifier,
 };
 use crate::encryption::rsa::keys::{RsaKeyPair, RsaPrivateKey, RsaPublicKey};
 use crate::math_core::number_theory::number_theory_service::{
@@ -12,8 +13,11 @@ use atomic_counter::RelaxedCounter;
 use bigdecimal::num_bigint::BigInt;
 use bigdecimal::One;
 use log::{debug, trace};
+use crate::encryption::encryption_types::{Decryptor, EncryptionScheme, Encryptor};
 
 pub struct RsaScheme {}
+
+impl EncryptionScheme for RsaScheme {}
 
 impl AsymmetricEncryptionScheme for RsaScheme {}
 
@@ -25,7 +29,7 @@ pub struct RsaKeyGenConfig {
     pub number_theory_service: NumberTheoryService,
 }
 
-impl KeyGenConfig for RsaKeyGenConfig {
+impl KeyGenWithPrimeConfig for RsaKeyGenConfig {
     fn characteristic(&self) -> u32 {
         self.key_size
     }
@@ -46,7 +50,7 @@ impl KeyGenConfig for RsaKeyGenConfig {
 impl KeyGenerator<RsaPublicKey, RsaPrivateKey, RsaScheme> for RsaScheme {
     type KeyPair = RsaKeyPair;
 
-    fn generate_keypair(config: &impl KeyGenConfig) -> Self::KeyPair {
+    fn generate_keypair(config: &impl KeyGenWithPrimeConfig) -> Self::KeyPair {
         debug!(
             "Generiere Schlüsselpaar mit key_size {} und Miller-Rabin-Iterations {}",
             config.characteristic(),
@@ -73,38 +77,50 @@ impl KeyGenerator<RsaPublicKey, RsaPrivateKey, RsaScheme> for RsaScheme {
 }
 
 impl Encryptor<RsaScheme> for RsaScheme {
+    type Input = BigInt;
+    type Output = BigInt;
     type Key = RsaPublicKey;
+}
 
-    fn encrypt(key: &Self::Key, plaintext: &BigInt, service: NumberTheoryService) -> BigInt {
+impl AsymmetricEncryptor<RsaScheme> for RsaScheme {
+    fn encrypt(key: &Self::Key, plaintext: &Self::Input, service: NumberTheoryService) -> Self::Output {
         service.fast_exponentiation(plaintext, &key.e, &key.n)
     }
 }
 
 impl Decryptor<RsaScheme> for RsaScheme {
+    type Input = BigInt;
+    type Output = BigInt;
     type Key = RsaPrivateKey;
+}
 
+impl AsymmetricDecryptor<RsaScheme> for RsaScheme {
     fn decrypt(key: &Self::Key, ciphertext: &BigInt, service: NumberTheoryService) -> BigInt {
         service.fast_exponentiation(ciphertext, &key.d, &key.n)
     }
 }
 
 impl Signer<RsaScheme> for RsaScheme {
+    type Input = BigInt;
+    type Output = BigInt;
     type Key = RsaPrivateKey;
 
-    fn sign(key: &Self::Key, message: &BigInt, service: NumberTheoryService) -> BigInt {
+    fn sign(key: &Self::Key, message: &Self::Input, service: NumberTheoryService) -> Self::Output {
         service.fast_exponentiation(message, &key.d, &key.n)
     }
 }
 
 impl Verifier<RsaScheme> for RsaScheme {
+    type Input = BigInt;
+    type Output = bool;
     type Key = RsaPublicKey;
 
     fn verify(
         key: &Self::Key,
-        message: &BigInt,
-        signature: &BigInt,
+        message: &Self::Input,
+        signature: &Self::Input,
         service: NumberTheoryService,
-    ) -> bool {
+    ) -> Self::Output {
         let decrypted_signature = service.fast_exponentiation(signature, &key.e, &key.n);
         decrypted_signature == *message
     }

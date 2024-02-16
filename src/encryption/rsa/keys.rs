@@ -1,16 +1,19 @@
 use crate::encryption::asymmetric_encryption_types::{
-    AsymmetricKey, AsymmetricKeyPair, AsymmetricDecryptionKey, AsymmetricEncryptionKey, PrivateKey, PublicKey,
-    SignatureKey, VerificationKey,
+    AsymmetricDecryptionKey, AsymmetricEncryptionKey, AsymmetricKey, AsymmetricKeyPair, PrivateKey,
+    PublicKey, SignatureKey, VerificationKey,
 };
 use crate::encryption::rsa::rsa_scheme::RsaScheme;
 
 use bigdecimal::num_bigint::BigInt;
+use crate::encryption::encryption_types::Key;
 
 #[derive(Clone, Debug)]
 pub struct RsaPublicKey {
     pub e: BigInt,
     pub n: BigInt,
 }
+
+impl Key<RsaScheme> for RsaPublicKey {}
 
 impl AsymmetricKey<RsaScheme> for RsaPublicKey {}
 
@@ -25,6 +28,8 @@ pub struct RsaPrivateKey {
     pub d: BigInt,
     pub n: BigInt,
 }
+
+impl Key<RsaScheme> for RsaPrivateKey {}
 
 impl AsymmetricKey<RsaScheme> for RsaPrivateKey {}
 

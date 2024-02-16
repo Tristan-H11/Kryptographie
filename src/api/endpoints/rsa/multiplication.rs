@@ -8,7 +8,7 @@ use serde::{Deserialize, Serialize};
 use std::str::FromStr;
 
 use crate::api::serializable_models::{KeyPair, SingleStringResponse, UseFastQuery};
-use crate::encryption::asymmetric_encryption_types::{Decryptor, Encryptor};
+use crate::encryption::asymmetric_encryption_types::{AsymmetricDecryptor, AsymmetricEncryptor};
 use crate::encryption::rsa::rsa_scheme::RsaScheme;
 
 use crate::math_core::number_theory::number_theory_service::NumberTheoryService;
