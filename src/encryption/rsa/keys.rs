@@ -1,61 +1,53 @@
-use crate::encryption::asymmetric_key_type::AsymmetricKeyType;
+use crate::encryption::asymmetric_encryption_types::{
+    AsymmetricEncryptionScheme, AsymmetricKey, AsymmetricKeyPair, DecryptionKey, EncryptionKey,
+    PrivateKey, PublicKey, SignatureKey, VerificationKey,
+};
+use crate::encryption::rsa::rsa_scheme::RsaScheme;
+use crate::math_core::number_theory::number_theory_service::{
+    NumberTheoryService, NumberTheoryServiceTrait,
+};
 use bigdecimal::num_bigint::BigInt;
 
-/// Ein RSA-Schlüssel.
 #[derive(Clone, Debug)]
-pub enum RsaKey {
-    PublicKey(PublicKey),
-    PrivateKey(PrivateKey),
-}
-
-#[derive(Clone, Debug)]
-pub struct PublicKey {
+pub struct RsaPublicKey {
     pub e: BigInt,
     pub n: BigInt,
 }
 
+impl AsymmetricKey<RsaScheme> for RsaPublicKey {}
+
+impl PublicKey<RsaScheme> for RsaPublicKey {}
+
+impl EncryptionKey<RsaScheme> for RsaPublicKey {}
+
+impl VerificationKey<RsaScheme> for RsaPublicKey {}
+
 #[derive(Clone, Debug)]
-pub struct PrivateKey {
+pub struct RsaPrivateKey {
     pub d: BigInt,
     pub n: BigInt,
 }
 
-impl RsaKey {
-    /// Erzeugt einen neuen RSA-Schlüssel.
-    pub fn new(key_type: AsymmetricKeyType, exponent: BigInt, modulus: BigInt) -> Self {
-        match key_type {
-            AsymmetricKeyType::Public => RsaKey::PublicKey(PublicKey {
-                e: exponent,
-                n: modulus,
-            }),
-            AsymmetricKeyType::Private => RsaKey::PrivateKey(PrivateKey {
-                d: exponent,
-                n: modulus,
-            }),
-        }
+impl AsymmetricKey<RsaScheme> for RsaPrivateKey {}
+
+impl PrivateKey<RsaScheme> for RsaPrivateKey {}
+
+impl DecryptionKey<RsaScheme> for RsaPrivateKey {}
+
+impl SignatureKey<RsaScheme> for RsaPrivateKey {}
+
+#[derive(Clone, Debug)]
+pub struct RsaKeyPair {
+    pub public_key: RsaPublicKey,
+    pub private_key: RsaPrivateKey,
+}
+
+impl AsymmetricKeyPair<RsaPublicKey, RsaPrivateKey, RsaScheme> for RsaKeyPair {
+    fn public(&self) -> RsaPublicKey {
+        self.public_key.clone()
     }
 
-    /// Gibt den Exponenten des Schlüssels zurück.
-    pub fn exponent(&self) -> &BigInt {
-        match self {
-            RsaKey::PublicKey(key) => &key.e,
-            RsaKey::PrivateKey(key) => &key.d,
-        }
-    }
-
-    /// Gibt das Modulus des Schlüssels zurück.
-    pub fn modulus(&self) -> &BigInt {
-        match self {
-            RsaKey::PublicKey(key) => &key.n,
-            RsaKey::PrivateKey(key) => &key.n,
-        }
-    }
-
-    /// Gibt den Typ des Schlüssels zurück.
-    pub fn key_type(&self) -> AsymmetricKeyType {
-        match self {
-            RsaKey::PublicKey(_) => AsymmetricKeyType::Public,
-            RsaKey::PrivateKey(_) => AsymmetricKeyType::Private,
-        }
+    fn private(&self) -> RsaPrivateKey {
+        self.private_key.clone()
     }
 }
