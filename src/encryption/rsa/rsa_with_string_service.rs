@@ -1,23 +1,22 @@
-use bigdecimal::num_bigint::{BigInt, Sign};
-use log::{debug, info};
-use sha2::{Digest, Sha256};
 use crate::encryption::asymmetric_encryption_types::{Decryptor, Encryptor, Signer};
 use crate::encryption::rsa::keys::{RsaPrivateKey, RsaPublicKey};
 use crate::encryption::rsa::rsa_scheme::RsaScheme;
+use bigdecimal::num_bigint::{BigInt, Sign};
+use log::{debug, info};
+use sha2::{Digest, Sha256};
 
 use crate::math_core::block_chiffre::{
     create_string_from_blocks_decrypt, create_string_from_blocks_encrypt, encode_string_to_blocks,
 };
-use crate::math_core::number_theory::number_theory_service::{
-    NumberTheoryService, NumberTheoryServiceTrait,
-};
+use crate::math_core::number_theory::number_theory_service::NumberTheoryService;
 use crate::math_core::traits::logarithm::Logarithm;
 
 pub struct RsaWithStringService {
     number_theory_service: NumberTheoryService,
 }
 
-impl RsaWithStringService { // TODO: Interface extrahieren, wenn klar ist, wie ElGamal mit dem blockChiffre funktioniert.
+impl RsaWithStringService {
+    // TODO: Interface extrahieren, wenn klar ist, wie ElGamal mit dem blockChiffre funktioniert.
     pub fn new(number_theory_service: NumberTheoryService) -> RsaWithStringService {
         RsaWithStringService {
             number_theory_service,
@@ -40,8 +39,10 @@ impl RsaWithStringService { // TODO: Interface extrahieren, wenn klar ist, wie E
         info!("Verschlüsseln mit blockgröße {}", block_size);
 
         let chunks = encode_string_to_blocks(message, block_size, g_base);
-        let encrypted_chunks = chunks.iter().map(|chunk| RsaScheme::encrypt(key, chunk, self.number_theory_service)).collect();
-
+        let encrypted_chunks = chunks
+            .iter()
+            .map(|chunk| RsaScheme::encrypt(key, chunk, self.number_theory_service))
+            .collect();
 
         // Die Größe der verschlüsselten Blöcke ist immer um 1 größer als die Klartextgröße.
         create_string_from_blocks_encrypt(encrypted_chunks, block_size + 1, g_base)
@@ -63,7 +64,10 @@ impl RsaWithStringService { // TODO: Interface extrahieren, wenn klar ist, wie E
         info!("Entschlüsseln mit blockgröße {}", block_size);
 
         let chunks = encode_string_to_blocks(message, block_size, g_base);
-        let decrypted_chunks = chunks.iter().map(|chunk| RsaScheme::decrypt(key, chunk, self.number_theory_service)).collect();
+        let decrypted_chunks = chunks
+            .iter()
+            .map(|chunk| RsaScheme::decrypt(key, chunk, self.number_theory_service))
+            .collect();
 
         create_string_from_blocks_decrypt(decrypted_chunks, g_base)
     }
@@ -83,7 +87,10 @@ impl RsaWithStringService { // TODO: Interface extrahieren, wenn klar ist, wie E
 
         let block_size = key.n.log(&g_base.into());
         let chunks = encode_string_to_blocks(&hashed_message, block_size, g_base);
-        let encrypted_chunks = chunks.iter().map(|chunk| RsaScheme::sign(key, chunk, self.number_theory_service)).collect();
+        let encrypted_chunks = chunks
+            .iter()
+            .map(|chunk| RsaScheme::sign(key, chunk, self.number_theory_service))
+            .collect();
 
         // Die Größe der verschlüsselten Blöcke ist immer um 1 größer als die Klartextgröße.
         create_string_from_blocks_encrypt(encrypted_chunks, block_size + 1, g_base)
@@ -99,7 +106,13 @@ impl RsaWithStringService { // TODO: Interface extrahieren, wenn klar ist, wie E
     ///
     /// # Rückgabe
     /// * `bool` - Gibt an, ob die Verifizierung erfolgreich war.
-    pub(crate) fn verify(&self, signature: &str, message: &str, key: &RsaPublicKey, g_base: u32) -> bool {
+    pub(crate) fn verify(
+        &self,
+        signature: &str,
+        message: &str,
+        key: &RsaPublicKey,
+        g_base: u32,
+    ) -> bool {
         info!(
             "Verifizieren der Nachricht {} mit Signatur {}",
             message, signature
@@ -113,9 +126,12 @@ impl RsaWithStringService { // TODO: Interface extrahieren, wenn klar ist, wie E
         // Ja, da steht encrypt. Das ist aber korrekt, weil dahinter auch nur eine Expnentiation steckt und die Typen aktuell noch nicht stimmen.
         // Das umstellen auf Verify komm mit dem Refactoring dieses Services hier.
         // Dafür ist es nötig, dass Signatur und Nachricht beide als BigInt vorliegen und nicht als String.
-        let decrypted_chunks = chunks.iter().map(|chunk| RsaScheme::encrypt(key, chunk, self.number_theory_service)).collect();
+        let decrypted_chunks = chunks
+            .iter()
+            .map(|chunk| RsaScheme::encrypt(key, chunk, self.number_theory_service))
+            .collect();
 
-        let verification =create_string_from_blocks_decrypt(decrypted_chunks, g_base);
+        let verification = create_string_from_blocks_decrypt(decrypted_chunks, g_base);
 
         verification == message_big_int
     }

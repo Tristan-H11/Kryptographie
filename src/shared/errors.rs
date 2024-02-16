@@ -39,6 +39,7 @@ impl std::error::Error for ArithmeticError {}
 #[derive(Debug, Clone)]
 pub enum RsaError {
     /// Wird geworfen, wenn die Schlüsselerzeugung fehlschlägt.
+    #[allow(dead_code)] // TODO: Wieder einbauen
     KeyGenerationError,
 }
 

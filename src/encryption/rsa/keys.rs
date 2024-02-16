@@ -1,11 +1,9 @@
 use crate::encryption::asymmetric_encryption_types::{
-    AsymmetricEncryptionScheme, AsymmetricKey, AsymmetricKeyPair, DecryptionKey, EncryptionKey,
-    PrivateKey, PublicKey, SignatureKey, VerificationKey,
+    AsymmetricKey, AsymmetricKeyPair, DecryptionKey, EncryptionKey, PrivateKey, PublicKey,
+    SignatureKey, VerificationKey,
 };
 use crate::encryption::rsa::rsa_scheme::RsaScheme;
-use crate::math_core::number_theory::number_theory_service::{
-    NumberTheoryService, NumberTheoryServiceTrait,
-};
+
 use bigdecimal::num_bigint::BigInt;
 
 #[derive(Clone, Debug)]

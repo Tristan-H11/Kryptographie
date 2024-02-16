@@ -10,7 +10,7 @@ use std::str::FromStr;
 use crate::api::serializable_models::{KeyPair, SingleStringResponse, UseFastQuery};
 use crate::encryption::asymmetric_encryption_types::{Decryptor, Encryptor};
 use crate::encryption::rsa::rsa_scheme::RsaScheme;
-use crate::encryption::rsa::rsa_with_string_service::RsaWithStringService;
+
 use crate::math_core::number_theory::number_theory_service::NumberTheoryService;
 use crate::math_core::number_theory::number_theory_service::NumberTheoryServiceSpeed::{
     Fast, Slow,
@@ -55,8 +55,10 @@ pub(crate) async fn multiplication(
         let public_key = req_body.key_pair.to_public_key()?;
         let private_key = req_body.key_pair.to_private_key()?;
 
-        let encrypted_factor_one = RsaScheme::encrypt(&public_key, &factor_one, number_theory_service);
-        let encrypted_factor_two = RsaScheme::encrypt(&public_key, &factor_two, number_theory_service);
+        let encrypted_factor_one =
+            RsaScheme::encrypt(&public_key, &factor_one, number_theory_service);
+        let encrypted_factor_two =
+            RsaScheme::encrypt(&public_key, &factor_two, number_theory_service);
 
         let encrypted_result = &encrypted_factor_one * &encrypted_factor_two;
 

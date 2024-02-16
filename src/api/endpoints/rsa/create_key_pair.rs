@@ -3,7 +3,7 @@ use actix_web::{HttpResponse, Responder};
 use log::info;
 use serde::Deserialize;
 
-use crate::api::serializable_models::{KeyPair, SingleStringResponse, UseFastQuery};
+use crate::api::serializable_models::{KeyPair, UseFastQuery};
 use crate::encryption::asymmetric_encryption_types::{AsymmetricKeyPair, KeyGenerator};
 use crate::encryption::rsa::rsa_scheme::{RsaKeyGenConfig, RsaScheme};
 use crate::math_core::block_chiffre::determine_block_size;
@@ -52,22 +52,15 @@ pub(crate) async fn create_key_pair(
 
     let key_pair = RsaScheme::generate_keypair(&config);
 
-    let public_key= key_pair.public();
+    let public_key = key_pair.public();
     let private_key = key_pair.private();
 
-    let block_size_pub = determine_block_size(
-        &public_key.n,
-        &req_body.number_system_base.into(),
-        true,
-    )
-    .to_string();
+    let block_size_pub =
+        determine_block_size(&public_key.n, &req_body.number_system_base.into(), true).to_string();
 
-    let block_size_priv = determine_block_size(
-        &private_key.n,
-        &req_body.number_system_base.into(),
-        false,
-    )
-    .to_string();
+    let block_size_priv =
+        determine_block_size(&private_key.n, &req_body.number_system_base.into(), false)
+            .to_string();
 
     let key_pair_response = KeyPair {
         modulus: public_key.n.to_str_radix(10),

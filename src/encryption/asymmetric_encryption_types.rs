@@ -75,10 +75,10 @@ pub trait VerificationKey<T: AsymmetricEncryptionScheme>: PublicKey<T> {}
 /// * `public` - Gibt den öffentlichen Schlüssel zurück.
 /// * `private` - Gibt den privaten Schlüssel zurück.
 pub trait AsymmetricKeyPair<Public, Private, Scheme>
-    where
-        Public: EncryptionKey<Scheme>,
-        Private: DecryptionKey<Scheme>,
-        Scheme: AsymmetricEncryptionScheme,
+where
+    Public: EncryptionKey<Scheme>,
+    Private: DecryptionKey<Scheme>,
+    Scheme: AsymmetricEncryptionScheme,
 {
     fn public(&self) -> Public;
     fn private(&self) -> Private;

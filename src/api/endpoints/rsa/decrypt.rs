@@ -38,7 +38,9 @@ pub(crate) async fn decrypt(
         };
 
         let rsa_service =
-            crate::encryption::rsa::rsa_with_string_service::RsaWithStringService::new(number_theory_service);
+            crate::encryption::rsa::rsa_with_string_service::RsaWithStringService::new(
+                number_theory_service,
+            );
 
         let plaintext = rsa_service.decrypt(&ciphertext, number_system_base, &private_key);
         let response = SingleStringResponse { message: plaintext };
