@@ -8,6 +8,8 @@ use serde::{Deserialize, Serialize};
 use std::str::FromStr;
 
 use crate::api::serializable_models::{KeyPair, SingleStringResponse, UseFastQuery};
+use crate::encryption::asymmetric_encryption_types::{Decryptor, Encryptor};
+use crate::encryption::rsa::rsa_scheme::RsaScheme;
 use crate::encryption::rsa::rsa_with_string_service::RsaWithStringService;
 use crate::math_core::number_theory::number_theory_service::NumberTheoryService;
 use crate::math_core::number_theory::number_theory_service::NumberTheoryServiceSpeed::{
@@ -46,8 +48,6 @@ pub(crate) async fn multiplication(
         false => NumberTheoryService::new(Slow),
     };
 
-    let rsa_service = RsaWithStringService::new(number_theory_service);
-
     call_checked_with_parsed_big_ints(|| {
         let factor_one = BigInt::from_str(&req_body.factor_one)?;
         let factor_two = BigInt::from_str(&req_body.factor_two)?;
@@ -55,12 +55,12 @@ pub(crate) async fn multiplication(
         let public_key = req_body.key_pair.to_public_key()?;
         let private_key = req_body.key_pair.to_private_key()?;
 
-        let encrypted_factor_one = rsa_service.encrypt_decrypt_number(&factor_one, &public_key);
-        let encrypted_factor_two = rsa_service.encrypt_decrypt_number(&factor_two, &public_key);
+        let encrypted_factor_one = RsaScheme::encrypt(&public_key, &factor_one, number_theory_service);
+        let encrypted_factor_two = RsaScheme::encrypt(&public_key, &factor_two, number_theory_service);
 
         let encrypted_result = &encrypted_factor_one * &encrypted_factor_two;
 
-        let result = rsa_service.encrypt_decrypt_number(&encrypted_result, &private_key);
+        let result = RsaScheme::decrypt(&private_key, &encrypted_result, number_theory_service);
 
         let response = MultiplicationResponse {
             encrypted_factor_one: encrypted_factor_one.to_str_radix(10),

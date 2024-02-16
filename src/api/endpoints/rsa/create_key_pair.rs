@@ -4,7 +4,8 @@ use log::info;
 use serde::Deserialize;
 
 use crate::api::serializable_models::{KeyPair, SingleStringResponse, UseFastQuery};
-use crate::encryption::rsa::rsa_keygen_service::RsaKeygenService;
+use crate::encryption::asymmetric_encryption_types::{AsymmetricKeyPair, KeyGenerator};
+use crate::encryption::rsa::rsa_scheme::{RsaKeyGenConfig, RsaScheme};
 use crate::math_core::block_chiffre::determine_block_size;
 use crate::math_core::number_theory::number_theory_service::NumberTheoryService;
 use crate::math_core::number_theory::number_theory_service::NumberTheoryServiceSpeed::{
@@ -42,36 +43,36 @@ pub(crate) async fn create_key_pair(
         false => NumberTheoryService::new(Slow),
     };
 
-    let key_gen_service = RsaKeygenService::new(req_body.modulus_width, number_theory_service);
-    let (public_key, private_key) = match key_gen_service
-        .generate_keypair(req_body.miller_rabin_rounds, req_body.random_seed)
-    {
-        Ok(key_pair) => key_pair,
-        Err(_) => {
-            return HttpResponse::InternalServerError().json(SingleStringResponse {
-                message: "Schlüsselerzeugung fehlgeschlagen.".to_string(),
-            })
-        }
+    let config = RsaKeyGenConfig {
+        key_size: req_body.modulus_width,
+        miller_rabin_iterations: req_body.miller_rabin_rounds,
+        random_seed: req_body.random_seed,
+        number_theory_service,
     };
 
+    let key_pair = RsaScheme::generate_keypair(&config);
+
+    let public_key= key_pair.public();
+    let private_key = key_pair.private();
+
     let block_size_pub = determine_block_size(
-        &public_key.modulus(),
+        &public_key.n,
         &req_body.number_system_base.into(),
         true,
     )
     .to_string();
 
     let block_size_priv = determine_block_size(
-        &private_key.modulus(),
+        &private_key.n,
         &req_body.number_system_base.into(),
         false,
     )
     .to_string();
 
     let key_pair_response = KeyPair {
-        modulus: public_key.modulus().to_str_radix(10),
-        e: public_key.exponent().to_str_radix(10),
-        d: private_key.exponent().to_str_radix(10),
+        modulus: public_key.n.to_str_radix(10),
+        e: public_key.e.to_str_radix(10),
+        d: private_key.d.to_str_radix(10),
         block_size_pub,
         block_size_priv,
     };

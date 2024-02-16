@@ -1,5 +1,4 @@
-use crate::encryption::asymmetric_key_type::AsymmetricKeyType;
-use crate::encryption::rsa::keys::RsaKey;
+use crate::encryption::rsa::keys::{RsaPrivateKey, RsaPublicKey};
 use bigdecimal::num_bigint::ParseBigIntError;
 use log::debug;
 use serde::{Deserialize, Serialize};
@@ -21,13 +20,12 @@ impl KeyPair {
     ///
     /// # Fehler
     /// * `ParseBigIntError` - Falls die BigInts nicht geparst werden können.
-    pub(crate) fn to_private_key(&self) -> Result<RsaKey, ParseBigIntError> {
+    pub(crate) fn to_private_key(&self) -> Result<RsaPrivateKey, ParseBigIntError> {
         debug!("Serialisiere KeyPair zu PrivateKey");
-        Ok(RsaKey::new(
-            AsymmetricKeyType::Private,
-            self.d.parse()?,
-            self.modulus.parse()?,
-        ))
+        Ok(RsaPrivateKey {
+            d: self.d.parse()?,
+            n: self.modulus.parse()?,
+        })
     }
 
     /// Wandelt das serialisierte Schlüsselpaar in einen öffentlichen Schlüssel um.
@@ -37,13 +35,12 @@ impl KeyPair {
     ///
     /// # Fehler
     /// * `ParseBigIntError` - Falls die BigInts nicht geparst werden können.
-    pub(crate) fn to_public_key(&self) -> Result<RsaKey, ParseBigIntError> {
+    pub(crate) fn to_public_key(&self) -> Result<RsaPublicKey, ParseBigIntError> {
         debug!("Serialisiere KeyPair zu PublicKey");
-        Ok(RsaKey::new(
-            AsymmetricKeyType::Public,
-            self.e.parse()?,
-            self.modulus.parse()?,
-        ))
+        Ok(RsaPublicKey {
+            e: self.e.parse()?,
+            n: self.modulus.parse()?,
+        })
     }
 }
 
