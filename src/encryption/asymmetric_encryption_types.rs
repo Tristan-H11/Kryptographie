@@ -56,10 +56,10 @@ where
 /// # Methoden
 /// * `generate_keypair` - Generiert ein Schlüsselpaar für das asymmetrische Verschlüsselungsschema.
 pub trait KeyGenerator<Public, Private, Scheme>
-    where
-        Public: AsymmetricEncryptionKey<Scheme>,
-        Private: AsymmetricDecryptionKey<Scheme>,
-        Scheme: AsymmetricEncryptionScheme,
+where
+    Public: AsymmetricEncryptionKey<Scheme>,
+    Private: AsymmetricDecryptionKey<Scheme>,
+    Scheme: AsymmetricEncryptionScheme,
 {
     type KeyPair: AsymmetricKeyPair<Public, Private, Scheme>;
     /// Generiert ein Schlüsselpaar für das asymmetrische Verschlüsselungsschema.
@@ -69,11 +69,11 @@ pub trait KeyGenerator<Public, Private, Scheme>
     ///
     /// # Rückgabe
     /// Ein Tupel aus dem öffentlichen und privaten Schlüssel.
-    fn generate_keypair(config: &impl KeyGenConfig) -> Self::KeyPair;
+    fn generate_keypair(config: &impl KeyGenWithPrimeConfig) -> Self::KeyPair;
 }
 
-/// Die Konfiguration für die Schlüsselgenerierung für ein Verschlüsselungsschema.
-pub trait KeyGenConfig: Debug {
+/// Die Konfiguration für die Schlüsselgenerierung für ein Verschlüsselungsschema, welches Primzahlen verwendet.
+pub trait KeyGenWithPrimeConfig: Debug {
     /// Typischerweise die Größe des Schlüssels oder des Moduls in Bits.
     fn characteristic(&self) -> u32;
     /// Die Anzahl der Iterationen für den Miller-Rabin-Test bei der Generierung von Primzahlen.
