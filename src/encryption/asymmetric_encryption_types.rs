@@ -52,6 +52,38 @@ pub trait PublicKey<T: AsymmetricEncryptionScheme>: AsymmetricKey<T> {}
 /// Ein privater Schlüssel für das asymmetrische Verschlüsselungsschema.
 pub trait PrivateKey<T: AsymmetricEncryptionScheme>: AsymmetricKey<T> {}
 
+/// Ein Schlüssel zum Entschlüsseln für das asymmetrische Verschlüsselungsschema.
+pub trait DecryptionKey<T: AsymmetricEncryptionScheme>: PrivateKey<T> {}
+
+/// Ein Schlüssel zum Verschlüsseln für das asymmetrische Verschlüsselungsschema.
+pub trait EncryptionKey<T: AsymmetricEncryptionScheme>: PublicKey<T> {}
+
+/// Ein Schlüssel zum Signieren für das asymmetrische Verschlüsselungsschema.
+pub trait SignatureKey<T: AsymmetricEncryptionScheme>: PrivateKey<T> {}
+
+/// Ein Schlüssel zum Verifizieren für das asymmetrische Verschlüsselungsschema.
+pub trait VerificationKey<T: AsymmetricEncryptionScheme>: PublicKey<T> {}
+
+/// Ein Schlüsselpaar für das asymmetrische Verschlüsselungsschema.
+///
+/// # Typen
+/// * `Public` - Der Typ des öffentlichen Schlüssels.
+/// * `Private` - Der Typ des privaten Schlüssels.
+/// * `Scheme` - Das asymmetrische Verschlüsselungsschema.
+///
+/// # Methoden
+/// * `public` - Gibt den öffentlichen Schlüssel zurück.
+/// * `private` - Gibt den privaten Schlüssel zurück.
+pub trait AsymmetricKeyPair<Public, Private, Scheme>
+    where
+        Public: EncryptionKey<Scheme>,
+        Private: DecryptionKey<Scheme>,
+        Scheme: AsymmetricEncryptionScheme,
+{
+    fn public(&self) -> Public;
+    fn private(&self) -> Private;
+}
+
 /// Ein Verschlüsseler für das asymmetrische Verschlüsselungsschema.
 pub trait Encryptor<T: AsymmetricEncryptionScheme>: AsymmetricEncryptionScheme {
     type Key: EncryptionKey<T>;
@@ -116,36 +148,4 @@ pub trait Verifier<T: AsymmetricEncryptionScheme>: AsymmetricEncryptionScheme {
         message: &BigInt,
         service: NumberTheoryService,
     ) -> bool;
-}
-
-/// Ein Schlüssel zum Entschlüsseln für das asymmetrische Verschlüsselungsschema.
-pub trait DecryptionKey<T: AsymmetricEncryptionScheme>: PrivateKey<T> {}
-
-/// Ein Schlüssel zum Verschlüsseln für das asymmetrische Verschlüsselungsschema.
-pub trait EncryptionKey<T: AsymmetricEncryptionScheme>: PublicKey<T> {}
-
-/// Ein Schlüssel zum Signieren für das asymmetrische Verschlüsselungsschema.
-pub trait SignatureKey<T: AsymmetricEncryptionScheme>: PrivateKey<T> {}
-
-/// Ein Schlüssel zum Verifizieren für das asymmetrische Verschlüsselungsschema.
-pub trait VerificationKey<T: AsymmetricEncryptionScheme>: PublicKey<T> {}
-
-/// Ein Schlüsselpaar für das asymmetrische Verschlüsselungsschema.
-///
-/// # Typen
-/// * `Public` - Der Typ des öffentlichen Schlüssels.
-/// * `Private` - Der Typ des privaten Schlüssels.
-/// * `Scheme` - Das asymmetrische Verschlüsselungsschema.
-///
-/// # Methoden
-/// * `public` - Gibt den öffentlichen Schlüssel zurück.
-/// * `private` - Gibt den privaten Schlüssel zurück.
-pub trait AsymmetricKeyPair<Public, Private, Scheme>
-where
-    Public: EncryptionKey<Scheme>,
-    Private: DecryptionKey<Scheme>,
-    Scheme: AsymmetricEncryptionScheme,
-{
-    fn public(&self) -> Public;
-    fn private(&self) -> Private;
 }
