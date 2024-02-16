@@ -1,5 +1,5 @@
 use crate::encryption::asymmetric_encryption_types::{
-    AsymmetricKey, AsymmetricKeyPair, DecryptionKey, EncryptionKey, PrivateKey, PublicKey,
+    AsymmetricKey, AsymmetricKeyPair, AsymmetricDecryptionKey, AsymmetricEncryptionKey, PrivateKey, PublicKey,
 };
 use crate::encryption::el_gamal::el_gamal_scheme::ElGamalScheme;
 use bigdecimal::num_bigint::BigInt;
@@ -17,7 +17,7 @@ impl AsymmetricKey<ElGamalScheme> for ElGamalPublicKey {}
 
 impl PublicKey<ElGamalScheme> for ElGamalPublicKey {}
 
-impl EncryptionKey<ElGamalScheme> for ElGamalPublicKey {}
+impl AsymmetricEncryptionKey<ElGamalScheme> for ElGamalPublicKey {}
 
 // TODO: Ist dieser Schlüssel auf für die Verifikation von Signaturen notwendig?
 
@@ -33,7 +33,7 @@ impl AsymmetricKey<ElGamalScheme> for ElGamalPrivateKey {}
 
 impl PrivateKey<ElGamalScheme> for ElGamalPrivateKey {}
 
-impl DecryptionKey<ElGamalScheme> for ElGamalPrivateKey {}
+impl AsymmetricDecryptionKey<ElGamalScheme> for ElGamalPrivateKey {}
 
 // TODO: Siehe oben. Ist dieser Schlüssel auf für die Signierung von Nachrichten notwendig?
 

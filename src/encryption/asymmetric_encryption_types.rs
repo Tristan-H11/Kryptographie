@@ -15,10 +15,10 @@ pub trait PublicKey<T: AsymmetricEncryptionScheme>: AsymmetricKey<T> {}
 pub trait PrivateKey<T: AsymmetricEncryptionScheme>: AsymmetricKey<T> {}
 
 /// Ein Schlüssel zum Entschlüsseln für das asymmetrische Verschlüsselungsschema.
-pub trait DecryptionKey<T: AsymmetricEncryptionScheme>: PrivateKey<T> {}
+pub trait AsymmetricDecryptionKey<T: AsymmetricEncryptionScheme>: PrivateKey<T> {}
 
 /// Ein Schlüssel zum Verschlüsseln für das asymmetrische Verschlüsselungsschema.
-pub trait EncryptionKey<T: AsymmetricEncryptionScheme>: PublicKey<T> {}
+pub trait AsymmetricEncryptionKey<T: AsymmetricEncryptionScheme>: PublicKey<T> {}
 
 /// Ein Schlüssel zum Signieren für das asymmetrische Verschlüsselungsschema.
 pub trait SignatureKey<T: AsymmetricEncryptionScheme>: PrivateKey<T> {}
@@ -38,8 +38,8 @@ pub trait VerificationKey<T: AsymmetricEncryptionScheme>: PublicKey<T> {}
 /// * `private` - Gibt den privaten Schlüssel zurück.
 pub trait AsymmetricKeyPair<Public, Private, Scheme>
 where
-    Public: EncryptionKey<Scheme>,
-    Private: DecryptionKey<Scheme>,
+    Public: AsymmetricEncryptionKey<Scheme>,
+    Private: AsymmetricDecryptionKey<Scheme>,
     Scheme: AsymmetricEncryptionScheme,
 {
     fn public(&self) -> Public;
@@ -57,8 +57,8 @@ where
 /// * `generate_keypair` - Generiert ein Schlüsselpaar für das asymmetrische Verschlüsselungsschema.
 pub trait KeyGenerator<Public, Private, Scheme>
     where
-        Public: EncryptionKey<Scheme>,
-        Private: DecryptionKey<Scheme>,
+        Public: AsymmetricEncryptionKey<Scheme>,
+        Private: AsymmetricDecryptionKey<Scheme>,
         Scheme: AsymmetricEncryptionScheme,
 {
     type KeyPair: AsymmetricKeyPair<Public, Private, Scheme>;
@@ -86,7 +86,7 @@ pub trait KeyGenConfig: Debug {
 
 /// Ein Verschlüsseler für das asymmetrische Verschlüsselungsschema.
 pub trait Encryptor<T: AsymmetricEncryptionScheme>: AsymmetricEncryptionScheme {
-    type Key: EncryptionKey<T>;
+    type Key: AsymmetricEncryptionKey<T>;
     /// Verschlüsselt den gegebenen Klartext mit dem gegebenen Schlüssel.
     ///
     /// # Argumente
@@ -101,7 +101,7 @@ pub trait Encryptor<T: AsymmetricEncryptionScheme>: AsymmetricEncryptionScheme {
 
 /// Ein Entschlüsseler für das asymmetrische Verschlüsselungsschema.
 pub trait Decryptor<T: AsymmetricEncryptionScheme>: AsymmetricEncryptionScheme {
-    type Key: DecryptionKey<T>;
+    type Key: AsymmetricDecryptionKey<T>;
     /// Entschlüsselt den gegebenen Chiffretext mit dem gegebenen Schlüssel.
     ///
     /// # Argumente

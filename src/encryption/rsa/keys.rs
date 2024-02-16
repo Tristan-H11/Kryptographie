@@ -1,5 +1,5 @@
 use crate::encryption::asymmetric_encryption_types::{
-    AsymmetricKey, AsymmetricKeyPair, DecryptionKey, EncryptionKey, PrivateKey, PublicKey,
+    AsymmetricKey, AsymmetricKeyPair, AsymmetricDecryptionKey, AsymmetricEncryptionKey, PrivateKey, PublicKey,
     SignatureKey, VerificationKey,
 };
 use crate::encryption::rsa::rsa_scheme::RsaScheme;
@@ -16,7 +16,7 @@ impl AsymmetricKey<RsaScheme> for RsaPublicKey {}
 
 impl PublicKey<RsaScheme> for RsaPublicKey {}
 
-impl EncryptionKey<RsaScheme> for RsaPublicKey {}
+impl AsymmetricEncryptionKey<RsaScheme> for RsaPublicKey {}
 
 impl VerificationKey<RsaScheme> for RsaPublicKey {}
 
@@ -30,7 +30,7 @@ impl AsymmetricKey<RsaScheme> for RsaPrivateKey {}
 
 impl PrivateKey<RsaScheme> for RsaPrivateKey {}
 
-impl DecryptionKey<RsaScheme> for RsaPrivateKey {}
+impl AsymmetricDecryptionKey<RsaScheme> for RsaPrivateKey {}
 
 impl SignatureKey<RsaScheme> for RsaPrivateKey {}
 
