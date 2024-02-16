@@ -1,5 +1,5 @@
 use crate::encryption::asymmetric_encryption_types::{
-    AsymmetricEncryptionScheme, KeyGenConfig, KeyGenerator,
+    AsymmetricEncryptionScheme, KeyGenWithPrimeConfig, KeyGenerator,
 };
 use crate::encryption::el_gamal::keys::{ElGamalKeyPair, ElGamalPrivateKey, ElGamalPublicKey};
 use crate::math_core::number_theory::number_theory_service::{
@@ -9,8 +9,12 @@ use crate::math_core::pseudo_random_number_generator::PseudoRandomNumberGenerato
 use crate::math_core::traits::increment::Increment;
 use atomic_counter::RelaxedCounter;
 use log::debug;
+use crate::encryption::encryption_types::EncryptionScheme;
 
 pub struct ElGamalScheme;
+
+impl EncryptionScheme for ElGamalScheme {}
+
 impl AsymmetricEncryptionScheme for ElGamalScheme {}
 
 /// Die Konfiguration für die Schlüsselgenerierung für das ElGamal-Kryptosystem in primen Restklassengruppen.
@@ -28,7 +32,7 @@ pub struct ElGamalKeyGenConfig {
     pub number_theory_service: NumberTheoryService,
 }
 
-impl KeyGenConfig for ElGamalKeyGenConfig {
+impl KeyGenWithPrimeConfig for ElGamalKeyGenConfig {
     fn characteristic(&self) -> u32 {
         self.modulus_width
     }
@@ -57,7 +61,7 @@ impl KeyGenerator<ElGamalPublicKey, ElGamalPrivateKey, ElGamalScheme> for ElGama
     ///
     /// # Rückgabe
     /// Ein Tupel aus dem öffentlichen und privaten Schlüssel.
-    fn generate_keypair(config: &impl KeyGenConfig) -> Self::KeyPair {
+    fn generate_keypair(config: &impl KeyGenWithPrimeConfig) -> Self::KeyPair {
         debug!(
             "Generieren eines neuen ElGamal-Schlüsselpaares mit Konfiguration: {:?}",
             config
