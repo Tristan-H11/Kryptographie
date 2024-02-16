@@ -13,7 +13,7 @@ use crate::math_core::traits::divisible::Divisible;
 use crate::math_core::traits::parity::Parity;
 use crate::shared::errors::ArithmeticError;
 
-#[derive(Clone, Copy)]
+#[derive(Clone, Copy, Debug)]
 pub struct SlowNumberTheoryService;
 
 impl SlowNumberTheoryService {

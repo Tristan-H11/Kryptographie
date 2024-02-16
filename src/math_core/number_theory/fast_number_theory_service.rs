@@ -12,7 +12,7 @@ use crate::math_core::number_theory::primality_test::PrimalityTest;
 use crate::math_core::pseudo_random_number_generator::PseudoRandomNumberGenerator;
 use crate::shared::errors::ArithmeticError;
 
-#[derive(Clone, Copy)]
+#[derive(Clone, Copy, Debug)]
 pub struct FastNumberTheoryService;
 
 impl FastNumberTheoryService {
