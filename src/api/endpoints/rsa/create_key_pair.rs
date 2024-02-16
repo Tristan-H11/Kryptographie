@@ -5,8 +5,8 @@ use serde::Deserialize;
 
 use crate::api::serializable_models::{KeyPair, UseFastQuery};
 use crate::encryption::asymmetric_encryption_types::{AsymmetricKeyPair, KeyGenerator};
+use crate::encryption::block_chiffre::block_chiffre::determine_block_size;
 use crate::encryption::rsa::rsa_scheme::{RsaKeyGenConfig, RsaScheme};
-use crate::math_core::block_chiffre::determine_block_size;
 use crate::math_core::number_theory::number_theory_service::NumberTheoryService;
 use crate::math_core::number_theory::number_theory_service::NumberTheoryServiceSpeed::{
     Fast, Slow,
