@@ -6,6 +6,7 @@ use atomic_counter::{AtomicCounter, RelaxedCounter};
 use bigdecimal::num_bigint::{BigInt, ToBigInt};
 use bigdecimal::{BigDecimal, One};
 use log::{debug, trace};
+use num::Integer;
 
 use crate::math_core::traits::increment::Increment;
 
@@ -214,6 +215,32 @@ impl PseudoRandomNumberGenerator {
         }
 
         (prime_candidate, primitive_root_candidate)
+    }
+
+    /// Generiert zwei verschiedene Primzahlen mit der angegebenen Breite.
+    ///
+    /// # Argumente
+    /// * `size` - Die Bit-Breite der Primzahlen.
+    /// * `miller_rabin_iterations` - Die Anzahl der Iterationen für den Miller-Rabin-Test.
+    pub fn get_distinct_primes(&self, size: u32, miller_rabin_iterations: u32) -> (BigInt, BigInt) {
+        let (prim_size_one, prim_size_two) = if size.is_even() {
+            (size / 2, size / 2)
+        } else {
+            (size / 2 + 1, size / 2)
+        };
+        let n_counter = RelaxedCounter::new(1);
+        let prime_one = self.generate_prime(prim_size_one, miller_rabin_iterations, &n_counter);
+        let mut prime_two = self.generate_prime(prim_size_two, miller_rabin_iterations, &n_counter);
+
+        while prime_one == prime_two {
+            trace!(
+                "Generierter prime_one {} ist gleich prime_two {}. Starte neuen Versuch",
+                prime_one,
+                prime_two
+            );
+            prime_two = self.generate_prime(prim_size_two, miller_rabin_iterations, &n_counter);
+        }
+        (prime_one, prime_two)
     }
 }
 
