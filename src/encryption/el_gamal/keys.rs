@@ -1,5 +1,5 @@
 use crate::encryption::asymmetric_encryption_types::{AsymmetricKey, AsymmetricKeyPair, DecryptionKey, EncryptionKey, PrivateKey, PublicKey};
-use crate::encryption::el_gamal::el_gamal_service::ElGamalScheme;
+use crate::encryption::el_gamal::el_gamal_scheme::ElGamalScheme;
 use bigdecimal::num_bigint::BigInt;
 
 /// Ein öffentlicher ElGamal-Schlüssel für das ElGamal-Kryptosystem in primen Restklassengruppen.

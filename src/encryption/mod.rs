@@ -1,3 +1,3 @@
-pub(crate) mod asymmetric_key_type;
-mod el_gamal;
+pub(crate) mod asymmetric_encryption_types;
+pub mod el_gamal;
 pub(crate) mod rsa;
