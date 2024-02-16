@@ -48,7 +48,7 @@ pub(crate) async fn sign(
         };
 
         let rsa_service =
-            crate::encryption::rsa::rsa_service::RsaService::new(number_theory_service);
+            crate::encryption::rsa::rsa_with_string_service::RsaWithStringService::new(number_theory_service);
 
         let signature = rsa_service.sign(&plaintext, &private_key, g_base);
         let response = SingleStringResponse { message: signature };

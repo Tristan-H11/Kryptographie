@@ -8,7 +8,7 @@ use serde::{Deserialize, Serialize};
 use std::str::FromStr;
 
 use crate::api::serializable_models::{KeyPair, SingleStringResponse, UseFastQuery};
-use crate::encryption::rsa::rsa_service::RsaService;
+use crate::encryption::rsa::rsa_with_string_service::RsaWithStringService;
 use crate::math_core::number_theory::number_theory_service::NumberTheoryService;
 use crate::math_core::number_theory::number_theory_service::NumberTheoryServiceSpeed::{
     Fast, Slow,
@@ -46,7 +46,7 @@ pub(crate) async fn multiplication(
         false => NumberTheoryService::new(Slow),
     };
 
-    let rsa_service = RsaService::new(number_theory_service);
+    let rsa_service = RsaWithStringService::new(number_theory_service);
 
     call_checked_with_parsed_big_ints(|| {
         let factor_one = BigInt::from_str(&req_body.factor_one)?;
