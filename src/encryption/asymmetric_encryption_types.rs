@@ -1,7 +1,7 @@
+use crate::encryption::encryption_types::{Decryptor, EncryptionScheme, Encryptor, Key};
 use crate::math_core::number_theory::number_theory_service::NumberTheoryService;
 use bigdecimal::num_bigint::BigInt;
 use std::fmt::Debug;
-use crate::encryption::encryption_types::{Decryptor, EncryptionScheme, Encryptor, Key};
 
 /// Ein asymmetrisches Verschlüsselungsschema.
 pub trait AsymmetricEncryptionScheme: EncryptionScheme {}
@@ -96,7 +96,11 @@ pub trait AsymmetricEncryptor<T: AsymmetricEncryptionScheme>: Encryptor<T> {
     ///
     /// # Rückgabe
     /// Der verschlüsselte Chiffretext.
-    fn encrypt(key: &Self::Key, plaintext: &Self::Input, service: NumberTheoryService) -> Self::Output;
+    fn encrypt(
+        key: &Self::Key,
+        plaintext: &Self::Input,
+        service: NumberTheoryService,
+    ) -> Self::Output;
 }
 
 /// Ein Entschlüsseler für das asymmetrische Verschlüsselungsschema.
@@ -110,7 +114,11 @@ pub trait AsymmetricDecryptor<T: AsymmetricEncryptionScheme>: Decryptor<T> {
     ///
     /// # Rückgabe
     /// Der entschlüsselte Klartext.
-    fn decrypt(key: &Self::Key, ciphertext: &Self::Input, service: NumberTheoryService) -> Self::Output;
+    fn decrypt(
+        key: &Self::Key,
+        ciphertext: &Self::Input,
+        service: NumberTheoryService,
+    ) -> Self::Output;
 }
 
 /// Ein Signierer für das asymmetrische Verschlüsselungsschema.

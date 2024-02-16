@@ -1,7 +1,8 @@
 use crate::encryption::asymmetric_encryption_types::{
-    AsymmetricEncryptionScheme, AsymmetricDecryptor, AsymmetricEncryptor, KeyGenWithPrimeConfig, KeyGenerator, Signer,
-    Verifier,
+    AsymmetricDecryptor, AsymmetricEncryptionScheme, AsymmetricEncryptor, KeyGenWithPrimeConfig,
+    KeyGenerator, Signer, Verifier,
 };
+use crate::encryption::encryption_types::{Decryptor, EncryptionScheme, Encryptor};
 use crate::encryption::rsa::keys::{RsaKeyPair, RsaPrivateKey, RsaPublicKey};
 use crate::math_core::number_theory::number_theory_service::{
     NumberTheoryService, NumberTheoryServiceTrait,
@@ -13,7 +14,6 @@ use atomic_counter::RelaxedCounter;
 use bigdecimal::num_bigint::BigInt;
 use bigdecimal::One;
 use log::{debug, trace};
-use crate::encryption::encryption_types::{Decryptor, EncryptionScheme, Encryptor};
 
 pub struct RsaScheme {}
 
@@ -83,7 +83,11 @@ impl Encryptor<RsaScheme> for RsaScheme {
 }
 
 impl AsymmetricEncryptor<RsaScheme> for RsaScheme {
-    fn encrypt(key: &Self::Key, plaintext: &Self::Input, service: NumberTheoryService) -> Self::Output {
+    fn encrypt(
+        key: &Self::Key,
+        plaintext: &Self::Input,
+        service: NumberTheoryService,
+    ) -> Self::Output {
         service.fast_exponentiation(plaintext, &key.e, &key.n)
     }
 }

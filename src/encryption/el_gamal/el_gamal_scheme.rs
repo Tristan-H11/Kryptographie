@@ -2,6 +2,7 @@ use crate::encryption::asymmetric_encryption_types::{
     AsymmetricEncryptionScheme, KeyGenWithPrimeConfig, KeyGenerator,
 };
 use crate::encryption::el_gamal::keys::{ElGamalKeyPair, ElGamalPrivateKey, ElGamalPublicKey};
+use crate::encryption::encryption_types::EncryptionScheme;
 use crate::math_core::number_theory::number_theory_service::{
     NumberTheoryService, NumberTheoryServiceTrait,
 };
@@ -9,7 +10,6 @@ use crate::math_core::pseudo_random_number_generator::PseudoRandomNumberGenerato
 use crate::math_core::traits::increment::Increment;
 use atomic_counter::RelaxedCounter;
 use log::debug;
-use crate::encryption::encryption_types::EncryptionScheme;
 
 pub struct ElGamalScheme;
 

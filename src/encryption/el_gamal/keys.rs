@@ -3,8 +3,8 @@ use crate::encryption::asymmetric_encryption_types::{
     PublicKey,
 };
 use crate::encryption::el_gamal::el_gamal_scheme::ElGamalScheme;
-use bigdecimal::num_bigint::BigInt;
 use crate::encryption::encryption_types::Key;
+use bigdecimal::num_bigint::BigInt;
 
 /// Ein öffentlicher ElGamal-Schlüssel für das ElGamal-Kryptosystem in primen Restklassengruppen.
 /// Besteht aus dem Modulus p, dem Generator g und dem öffentlichen Wert y.

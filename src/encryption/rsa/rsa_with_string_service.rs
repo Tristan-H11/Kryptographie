@@ -1,4 +1,6 @@
-use crate::encryption::asymmetric_encryption_types::{AsymmetricDecryptor, AsymmetricEncryptor, Signer};
+use crate::encryption::asymmetric_encryption_types::{
+    AsymmetricDecryptor, AsymmetricEncryptor, Signer,
+};
 use crate::encryption::block_chiffre::block_chiffre::{
     create_string_from_blocks_decrypt, create_string_from_blocks_encrypt, encode_string_to_blocks,
 };
