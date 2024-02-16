@@ -1,3 +1,3 @@
 pub mod keys;
-pub mod rsa_keygen_service;
+mod rsa_scheme;
 pub(crate) mod rsa_service;
