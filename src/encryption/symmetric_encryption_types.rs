@@ -1,4 +1,4 @@
-use crate::encryption::encryption_types::{EncryptionScheme, Encryptor, Key};
+use crate::encryption::encryption_types::{Decryptor, EncryptionScheme, Encryptor, Key};
 
 /// Ein symmetrisches Verschlüsselungsschema.
 pub trait SymmetricEncryptionScheme: EncryptionScheme {}
@@ -56,7 +56,7 @@ pub trait SymmetricEncryptor<T: SymmetricEncryptionScheme>: Encryptor<T> {
     fn encrypt(plaintext: Self::Input, key: &Self::Key) -> Self::Output;
 }
 
-pub trait SymmetricDecryptor<T: SymmetricEncryptionScheme>: Encryptor<T> {
+pub trait SymmetricDecryptor<T: SymmetricEncryptionScheme>: Decryptor<T> {
     /// Entschlüsselt den gegebenen Geheimtext mit dem gegebenen Schlüssel.
     ///
     /// # Argumente
