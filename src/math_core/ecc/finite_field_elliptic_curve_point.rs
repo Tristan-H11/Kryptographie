@@ -64,10 +64,10 @@ impl FiniteFieldEllipticCurvePoint {
         let slope_denom = service.modulo_inverse(&(&other.x - &self.x), p).unwrap();
 
         // Steigung der Geraden durch die beiden Punkte berechnen
-        let slope = (slope_numer * slope_denom).rem_euclid(p);
+        let slope = slope_numer * slope_denom;
 
-        let x_sum = (&slope * &slope - &self.x - &other.x).rem_euclid(p);
-        let y_sum = (&slope * (&self.x - &x_sum) - &self.y).rem_euclid(p);
+        let x_sum = &slope * &slope - &self.x - &other.x;
+        let y_sum = &slope * (&self.x - &x_sum) - &self.y;
 
         Some(FiniteFieldEllipticCurvePoint::new(x_sum, y_sum, Rc::clone(&self.curve)).normalize())
     }
@@ -85,10 +85,10 @@ impl FiniteFieldEllipticCurvePoint {
         let slope_denom = 2u32 * &self.y;
         let slope_denom = service.modulo_inverse(&slope_denom, p).unwrap();
         // Steigung der Geraden durch die beiden Punkte berechnen
-        let slope = (slope_numer * slope_denom).rem_euclid(p);
+        let slope = slope_numer * slope_denom;
 
-        let x_sum = (&slope * &slope - 2u32 * &self.x).rem_euclid(p);
-        let y_sum = (&slope * (&self.x - &x_sum) - &self.y).rem_euclid(p);
+        let x_sum = &slope * &slope - 2u32 * &self.x;
+        let y_sum = &slope * (&self.x - &x_sum) - &self.y;
 
         FiniteFieldEllipticCurvePoint::new(x_sum, y_sum, Rc::clone(&self.curve)).normalize()
     }
@@ -126,6 +126,7 @@ impl FiniteFieldEllipticCurvePoint {
 
     ///
     /// Normalisiert den Punkt, indem negative Koordinaten in positive Koordinaten umgewandelt werden.
+    /// Anschließend wird der Punkt wieder in den Körper der elliptischen Kurve zurückgeführt.
     ///
     fn normalize(&self) -> Self {
         let p = &self.curve.p;
@@ -141,7 +142,9 @@ impl FiniteFieldEllipticCurvePoint {
             y += p;
         }
 
-        FiniteFieldEllipticCurvePoint::new(x, y, Rc::clone(&self.curve))
+        let normalized_x = x.rem_euclid(p);
+        let normalized_y = y.rem_euclid(p);
+        FiniteFieldEllipticCurvePoint::new(normalized_x, normalized_y, Rc::clone(&self.curve))
     }
 }
 
