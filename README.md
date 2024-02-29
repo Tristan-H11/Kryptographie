@@ -10,11 +10,11 @@ Um dieses Projekt lokal zu installieren, führen Sie die folgenden Schritte aus:
 
 1. Klonen Sie das Repository:
 ```
-git clone https://github.com/Tristan-H11/RSA-Implementation.git
+https://github.com/Tristan-H11/Kryptographie.git
 ```
 2. Wechseln Sie in das Verzeichnis des Projekts:
 ```
-cd RSA-Implementation
+cd Kryptographie
 ```
 3. Installieren Sie die Abhängigkeiten:
 ```
