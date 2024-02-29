@@ -29,7 +29,7 @@ impl ToRadixString for BigInt {
                     .to_u32()
                     .expect("Umwandlung in u32 fehlgeschlagen"),
             )
-                .expect("Umwandlung in char fehlgeschlagen"); // TODO Fehlerbehandlung ggf später einbauen
+            .expect("Umwandlung in char fehlgeschlagen"); // TODO Fehlerbehandlung ggf später einbauen
             result.push(char);
         }
         result.chars().rev().collect()

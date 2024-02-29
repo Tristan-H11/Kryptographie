@@ -1,7 +1,7 @@
 use bigdecimal::num_bigint::BigInt;
-use bigdecimal::{One, Signed, ToPrimitive, Zero};
-use crate::encryption::block_chiffre::decimal_unicode_conversion_core::ToRadixString;
+use bigdecimal::{One, Zero};
 
+use crate::encryption::block_chiffre::decimal_unicode_conversion_core::ToRadixString;
 use crate::encryption::block_chiffre::keys::DecimalUnicodeConversionSchemeKey;
 use crate::encryption::encryption_types::{Decryptor, EncryptionScheme, Encryptor};
 use crate::encryption::symmetric_encryption_types::{
@@ -92,9 +92,7 @@ impl SymmetricDecryptor<ToDecimalBlockScheme> for ToDecimalBlockScheme {
         // dabei ist key.radix die Basis der g-adischen Entwicklung.
         let decoded_chars_chunks = ciphertext
             .iter()
-            .map(|decimal| {
-                decimal.to_radix_string(&key.radix)
-            })
+            .map(|decimal| decimal.to_radix_string(&key.radix))
             .collect::<Vec<String>>();
 
         // Die einzelnen Blöcke zu einer Zeichenfolge zusammenfügen
@@ -104,8 +102,10 @@ impl SymmetricDecryptor<ToDecimalBlockScheme> for ToDecimalBlockScheme {
 
 #[cfg(test)]
 mod tests {
-    use super::*;
     use std::str::FromStr;
+
+    use super::*;
+
     #[test]
     fn test_happy_flow() {
         let m = "Da苉 ist eine Testnachricht";
