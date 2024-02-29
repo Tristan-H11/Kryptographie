@@ -41,7 +41,7 @@ impl PrivateKey<ElGamalScheme> for ElGamalPrivateKey {}
 
 impl AsymmetricDecryptionKey<ElGamalScheme> for ElGamalPrivateKey {}
 
-// TODO: Siehe oben. Ist dieser Schlüssel auf für die Signierung von Nachrichten notwendig?
+// TODO: Siehe oben. Ist dieser Schlüssel auch für die Signierung von Nachrichten notwendig?
 
 #[derive(Clone, Debug)]
 pub struct ElGamalKeyPair {
