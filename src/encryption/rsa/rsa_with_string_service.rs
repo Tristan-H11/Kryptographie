@@ -127,6 +127,8 @@ impl RsaWithStringService {
         let chunks = encode_string_to_blocks(signature, block_size, g_base);
         // Ja, da steht encrypt. Das ist aber korrekt, weil dahinter auch nur eine Expnentiation steckt und die Typen aktuell noch nicht stimmen.
         // Das umstellen auf Verify komm mit dem Refactoring dieses Services hier.
+        // Ja, da steht encrypt. Das ist aber korrekt, weil dahinter auch nur eine Exponentiation steckt und die Typen aktuell noch nicht stimmen.
+        // Das Umstellen auf Verify komm mit dem Refactoring dieses Services hier.
         // Dafür ist es nötig, dass Signatur und Nachricht beide als BigInt vorliegen und nicht als String.
         let decrypted_chunks = chunks
             .iter()
