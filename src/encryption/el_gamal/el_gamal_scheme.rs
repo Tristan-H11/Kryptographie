@@ -169,7 +169,7 @@ impl AsymmetricDecryptor<'_, ElGamalScheme> for ElGamalScheme {
         let x = &key.x;
         let (a, b) = ciphertext;
 
-        // Berechnen von z = a^x mod p = a^(p-1-x) mod p
+        // Berechnen von z = (a^x)^-1 mod p = a^(p-1-x) mod p
         let z = service.fast_exponentiation(a, &(p.decrement() - x), p);
 
         // Berechnen des Klartextes m = b * z mod p
