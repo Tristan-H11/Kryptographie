@@ -5,12 +5,12 @@ use serde::Deserialize;
 
 use crate::api::serializable_models::{KeyPair, UseFastQuery};
 use crate::encryption::asymmetric_encryption_types::{AsymmetricKeyPair, KeyGenerator};
-use crate::encryption::block_chiffre::block_chiffre::determine_block_size;
 use crate::encryption::rsa::rsa_scheme::{RsaKeyGenConfig, RsaScheme};
 use crate::math_core::number_theory::number_theory_service::NumberTheoryService;
 use crate::math_core::number_theory::number_theory_service::NumberTheoryServiceSpeed::{
     Fast, Slow,
 };
+use crate::math_core::traits::logarithm::Logarithm;
 
 #[derive(Deserialize)]
 pub struct CreateKeyPairRequest {
@@ -55,19 +55,15 @@ pub(crate) async fn create_key_pair(
     let public_key = key_pair.public();
     let private_key = key_pair.private();
 
-    let block_size_pub =
-        determine_block_size(&public_key.n, &req_body.number_system_base.into(), true).to_string();
-
-    let block_size_priv =
-        determine_block_size(&private_key.n, &req_body.number_system_base.into(), false)
-            .to_string();
+    let block_size_pub = public_key.n.log(&req_body.number_system_base.into());
+    let block_size_priv = private_key.n.log(&req_body.number_system_base.into()) + 1;
 
     let key_pair_response = KeyPair {
         modulus: public_key.n.to_str_radix(10),
         e: public_key.e.to_str_radix(10),
         d: private_key.d.to_str_radix(10),
-        block_size_pub,
-        block_size_priv,
+        block_size_pub: block_size_pub.to_string(),
+        block_size_priv: block_size_priv.to_string(),
     };
 
     HttpResponse::Ok().json(key_pair_response)
