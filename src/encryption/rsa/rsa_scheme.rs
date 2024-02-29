@@ -99,7 +99,11 @@ impl<'a> Decryptor<'a, RsaScheme> for RsaScheme {
 }
 
 impl<'a> AsymmetricDecryptor<'a, RsaScheme> for RsaScheme {
-    fn decrypt(key: &Self::Key, ciphertext: &BigInt, service: NumberTheoryService) -> BigInt {
+    fn decrypt(
+        key: &Self::Key,
+        ciphertext: &Self::Input,
+        service: NumberTheoryService,
+    ) -> Self::Output {
         service.fast_exponentiation(ciphertext, &key.d, &key.n)
     }
 }
