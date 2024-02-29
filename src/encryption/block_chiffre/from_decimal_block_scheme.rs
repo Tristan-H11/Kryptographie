@@ -163,7 +163,7 @@ mod tests {
         };
 
         let s = "";
-        FromDecimalBlockScheme::decrypt(&s.to_string(), &key);
+        FromDecimalBlockScheme::decrypt(s, &key);
     }
 
     #[test]
@@ -175,7 +175,7 @@ mod tests {
         };
 
         let s = "";
-        FromDecimalBlockScheme::decrypt(&s.to_string(), &key);
+        FromDecimalBlockScheme::decrypt(s, &key);
     }
 
     #[test]

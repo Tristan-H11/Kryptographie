@@ -47,7 +47,7 @@ mod tests {
     fn test_to_radix_string() {
         let decimal = BigInt::from(123456789);
         let radix = 16;
-        let expected = "\u{7}\u{5}\u{b}\u{c}\r\u{1}\u{5}".to_string();
+        let expected = "\u{7}\u{5}\u{b}\u{c}\r\u{1}\u{5}";
 
         let result = decimal.to_radix_string(&radix);
 
@@ -58,7 +58,7 @@ mod tests {
     fn test_to_radix_string_zero() {
         let decimal = BigInt::from(0);
         let radix = 16;
-        let expected = "\u{0}".to_string();
+        let expected = "\u{0}";
 
         let result = decimal.to_radix_string(&radix);
 
@@ -69,7 +69,7 @@ mod tests {
     fn test_to_radix_string_decimal_is_radix() {
         let decimal = BigInt::from(16);
         let radix = 16;
-        let expected = "".to_string();
+        let expected = "";
 
         let result = decimal.to_radix_string(&radix);
 
@@ -80,7 +80,7 @@ mod tests {
     fn test_to_radix_big_numbers() {
         let decimal = BigInt::from_str("12345678987654321").unwrap();
         let radix = 55296;
-        let expected = "IЇ秜咱".to_string();
+        let expected = "IЇ秜咱";
 
         let result = decimal.to_radix_string(&radix);
 
