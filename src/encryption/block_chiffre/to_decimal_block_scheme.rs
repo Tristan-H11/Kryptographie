@@ -24,6 +24,15 @@ impl Encryptor<ToDecimalBlockScheme> for ToDecimalBlockScheme {
 }
 
 impl SymmetricEncryptor<ToDecimalBlockScheme> for ToDecimalBlockScheme {
+    /// Interpretiert den String als eine Zeichenkette von Unicode-Zeichen bis zu einem gegebenen Radix, teilt diese
+    /// Zeichenkette in Blöcke der gegebenen Größe auf und wandelt diese Blöcke in Dezimalzahlen um.
+    ///
+    /// # Arguments
+    /// * `plaintext` - Der Klartext, der verschlüsselt werden soll.
+    /// * `key` - Der Schlüssel, der die Basis und die Blockgröße enthält.
+    ///
+    /// # Returns
+    /// Ein Vektor von Dezimalzahlen, die die verschlüsselten Blöcke repräsentieren.
     fn encrypt(plaintext: Self::Input, key: &Self::Key) -> Self::Output {
         assert!(key.radix > 0, "Die Basis muss größer als 0 sein.");
         assert!(key.block_size > 0, "Die Blockgröße muss größer als 0 sein.");
@@ -67,6 +76,14 @@ impl Decryptor<ToDecimalBlockScheme> for ToDecimalBlockScheme {
 }
 
 impl SymmetricDecryptor<ToDecimalBlockScheme> for ToDecimalBlockScheme {
+    /// Wandelt die Dezimalzahlen in Blöcke von Unicode-Zeichen um und fügt diese Blöcke zu einer Zeichenfolge zusammen.
+    ///
+    /// # Arguments
+    /// * `ciphertext` - Die Dezimalzahlen, die die verschlüsselten Blöcke repräsentieren.
+    /// * `key` - Der Schlüssel, der die Basis und die Blockgröße enthält.
+    ///
+    /// # Returns
+    /// Die entschlüsselte Zeichenfolge.
     fn decrypt(ciphertext: Self::Input, key: &Self::Key) -> Self::Output {
         assert!(key.radix > 0, "Die Basis muss größer als 0 sein.");
         assert!(key.block_size > 0, "Die Blockgröße muss größer als 0 sein.");
