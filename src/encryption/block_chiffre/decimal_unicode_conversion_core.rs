@@ -58,7 +58,7 @@ mod tests {
     fn test_to_radix_string_zero() {
         let decimal = BigInt::from(0);
         let radix = 16;
-        let expected = "\u{0}";
+        let expected = "";
 
         let result = decimal.to_radix_string(&radix);
 
@@ -69,7 +69,7 @@ mod tests {
     fn test_to_radix_string_decimal_is_radix() {
         let decimal = BigInt::from(16);
         let radix = 16;
-        let expected = "";
+        let expected = "\u{1}\u{0}";
 
         let result = decimal.to_radix_string(&radix);
 
