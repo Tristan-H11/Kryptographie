@@ -61,7 +61,7 @@ impl PseudoRandomNumberGenerator {
     /// * `n_counter` - Der AtomicCounter, der den Index des Elementes aus der Zufallsfolge enthält.
     ///
     /// # Rückgabe
-    /// * BigUint
+    /// Die Zufallszahl.
     pub fn take(&self, a: &BigInt, b: &BigInt, n_counter: &RelaxedCounter) -> BigInt {
         trace!(
             "Zufallszahl aus dem Bereich von {} bis {} mit n {}",
@@ -87,7 +87,7 @@ impl PseudoRandomNumberGenerator {
     /// * `n_counter` - Index des Elementes aus der Zufallsfolge.
     ///
     /// # Rückgabe
-    /// * BigUint
+    /// Die ungerade Zufallszahl.
     pub fn take_uneven(&self, a: &BigInt, b: &BigInt, n_counter: &RelaxedCounter) -> BigInt {
         self.take(a, b, n_counter) | BigInt::one()
     }
