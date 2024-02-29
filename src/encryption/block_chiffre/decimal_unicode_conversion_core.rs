@@ -40,8 +40,9 @@ impl ToRadixString for BigInt {
 
 #[cfg(test)]
 mod tests {
-    use super::*;
     use std::str::FromStr;
+
+    use super::*;
 
     #[test]
     fn test_to_radix_string() {
