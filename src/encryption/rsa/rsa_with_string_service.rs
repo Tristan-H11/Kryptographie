@@ -1,11 +1,13 @@
 use crate::encryption::asymmetric_encryption_types::{
     AsymmetricDecryptor, AsymmetricEncryptor, Signer,
 };
-use crate::encryption::block_chiffre::block_chiffre::{
-    create_string_from_blocks_decrypt, create_string_from_blocks_encrypt, encode_string_to_blocks,
-};
+
+use crate::encryption::block_chiffre::from_decimal_block_scheme::FromDecimalBlockScheme;
+use crate::encryption::block_chiffre::keys::DecimalUnicodeConversionSchemeKey;
+use crate::encryption::block_chiffre::to_decimal_block_scheme::ToDecimalBlockScheme;
 use crate::encryption::rsa::keys::{RsaPrivateKey, RsaPublicKey};
 use crate::encryption::rsa::rsa_scheme::RsaScheme;
+use crate::encryption::symmetric_encryption_types::{SymmetricDecryptor, SymmetricEncryptor};
 use bigdecimal::num_bigint::{BigInt, Sign};
 use log::{debug, info};
 use sha2::{Digest, Sha256};
@@ -40,14 +42,23 @@ impl RsaWithStringService {
         let block_size = key.n.log(&g_base.into());
         info!("Verschlüsseln mit blockgröße {}", block_size);
 
-        let chunks = encode_string_to_blocks(message, block_size, g_base);
+        let pre_key = DecimalUnicodeConversionSchemeKey {
+            radix: g_base,
+            block_size,
+        };
+
+        let chunks = ToDecimalBlockScheme::encrypt(message, &pre_key);
         let encrypted_chunks = chunks
             .iter()
             .map(|chunk| RsaScheme::encrypt(key, chunk, self.number_theory_service))
             .collect();
 
         // Die Größe der verschlüsselten Blöcke ist immer um 1 größer als die Klartextgröße.
-        create_string_from_blocks_encrypt(encrypted_chunks, block_size + 1, g_base)
+        let post_key = DecimalUnicodeConversionSchemeKey {
+            radix: g_base,
+            block_size: block_size + 1,
+        };
+        FromDecimalBlockScheme::encrypt(&encrypted_chunks, &post_key)
     }
 
     /// Entschlüsselt eine Nachricht. Unterscheidet sich zur Funktion `encrypt` nur in der Hinsicht, dass hier angenommen
@@ -65,13 +76,17 @@ impl RsaWithStringService {
         let block_size = key.n.log(&g_base.into()) + 1;
         info!("Entschlüsseln mit blockgröße {}", block_size);
 
-        let chunks = encode_string_to_blocks(message, block_size, g_base);
+        let unicode_conversion_key = DecimalUnicodeConversionSchemeKey {
+            radix: g_base,
+            block_size,
+        };
+        let chunks = FromDecimalBlockScheme::decrypt(message, &unicode_conversion_key);
         let decrypted_chunks = chunks
             .iter()
             .map(|chunk| RsaScheme::decrypt(key, chunk, self.number_theory_service))
             .collect();
 
-        create_string_from_blocks_decrypt(decrypted_chunks, g_base)
+        ToDecimalBlockScheme::decrypt(&decrypted_chunks, &unicode_conversion_key)
     }
 
     /// Signiert eine Nachricht mit dem privaten Schlüssel.
@@ -88,14 +103,22 @@ impl RsaWithStringService {
         let hashed_message = RsaWithStringService::get_decimal_hash(message).to_str_radix(10);
 
         let block_size = key.n.log(&g_base.into());
-        let chunks = encode_string_to_blocks(&hashed_message, block_size, g_base);
+        let pre_key = DecimalUnicodeConversionSchemeKey {
+            radix: g_base,
+            block_size,
+        };
+        let chunks = ToDecimalBlockScheme::encrypt(&hashed_message, &pre_key);
         let encrypted_chunks = chunks
             .iter()
             .map(|chunk| RsaScheme::sign(key, chunk, self.number_theory_service))
             .collect();
 
         // Die Größe der verschlüsselten Blöcke ist immer um 1 größer als die Klartextgröße.
-        create_string_from_blocks_encrypt(encrypted_chunks, block_size + 1, g_base)
+        let post_key = DecimalUnicodeConversionSchemeKey {
+            radix: g_base,
+            block_size: block_size + 1,
+        };
+        FromDecimalBlockScheme::encrypt(&encrypted_chunks, &post_key)
     }
 
     /// Verifiziert eine Nachricht mit der Signatur.
@@ -124,9 +147,11 @@ impl RsaWithStringService {
         let block_size = key.n.log(&g_base.into()) + 1;
         info!("Entschlüsseln mit blockgröße {}", block_size);
 
-        let chunks = encode_string_to_blocks(signature, block_size, g_base);
-        // Ja, da steht encrypt. Das ist aber korrekt, weil dahinter auch nur eine Expnentiation steckt und die Typen aktuell noch nicht stimmen.
-        // Das umstellen auf Verify komm mit dem Refactoring dieses Services hier.
+        let unicode_conversion_key = DecimalUnicodeConversionSchemeKey {
+            radix: g_base,
+            block_size,
+        };
+        let chunks = ToDecimalBlockScheme::encrypt(signature, &unicode_conversion_key);
         // Ja, da steht encrypt. Das ist aber korrekt, weil dahinter auch nur eine Exponentiation steckt und die Typen aktuell noch nicht stimmen.
         // Das Umstellen auf Verify komm mit dem Refactoring dieses Services hier.
         // Dafür ist es nötig, dass Signatur und Nachricht beide als BigInt vorliegen und nicht als String.
@@ -135,7 +160,8 @@ impl RsaWithStringService {
             .map(|chunk| RsaScheme::encrypt(key, chunk, self.number_theory_service))
             .collect();
 
-        let verification = create_string_from_blocks_decrypt(decrypted_chunks, g_base);
+        let verification =
+            ToDecimalBlockScheme::decrypt(&decrypted_chunks, &unicode_conversion_key);
 
         verification == message_big_int
     }
