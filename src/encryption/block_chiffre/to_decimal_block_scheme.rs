@@ -1,6 +1,6 @@
 use bigdecimal::num_bigint::BigInt;
 use bigdecimal::{One, Signed, ToPrimitive, Zero};
-use std::char::from_u32;
+use crate::encryption::block_chiffre::decimal_unicode_conversion_core::ToRadixString;
 
 use crate::encryption::block_chiffre::keys::DecimalUnicodeConversionSchemeKey;
 use crate::encryption::encryption_types::{Decryptor, EncryptionScheme, Encryptor};
@@ -93,22 +93,7 @@ impl SymmetricDecryptor<ToDecimalBlockScheme> for ToDecimalBlockScheme {
         let decoded_chars_chunks = ciphertext
             .iter()
             .map(|decimal| {
-                let mut decimal = decimal.clone();
-                let mut result = String::new();
-
-                while decimal.is_positive() {
-                    // Hier werden die u32-Operationen statt .div_rem(&BigInt) genutzt, weil diese schneller sind.
-                    let remainder = decimal.clone() % key.radix;
-                    decimal = decimal / key.radix;
-                    let char = from_u32(
-                        remainder
-                            .to_u32()
-                            .expect("Umwandlung in u32 fehlgeschlagen"),
-                    )
-                    .expect("Umwandlung in char fehlgeschlagen"); // TODO Fehlerbehandlung ggf später einbauen
-                    result.push(char);
-                }
-                result.chars().rev().collect()
+                decimal.to_radix_string(&key.radix)
             })
             .collect::<Vec<String>>();
 
