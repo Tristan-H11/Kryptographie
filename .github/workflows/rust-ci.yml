@@ -24,7 +24,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - name: Unit testing Rust
-        run: cargo test --verbose
+        run: cargo test --release --verbose
   fmt:
     name: fmt
     runs-on: ubuntu-latest
