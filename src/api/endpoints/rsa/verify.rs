@@ -15,7 +15,7 @@ pub struct VerifyRequest {
     pub plaintext: String,
     pub signature: String,
     pub key_pair: KeyPair,
-    pub g_base: u32,
+    pub radix: u32,
 }
 
 /// Endpunkt zum Verifizieren einer Nachricht mit RSA.
@@ -39,7 +39,7 @@ pub(crate) async fn verify(
 
     let plaintext = req_body.plaintext;
     let signature = req_body.signature;
-    let g_base = req_body.g_base;
+    let radix = req_body.radix;
 
     call_checked_with_parsed_big_ints(|| {
         let public_key = req_body.key_pair.to_public_key()?;
@@ -54,7 +54,7 @@ pub(crate) async fn verify(
                 number_theory_service,
             );
 
-        let plaintext = rsa_service.verify(&signature, &plaintext, &public_key, g_base);
+        let plaintext = rsa_service.verify(&signature, &plaintext, &public_key, radix);
         let response = SingleStringResponse {
             message: plaintext.to_string(),
         };

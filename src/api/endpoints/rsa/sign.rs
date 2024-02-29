@@ -14,7 +14,7 @@ use crate::math_core::number_theory::number_theory_service::NumberTheoryServiceS
 pub struct SignRequest {
     pub plaintext: String,
     pub key_pair: KeyPair,
-    pub g_base: u32,
+    pub radix: u32,
 }
 
 /// Endpunkt zum Signieren einer Nachricht mit RSA.
@@ -37,7 +37,7 @@ pub(crate) async fn sign(
     let use_fast = query.use_fast;
 
     let plaintext = req_body.plaintext;
-    let g_base = req_body.g_base;
+    let radix = req_body.radix;
 
     call_checked_with_parsed_big_ints(|| {
         let private_key = req_body.key_pair.to_private_key()?;
@@ -52,7 +52,7 @@ pub(crate) async fn sign(
                 number_theory_service,
             );
 
-        let signature = rsa_service.sign(&plaintext, &private_key, g_base);
+        let signature = rsa_service.sign(&plaintext, &private_key, radix);
         let response = SingleStringResponse { message: signature };
 
         Ok(HttpResponse::Ok().json(response))
