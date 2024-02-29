@@ -53,7 +53,7 @@ pub trait SymmetricEncryptor<T: SymmetricEncryptionScheme>: Encryptor<T> {
     ///
     /// # Rückgabe
     /// Der Geheimtext.
-    fn encrypt(plaintext: Self::Input, key: &Self::Key) -> Self::Output;
+    fn encrypt(plaintext: &Self::Input, key: &Self::Key) -> Self::Output;
 }
 
 pub trait SymmetricDecryptor<T: SymmetricEncryptionScheme>: Decryptor<T> {
@@ -65,5 +65,5 @@ pub trait SymmetricDecryptor<T: SymmetricEncryptionScheme>: Decryptor<T> {
     ///
     /// # Rückgabe
     /// Der Klartext.
-    fn decrypt(ciphertext: Self::Input, key: &Self::Key) -> Self::Output;
+    fn decrypt(ciphertext: &Self::Input, key: &Self::Key) -> Self::Output;
 }

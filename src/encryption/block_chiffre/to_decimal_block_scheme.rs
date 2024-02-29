@@ -33,7 +33,7 @@ impl SymmetricEncryptor<ToDecimalBlockScheme> for ToDecimalBlockScheme {
     ///
     /// # Returns
     /// Ein Vektor von Dezimalzahlen, die die verschlüsselten Blöcke repräsentieren.
-    fn encrypt(plaintext: Self::Input, key: &Self::Key) -> Self::Output {
+    fn encrypt(plaintext: &Self::Input, key: &Self::Key) -> Self::Output {
         assert!(key.radix > 0, "Die Basis muss größer als 0 sein.");
         assert!(key.block_size > 0, "Die Blockgröße muss größer als 0 sein.");
 
@@ -84,7 +84,7 @@ impl SymmetricDecryptor<ToDecimalBlockScheme> for ToDecimalBlockScheme {
     ///
     /// # Returns
     /// Die entschlüsselte Zeichenfolge.
-    fn decrypt(ciphertext: Self::Input, key: &Self::Key) -> Self::Output {
+    fn decrypt(ciphertext: &Self::Input, key: &Self::Key) -> Self::Output {
         assert!(key.radix > 0, "Die Basis muss größer als 0 sein.");
         assert!(key.block_size > 0, "Die Blockgröße muss größer als 0 sein.");
 
@@ -114,7 +114,7 @@ mod tests {
             block_size: 8,
         };
 
-        let ciphertext = ToDecimalBlockScheme::encrypt(m.to_string(), &key);
+        let ciphertext = ToDecimalBlockScheme::encrypt(&m.to_string(), &key);
 
         assert_eq!(
             ciphertext,
@@ -126,7 +126,7 @@ mod tests {
             ]
         );
 
-        let plaintext = ToDecimalBlockScheme::decrypt(ciphertext, &key);
+        let plaintext = ToDecimalBlockScheme::decrypt(&ciphertext, &key);
         assert_eq!(m, plaintext);
     }
 
@@ -138,11 +138,11 @@ mod tests {
             block_size: 8,
         };
 
-        let ciphertext = ToDecimalBlockScheme::encrypt(m.to_string(), &key);
+        let ciphertext = ToDecimalBlockScheme::encrypt(&m.to_string(), &key);
 
         assert_eq!(ciphertext, vec![]);
 
-        let plaintext = ToDecimalBlockScheme::decrypt(ciphertext, &key);
+        let plaintext = ToDecimalBlockScheme::decrypt(&ciphertext, &key);
         assert_eq!(m, plaintext);
     }
 
@@ -155,7 +155,7 @@ mod tests {
             block_size: 8,
         };
 
-        ToDecimalBlockScheme::encrypt(m.to_string(), &key);
+        ToDecimalBlockScheme::encrypt(&m.to_string(), &key);
     }
 
     #[test]
@@ -167,7 +167,7 @@ mod tests {
             block_size: 0,
         };
 
-        ToDecimalBlockScheme::encrypt(m.to_string(), &key);
+        ToDecimalBlockScheme::encrypt(&m.to_string(), &key);
     }
 
     #[test]
@@ -178,7 +178,7 @@ mod tests {
             block_size: 8,
         };
 
-        ToDecimalBlockScheme::decrypt(vec![], &key);
+        ToDecimalBlockScheme::decrypt(&vec![], &key);
     }
 
     #[test]
@@ -189,7 +189,7 @@ mod tests {
             block_size: 0,
         };
 
-        ToDecimalBlockScheme::decrypt(vec![], &key);
+        ToDecimalBlockScheme::decrypt(&vec![], &key);
     }
 
     #[test]
@@ -200,12 +200,12 @@ mod tests {
             block_size: 8,
         };
 
-        let ciphertext = ToDecimalBlockScheme::encrypt(m.to_string(), &key);
+        let ciphertext = ToDecimalBlockScheme::encrypt(&m.to_string(), &key);
 
         let mut manipulated_ciphertext = ciphertext.clone();
         manipulated_ciphertext[0] = BigInt::from_str("123456789").unwrap();
 
-        let plaintext = ToDecimalBlockScheme::decrypt(manipulated_ciphertext, &key);
+        let plaintext = ToDecimalBlockScheme::decrypt(&manipulated_ciphertext, &key);
         assert_eq!(plaintext, "ࢸ贕eine Testnachricht");
         // Hier ist nur der erste Block manipuliert, die anderen Blöcke sind noch valide.
         // Das Zeichen ggf am Ende sieht nur aus, als wäre es dort falsch, es steht aber an der richtigen Stelle.
