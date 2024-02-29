@@ -2,7 +2,7 @@ use bigdecimal::num_bigint::BigInt;
 use bigdecimal::{One, Signed, ToPrimitive, Zero};
 use std::char::from_u32;
 
-use crate::encryption::block_chiffre::keys::ToDecimalKey;
+use crate::encryption::block_chiffre::keys::DecimalUnicodeConversionSchemeKey;
 use crate::encryption::encryption_types::{Decryptor, EncryptionScheme, Encryptor};
 use crate::encryption::symmetric_encryption_types::{
     SymmetricDecryptor, SymmetricEncryptionScheme, SymmetricEncryptor,
@@ -20,7 +20,7 @@ impl SymmetricEncryptionScheme for ToDecimalBlockScheme {}
 impl Encryptor<ToDecimalBlockScheme> for ToDecimalBlockScheme {
     type Input = String;
     type Output = Vec<BigInt>;
-    type Key = ToDecimalKey;
+    type Key = DecimalUnicodeConversionSchemeKey;
 }
 
 impl SymmetricEncryptor<ToDecimalBlockScheme> for ToDecimalBlockScheme {
@@ -63,7 +63,7 @@ impl SymmetricEncryptor<ToDecimalBlockScheme> for ToDecimalBlockScheme {
 impl Decryptor<ToDecimalBlockScheme> for ToDecimalBlockScheme {
     type Input = Vec<BigInt>;
     type Output = String;
-    type Key = ToDecimalKey;
+    type Key = DecimalUnicodeConversionSchemeKey;
 }
 
 impl SymmetricDecryptor<ToDecimalBlockScheme> for ToDecimalBlockScheme {
@@ -107,7 +107,7 @@ mod tests {
     #[test]
     fn test_happy_flow() {
         let m = "Da苉 ist eine Testnachricht";
-        let key = ToDecimalKey {
+        let key = DecimalUnicodeConversionSchemeKey {
             radix: 55296,
             block_size: 8,
         };
@@ -131,7 +131,7 @@ mod tests {
     #[test]
     fn test_empty_string() {
         let m = "";
-        let key = ToDecimalKey {
+        let key = DecimalUnicodeConversionSchemeKey {
             radix: 55296,
             block_size: 8,
         };
@@ -148,7 +148,7 @@ mod tests {
     #[should_panic]
     fn test_invalid_radix_encrypt() {
         let m = "Da苉 ist eine Testnachricht";
-        let key = ToDecimalKey {
+        let key = DecimalUnicodeConversionSchemeKey {
             radix: 0,
             block_size: 8,
         };
@@ -160,7 +160,7 @@ mod tests {
     #[should_panic]
     fn test_invalid_block_size_encrypt() {
         let m = "Da苉 ist eine Testnachricht";
-        let key = ToDecimalKey {
+        let key = DecimalUnicodeConversionSchemeKey {
             radix: 55296,
             block_size: 0,
         };
@@ -171,7 +171,7 @@ mod tests {
     #[test]
     #[should_panic]
     fn test_invalid_radix_decrypt() {
-        let key = ToDecimalKey {
+        let key = DecimalUnicodeConversionSchemeKey {
             radix: 0,
             block_size: 8,
         };
@@ -182,7 +182,7 @@ mod tests {
     #[test]
     #[should_panic]
     fn test_invalid_block_size_decrypt() {
-        let key = ToDecimalKey {
+        let key = DecimalUnicodeConversionSchemeKey {
             radix: 55296,
             block_size: 0,
         };
@@ -193,7 +193,7 @@ mod tests {
     #[test]
     fn test_manipulated_block_remains_other_blocks_valid() {
         let m = "Da苉 ist eine Testnachricht";
-        let key = ToDecimalKey {
+        let key = DecimalUnicodeConversionSchemeKey {
             radix: 55296,
             block_size: 8,
         };
