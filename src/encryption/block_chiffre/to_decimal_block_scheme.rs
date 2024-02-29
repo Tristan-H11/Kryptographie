@@ -17,13 +17,13 @@ impl EncryptionScheme for ToDecimalBlockScheme {}
 
 impl SymmetricEncryptionScheme for ToDecimalBlockScheme {}
 
-impl Encryptor<ToDecimalBlockScheme> for ToDecimalBlockScheme {
-    type Input = String;
+impl<'a> Encryptor<'a, ToDecimalBlockScheme> for ToDecimalBlockScheme {
+    type Input = str;
     type Output = Vec<BigInt>;
     type Key = DecimalUnicodeConversionSchemeKey;
 }
 
-impl SymmetricEncryptor<ToDecimalBlockScheme> for ToDecimalBlockScheme {
+impl<'a> SymmetricEncryptor<'a, ToDecimalBlockScheme> for ToDecimalBlockScheme {
     /// Interpretiert den String als eine Zeichenkette von Unicode-Zeichen bis zu einem gegebenen Radix, teilt diese
     /// Zeichenkette in Blöcke der gegebenen Größe auf und wandelt diese Blöcke in Dezimalzahlen um.
     ///
@@ -69,13 +69,13 @@ impl SymmetricEncryptor<ToDecimalBlockScheme> for ToDecimalBlockScheme {
     }
 }
 
-impl Decryptor<ToDecimalBlockScheme> for ToDecimalBlockScheme {
+impl<'a> Decryptor<'a, ToDecimalBlockScheme> for ToDecimalBlockScheme {
     type Input = Vec<BigInt>;
     type Output = String;
     type Key = DecimalUnicodeConversionSchemeKey;
 }
 
-impl SymmetricDecryptor<ToDecimalBlockScheme> for ToDecimalBlockScheme {
+impl<'a> SymmetricDecryptor<'a, ToDecimalBlockScheme> for ToDecimalBlockScheme {
     /// Wandelt die Dezimalzahlen in Blöcke von Unicode-Zeichen um und fügt diese Blöcke zu einer Zeichenfolge zusammen.
     ///
     /// # Arguments
@@ -114,7 +114,7 @@ mod tests {
             block_size: 8,
         };
 
-        let ciphertext = ToDecimalBlockScheme::encrypt(&m.to_string(), &key);
+        let ciphertext = ToDecimalBlockScheme::encrypt(m, &key);
 
         assert_eq!(
             ciphertext,
@@ -138,7 +138,7 @@ mod tests {
             block_size: 8,
         };
 
-        let ciphertext = ToDecimalBlockScheme::encrypt(&m.to_string(), &key);
+        let ciphertext = ToDecimalBlockScheme::encrypt(m, &key);
 
         assert_eq!(ciphertext, vec![]);
 
@@ -155,7 +155,7 @@ mod tests {
             block_size: 8,
         };
 
-        ToDecimalBlockScheme::encrypt(&m.to_string(), &key);
+        ToDecimalBlockScheme::encrypt(m, &key);
     }
 
     #[test]
@@ -167,7 +167,7 @@ mod tests {
             block_size: 0,
         };
 
-        ToDecimalBlockScheme::encrypt(&m.to_string(), &key);
+        ToDecimalBlockScheme::encrypt(m, &key);
     }
 
     #[test]
@@ -200,7 +200,7 @@ mod tests {
             block_size: 8,
         };
 
-        let ciphertext = ToDecimalBlockScheme::encrypt(&m.to_string(), &key);
+        let ciphertext = ToDecimalBlockScheme::encrypt(m, &key);
 
         let mut manipulated_ciphertext = ciphertext.clone();
         manipulated_ciphertext[0] = BigInt::from_str("123456789").unwrap();

@@ -86,7 +86,7 @@ pub trait KeyGenWithPrimeConfig: Debug {
 }
 
 /// Ein Verschlüsseler für das asymmetrische Verschlüsselungsschema.
-pub trait AsymmetricEncryptor<T: AsymmetricEncryptionScheme>: Encryptor<T> {
+pub trait AsymmetricEncryptor<'a, T: AsymmetricEncryptionScheme>: Encryptor<'a, T> {
     /// Verschlüsselt den gegebenen Klartext mit dem gegebenen Schlüssel.
     ///
     /// # Argumente
@@ -104,7 +104,7 @@ pub trait AsymmetricEncryptor<T: AsymmetricEncryptionScheme>: Encryptor<T> {
 }
 
 /// Ein Entschlüsseler für das asymmetrische Verschlüsselungsschema.
-pub trait AsymmetricDecryptor<T: AsymmetricEncryptionScheme>: Decryptor<T> {
+pub trait AsymmetricDecryptor<'a, T: AsymmetricEncryptionScheme>: Decryptor<'a, T> {
     /// Entschlüsselt den gegebenen Chiffretext mit dem gegebenen Schlüssel.
     ///
     /// # Argumente
