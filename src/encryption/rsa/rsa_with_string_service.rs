@@ -33,17 +33,17 @@ impl RsaWithStringService {
     ///
     /// # Argumente
     /// * `message` - Die zu verschlüsselnde Nachricht.
-    /// * `g_base` - Die Basis des Zeichensatzes, in der die Nachricht verschlüsselt werden soll.
+    /// * `radix` - Die Basis des Zeichensatzes, in der die Nachricht verschlüsselt werden soll.
     /// * `key` - Der zu verwendende Schlüssel.
     ///
     /// # Rückgabe
     /// * `String` - Die verschlüsselte Nachricht.
-    pub(crate) fn encrypt(&self, message: &str, g_base: u32, key: &RsaPublicKey) -> String {
-        let block_size = key.n.log(&g_base.into());
+    pub(crate) fn encrypt(&self, message: &str, radix: u32, key: &RsaPublicKey) -> String {
+        let block_size = key.n.log(&radix.into());
         info!("Verschlüsseln mit blockgröße {}", block_size);
 
         let pre_key = DecimalUnicodeConversionSchemeKey {
-            radix: g_base,
+            radix: radix,
             block_size,
         };
 
@@ -55,7 +55,7 @@ impl RsaWithStringService {
 
         // Die Größe der verschlüsselten Blöcke ist immer um 1 größer als die Klartextgröße.
         let post_key = DecimalUnicodeConversionSchemeKey {
-            radix: g_base,
+            radix: radix,
             block_size: block_size + 1,
         };
         FromDecimalBlockScheme::encrypt(&encrypted_chunks, &post_key)
@@ -67,17 +67,17 @@ impl RsaWithStringService {
     ///
     /// # Argumente
     /// * `message` - Die zu entschlüsselnde Nachricht.
-    /// * `g_base` - Die Basis des Zeichensatzes, in der die Nachricht verschlüsselt wurde.
+    /// * `radix` - Die Basis des Zeichensatzes, in der die Nachricht verschlüsselt wurde.
     /// * `key` - Der zu verwendende Schlüssel.
     ///
     /// # Rückgabe
     /// * `String` - Die entschlüsselte Nachricht.
-    pub(crate) fn decrypt(&self, message: &str, g_base: u32, key: &RsaPrivateKey) -> String {
-        let block_size = key.n.log(&g_base.into()) + 1;
+    pub(crate) fn decrypt(&self, message: &str, radix: u32, key: &RsaPrivateKey) -> String {
+        let block_size = key.n.log(&radix.into()) + 1;
         info!("Entschlüsseln mit blockgröße {}", block_size);
 
         let unicode_conversion_key = DecimalUnicodeConversionSchemeKey {
-            radix: g_base,
+            radix: radix,
             block_size,
         };
         let chunks = FromDecimalBlockScheme::decrypt(message, &unicode_conversion_key);
@@ -94,17 +94,17 @@ impl RsaWithStringService {
     /// # Argumente
     /// * `message` - Die zu signierende Nachricht.
     /// * `key` - Der private Schlüssel.
-    /// * `g_base` - Die Basis des Zeichensatzes, in der die Nachricht signiert werden soll.
+    /// * `radix` - Die Basis des Zeichensatzes, in der die Nachricht signiert werden soll.
     ///
     /// # Rückgabe
     /// * `String` - Die Signatur.
-    pub(crate) fn sign(&self, message: &str, key: &RsaPrivateKey, g_base: u32) -> String {
+    pub(crate) fn sign(&self, message: &str, key: &RsaPrivateKey, radix: u32) -> String {
         info!("Signieren der Nachricht {}", message);
         let hashed_message = RsaWithStringService::get_decimal_hash(message).to_str_radix(10);
 
-        let block_size = key.n.log(&g_base.into());
+        let block_size = key.n.log(&radix.into());
         let pre_key = DecimalUnicodeConversionSchemeKey {
-            radix: g_base,
+            radix: radix,
             block_size,
         };
         let chunks = ToDecimalBlockScheme::encrypt(&hashed_message, &pre_key);
@@ -115,7 +115,7 @@ impl RsaWithStringService {
 
         // Die Größe der verschlüsselten Blöcke ist immer um 1 größer als die Klartextgröße.
         let post_key = DecimalUnicodeConversionSchemeKey {
-            radix: g_base,
+            radix: radix,
             block_size: block_size + 1,
         };
         FromDecimalBlockScheme::encrypt(&encrypted_chunks, &post_key)
@@ -127,7 +127,7 @@ impl RsaWithStringService {
     /// * `signature` - Die Signatur.
     /// * `message` - Die Nachricht.
     /// * `key` - Der öffentliche Schlüssel.
-    /// * `g_base` - Die Basis des Zeichensatzes, in der die Nachricht signiert werden soll.
+    /// * `radix` - Die Basis des Zeichensatzes, in der die Nachricht signiert werden soll.
     ///
     /// # Rückgabe
     /// * `bool` - Gibt an, ob die Verifizierung erfolgreich war.
@@ -136,7 +136,7 @@ impl RsaWithStringService {
         signature: &str,
         message: &str,
         key: &RsaPublicKey,
-        g_base: u32,
+        radix: u32,
     ) -> bool {
         info!(
             "Verifizieren der Nachricht {} mit Signatur {}",
@@ -144,11 +144,11 @@ impl RsaWithStringService {
         );
         let message_big_int = RsaWithStringService::get_decimal_hash(message).to_str_radix(10);
 
-        let block_size = key.n.log(&g_base.into()) + 1;
+        let block_size = key.n.log(&radix.into()) + 1;
         info!("Entschlüsseln mit blockgröße {}", block_size);
 
         let unicode_conversion_key = DecimalUnicodeConversionSchemeKey {
-            radix: g_base,
+            radix: radix,
             block_size,
         };
         let chunks = ToDecimalBlockScheme::encrypt(signature, &unicode_conversion_key);
@@ -289,11 +289,11 @@ mod tests {
 
             let rsa_service = RsaWithStringService::new(service);
 
-            let g_base = 55296;
+            let radix = 55296;
 
-            let signature = rsa_service.sign(message, private_key, g_base);
+            let signature = rsa_service.sign(message, private_key, radix);
 
-            let is_valid = rsa_service.verify(&signature, message, public_key, g_base);
+            let is_valid = rsa_service.verify(&signature, message, public_key, radix);
             assert!(is_valid);
         });
     }
@@ -315,11 +315,11 @@ mod tests {
 
             let rsa_service = RsaWithStringService::new(service);
 
-            let g_base = 55296;
+            let radix = 55296;
 
-            let signature = rsa_service.sign(message, private_key, g_base);
+            let signature = rsa_service.sign(message, private_key, radix);
 
-            let is_valid = rsa_service.verify(&signature, message, public_key, g_base);
+            let is_valid = rsa_service.verify(&signature, message, public_key, radix);
             assert!(is_valid);
         });
     }
@@ -340,11 +340,11 @@ mod tests {
 
             let rsa_service = RsaWithStringService::new(service);
 
-            let g_base = 55296;
+            let radix = 55296;
 
-            let signature = rsa_service.sign(&message, private_key, g_base);
+            let signature = rsa_service.sign(&message, private_key, radix);
 
-            let is_valid = rsa_service.verify(&signature, &message, public_key, g_base);
+            let is_valid = rsa_service.verify(&signature, &message, public_key, radix);
             assert!(is_valid);
         });
     }
@@ -366,11 +366,11 @@ mod tests {
 
             let rsa_service = RsaWithStringService::new(service);
 
-            let g_base = 55296;
+            let radix = 55296;
 
-            let signature = rsa_service.sign(&message_one, private_key, g_base);
+            let signature = rsa_service.sign(&message_one, private_key, radix);
 
-            let is_valid = rsa_service.verify(&signature, &message_two, public_key, g_base);
+            let is_valid = rsa_service.verify(&signature, &message_two, public_key, radix);
             assert!(!is_valid);
         });
     }
