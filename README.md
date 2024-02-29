@@ -2,23 +2,7 @@
 
 [![Rust-CI](https://github.com/Tristan-H11/RSA-Implementation/actions/workflows/rust-ci.yml/badge.svg)](https://github.com/Tristan-H11/RSA-Implementation/actions/workflows/rust-ci.yml)
 
-Dieses Projekt ist eine Implementierung des RSA-Algorithmus in Rust und TypeScript.
-
-## Inhaltsverzeichnis
-
-- [Technologien](#technologien)
-- [Installation](#installation)
-- [Verwendung](#verwendung)
-
-## Technologien
-
-Dieses Projekt wurde mit:
-
-- Rust 1.55.0
-- TypeScript 4.4
-- Angular 12.2
-- npm 7.21
-- Cargo 1.55
+Dieses Projekt ist eine Implementierung des RSA-Algorithmus und einiger ElGamal-Derivate in Rust und TypeScript.
 
 ## Installation
 
@@ -44,11 +28,11 @@ Um das Projekt auszuführen, verwenden Sie die folgenden Befehle:
 
 Für Rust:
 ```
-cargo run
+cargo run --release
 ```
 
 Für Angular:
 ```
-cd ./gui
+cd ./GUI
 ng serve
 ```
