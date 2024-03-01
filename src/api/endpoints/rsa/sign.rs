@@ -1,10 +1,14 @@
 use crate::api::basic::call_checked_with_parsed_big_ints;
 use actix_web::web::{Json, Query};
 use actix_web::{HttpResponse, Responder};
+use keys::RsaWithStringPrivateKey;
 use log::info;
 use serde::Deserialize;
 
 use crate::api::serializable_models::{KeyPair, SingleStringResponse, UseFastQuery};
+use crate::encryption::asymmetric_encryption_types::Signer;
+use crate::encryption::string_schemes::rsa::keys;
+use crate::encryption::string_schemes::rsa::rsa_with_string_scheme::RsaWithStringScheme;
 use crate::math_core::number_theory::number_theory_service::NumberTheoryService;
 use crate::math_core::number_theory::number_theory_service::NumberTheoryServiceSpeed::{
     Fast, Slow,
@@ -47,12 +51,13 @@ pub(crate) async fn sign(
             false => NumberTheoryService::new(Slow),
         };
 
-        let rsa_service =
-            crate::encryption::string_schemes::rsa::rsa_with_string_service::RsaWithStringService::new(
-                number_theory_service,
-            );
+        let rsa_with_string_key = RsaWithStringPrivateKey {
+            rsa_private_key: private_key,
+            radix,
+        };
 
-        let signature = rsa_service.sign(&plaintext, &private_key, radix);
+        let signature =
+            RsaWithStringScheme::sign(&rsa_with_string_key, &plaintext, number_theory_service);
         let response = SingleStringResponse { message: signature };
 
         Ok(HttpResponse::Ok().json(response))

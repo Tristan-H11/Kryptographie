@@ -1,5 +1,5 @@
 use bigdecimal::num_bigint::{BigInt, Sign};
-use log::{debug};
+use log::debug;
 use sha2::{Digest, Sha256};
 
 use crate::encryption::asymmetric_encryption_types::{
@@ -236,7 +236,6 @@ impl RsaWithStringScheme {
 
 #[cfg(test)]
 mod tests {
-    use crate::encryption::asymmetric_encryption_types::KeyGenerator;
     use crate::encryption::core::rsa::rsa_scheme::RsaKeyGenConfig;
     use crate::math_core::number_theory::number_theory_service::NumberTheoryServiceSpeed::{
         Fast, Slow,

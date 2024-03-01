@@ -4,7 +4,7 @@ use crate::encryption::asymmetric_encryption_types::{
 };
 use crate::encryption::core::rsa::keys;
 use crate::encryption::encryption_types::Key;
-use crate::encryption::string_schemes::rsa::rsa_with_string_service::RsaWithStringScheme;
+use crate::encryption::string_schemes::rsa::rsa_with_string_scheme::RsaWithStringScheme;
 use keys::{RsaPrivateKey, RsaPublicKey};
 
 #[derive(Clone, Debug)]

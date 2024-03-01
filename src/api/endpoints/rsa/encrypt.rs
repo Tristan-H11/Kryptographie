@@ -4,6 +4,9 @@ use actix_web::{HttpResponse, Responder};
 use log::info;
 
 use crate::api::serializable_models::{EncryptDecryptRequest, SingleStringResponse, UseFastQuery};
+use crate::encryption::asymmetric_encryption_types::AsymmetricEncryptor;
+use crate::encryption::string_schemes::rsa::keys::RsaWithStringPublicKey;
+use crate::encryption::string_schemes::rsa::rsa_with_string_scheme::RsaWithStringScheme;
 use crate::math_core::number_theory::number_theory_service::NumberTheoryService;
 use crate::math_core::number_theory::number_theory_service::NumberTheoryServiceSpeed::{
     Fast, Slow,
@@ -34,12 +37,13 @@ pub(crate) async fn encrypt(
             false => NumberTheoryService::new(Slow),
         };
 
-        let rsa_service =
-            crate::encryption::string_schemes::rsa::rsa_with_string_service::RsaWithStringService::new(
-                number_theory_service,
-            );
+        let rsa_with_string_key = RsaWithStringPublicKey {
+            rsa_public_key: public_key,
+            radix: number_system_base,
+        };
 
-        let ciphertext = rsa_service.encrypt(&plaintext, number_system_base, &public_key);
+        let ciphertext =
+            RsaWithStringScheme::encrypt(&rsa_with_string_key, &plaintext, number_theory_service);
         let response = SingleStringResponse {
             message: ciphertext,
         };

@@ -5,6 +5,9 @@ use log::info;
 use serde::Deserialize;
 
 use crate::api::serializable_models::{KeyPair, SingleStringResponse, UseFastQuery};
+use crate::encryption::asymmetric_encryption_types::Verifier;
+use crate::encryption::string_schemes::rsa::keys::RsaWithStringPublicKey;
+use crate::encryption::string_schemes::rsa::rsa_with_string_scheme::RsaWithStringScheme;
 use crate::math_core::number_theory::number_theory_service::NumberTheoryService;
 use crate::math_core::number_theory::number_theory_service::NumberTheoryServiceSpeed::{
     Fast, Slow,
@@ -49,12 +52,17 @@ pub(crate) async fn verify(
             false => NumberTheoryService::new(Slow),
         };
 
-        let rsa_service =
-            crate::encryption::string_schemes::rsa::rsa_with_string_service::RsaWithStringService::new(
-                number_theory_service,
-            );
+        let rsa_with_string_key = RsaWithStringPublicKey {
+            rsa_public_key: public_key,
+            radix,
+        };
 
-        let plaintext = rsa_service.verify(&signature, &plaintext, &public_key, radix);
+        let plaintext = RsaWithStringScheme::verify(
+            &rsa_with_string_key,
+            &plaintext,
+            &signature,
+            number_theory_service,
+        );
         let response = SingleStringResponse {
             message: plaintext.to_string(),
         };
