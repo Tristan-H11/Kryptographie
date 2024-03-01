@@ -2,8 +2,8 @@ use crate::encryption::asymmetric_encryption_types::{
     AsymmetricDecryptor, AsymmetricEncryptionScheme, AsymmetricEncryptor, KeyGenWithPrimeConfig,
     KeyGenerator, Signer, Verifier,
 };
+use crate::encryption::core::rsa::keys::{RsaKeyPair, RsaPrivateKey, RsaPublicKey};
 use crate::encryption::encryption_types::{Decryptor, EncryptionScheme, Encryptor};
-use crate::encryption::rsa::keys::{RsaKeyPair, RsaPrivateKey, RsaPublicKey};
 use crate::math_core::number_theory::number_theory_service::{
     NumberTheoryService, NumberTheoryServiceTrait,
 };

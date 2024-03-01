@@ -1,4 +1,4 @@
-use crate::encryption::rsa::keys::{RsaPrivateKey, RsaPublicKey};
+use crate::encryption::core::rsa::keys::{RsaPrivateKey, RsaPublicKey};
 use bigdecimal::num_bigint::ParseBigIntError;
 use log::debug;
 use serde::{Deserialize, Serialize};

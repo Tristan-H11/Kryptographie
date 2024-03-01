@@ -50,7 +50,7 @@ pub(crate) async fn verify(
         };
 
         let rsa_service =
-            crate::encryption::rsa::rsa_with_string_service::RsaWithStringService::new(
+            crate::encryption::string_schemes::rsa::rsa_with_string_service::RsaWithStringService::new(
                 number_theory_service,
             );
 

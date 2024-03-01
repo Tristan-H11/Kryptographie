@@ -1,6 +1,6 @@
-use crate::encryption::block_chiffre::from_decimal_block_scheme::FromDecimalBlockScheme;
-use crate::encryption::block_chiffre::to_decimal_block_scheme::ToDecimalBlockScheme;
 use crate::encryption::encryption_types::Key;
+use crate::encryption::string_schemes::decimal_unicode_schemes::from_decimal_block_scheme::FromDecimalBlockScheme;
+use crate::encryption::string_schemes::decimal_unicode_schemes::to_decimal_block_scheme::ToDecimalBlockScheme;
 use crate::encryption::symmetric_encryption_types::{
     SymmetricDecryptionKey, SymmetricEncryptionKey, SymmetricKey,
 };

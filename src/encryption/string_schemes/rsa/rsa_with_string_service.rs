@@ -2,11 +2,11 @@ use crate::encryption::asymmetric_encryption_types::{
     AsymmetricDecryptor, AsymmetricEncryptor, Signer,
 };
 
-use crate::encryption::block_chiffre::from_decimal_block_scheme::FromDecimalBlockScheme;
-use crate::encryption::block_chiffre::keys::DecimalUnicodeConversionSchemeKey;
-use crate::encryption::block_chiffre::to_decimal_block_scheme::ToDecimalBlockScheme;
-use crate::encryption::rsa::keys::{RsaPrivateKey, RsaPublicKey};
-use crate::encryption::rsa::rsa_scheme::RsaScheme;
+use crate::encryption::core::rsa::keys::{RsaPrivateKey, RsaPublicKey};
+use crate::encryption::core::rsa::rsa_scheme::RsaScheme;
+use crate::encryption::string_schemes::decimal_unicode_schemes::from_decimal_block_scheme::FromDecimalBlockScheme;
+use crate::encryption::string_schemes::decimal_unicode_schemes::keys::DecimalUnicodeConversionSchemeKey;
+use crate::encryption::string_schemes::decimal_unicode_schemes::to_decimal_block_scheme::ToDecimalBlockScheme;
 use crate::encryption::symmetric_encryption_types::{SymmetricDecryptor, SymmetricEncryptor};
 use bigdecimal::num_bigint::{BigInt, Sign};
 use log::{debug, info};
@@ -189,7 +189,7 @@ impl RsaWithStringService {
 mod tests {
     use crate::encryption::asymmetric_encryption_types::KeyGenerator;
 
-    use crate::encryption::rsa::rsa_scheme::RsaKeyGenConfig;
+    use crate::encryption::core::rsa::rsa_scheme::RsaKeyGenConfig;
     use crate::math_core::number_theory::number_theory_service::NumberTheoryServiceSpeed::{
         Fast, Slow,
     };

@@ -1,9 +1,9 @@
 use bigdecimal::num_bigint::BigInt;
 use bigdecimal::{One, Zero};
 
-use crate::encryption::block_chiffre::decimal_unicode_conversion_core::ToRadixString;
-use crate::encryption::block_chiffre::keys::DecimalUnicodeConversionSchemeKey;
 use crate::encryption::encryption_types::{Decryptor, EncryptionScheme, Encryptor};
+use crate::encryption::string_schemes::decimal_unicode_schemes::decimal_unicode_conversion_core::ToRadixString;
+use crate::encryption::string_schemes::decimal_unicode_schemes::keys::DecimalUnicodeConversionSchemeKey;
 use crate::encryption::symmetric_encryption_types::{
     SymmetricDecryptor, SymmetricEncryptionScheme, SymmetricEncryptor,
 };

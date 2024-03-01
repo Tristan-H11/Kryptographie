@@ -2,7 +2,9 @@ use crate::encryption::asymmetric_encryption_types::{
     AsymmetricDecryptor, AsymmetricEncryptionScheme, AsymmetricEncryptor, KeyGenWithPrimeConfig,
     KeyGenerator,
 };
-use crate::encryption::el_gamal::keys::{ElGamalKeyPair, ElGamalPrivateKey, ElGamalPublicKey};
+use crate::encryption::core::el_gamal::keys::{
+    ElGamalKeyPair, ElGamalPrivateKey, ElGamalPublicKey,
+};
 use crate::encryption::encryption_types::{Decryptor, EncryptionScheme, Encryptor};
 use crate::math_core::number_theory::number_theory_service::{
     NumberTheoryService, NumberTheoryServiceTrait,

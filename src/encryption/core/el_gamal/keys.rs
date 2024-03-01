@@ -2,7 +2,7 @@ use crate::encryption::asymmetric_encryption_types::{
     AsymmetricDecryptionKey, AsymmetricEncryptionKey, AsymmetricKey, AsymmetricKeyPair, PrivateKey,
     PublicKey,
 };
-use crate::encryption::el_gamal::el_gamal_scheme::ElGamalScheme;
+use crate::encryption::core::el_gamal::el_gamal_scheme::ElGamalScheme;
 use crate::encryption::encryption_types::Key;
 use bigdecimal::num_bigint::BigInt;
 

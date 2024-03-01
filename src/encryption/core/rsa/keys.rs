@@ -2,7 +2,7 @@ use crate::encryption::asymmetric_encryption_types::{
     AsymmetricDecryptionKey, AsymmetricEncryptionKey, AsymmetricKey, AsymmetricKeyPair, PrivateKey,
     PublicKey, SignatureKey, VerificationKey,
 };
-use crate::encryption::rsa::rsa_scheme::RsaScheme;
+use crate::encryption::core::rsa::rsa_scheme::RsaScheme;
 
 use crate::encryption::encryption_types::Key;
 use bigdecimal::num_bigint::BigInt;

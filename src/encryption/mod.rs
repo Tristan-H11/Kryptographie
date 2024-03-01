@@ -1,6 +1,5 @@
-pub(crate) mod asymmetric_encryption_types;
-pub mod block_chiffre;
-pub mod el_gamal;
-mod encryption_types;
-pub(crate) mod rsa;
-mod symmetric_encryption_types;
+pub mod asymmetric_encryption_types;
+pub mod core;
+pub mod encryption_types;
+pub mod string_schemes;
+pub mod symmetric_encryption_types;
