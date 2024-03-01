@@ -123,7 +123,7 @@ pub trait AsymmetricDecryptor<T: AsymmetricEncryptionScheme>: Decryptor<T> {
 
 /// Ein Signierer für das asymmetrische Verschlüsselungsschema.
 pub trait Signer<T: AsymmetricEncryptionScheme> {
-    type Input;
+    type Input: ?Sized;
     type Output;
     type Key: SignatureKey<T>;
     /// Signiert die gegebene Nachricht mit dem gegebenen Schlüssel.
@@ -140,7 +140,7 @@ pub trait Signer<T: AsymmetricEncryptionScheme> {
 
 /// Ein Verifizierer für das asymmetrische Verschlüsselungsschema.
 pub trait Verifier<T: AsymmetricEncryptionScheme> {
-    type Input;
+    type Input: ?Sized;
     type Output;
     type Key: VerificationKey<T>;
     /// Überprüft die gegebene Signatur für die gegebene Nachricht mit dem gegebenen Schlüssel.
