@@ -44,7 +44,7 @@ where
     fn generate_keypair(&self) -> Self::KeyPair;
 }
 
-pub trait SymmetricEncryptor<'a, T: SymmetricEncryptionScheme>: Encryptor<'a, T> {
+pub trait SymmetricEncryptor<T: SymmetricEncryptionScheme>: Encryptor<T> {
     /// Verschlüsselt den gegebenen Klartext mit dem gegebenen Schlüssel.
     ///
     /// # Argumente
@@ -56,7 +56,7 @@ pub trait SymmetricEncryptor<'a, T: SymmetricEncryptionScheme>: Encryptor<'a, T>
     fn encrypt(plaintext: &Self::Input, key: &Self::Key) -> Self::Output;
 }
 
-pub trait SymmetricDecryptor<'a, T: SymmetricEncryptionScheme>: Decryptor<'a, T> {
+pub trait SymmetricDecryptor<T: SymmetricEncryptionScheme>: Decryptor<T> {
     /// Entschlüsselt den gegebenen Geheimtext mit dem gegebenen Schlüssel.
     ///
     /// # Argumente

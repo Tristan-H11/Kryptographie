@@ -16,13 +16,13 @@ impl EncryptionScheme for FromDecimalBlockScheme {}
 
 impl SymmetricEncryptionScheme for FromDecimalBlockScheme {}
 
-impl<'a> Encryptor<'a, FromDecimalBlockScheme> for FromDecimalBlockScheme {
+impl Encryptor<FromDecimalBlockScheme> for FromDecimalBlockScheme {
     type Input = Vec<BigInt>;
     type Output = String;
     type Key = DecimalUnicodeConversionSchemeKey;
 }
 
-impl<'a> SymmetricEncryptor<'a, FromDecimalBlockScheme> for FromDecimalBlockScheme {
+impl SymmetricEncryptor<FromDecimalBlockScheme> for FromDecimalBlockScheme {
     /// Erzeugt einen String aus den gegebenen Dezimalzahlen, indem die g-adische Entwicklung der Zahlen gebildet wird.
     /// Dabei wird die Basis aus dem Schlüssel verwendet.
     /// Um die gegebene Blockgröße zu erreichen, wird der String mit führenden Unicode-Nullen aufgefüllt.
@@ -61,13 +61,13 @@ impl<'a> SymmetricEncryptor<'a, FromDecimalBlockScheme> for FromDecimalBlockSche
     }
 }
 
-impl<'a> Decryptor<'a, FromDecimalBlockScheme> for FromDecimalBlockScheme {
+impl<'a> Decryptor<FromDecimalBlockScheme> for FromDecimalBlockScheme {
     type Input = str;
     type Output = Vec<BigInt>;
     type Key = DecimalUnicodeConversionSchemeKey;
 }
 
-impl<'a> SymmetricDecryptor<'a, FromDecimalBlockScheme> for FromDecimalBlockScheme {
+impl<'a> SymmetricDecryptor<FromDecimalBlockScheme> for FromDecimalBlockScheme {
     /// Interpretiert den String als eine Zeichenkette von Unicode-Zeichen bis zu einem gegebenen Radix, teilt diese
     /// Zeichenkette in Blöcke der gegebenen Größe auf und wandelt diese Blöcke in Dezimalzahlen um.
     ///

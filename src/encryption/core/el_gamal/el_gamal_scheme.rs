@@ -98,13 +98,13 @@ impl KeyGenerator<ElGamalPublicKey, ElGamalPrivateKey, ElGamalScheme> for ElGama
     }
 }
 
-impl Encryptor<'_, ElGamalScheme> for ElGamalScheme {
+impl Encryptor<ElGamalScheme> for ElGamalScheme {
     type Input = BigInt;
     type Output = (BigInt, BigInt);
     type Key = ElGamalPublicKey;
 }
 
-impl AsymmetricEncryptor<'_, ElGamalScheme> for ElGamalScheme {
+impl AsymmetricEncryptor<ElGamalScheme> for ElGamalScheme {
     /// Verschlüsselt eine Nachricht mit dem öffentlichen Schlüssel des ElGamal-Kryptosystems in primen Restklassengruppen.
     ///
     /// # Argumente
@@ -146,13 +146,13 @@ impl AsymmetricEncryptor<'_, ElGamalScheme> for ElGamalScheme {
     }
 }
 
-impl Decryptor<'_, ElGamalScheme> for ElGamalScheme {
+impl Decryptor<ElGamalScheme> for ElGamalScheme {
     type Input = (BigInt, BigInt);
     type Output = BigInt;
     type Key = ElGamalPrivateKey;
 }
 
-impl AsymmetricDecryptor<'_, ElGamalScheme> for ElGamalScheme {
+impl AsymmetricDecryptor<ElGamalScheme> for ElGamalScheme {
     /// Entschlüsselt eine Nachricht mit dem privaten Schlüssel des ElGamal-Kryptosystems in primen Restklassengruppen.
     ///
     /// # Argumente

@@ -76,13 +76,13 @@ impl KeyGenerator<RsaPublicKey, RsaPrivateKey, RsaScheme> for RsaScheme {
     }
 }
 
-impl<'a> Encryptor<'a, RsaScheme> for RsaScheme {
+impl Encryptor<RsaScheme> for RsaScheme {
     type Input = BigInt;
     type Output = BigInt;
     type Key = RsaPublicKey;
 }
 
-impl<'a> AsymmetricEncryptor<'a, RsaScheme> for RsaScheme {
+impl AsymmetricEncryptor<RsaScheme> for RsaScheme {
     fn encrypt(
         key: &Self::Key,
         plaintext: &Self::Input,
@@ -92,13 +92,13 @@ impl<'a> AsymmetricEncryptor<'a, RsaScheme> for RsaScheme {
     }
 }
 
-impl<'a> Decryptor<'a, RsaScheme> for RsaScheme {
+impl Decryptor<RsaScheme> for RsaScheme {
     type Input = BigInt;
     type Output = BigInt;
     type Key = RsaPrivateKey;
 }
 
-impl<'a> AsymmetricDecryptor<'a, RsaScheme> for RsaScheme {
+impl AsymmetricDecryptor<RsaScheme> for RsaScheme {
     fn decrypt(
         key: &Self::Key,
         ciphertext: &Self::Input,

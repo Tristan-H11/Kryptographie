@@ -17,13 +17,13 @@ impl EncryptionScheme for ToDecimalBlockScheme {}
 
 impl SymmetricEncryptionScheme for ToDecimalBlockScheme {}
 
-impl<'a> Encryptor<'a, ToDecimalBlockScheme> for ToDecimalBlockScheme {
+impl<'a> Encryptor<ToDecimalBlockScheme> for ToDecimalBlockScheme {
     type Input = str;
     type Output = Vec<BigInt>;
     type Key = DecimalUnicodeConversionSchemeKey;
 }
 
-impl<'a> SymmetricEncryptor<'a, ToDecimalBlockScheme> for ToDecimalBlockScheme {
+impl<'a> SymmetricEncryptor<ToDecimalBlockScheme> for ToDecimalBlockScheme {
     /// Interpretiert den String als eine Zeichenkette von Unicode-Zeichen bis zu einem gegebenen Radix, teilt diese
     /// Zeichenkette in Blöcke der gegebenen Größe auf und wandelt diese Blöcke in Dezimalzahlen um.
     ///
@@ -69,13 +69,13 @@ impl<'a> SymmetricEncryptor<'a, ToDecimalBlockScheme> for ToDecimalBlockScheme {
     }
 }
 
-impl<'a> Decryptor<'a, ToDecimalBlockScheme> for ToDecimalBlockScheme {
+impl Decryptor<ToDecimalBlockScheme> for ToDecimalBlockScheme {
     type Input = Vec<BigInt>;
     type Output = String;
     type Key = DecimalUnicodeConversionSchemeKey;
 }
 
-impl<'a> SymmetricDecryptor<'a, ToDecimalBlockScheme> for ToDecimalBlockScheme {
+impl SymmetricDecryptor<ToDecimalBlockScheme> for ToDecimalBlockScheme {
     /// Wandelt die Dezimalzahlen in Blöcke von Unicode-Zeichen um und fügt diese Blöcke zu einer Zeichenfolge zusammen.
     ///
     /// # Arguments

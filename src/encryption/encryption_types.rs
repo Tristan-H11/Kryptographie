@@ -5,14 +5,14 @@ pub trait EncryptionScheme {}
 pub trait Key<T: EncryptionScheme> {}
 
 /// Ein Verschlüsselungsverfahren.
-pub trait Encryptor<'a, T: EncryptionScheme> {
+pub trait Encryptor<T: EncryptionScheme> {
     type Input: ?Sized;
     type Output;
     type Key: Key<T>;
 }
 
 /// Ein Entschlüsselungsverfahren.
-pub trait Decryptor<'a, T: EncryptionScheme> {
+pub trait Decryptor<T: EncryptionScheme> {
     type Input: ?Sized;
     type Output;
     type Key: Key<T>;
