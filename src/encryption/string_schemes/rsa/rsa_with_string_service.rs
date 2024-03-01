@@ -1,172 +1,221 @@
+use bigdecimal::num_bigint::{BigInt, Sign};
+use log::{debug};
+use sha2::{Digest, Sha256};
+
 use crate::encryption::asymmetric_encryption_types::{
-    AsymmetricDecryptor, AsymmetricEncryptor, Signer,
+    AsymmetricDecryptor, AsymmetricEncryptionScheme, AsymmetricEncryptor, KeyGenWithPrimeConfig,
+    KeyGenerator, Signer, Verifier,
 };
 
-use crate::encryption::core::rsa::keys::{RsaPrivateKey, RsaPublicKey};
 use crate::encryption::core::rsa::rsa_scheme::RsaScheme;
+use crate::encryption::encryption_types::{Decryptor, EncryptionScheme, Encryptor};
 use crate::encryption::string_schemes::decimal_unicode_schemes::from_decimal_block_scheme::FromDecimalBlockScheme;
 use crate::encryption::string_schemes::decimal_unicode_schemes::keys::DecimalUnicodeConversionSchemeKey;
 use crate::encryption::string_schemes::decimal_unicode_schemes::to_decimal_block_scheme::ToDecimalBlockScheme;
+use crate::encryption::string_schemes::rsa::keys::{
+    RsaWithStringKeyPair, RsaWithStringPrivateKey, RsaWithStringPublicKey,
+};
 use crate::encryption::symmetric_encryption_types::{SymmetricDecryptor, SymmetricEncryptor};
-use bigdecimal::num_bigint::{BigInt, Sign};
-use log::{debug, info};
-use sha2::{Digest, Sha256};
-
 use crate::math_core::number_theory::number_theory_service::NumberTheoryService;
 use crate::math_core::traits::logarithm::Logarithm;
 
-pub struct RsaWithStringService {
-    number_theory_service: NumberTheoryService,
+pub struct RsaWithStringScheme {}
+
+impl EncryptionScheme for RsaWithStringScheme {}
+
+impl AsymmetricEncryptionScheme for RsaWithStringScheme {}
+
+impl<'a> Encryptor<RsaWithStringScheme> for RsaWithStringScheme {
+    type Input = str;
+    type Output = String;
+    type Key = RsaWithStringPublicKey;
 }
 
-impl RsaWithStringService {
-    // TODO: Interface extrahieren, wenn klar ist, wie ElGamal mit dem blockChiffre funktioniert.
-    pub fn new(number_theory_service: NumberTheoryService) -> RsaWithStringService {
-        RsaWithStringService {
-            number_theory_service,
-        }
-    }
-
-    /// Verschlüsselt eine Nachricht. Die Nachricht wird in Blöcke der Größe `block_size` aufgeteilt und dann
-    /// verschlüsselt. Die verschlüsselten Blöcke werden dann zu einem String zusammengefügt.
-    /// Nicht-volle Blöcke werden mit führenden Nullen aufgefüllt.
+impl AsymmetricEncryptor<RsaWithStringScheme> for RsaWithStringScheme {
+    /// Verschlüsselt eine beliebig lange Zeichenkette, in dem diese in Blöcke fester Größe aufgeteilt,
+    /// und dann unter einer Decimal-Unicode-Abbildung mittels RSA verschlüsselt werden.
+    /// Zu beachten ist dabei, dass nicht-volle Blöcke mit führenden Unicode-Nullen aufgefüllt werden.
     ///
     /// # Argumente
-    /// * `message` - Die zu verschlüsselnde Nachricht.
-    /// * `radix` - Die Basis des Zeichensatzes, in der die Nachricht verschlüsselt werden soll.
     /// * `key` - Der zu verwendende Schlüssel.
+    /// * `plaintext` - Der zu verschlüsselnde Klartext.
+    /// * `service` - Der zu verwendende NumberTheoryService.
     ///
     /// # Rückgabe
     /// * `String` - Die verschlüsselte Nachricht.
-    pub(crate) fn encrypt(&self, message: &str, radix: u32, key: &RsaPublicKey) -> String {
-        let block_size = key.n.log(&radix.into());
-        info!("Verschlüsseln mit blockgröße {}", block_size);
+    fn encrypt(
+        key: &Self::Key,
+        plaintext: &Self::Input,
+        service: NumberTheoryService,
+    ) -> Self::Output {
+        let radix = key.radix;
+        let block_size = key.rsa_public_key.n.log(&radix.into());
+        let pre_key = DecimalUnicodeConversionSchemeKey { radix, block_size };
+        let rsa_key = &key.rsa_public_key;
 
-        let pre_key = DecimalUnicodeConversionSchemeKey {
-            radix: radix,
-            block_size,
-        };
-
-        let chunks = ToDecimalBlockScheme::encrypt(message, &pre_key);
+        let chunks = ToDecimalBlockScheme::encrypt(plaintext, &pre_key);
         let encrypted_chunks = chunks
             .iter()
-            .map(|chunk| RsaScheme::encrypt(key, chunk, self.number_theory_service))
+            .map(|chunk| RsaScheme::encrypt(rsa_key, chunk, service))
             .collect();
 
         // Die Größe der verschlüsselten Blöcke ist immer um 1 größer als die Klartextgröße.
         let post_key = DecimalUnicodeConversionSchemeKey {
-            radix: radix,
+            radix,
             block_size: block_size + 1,
         };
         FromDecimalBlockScheme::encrypt(&encrypted_chunks, &post_key)
     }
+}
 
-    /// Entschlüsselt eine Nachricht. Unterscheidet sich zur Funktion `encrypt` nur in der Hinsicht, dass hier angenommen
-    /// wird, dass die verschlüsselten Blöcke immer um 1 größer sind als die Klartextblöcke, in denen die übergebene
-    /// Nachricht verschlüsselt wurde.
+impl<'a> Decryptor<RsaWithStringScheme> for RsaWithStringScheme {
+    type Input = str;
+    type Output = String;
+    type Key = RsaWithStringPrivateKey;
+}
+
+impl AsymmetricDecryptor<RsaWithStringScheme> for RsaWithStringScheme {
+    /// Entschlüsselt eine beliebig lange Zeichenkette, in dem diese in Blöcke fester Größe aufgeteilt,
+    /// und dann unter einer Decimal-Unicode-Abbildung mittels RSA entschlüsselt werden.
+    /// Im Regelfall wurde diese Nachricht vorher mit `encrypt` verschlüsselt und dann ist davon
+    /// auszugehen, dass die verschlüsselten Blöcke immer um 1 größer sind als die Klartextblöcke.
     ///
     /// # Argumente
-    /// * `message` - Die zu entschlüsselnde Nachricht.
-    /// * `radix` - Die Basis des Zeichensatzes, in der die Nachricht verschlüsselt wurde.
     /// * `key` - Der zu verwendende Schlüssel.
+    /// * `ciphertext` - Der zu verschlüsselnde Klartext.
+    /// * `service` - Der zu verwendende NumberTheoryService.
     ///
     /// # Rückgabe
     /// * `String` - Die entschlüsselte Nachricht.
-    pub(crate) fn decrypt(&self, message: &str, radix: u32, key: &RsaPrivateKey) -> String {
-        let block_size = key.n.log(&radix.into()) + 1;
-        info!("Entschlüsseln mit blockgröße {}", block_size);
+    fn decrypt(
+        key: &Self::Key,
+        ciphertext: &Self::Input,
+        service: NumberTheoryService,
+    ) -> Self::Output {
+        let radix = key.radix;
+        let rsa_key = &key.rsa_private_key;
+        let block_size = rsa_key.n.log(&radix.into()) + 1;
 
-        let unicode_conversion_key = DecimalUnicodeConversionSchemeKey {
-            radix: radix,
-            block_size,
-        };
-        let chunks = FromDecimalBlockScheme::decrypt(message, &unicode_conversion_key);
+        let unicode_conversion_key = DecimalUnicodeConversionSchemeKey { radix, block_size };
+        let chunks = FromDecimalBlockScheme::decrypt(ciphertext, &unicode_conversion_key);
         let decrypted_chunks = chunks
             .iter()
-            .map(|chunk| RsaScheme::decrypt(key, chunk, self.number_theory_service))
+            .map(|chunk| RsaScheme::decrypt(rsa_key, chunk, service))
             .collect();
 
         ToDecimalBlockScheme::decrypt(&decrypted_chunks, &unicode_conversion_key)
     }
+}
 
-    /// Signiert eine Nachricht mit dem privaten Schlüssel.
+impl<'a> Signer<RsaWithStringScheme> for RsaWithStringScheme {
+    type Input = str;
+    type Output = String;
+    type Key = RsaWithStringPrivateKey;
+
+    /// Signiert eine Nachricht. Dafür wird die Nachricht gehasht und dann unter einer
+    /// Decimal-Unicode-Abbildung mittels RSA signiert.
     ///
     /// # Argumente
-    /// * `message` - Die zu signierende Nachricht.
     /// * `key` - Der private Schlüssel.
-    /// * `radix` - Die Basis des Zeichensatzes, in der die Nachricht signiert werden soll.
+    /// * `message` - Die zu signierende Nachricht.
+    /// * `service` - Der zu verwendende NumberTheoryService.
     ///
     /// # Rückgabe
     /// * `String` - Die Signatur.
-    pub(crate) fn sign(&self, message: &str, key: &RsaPrivateKey, radix: u32) -> String {
-        info!("Signieren der Nachricht {}", message);
-        let hashed_message = RsaWithStringService::get_decimal_hash(message).to_str_radix(10);
+    ///
+    fn sign(key: &Self::Key, message: &Self::Input, service: NumberTheoryService) -> Self::Output {
+        let radix = key.radix;
+        let rsa_key = &key.rsa_private_key;
+        let block_size = rsa_key.n.log(&radix.into());
+        let hashed_message = RsaWithStringScheme::get_decimal_hash(message).to_str_radix(10);
 
-        let block_size = key.n.log(&radix.into());
-        let pre_key = DecimalUnicodeConversionSchemeKey {
-            radix: radix,
-            block_size,
-        };
+        let pre_key = DecimalUnicodeConversionSchemeKey { radix, block_size };
         let chunks = ToDecimalBlockScheme::encrypt(&hashed_message, &pre_key);
         let encrypted_chunks = chunks
             .iter()
-            .map(|chunk| RsaScheme::sign(key, chunk, self.number_theory_service))
+            .map(|chunk| RsaScheme::sign(rsa_key, chunk, service))
             .collect();
 
         // Die Größe der verschlüsselten Blöcke ist immer um 1 größer als die Klartextgröße.
         let post_key = DecimalUnicodeConversionSchemeKey {
-            radix: radix,
+            radix,
             block_size: block_size + 1,
         };
         FromDecimalBlockScheme::encrypt(&encrypted_chunks, &post_key)
     }
+}
 
-    /// Verifiziert eine Nachricht mit der Signatur.
+impl<'a> Verifier<RsaWithStringScheme> for RsaWithStringScheme {
+    type Input = str;
+    type Output = bool;
+    type Key = RsaWithStringPublicKey;
+
+    /// Verifiert eine Nachricht gegen eine Signatur. // TODO: Auf RsaScheme::verify umstellen
     ///
     /// # Argumente
+    /// * `key` - Der öffentliche Schlüssel.
     /// * `signature` - Die Signatur.
     /// * `message` - Die Nachricht.
-    /// * `key` - Der öffentliche Schlüssel.
-    /// * `radix` - Die Basis des Zeichensatzes, in der die Nachricht signiert werden soll.
+    /// * `service` - Der zu verwendende NumberTheoryService.
     ///
     /// # Rückgabe
     /// * `bool` - Gibt an, ob die Verifizierung erfolgreich war.
-    pub(crate) fn verify(
-        &self,
-        signature: &str,
-        message: &str,
-        key: &RsaPublicKey,
-        radix: u32,
-    ) -> bool {
-        info!(
-            "Verifizieren der Nachricht {} mit Signatur {}",
-            message, signature
-        );
-        let message_big_int = RsaWithStringService::get_decimal_hash(message).to_str_radix(10);
+    fn verify(
+        key: &Self::Key,
+        signature: &Self::Input,
+        message: &Self::Input,
+        service: NumberTheoryService,
+    ) -> Self::Output {
+        let radix = key.radix;
+        let rsa_key = &key.rsa_public_key;
+        let block_size = rsa_key.n.log(&radix.into());
 
-        let block_size = key.n.log(&radix.into()) + 1;
-        info!("Entschlüsseln mit blockgröße {}", block_size);
-
-        let unicode_conversion_key = DecimalUnicodeConversionSchemeKey {
-            radix: radix,
-            block_size,
+        let message_unicode_conversion_key =
+            DecimalUnicodeConversionSchemeKey { radix, block_size };
+        let signature_unicode_conversion_key = DecimalUnicodeConversionSchemeKey {
+            radix,
+            block_size: block_size + 1,
         };
-        let chunks = ToDecimalBlockScheme::encrypt(signature, &unicode_conversion_key);
-        // Ja, da steht encrypt. Das ist aber korrekt, weil dahinter auch nur eine Exponentiation steckt und die Typen aktuell noch nicht stimmen.
-        // Das Umstellen auf Verify komm mit dem Refactoring dieses Services hier.
-        // Dafür ist es nötig, dass Signatur und Nachricht beide als BigInt vorliegen und nicht als String.
-        let decrypted_chunks = chunks
+
+        let hashed_message = RsaWithStringScheme::get_decimal_hash(message).to_str_radix(10);
+        // Die g-adisch entwickelten Werte der gehashten Nachricht
+        let message_chunks =
+            ToDecimalBlockScheme::encrypt(&hashed_message, &message_unicode_conversion_key);
+        // Die verschlüsselten Werte der Signatur
+        let encrypted_signature_chunks =
+            FromDecimalBlockScheme::decrypt(signature, &signature_unicode_conversion_key);
+
+        message_chunks
             .iter()
-            .map(|chunk| RsaScheme::encrypt(key, chunk, self.number_theory_service))
-            .collect();
+            .zip(encrypted_signature_chunks.iter())
+            .all(|(message_chunk, encrypted_signature_chunk)| {
+                RsaScheme::verify(rsa_key, message_chunk, encrypted_signature_chunk, service)
+            })
+    }
+}
 
-        let verification =
-            ToDecimalBlockScheme::decrypt(&decrypted_chunks, &unicode_conversion_key);
+impl RsaWithStringScheme {
+    // TODO KeyGenConfig anpassen? Das hier passt nicht mehr ins Muster
 
-        verification == message_big_int
+    fn generate_keypair(config: &impl KeyGenWithPrimeConfig, radix: u32) -> RsaWithStringKeyPair {
+        let rsa_key_pair = RsaScheme::generate_keypair(config);
+
+        let public_key = RsaWithStringPublicKey {
+            rsa_public_key: rsa_key_pair.public_key,
+            radix,
+        };
+        let private_key = RsaWithStringPrivateKey {
+            rsa_private_key: rsa_key_pair.private_key,
+            radix,
+        };
+
+        RsaWithStringKeyPair {
+            public_key,
+            private_key,
+        }
     }
 
-    /// Diese Methode berechnet den Hash einer Nachricht.
+    /// Diese Methode berechnet den SHA256-Hash einer Nachricht.
     ///
     /// # Argumente
     /// * `message` - Die Nachricht.
@@ -188,7 +237,6 @@ impl RsaWithStringService {
 #[cfg(test)]
 mod tests {
     use crate::encryption::asymmetric_encryption_types::KeyGenerator;
-
     use crate::encryption::core::rsa::rsa_scheme::RsaKeyGenConfig;
     use crate::math_core::number_theory::number_theory_service::NumberTheoryServiceSpeed::{
         Fast, Slow,
@@ -212,16 +260,7 @@ mod tests {
                 random_seed: 73,
                 number_theory_service: service.clone(),
             };
-            let key_pair = RsaScheme::generate_keypair(&config);
-            let (public_key, private_key) = (&key_pair.public_key, &key_pair.private_key);
-
-            let rsa_service = RsaWithStringService::new(service);
-
-            let encrypted_message = rsa_service.encrypt(message, 55296, public_key);
-            println!("Verschlüsselte Nachricht: {}", encrypted_message);
-
-            let decrypted_message = rsa_service.decrypt(&encrypted_message, 55296, private_key);
-            assert_eq!(message, decrypted_message);
+            encryption_decryption_assert(config, 55296, message, service);
         });
     }
 
@@ -236,16 +275,7 @@ mod tests {
                 random_seed: 3,
                 number_theory_service: service.clone(),
             };
-            let key_pair = RsaScheme::generate_keypair(&config);
-            let (public_key, private_key) = (&key_pair.public_key, &key_pair.private_key);
-
-            let rsa_service = RsaWithStringService::new(service);
-
-            let encrypted_message = rsa_service.encrypt(message, 55296, public_key);
-            println!("Verschlüsselte Nachricht: {}", encrypted_message);
-
-            let decrypted_message = rsa_service.decrypt(&encrypted_message, 55296, private_key);
-            assert_eq!(message, decrypted_message);
+            encryption_decryption_assert(config, 55296, message, service);
         });
     }
 
@@ -260,17 +290,27 @@ mod tests {
                 random_seed: 874,
                 number_theory_service: service.clone(),
             };
-            let key_pair = RsaScheme::generate_keypair(&config);
-            let (public_key, private_key) = (&key_pair.public_key, &key_pair.private_key);
-
-            let rsa_service = RsaWithStringService::new(service);
-
-            let encrypted_message = rsa_service.encrypt(message, 55296, public_key);
-            println!("Verschlüsselte Nachricht: {}", encrypted_message);
-
-            let decrypted_message = rsa_service.decrypt(&encrypted_message, 55296, private_key);
-            assert_eq!(message, decrypted_message);
+            encryption_decryption_assert(config, 55296, message, service);
         });
+    }
+
+    /// Diese Methode führt die Verschlüsselung und Entschlüsselung einer Nachricht mit einem
+    /// gegebenen Schlüssel durch und prüft, ob die ursprüngliche Nachricht wiederhergestellt werden kann.
+    fn encryption_decryption_assert(
+        config: RsaKeyGenConfig,
+        _radix: u32,
+        message: &str,
+        service: NumberTheoryService,
+    ) {
+        let radix = 55296;
+        let key_pair = RsaWithStringScheme::generate_keypair(&config, radix);
+        let (public_key, private_key) = (&key_pair.public_key, &key_pair.private_key);
+
+        let encrypted_message = RsaWithStringScheme::encrypt(public_key, message, service.clone());
+
+        let decrypted_message =
+            RsaWithStringScheme::decrypt(private_key, &encrypted_message, service.clone());
+        assert_eq!(message, decrypted_message);
     }
 
     #[test]
@@ -284,17 +324,7 @@ mod tests {
                 random_seed: 653,
                 number_theory_service: service.clone(),
             };
-            let key_pair = RsaScheme::generate_keypair(&config);
-            let (public_key, private_key) = (&key_pair.public_key, &key_pair.private_key);
-
-            let rsa_service = RsaWithStringService::new(service);
-
-            let radix = 55296;
-
-            let signature = rsa_service.sign(message, private_key, radix);
-
-            let is_valid = rsa_service.verify(&signature, message, public_key, radix);
-            assert!(is_valid);
+            sign_verify_assert(config, 55296, message, service, true);
         });
     }
 
@@ -310,17 +340,7 @@ mod tests {
                 random_seed: 55,
                 number_theory_service: service.clone(),
             };
-            let key_pair = RsaScheme::generate_keypair(&config);
-            let (public_key, private_key) = (&key_pair.public_key, &key_pair.private_key);
-
-            let rsa_service = RsaWithStringService::new(service);
-
-            let radix = 55296;
-
-            let signature = rsa_service.sign(message, private_key, radix);
-
-            let is_valid = rsa_service.verify(&signature, message, public_key, radix);
-            assert!(is_valid);
+            sign_verify_assert(config, 55296, message, service, true);
         });
     }
 
@@ -335,17 +355,7 @@ mod tests {
                 random_seed: 40,
                 number_theory_service: service.clone(),
             };
-            let key_pair = RsaScheme::generate_keypair(&config);
-            let (public_key, private_key) = (&key_pair.public_key, &key_pair.private_key);
-
-            let rsa_service = RsaWithStringService::new(service);
-
-            let radix = 55296;
-
-            let signature = rsa_service.sign(&message, private_key, radix);
-
-            let is_valid = rsa_service.verify(&signature, &message, public_key, radix);
-            assert!(is_valid);
+            sign_verify_assert(config, 55296, message, service, true);
         });
     }
 
@@ -361,18 +371,35 @@ mod tests {
                 random_seed: 17,
                 number_theory_service: service.clone(),
             };
-            let key_pair = RsaScheme::generate_keypair(&config);
+            let radix = 55296;
+            let key_pair = RsaWithStringScheme::generate_keypair(&config, radix);
             let (public_key, private_key) = (&key_pair.public_key, &key_pair.private_key);
 
-            let rsa_service = RsaWithStringService::new(service);
+            let _radix = 55296;
 
-            let radix = 55296;
+            let signature = RsaWithStringScheme::sign(private_key, message_one, service.clone());
 
-            let signature = rsa_service.sign(&message_one, private_key, radix);
-
-            let is_valid = rsa_service.verify(&signature, &message_two, public_key, radix);
+            let is_valid =
+                RsaWithStringScheme::verify(public_key, &signature, message_two, service.clone());
             assert!(!is_valid);
         });
+    }
+
+    fn sign_verify_assert(
+        config: RsaKeyGenConfig,
+        radix: u32,
+        message: &str,
+        service: NumberTheoryService,
+        expected: bool,
+    ) {
+        let key_pair = RsaWithStringScheme::generate_keypair(&config, radix);
+        let (public_key, private_key) = (&key_pair.public_key, &key_pair.private_key);
+
+        let signature = RsaWithStringScheme::sign(private_key, message, service.clone());
+
+        let is_valid =
+            RsaWithStringScheme::verify(public_key, &signature, message, service.clone());
+        assert_eq!(expected, is_valid);
     }
 
     // TODO: Eventuell können die Weg, weil trivial. Aber das ist noch nicht klar.
