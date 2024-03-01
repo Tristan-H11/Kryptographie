@@ -150,7 +150,7 @@ impl<'a> Verifier<RsaWithStringScheme> for RsaWithStringScheme {
     type Output = bool;
     type Key = RsaWithStringPublicKey;
 
-    /// Verifiert eine Nachricht gegen eine Signatur. // TODO: Auf RsaScheme::verify umstellen
+    /// Verifiert eine Nachricht gegen eine Signatur.
     ///
     /// # Argumente
     /// * `key` - Der öffentliche Schlüssel.
