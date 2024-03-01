@@ -12,12 +12,13 @@ pub trait ToRadixString {
     ///
     /// # Returns
     /// Eine Zeichenkette, die die g-adische Entwicklung der Dezimalzahl in Unicode-Darstellung repräsentiert.
-    fn to_radix_string(&self, radix: &u32) -> String;
+    /// Falls ein Zeichen nicht in u32 dargestellt werden kann, wird `None` zurückgegeben.
+    fn to_radix_string(&self, radix: &u32) -> Option<String>;
 }
 
 impl ToRadixString for BigInt {
-    fn to_radix_string(&self, radix: &u32) -> String {
-        assert!(radix > &0, "Die Basis muss größer als 0 sein.");
+    fn to_radix_string(&self, radix: &u32) -> Option<String> {
+        assert!(radix > &1, "Die Basis muss größer als 1 sein.");
 
         let mut decimal = self.clone();
         let mut result = String::new();
@@ -26,15 +27,10 @@ impl ToRadixString for BigInt {
             // Hier werden die u32-Operationen statt .div_rem(&BigInt) genutzt, weil diese schneller sind.
             let remainder = decimal.clone() % radix;
             decimal = decimal / radix;
-            let char = from_u32(
-                remainder
-                    .to_u32()
-                    .expect("Umwandlung in u32 fehlgeschlagen"),
-            )
-            .expect("Umwandlung in char fehlgeschlagen"); // TODO Fehlerbehandlung ggf später einbauen
+            let char = from_u32(remainder.to_u32()?)?;
             result.push(char);
         }
-        result.chars().rev().collect()
+        Some(result.chars().rev().collect())
     }
 }
 
@@ -52,7 +48,7 @@ mod tests {
 
         let result = decimal.to_radix_string(&radix);
 
-        assert_eq!(result, expected);
+        assert_eq!(result.unwrap(), expected);
     }
 
     #[test]
@@ -63,7 +59,7 @@ mod tests {
 
         let result = decimal.to_radix_string(&radix);
 
-        assert_eq!(result, expected);
+        assert_eq!(result.unwrap(), expected);
     }
 
     #[test]
@@ -74,7 +70,7 @@ mod tests {
 
         let result = decimal.to_radix_string(&radix);
 
-        assert_eq!(result, expected);
+        assert_eq!(result.unwrap(), expected);
     }
 
     #[test]
@@ -85,15 +81,37 @@ mod tests {
 
         let result = decimal.to_radix_string(&radix);
 
-        assert_eq!(result, expected);
+        assert_eq!(result.unwrap(), expected);
     }
 
     #[test]
     #[should_panic]
-    fn test_to_radix_string_invalid_radix() {
+    fn test_to_radix_string_invalid_zero_radix() {
         let decimal = BigInt::from(123456789);
         let radix = 0;
 
         decimal.to_radix_string(&radix);
+    }
+
+    #[test]
+    #[should_panic]
+    fn test_to_radix_string_invalid_one_radix() {
+        let decimal = BigInt::from(123456789);
+        let radix = 1;
+
+        decimal.to_radix_string(&radix);
+    }
+
+    #[test]
+    fn test_to_radix_string_overflow_unicode() {
+        use num::BigInt;
+        use std::str::FromStr;
+
+        let decimal = BigInt::from_str("1114112").unwrap(); // 1 more than max Unicode value
+        let radix = 11141120;
+
+        let result = decimal.to_radix_string(&radix);
+
+        assert_eq!(result, None);
     }
 }

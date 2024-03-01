@@ -43,7 +43,7 @@ impl SymmetricEncryptor<FromDecimalBlockScheme> for FromDecimalBlockScheme {
         plaintext
             .iter()
             .map(|block| {
-                let string = block.to_radix_string(&key.radix);
+                let string = block.to_radix_string(&key.radix).unwrap(); // TODO Fehlerbehandlung
 
                 if string.len() < key.block_size {
                     format!(

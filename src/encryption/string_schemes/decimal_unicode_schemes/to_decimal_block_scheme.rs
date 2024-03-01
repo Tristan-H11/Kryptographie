@@ -92,7 +92,7 @@ impl SymmetricDecryptor<ToDecimalBlockScheme> for ToDecimalBlockScheme {
         // dabei ist key.radix die Basis der g-adischen Entwicklung.
         let decoded_chars_chunks = ciphertext
             .iter()
-            .map(|decimal| decimal.to_radix_string(&key.radix))
+            .map(|decimal| decimal.to_radix_string(&key.radix).unwrap()) // TODO Fehlerbehandlung
             .collect::<Vec<String>>();
 
         // Die einzelnen Blöcke zu einer Zeichenfolge zusammenfügen
