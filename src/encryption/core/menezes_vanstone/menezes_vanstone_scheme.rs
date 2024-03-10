@@ -8,7 +8,7 @@ use crate::encryption::asymmetric_encryption_types::{AsymmetricDecryptor, Asymme
 use crate::encryption::core::menezes_vanstone::keys::{MenezesVanstonePrivateKey, MenezesVanstonePublicKey};
 use crate::encryption::encryption_types::{Decryptor, EncryptionScheme, Encryptor};
 use crate::math_core::ecc::finite_field_elliptic_curve_point::FiniteFieldEllipticCurvePoint;
-use crate::math_core::number_theory::number_theory_service::NumberTheoryService;
+use crate::math_core::number_theory::number_theory_service::{NumberTheoryService, NumberTheoryServiceTrait};
 use crate::math_core::pseudo_random_number_generator::PseudoRandomNumberGenerator;
 use crate::math_core::traits::increment::Increment;
 
@@ -83,6 +83,48 @@ impl Decryptor<MenezesVanstoneScheme> for MenezesVanstoneScheme {
 
 impl AsymmetricDecryptor<MenezesVanstoneScheme> for MenezesVanstoneScheme {
     fn decrypt(key: &Self::Key, ciphertext: &Self::Input, service: NumberTheoryService) -> Self::Output {
-        todo!()
+        let a = &ciphertext.point;
+        let b1 = &ciphertext.first;
+        let b2 = &ciphertext.second;
+        let prime = &key.curve.p;
+
+        let point = a.multiply(&key.x);
+        let (c1, c2) = (point.x, point.y);
+        let m1 = (b1 * service.modulo_inverse(&c1, prime)) % prime;
+        let m2 = (b2 * service.modulo_inverse(&c2, prime)) % prime;
+
+        MenezesVanstonePlaintext {
+            first: m1,
+            second: m2,
+        }
     }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
