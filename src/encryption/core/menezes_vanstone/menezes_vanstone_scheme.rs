@@ -12,11 +12,13 @@ use crate::math_core::number_theory::number_theory_service::{NumberTheoryService
 use crate::math_core::pseudo_random_number_generator::PseudoRandomNumberGenerator;
 use crate::math_core::traits::increment::Increment;
 
+#[derive(Clone, Debug, PartialEq)]
 pub struct MenezesVanstonePlaintext {
     pub first: BigInt,
     pub second: BigInt,
 }
 
+#[derive(Clone, Debug, PartialEq)]
 pub struct MenezesVanstoneCiphertext {
     pub point: FiniteFieldEllipticCurvePoint,
     pub first: BigInt,
@@ -90,8 +92,8 @@ impl AsymmetricDecryptor<MenezesVanstoneScheme> for MenezesVanstoneScheme {
 
         let point = a.multiply(&key.x);
         let (c1, c2) = (point.x, point.y);
-        let m1 = (b1 * service.modulo_inverse(&c1, prime)) % prime;
-        let m2 = (b2 * service.modulo_inverse(&c2, prime)) % prime;
+        let m1 = (b1 * service.modulo_inverse(&c1, prime).unwrap()) % prime; //TODO Unwrap
+        let m2 = (b2 * service.modulo_inverse(&c2, prime).unwrap()) % prime; //TODO Unwrap
 
         MenezesVanstonePlaintext {
             first: m1,
@@ -101,7 +103,34 @@ impl AsymmetricDecryptor<MenezesVanstoneScheme> for MenezesVanstoneScheme {
 }
 
 
+#[cfg(test)]
+mod tests {
+    use std::rc::Rc;
 
+    use crate::math_core::ecc::finite_field_elliptic_curve::FiniteFieldEllipticCurve;
+    use crate::math_core::number_theory::number_theory_service::NumberTheoryServiceSpeed::Fast;
+
+    use super::*;
+
+    #[test]
+    fn test_menezes_vanstone_encryption_decryption() {
+        let curve = FiniteFieldEllipticCurve::new(3.into(), 9.into(), 11.into());
+        let generator = FiniteFieldEllipticCurvePoint::new(2.into(), 1.into(), Rc::new(curve.clone()));
+        let y = FiniteFieldEllipticCurvePoint::new(3.into(), 10.into(), Rc::new(curve.clone()));
+        let x = 7.into();
+
+        let public_key = MenezesVanstonePublicKey { curve: curve.clone(), generator, y };
+        let private_key = MenezesVanstonePrivateKey { curve, x };
+
+        let plaintext = MenezesVanstonePlaintext { first: 10.into(), second: 1.into() };
+
+        let service = NumberTheoryService::new(Fast);
+        let ciphertext = MenezesVanstoneScheme::encrypt(&public_key, &plaintext, service);
+        let decrypted_plaintext = MenezesVanstoneScheme::decrypt(&private_key, &ciphertext, service);
+
+        assert_eq!(plaintext, decrypted_plaintext);
+    }
+}
 
 
 
