@@ -1,2 +1,2 @@
-mod finite_field_elliptic_curve;
-mod finite_field_elliptic_curve_point;
+pub mod finite_field_elliptic_curve;
+pub mod finite_field_elliptic_curve_point;
