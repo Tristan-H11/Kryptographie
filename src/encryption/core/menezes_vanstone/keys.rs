@@ -10,7 +10,6 @@ use crate::math_core::ecc::finite_field_elliptic_curve_point::FiniteFieldEllipti
 pub struct MenezesVanstonePublicKey {
     pub curve: FiniteFieldEllipticCurve,
     pub generator: FiniteFieldEllipticCurvePoint,
-    pub prime: BigInt,
     pub y: FiniteFieldEllipticCurvePoint,
 }
 
@@ -22,7 +21,6 @@ impl AsymmetricEncryptionKey<MenezesVanstoneScheme> for MenezesVanstonePublicKey
 #[derive(Clone, Debug)]
 pub struct MenezesVanstonePrivateKey {
     pub curve: FiniteFieldEllipticCurve,
-    pub prime: BigInt,
     pub x: BigInt,
 }
 
