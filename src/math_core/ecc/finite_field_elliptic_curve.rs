@@ -1,5 +1,3 @@
-use std::rc::Rc;
-
 use bigdecimal::num_bigint::BigInt;
 use bigdecimal::num_traits::Euclid;
 use bigdecimal::Zero;
@@ -19,19 +17,19 @@ pub struct FiniteFieldEllipticCurve {
     pub a: BigInt,
     pub b: BigInt,
     // Der Modulus p der elliptischen Kurve, um sie über einem endlichen Körper zu definieren
-    pub p: BigInt,
+    pub prime: BigInt,
 }
 
-pub fn get_educational_curve_rc() -> Rc<FiniteFieldEllipticCurve> {
+pub fn get_educational_curve() -> FiniteFieldEllipticCurve {
     let p = 17.into();
     let a = 0.into();
     let b = 7.into();
-    Rc::new(FiniteFieldEllipticCurve::new(a, b, p))
+    FiniteFieldEllipticCurve::new(a, b, p)
 }
 
 impl FiniteFieldEllipticCurve {
     pub fn new(a: BigInt, b: BigInt, p: BigInt) -> Self {
-        Self { a, b, p }
+        Self { a, b, prime: p }
     }
 
     ///
@@ -43,7 +41,8 @@ impl FiniteFieldEllipticCurve {
         let y_squared = point.y.pow(2);
 
         // y^2 = x^3 + ax + b (mod p) ist äquivalent zu (x^3 + ax + b - y^2) % p == 0
-        let remainder = (x_cubed + &self.a * &point.x + &self.b - y_squared).rem_euclid(&self.p);
+        let remainder =
+            (x_cubed + &self.a * &point.x + &self.b - y_squared).rem_euclid(&self.prime);
         remainder == BigInt::zero()
     }
 
@@ -53,7 +52,7 @@ impl FiniteFieldEllipticCurve {
     pub fn is_singular(&self) -> bool {
         let four_a_cubed = 4u32 * &self.a.pow(3);
         let twenty_seven_b_squared = 27u32 * &self.b.pow(2);
-        (four_a_cubed + twenty_seven_b_squared).rem_euclid(&self.p) == BigInt::zero()
+        (four_a_cubed + twenty_seven_b_squared).rem_euclid(&self.prime) == BigInt::zero()
     }
 }
 
@@ -63,31 +62,31 @@ mod tests {
 
     #[test]
     fn test_has_point_not() {
-        let curve = get_educational_curve_rc();
-        let point = FiniteFieldEllipticCurvePoint::new(5.into(), 7.into(), Rc::clone(&curve));
+        let curve = get_educational_curve();
+        let point = FiniteFieldEllipticCurvePoint::new(5.into(), 7.into());
         // (5, 7) liegt nicht auf y^2 = x^3 + 7 (mod 17)
         assert!(!curve.has_point(&point));
 
-        let point = FiniteFieldEllipticCurvePoint::new(4.into(), 6.into(), Rc::clone(&curve));
+        let point = FiniteFieldEllipticCurvePoint::new(4.into(), 6.into());
         // (4, 6) liegt nicht auf y^2 = x^3 + 7 (mod 17). Genaugenommen tut es keiner mit x=4.
         assert!(!curve.has_point(&point));
     }
 
     #[test]
     fn test_has_point() {
-        let curve = get_educational_curve_rc();
-        let point = FiniteFieldEllipticCurvePoint::new(5.into(), 8.into(), Rc::clone(&curve));
+        let curve = get_educational_curve();
+        let point = FiniteFieldEllipticCurvePoint::new(5.into(), 8.into());
         // (5, 8) liegt auf y^2 = x^3 + 7 (mod 17)
         assert!(curve.has_point(&point));
 
-        let point = FiniteFieldEllipticCurvePoint::new(5.into(), 9.into(), Rc::clone(&curve));
+        let point = FiniteFieldEllipticCurvePoint::new(5.into(), 9.into());
         // (5, 8) liegt auf y^2 = x^3 + 7 (mod 17)
         assert!(curve.has_point(&point));
     }
 
     #[test]
     fn test_is_not_singular() {
-        let curve = get_educational_curve_rc();
+        let curve = get_educational_curve();
         // 4 * 0^3 + 27 * 7^2 = 0 + 1323 = 1323 (mod 17)= 14 != 0
         assert!(!curve.is_singular());
     }

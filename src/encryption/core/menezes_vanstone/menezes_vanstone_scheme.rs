@@ -53,7 +53,7 @@ impl AsymmetricEncryptor<MenezesVanstoneScheme> for MenezesVanstoneScheme {
     ) -> Self::Output {
         let m1 = &plaintext.first;
         let m2 = &plaintext.second;
-        let prime = &key.curve.p;
+        let prime = &key.curve.prime;
 
         // TODO Der Seed für die Generierung der Zufallszahl für das Verschlüsseln der Nachricht
         // wird vorerst aus der aktuellen Systemzeit generiert und auf 2^16 begrenzt.
@@ -68,14 +68,14 @@ impl AsymmetricEncryptor<MenezesVanstoneScheme> for MenezesVanstoneScheme {
         let (mut k, mut c1, mut c2);
         loop {
             k = random_generator.take(&1.into(), &prime.decrement(), &counter);
-            let point = key.y.multiply(&k);
+            let point = key.y.multiply(&k, &key.curve);
             (c1, c2) = (point.x, point.y);
             // Sind beide Werte ungleich 0, so ist das Paar (c1, c2) gültig
             if !c1.is_zero() && !c2.is_zero() {
                 break;
             }
         }
-        let a = key.generator.multiply(&k);
+        let a = key.generator.multiply(&k, &key.curve);
         let b1 = (c1 * m1) % prime;
         let b2 = (c2 * m2) % prime;
 
@@ -102,9 +102,9 @@ impl AsymmetricDecryptor<MenezesVanstoneScheme> for MenezesVanstoneScheme {
         let a = &ciphertext.point;
         let b1 = &ciphertext.first;
         let b2 = &ciphertext.second;
-        let prime = &key.curve.p;
+        let prime = &key.curve.prime;
 
-        let point = a.multiply(&key.x);
+        let point = a.multiply(&key.x, &key.curve);
         let (c1, c2) = (point.x, point.y);
         let m1 = (b1 * service.modulo_inverse(&c1, prime).unwrap()) % prime; //TODO Unwrap
         let m2 = (b2 * service.modulo_inverse(&c2, prime).unwrap()) % prime; //TODO Unwrap
@@ -118,8 +118,6 @@ impl AsymmetricDecryptor<MenezesVanstoneScheme> for MenezesVanstoneScheme {
 
 #[cfg(test)]
 mod tests {
-    use std::rc::Rc;
-
     use crate::math_core::ecc::finite_field_elliptic_curve::FiniteFieldEllipticCurve;
     use crate::math_core::number_theory::number_theory_service::NumberTheoryServiceSpeed::Fast;
 
@@ -128,9 +126,8 @@ mod tests {
     #[test]
     fn test_menezes_vanstone_encryption_decryption() {
         let curve = FiniteFieldEllipticCurve::new(3.into(), 9.into(), 11.into());
-        let generator =
-            FiniteFieldEllipticCurvePoint::new(2.into(), 1.into(), Rc::new(curve.clone()));
-        let y = FiniteFieldEllipticCurvePoint::new(3.into(), 10.into(), Rc::new(curve.clone()));
+        let generator = FiniteFieldEllipticCurvePoint::new(2.into(), 1.into());
+        let y = FiniteFieldEllipticCurvePoint::new(3.into(), 10.into());
         let x = 7.into();
 
         let public_key = MenezesVanstonePublicKey {
