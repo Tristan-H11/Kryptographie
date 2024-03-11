@@ -14,7 +14,7 @@ use crate::math_core::traits::parity::Parity;
 /// Die Koordinaten des Punktes sind Elemente eines endlichen Körpers.
 /// TODO: Handling von Punkten im Unendlichen und im Ursprung verbessern
 ///
-#[derive(Clone, PartialEq, Debug)]
+#[derive(Clone, PartialEq, Debug, Default)]
 pub struct FiniteFieldEllipticCurvePoint {
     // Die Koordinaten des Punktes
     pub x: BigInt,
@@ -186,5 +186,19 @@ mod tests {
         let p2 = p1.multiply(&0.into(), &curve);
         let expected = FiniteFieldEllipticCurvePoint::new(BigInt::zero(), BigInt::zero());
         assert_eq!(p2, expected);
+    }
+
+    #[test]
+    fn test_add_with_zero() {
+        let curve = get_educational_curve();
+        let p1 = FiniteFieldEllipticCurvePoint::new(12.into(), 16.into());
+
+        // Point + 0 = Point
+        let p2 = p1.add(&Default::default(), &curve.prime);
+        assert_eq!(p2, p1);
+
+        // 0 + Point = Point
+        let p3 = FiniteFieldEllipticCurvePoint::default().add(&p1, &curve.prime);
+        assert_eq!(p3, p1);
     }
 }
