@@ -21,7 +21,7 @@ pub struct FiniteFieldEllipticCurvePoint {
     pub y: BigInt,
 }
 
-// TODO: Arithmetik von der Datenklasse des Punktes trennen, dabei auch die Kurve aus dem Punkt entfernen.
+// TODO: Arithmetik von der Datenklasse des Punktes trennen.
 impl FiniteFieldEllipticCurvePoint {
     pub fn new(x: BigInt, y: BigInt) -> Self {
         Self { x, y }
