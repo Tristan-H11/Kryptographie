@@ -67,6 +67,7 @@ impl AsymmetricDecryptor<MenezesVanstoneStringScheme> for MenezesVanstoneStringS
             point: FiniteFieldEllipticCurvePoint {
                 x: Default::default(),
                 y: Default::default(),
+                is_infinite: false,
             },
             first: Default::default(),
             second: Default::default(),

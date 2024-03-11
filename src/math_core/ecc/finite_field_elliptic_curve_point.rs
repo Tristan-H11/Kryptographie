@@ -19,17 +19,31 @@ pub struct FiniteFieldEllipticCurvePoint {
     // Die Koordinaten des Punktes
     pub x: BigInt,
     pub y: BigInt,
+    pub is_infinite: bool,
 }
 
 // TODO: Arithmetik von der Datenklasse des Punktes trennen.
 impl FiniteFieldEllipticCurvePoint {
     pub fn new(x: BigInt, y: BigInt) -> Self {
-        Self { x, y }
+        Self {
+            x,
+            y,
+            is_infinite: false,
+        }
+    }
+
+    pub fn infinite() -> Self {
+        Self {
+            x: BigInt::zero(),
+            y: BigInt::zero(),
+            is_infinite: true,
+        }
     }
 
     /// Addiert zwei nicht-identische (!) Punkte auf einer elliptischen Kurve.
     /// Die Punkte müssen auf der gleichen elliptischen Kurve liegen.
     /// Sind sie identisch, kann die Berechnung fehlschlagen!
+    /// TODO: Infinity Point
     pub fn add(&self, other: &Self, prime: &BigInt) -> Self {
         // Falls einer der beiden Punkte im Ursprung liegt, ist das Ergebnis der andere Punkt
         if self.x.is_zero() && self.y.is_zero() {
@@ -60,7 +74,7 @@ impl FiniteFieldEllipticCurvePoint {
 
     ///
     /// Verdoppelt einen Punkt auf einer elliptischen Kurve.
-    ///
+    /// TODO: Infinity Point
     pub fn double(&self, curve: &FiniteFieldEllipticCurve) -> Self {
         let service = NumberTheoryService::new(Fast); // TODO X: Später korrigieren
         let p = &curve.prime;
@@ -83,7 +97,7 @@ impl FiniteFieldEllipticCurvePoint {
     /// Dabei wird die optimierte Berechnung in Form des Double-and-add Algorithmus verwendet.
     /// Bei Multiplikation mit 0 wird der Punkt im Ursprung mit Bezug auf die ursprüngliche Kurve
     /// zurückgegeben.
-    ///
+    /// TODO: Infinity Point
     pub fn multiply(&self, scalar: &BigInt, curve: &FiniteFieldEllipticCurve) -> Self {
         if scalar.is_zero() {
             return FiniteFieldEllipticCurvePoint::new(BigInt::zero(), BigInt::zero());
@@ -106,15 +120,19 @@ impl FiniteFieldEllipticCurvePoint {
     /// Anschließend wird der Punkt wieder in den Körper der elliptischen Kurve zurückgeführt.
     ///
     fn normalize(&self, prime: &BigInt) -> Self {
+        if self.is_infinite {
+            return self.clone();
+        }
+
         let mut x = self.x.clone();
         let mut y = self.y.clone();
 
         // Ggf muss hier mal ein while statt einem if hin, um "vielfach zu tiefe" Zahlen abzufangen?
-        if self.x < BigInt::zero() {
+        if x < BigInt::zero() {
             x += prime;
         }
         // Ggf muss hier mal ein while statt einem if hin, um "vielfach zu tiefe" Zahlen abzufangen?
-        if self.y < BigInt::zero() {
+        if y < BigInt::zero() {
             y += prime;
         }
 
