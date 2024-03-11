@@ -1,2 +1,2 @@
-pub mod math;
-pub mod rsa;
+pub mod math_endpoints;
+pub mod rsa_endpoints;
