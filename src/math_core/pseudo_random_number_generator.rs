@@ -74,7 +74,7 @@ impl PseudoRandomNumberGenerator {
         let range: BigDecimal = (b - a + BigInt::one()).into();
 
         // Das unwrap() wird niemals fehlschlagen, weil die Implementation von to_bigint() nur
-        // Some, aber niemals None zurückgibt. Es ist unklar, warum es überhaupt Option ist.
+        // Some, aber niemals None zurückgibt.
         a + (factor * range).to_bigint().unwrap()
     }
 
