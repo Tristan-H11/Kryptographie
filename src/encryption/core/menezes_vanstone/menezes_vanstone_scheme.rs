@@ -125,7 +125,7 @@ mod tests {
 
     #[test]
     fn test_menezes_vanstone_encryption_decryption() {
-        let curve = FiniteFieldEllipticCurve::new(3.into(), 9.into(), 11.into());
+        let curve = FiniteFieldEllipticCurve::new(3.into(), 11.into());
         let generator = FiniteFieldEllipticCurvePoint::new(2.into(), 1.into());
         let y = FiniteFieldEllipticCurvePoint::new(3.into(), 10.into());
         let x = 7.into();

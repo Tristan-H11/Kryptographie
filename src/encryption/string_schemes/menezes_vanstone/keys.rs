@@ -11,6 +11,7 @@ use crate::encryption::string_schemes::menezes_vanstone::menezes_vanstone_string
 #[derive(Clone, Debug)]
 pub struct MenezesVanstoneStringPublicKey {
     pub mv_key: MenezesVanstonePublicKey,
+    pub radix: u32,
 }
 
 impl Key<MenezesVanstoneStringScheme> for MenezesVanstoneStringPublicKey {}
@@ -21,6 +22,7 @@ impl AsymmetricEncryptionKey<MenezesVanstoneStringScheme> for MenezesVanstoneStr
 #[derive(Clone, Debug)]
 pub struct MenezesVanstoneStringPrivateKey {
     pub mv_key: MenezesVanstonePrivateKey,
+    pub radix: u32,
 }
 
 impl Key<MenezesVanstoneStringScheme> for MenezesVanstoneStringPrivateKey {}
