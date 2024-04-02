@@ -1,3 +1,4 @@
+use std::ops::Neg;
 use bigdecimal::num_bigint::BigInt;
 use bigdecimal::num_traits::Euclid;
 use bigdecimal::Zero;
@@ -15,21 +16,26 @@ use crate::math_core::ecc::finite_field_elliptic_curve_point::FiniteFieldEllipti
 pub struct FiniteFieldEllipticCurve {
     // Die Koeffizienten a und b der elliptischen Kurve
     pub a: BigInt,
-    pub b: BigInt,
+    pub b: u32,
     // Der Modulus p der elliptischen Kurve, um sie über einem endlichen Körper zu definieren
     pub prime: BigInt,
 }
 
 pub fn get_educational_curve() -> FiniteFieldEllipticCurve {
     let p = 17.into();
-    let a = 0.into();
-    let b = 7.into();
-    FiniteFieldEllipticCurve::new(a, b, p)
+    let a = 7.into();
+    FiniteFieldEllipticCurve::new(a, p)
 }
 
 impl FiniteFieldEllipticCurve {
-    pub fn new(a: BigInt, b: BigInt, p: BigInt) -> Self {
-        Self { a, b, prime: p }
+    ///
+    /// Erstellt eine Elliptische Kurve nach dem Muster:
+    /// y^2 = x^3 - n^2 * x + 0 (mod p)
+    ///
+    /// Das b der Kurve ist hier bewusst als 0 gewählt und das n wird erst quadriert und dann negiert.
+    pub fn new(a: BigInt, p: BigInt) -> Self {
+        let a = a.pow(2).neg();
+        Self { a, b: 0u32, prime: p }
     }
 
     ///
@@ -93,14 +99,14 @@ mod tests {
 
     #[test]
     fn test_is_singular_trivial() {
-        let curve = FiniteFieldEllipticCurve::new(0.into(), 0.into(), 17.into());
+        let curve = FiniteFieldEllipticCurve::new(0.into(), 17.into());
         // 4 * 0^3 + 27 * 0^2 = 0 + 0 = 0 (mod 17) = 0
         assert!(curve.is_singular());
     }
 
     #[test]
     fn test_is_singular_non_trivial() {
-        let curve = FiniteFieldEllipticCurve::new(BigInt::from(-3), 2.into(), 17.into());
+        let curve = FiniteFieldEllipticCurve::new(BigInt::from(-3), 17.into());
         // 4 * (-3)^3 + 27 * 2^2 = -108 + 108 = 0 (mod 17) = 0
         assert!(curve.is_singular());
     }
