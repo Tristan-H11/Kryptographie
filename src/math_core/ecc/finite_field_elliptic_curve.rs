@@ -64,6 +64,11 @@ impl FiniteFieldEllipticCurve {
         let twenty_seven_b_squared = 27u32 * &self.b.pow(2);
         (four_a_cubed + twenty_seven_b_squared).rem_euclid(&self.prime) == BigInt::zero()
     }
+
+    pub fn get_order_of_subgroup(&self) -> BigInt {
+        self.prime.clone() // TODO Noch falsch. Muss korrigiert werden, damit das Schema zuverlässig klappt!
+                           // TODO aktuell ist das erstmal eine übergangslösung, die regelmäßig zu falschen Ergebnissen führt
+    }
 }
 
 #[cfg(test)]

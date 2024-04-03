@@ -47,7 +47,7 @@ impl AsymmetricEncryptor<MenezesVanstoneStringScheme> for MenezesVanstoneStringS
         let radix = key.radix;
         let mut block_size = key.mv_key.curve.prime.log(&radix.into());
         if block_size < 2 {
-            // TODO Korrigieren
+            // TODO Korrigieren, BlockSize einheitlich irgendwo berechnen und ein Minimum festlegen
             block_size = 2;
         }
         let decimal_unicode_key = DecimalUnicodeConversionSchemeKey { radix, block_size };
@@ -57,10 +57,10 @@ impl AsymmetricEncryptor<MenezesVanstoneStringScheme> for MenezesVanstoneStringS
         // TODO Damit es ohne Padding funktioniert, muss ggf ein letzter, nicht vorhandener Block
         // TODO mit \u0000 gefüllt werden.
         // Den Plaintext auffüllen, bis er eine gerade Anzahl von Blöcken erzeugen wird
-        // let diff = block_size * 2 - (plaintext.len() % (block_size * 2));
-        // let supplement = "\u{0000}".repeat(diff);
-        // let mut padded_plaintext = String::from(plaintext);
-        // padded_plaintext.push_str(&supplement);
+        let diff = block_size * 2 - (plaintext.len() % (block_size * 2));
+        let supplement = "\u{0000}".repeat(diff);
+        let mut padded_plaintext = String::from(plaintext);
+        padded_plaintext.push_str(&supplement);
 
         // Blockchiffre anwenden
         let message = ToDecimalBlockScheme::encrypt(&plaintext, &decimal_unicode_key);
@@ -88,8 +88,7 @@ impl AsymmetricEncryptor<MenezesVanstoneStringScheme> for MenezesVanstoneStringS
             big_int_vec.push(ciphertext.first.clone());
             big_int_vec.push(ciphertext.second.clone());
         }
-        let ciphertext_string =
-            FromDecimalBlockScheme::encrypt(&big_int_vec, &decimal_unicode_key);
+        let ciphertext_string = FromDecimalBlockScheme::encrypt(&big_int_vec, &decimal_unicode_key);
 
         // Die genutzten Punkte akkumulieren
         let points = ciphertext_list
@@ -128,7 +127,7 @@ impl AsymmetricDecryptor<MenezesVanstoneStringScheme> for MenezesVanstoneStringS
         // Wenn wir hier keine zusammenpassende Anzahl von Punkten und Tupeln haben,
         // dann ist die Nachricht nicht korrekt verschlüsselt worden.
         // Durch '*2' wird ebenfalls sichergestellt, dass es eine gerade Anzahl von Tupeln gibt.
-        assert_eq!(points.len() * 2, big_int_vec.len());
+        assert_eq!(points.len() * 2, big_int_vec.len(), "Ungültiger Ciphertext");
 
         // Die Zahlen in eine Liste von MenezesVanstoneCiphertext mappen
         let mut ciphertext_list: Vec<MenezesVanstoneCiphertext> = Vec::new();
@@ -160,6 +159,7 @@ impl AsymmetricDecryptor<MenezesVanstoneStringScheme> for MenezesVanstoneStringS
 
 #[cfg(test)]
 mod tests {
+    use rand::Rng;
     use std::str::FromStr;
 
     use crate::encryption::core::menezes_vanstone::keys::{
@@ -191,17 +191,22 @@ mod tests {
             generator,
             y,
         };
+
+        // Der Radix soll hier für jeden Testlauf zufällig gewählt werden, damit die Tests
+        // mehr abfangen können.
+        let radix = rand::thread_rng().gen_range(240..55296);
+        println!("Radix: {}", radix);
         let public_key = MenezesVanstoneStringPublicKey {
             mv_key: public_key,
-            radix: 140,
+            radix,
         };
         let private_key = MenezesVanstonePrivateKey { curve, x };
         let private_key = MenezesVanstoneStringPrivateKey {
             mv_key: private_key,
-            radix: 140,
+            radix,
         };
 
-        let plaintext = "Das ist ein Test  ";
+        let plaintext = "Das ist ein Test1234567890";
 
         let service = NumberTheoryService::new(Fast);
         let ciphertext = MenezesVanstoneStringScheme::encrypt(&public_key, &plaintext, service);

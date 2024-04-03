@@ -1,3 +1,4 @@
+use std::str::FromStr;
 use std::time::SystemTime;
 
 use atomic_counter::RelaxedCounter;
@@ -66,8 +67,9 @@ impl AsymmetricEncryptor<MenezesVanstoneScheme> for MenezesVanstoneScheme {
 
         // Bestimmen von c1 und c2
         let (mut k, mut c1, mut c2);
+        let order_of_subgroup = key.curve.get_order_of_subgroup();
         loop {
-            k = random_generator.take(&1.into(), &prime.decrement(), &counter);
+            k = random_generator.take(&1.into(), &order_of_subgroup.decrement(), &counter);
             let point = key.y.multiply(&k, &key.curve);
             (c1, c2) = (point.x, point.y);
             // Sind beide Werte ungleich 0, so ist das Paar (c1, c2) gültig
@@ -118,9 +120,9 @@ impl AsymmetricDecryptor<MenezesVanstoneScheme> for MenezesVanstoneScheme {
 
 #[cfg(test)]
 mod tests {
-    use std::str::FromStr;
     use crate::math_core::ecc::finite_field_elliptic_curve::FiniteFieldEllipticCurve;
     use crate::math_core::number_theory::number_theory_service::NumberTheoryServiceSpeed::Fast;
+    use std::str::FromStr;
 
     use super::*;
 
