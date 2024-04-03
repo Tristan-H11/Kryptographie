@@ -118,6 +118,7 @@ impl AsymmetricDecryptor<MenezesVanstoneScheme> for MenezesVanstoneScheme {
 
 #[cfg(test)]
 mod tests {
+    use std::str::FromStr;
     use crate::math_core::ecc::finite_field_elliptic_curve::FiniteFieldEllipticCurve;
     use crate::math_core::number_theory::number_theory_service::NumberTheoryServiceSpeed::Fast;
 
@@ -125,28 +126,37 @@ mod tests {
 
     #[test]
     fn test_menezes_vanstone_encryption_decryption() {
-        let curve = FiniteFieldEllipticCurve::new(3.into(), 11.into());
-        let generator = FiniteFieldEllipticCurvePoint::new(2.into(), 1.into());
-        let y = FiniteFieldEllipticCurvePoint::new(3.into(), 10.into());
-        let x = 7.into();
+        let curve = FiniteFieldEllipticCurve::new(
+            5.into(),
+            BigInt::from_str("259421157018863391010844302469063884861").unwrap(),
+        );
+        let generator = FiniteFieldEllipticCurvePoint::new(
+            BigInt::from_str("152198469913648308717544634828661961231").unwrap(),
+            BigInt::from_str("50296851635441247077790719368115682846").unwrap(),
+        );
+        let y = FiniteFieldEllipticCurvePoint::new(
+            BigInt::from_str("26370934085012164485153092381593646122").unwrap(),
+            BigInt::from_str("126290671313284822425335475919650022666").unwrap(),
+        );
+        let x = BigInt::from_str("12401522966815986254216934185370504355").unwrap();
 
         let public_key = MenezesVanstonePublicKey {
             curve: curve.clone(),
             generator,
             y,
         };
+
         let private_key = MenezesVanstonePrivateKey { curve, x };
 
         let plaintext = MenezesVanstonePlaintext {
-            first: 10.into(),
-            second: 1.into(),
+            first: 123.into(),
+            second: 456.into(),
         };
 
         let service = NumberTheoryService::new(Fast);
         let ciphertext = MenezesVanstoneScheme::encrypt(&public_key, &plaintext, service);
         let decrypted_plaintext =
             MenezesVanstoneScheme::decrypt(&private_key, &ciphertext, service);
-
         assert_eq!(plaintext, decrypted_plaintext);
     }
 }
