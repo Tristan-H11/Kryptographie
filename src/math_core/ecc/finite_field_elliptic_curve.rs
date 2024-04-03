@@ -1,7 +1,7 @@
-use std::ops::Neg;
 use bigdecimal::num_bigint::BigInt;
 use bigdecimal::num_traits::Euclid;
 use bigdecimal::Zero;
+use std::ops::Neg;
 
 use crate::math_core::ecc::finite_field_elliptic_curve_point::FiniteFieldEllipticCurvePoint;
 
@@ -35,7 +35,11 @@ impl FiniteFieldEllipticCurve {
     /// Das b der Kurve ist hier bewusst als 0 gewählt und das n wird erst quadriert und dann negiert.
     pub fn new(a: BigInt, p: BigInt) -> Self {
         let a = a.pow(2).neg();
-        Self { a, b: 0u32, prime: p }
+        Self {
+            a,
+            b: 0u32,
+            prime: p,
+        }
     }
 
     ///
