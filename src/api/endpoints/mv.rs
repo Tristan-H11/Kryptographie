@@ -1,4 +1,4 @@
-use crate::api::serializable_models::UseFastQuery;
+use crate::api::serializable_models::{SingleStringResponse, UseFastQuery};
 
 use crate::math_core::number_theory::number_theory_service::NumberTheoryService;
 use crate::math_core::number_theory::number_theory_service::NumberTheoryServiceSpeed::{
@@ -55,9 +55,14 @@ pub struct MvEncryptRequest {
 }
 
 #[derive(Serialize)]
-pub struct MvEncryptResponse {
+pub struct MvCipherText {
     pub encrypted_message: String,
     pub points: Vec<EcPoint>,
+}
+
+pub struct MvDecryptRequest {
+    pub private_key: MvPrivateKey,
+    pub cipher_text: MvCipherText,
 }
 
 /// Erstellt ein neues Schlüsselpaar für das MenezesVanstone-Schema.
@@ -105,10 +110,30 @@ pub(crate) async fn encrypt(req_body: Json<MvEncryptRequest>) -> impl Responder 
 
     let encrypted_message = "TODO".to_string();
 
-    let response = MvEncryptResponse {
+    let response = MvCipherText {
         encrypted_message,
         points: vec![EcPoint::default()],
     };
 
     HttpResponse::Ok().json(response)
+}
+
+/// Entschlüsselt eine Nachricht mit dem MenezesVanstone-Schema.
+///
+/// # Arguments
+/// * `req_body` - Die Anfrage, die die verschlüsselte Nachricht enthält.
+///
+/// # Returns
+/// * `HttpResponse` - Die Antwort, die die entschlüsselte Nachricht enthält.
+pub(crate) async fn decrypt(req_body: Json<MvEncryptRequest>) -> impl Responder {
+    info!("Endpunkt /menezesVanstone/decrypt wurde aufgerufen");
+    let _req_body: MvEncryptRequest = req_body.into_inner();
+
+    // TODO
+
+    let decrypted_message = "TODO".to_string();
+
+    HttpResponse::Ok().json(SingleStringResponse {
+        message: decrypted_message,
+    })
 }

@@ -28,7 +28,9 @@ pub fn config_app(cfg: &mut web::ServiceConfig) {
         .service(
             web::scope("/menezesVanstone")
                 .route("/createKeyPair", web::post().to(mv::create_key_pair))
-                .route("/encrypt", web::post().to(mv::encrypt)),
+                .route("/encrypt", web::post().to(mv::encrypt))
+                .route("/decrypt", web::post().to(mv::decrypt)),
+
         )
         .service(
             web::scope("/math")
