@@ -79,14 +79,14 @@ impl FiniteFieldEllipticCurvePoint {
         let service = NumberTheoryService::new(Fast); // TODO X: Später korrigieren
         let p = &curve.prime;
         // Zähler der Steigung berechnen
-        let slope_numer = 3u32 * &self.x * &self.x + &curve.a;
+        let slope_numer = 3 * &self.x * &self.x + &curve.a;
         // Nenner der Steigung berechnen
-        let slope_denom = 2u32 * &self.y;
+        let slope_denom = 2 * &self.y;
         let slope_denom = service.modulo_inverse(&slope_denom, p).unwrap();
         // Steigung der Geraden durch die beiden Punkte berechnen
         let slope = slope_numer * slope_denom;
 
-        let x_sum = &slope * &slope - 2u32 * &self.x;
+        let x_sum = &slope * &slope - 2 * &self.x;
         let y_sum = &slope * (&self.x - &x_sum) - &self.y;
 
         FiniteFieldEllipticCurvePoint::new(x_sum, y_sum).normalize(p)

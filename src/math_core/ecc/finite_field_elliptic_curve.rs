@@ -15,29 +15,34 @@ use crate::math_core::ecc::finite_field_elliptic_curve_point::FiniteFieldEllipti
 #[derive(Clone, PartialEq, Debug)]
 pub struct FiniteFieldEllipticCurve {
     // Die Koeffizienten a und b der elliptischen Kurve
-    pub a: BigInt,
-    pub b: u32,
+    pub a: i32,
+    pub b: i32,
     // Der Modulus p der elliptischen Kurve, um sie über einem endlichen Körper zu definieren
     pub prime: BigInt,
 }
 
 pub fn get_educational_curve() -> FiniteFieldEllipticCurve {
-    let p = 17.into();
-    let a = 7.into();
-    FiniteFieldEllipticCurve::new(a, p)
+    let p = 11.into();
+    let a = 3.into();
+    FiniteFieldEllipticCurve {
+        a,
+        b: 9i32,
+        prime: p,
+
+    }
 }
 
 impl FiniteFieldEllipticCurve {
     ///
-    /// Erstellt eine Elliptische Kurve nach dem Muster:
+    /// Erstellt eine elliptische Kurve nach dem Muster:
     /// y^2 = x^3 - n^2 * x + 0 (mod p)
     ///
     /// Das b der Kurve ist hier bewusst als 0 gewählt und das n wird erst quadriert und dann negiert.
-    pub fn new(a: BigInt, p: BigInt) -> Self {
+    pub fn new(a: i32, p: BigInt) -> Self {
         let a = a.pow(2).neg();
         Self {
             a,
-            b: 0u32,
+            b: 0i32,
             prime: p,
         }
     }
@@ -60,9 +65,9 @@ impl FiniteFieldEllipticCurve {
     /// Gibt zurück, ob die Kurve die Bedingung 4a^3 + 27b^2 = 0 erfüllt, also ob die Kurve singulär ist.
     ///
     pub fn is_singular(&self) -> bool {
-        let four_a_cubed = 4u32 * &self.a.pow(3);
-        let twenty_seven_b_squared = 27u32 * &self.b.pow(2);
-        (four_a_cubed + twenty_seven_b_squared).rem_euclid(&self.prime) == BigInt::zero()
+        let four_a_cubed = 4 * &self.a.pow(3);
+        let twenty_seven_b_squared = 27 * &self.b.pow(2);
+        (BigInt::from(four_a_cubed) + BigInt::from(twenty_seven_b_squared)).rem_euclid(&self.prime) == BigInt::zero()
     }
 
     pub fn get_order_of_subgroup(&self) -> BigInt {
@@ -115,7 +120,7 @@ mod tests {
 
     #[test]
     fn test_is_singular_non_trivial() {
-        let curve = FiniteFieldEllipticCurve::new(BigInt::from(-3), 17.into());
+        let curve = FiniteFieldEllipticCurve::new(-3, 17.into());
         // 4 * (-3)^3 + 27 * 2^2 = -108 + 108 = 0 (mod 17) = 0
         assert!(curve.is_singular());
     }
