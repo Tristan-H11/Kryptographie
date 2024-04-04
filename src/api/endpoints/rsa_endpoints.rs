@@ -23,7 +23,7 @@ use serde::{Deserialize, Serialize};
 use std::str::FromStr;
 
 #[derive(Deserialize)]
-pub struct CreateKeyPairRequest {
+pub struct RsaCreateKeyPairRequest {
     pub modulus_width: u32,
     pub miller_rabin_rounds: u32,
     pub random_seed: u32,
@@ -31,7 +31,7 @@ pub struct CreateKeyPairRequest {
 }
 
 #[derive(Serialize, Deserialize)]
-pub struct KeyPair {
+pub struct RsaKeyPair {
     pub modulus: String,
     pub e: String,
     pub d: String,
@@ -39,7 +39,7 @@ pub struct KeyPair {
     pub block_size_priv: String,
 }
 
-impl KeyPair {
+impl RsaKeyPair {
     /// Wandelt das serialisierte Schlüsselpaar in einen privaten Schlüssel um.
     ///
     /// # Rückgabe
@@ -72,36 +72,36 @@ impl KeyPair {
 }
 
 #[derive(Deserialize)]
-pub struct EncryptDecryptRequest {
+pub struct RsaEncryptDecryptRequest {
     pub message: String,
-    pub key_pair: KeyPair,
+    pub key_pair: RsaKeyPair,
     pub number_system_base: u32,
 }
 
 #[derive(Deserialize)]
-pub struct SignRequest {
+pub struct RsaSignRequest {
     pub plaintext: String,
-    pub key_pair: KeyPair,
+    pub key_pair: RsaKeyPair,
     pub radix: u32,
 }
 
 #[derive(Deserialize)]
-pub struct VerifyRequest {
+pub struct RsaVerifyRequest {
     pub plaintext: String,
     pub signature: String,
-    pub key_pair: KeyPair,
+    pub key_pair: RsaKeyPair,
     pub radix: u32,
 }
 
 #[derive(Deserialize)]
-pub struct MultiplicationRequest {
+pub struct RsaMultiplicationRequest {
     pub factor_one: String,
     pub factor_two: String,
-    pub key_pair: KeyPair,
+    pub key_pair: RsaKeyPair,
 }
 
 #[derive(Serialize)]
-pub struct MultiplicationResponse {
+pub struct RsaMultiplicationResponse {
     pub encrypted_factor_one: String,
     pub encrypted_factor_two: String,
     pub encrypted_result: String,
@@ -116,14 +116,14 @@ pub struct MultiplicationResponse {
 /// # Returns
 /// * `HttpResponse` - Die Antwort, die das Schlüsselpaar enthält.
 pub(crate) async fn create_key_pair(
-    req_body: Json<CreateKeyPairRequest>,
+    req_body: Json<RsaCreateKeyPairRequest>,
     query: Query<UseFastQuery>,
 ) -> impl Responder {
     info!(
         "Endpunkt /rsa/createKeyPair wurde aufgerufen, use_fast: {}",
         query.use_fast
     );
-    let req_body: CreateKeyPairRequest = req_body.into_inner();
+    let req_body: RsaCreateKeyPairRequest = req_body.into_inner();
     let use_fast = query.use_fast;
 
     let number_theory_service = match use_fast {
@@ -146,7 +146,7 @@ pub(crate) async fn create_key_pair(
     let block_size_pub = public_key.n.log(&req_body.number_system_base.into());
     let block_size_priv = private_key.n.log(&req_body.number_system_base.into()) + 1;
 
-    let key_pair_response = KeyPair {
+    let key_pair_response = RsaKeyPair {
         modulus: public_key.n.to_str_radix(10),
         e: public_key.e.to_str_radix(10),
         d: private_key.d.to_str_radix(10),
@@ -161,14 +161,14 @@ pub(crate) async fn create_key_pair(
 /// Verschlüsselt eine Nachricht.
 ///
 pub(crate) async fn encrypt(
-    req_body: Json<EncryptDecryptRequest>,
+    req_body: Json<RsaEncryptDecryptRequest>,
     query: Query<UseFastQuery>,
 ) -> impl Responder {
     info!(
         "Endpunkt /rsa/encrypt wurde aufgerufen, use_fast: {}",
         query.use_fast
     );
-    let req_body: EncryptDecryptRequest = req_body.into_inner();
+    let req_body: RsaEncryptDecryptRequest = req_body.into_inner();
     let use_fast = query.use_fast;
 
     let plaintext = req_body.message;
@@ -205,14 +205,14 @@ pub(crate) async fn encrypt(
 /// # Rückgabe
 /// * `HttpResponse` - Die Antwort, die den entschlüsselten Text enthält.
 pub(crate) async fn decrypt(
-    req_body: Json<EncryptDecryptRequest>,
+    req_body: Json<RsaEncryptDecryptRequest>,
     query: Query<UseFastQuery>,
 ) -> impl Responder {
     info!(
         "Endpunkt /rsa/decrypt wurde aufgerufen, use_fast: {}",
         query.use_fast
     );
-    let req_body: EncryptDecryptRequest = req_body.into_inner();
+    let req_body: RsaEncryptDecryptRequest = req_body.into_inner();
     let use_fast = query.use_fast;
     let ciphertext = req_body.message;
     let number_system_base = req_body.number_system_base;
@@ -246,14 +246,14 @@ pub(crate) async fn decrypt(
 /// # Rückgabe
 /// * `HttpResponse` - Die Antwort, die die Signatur enthält.
 pub(crate) async fn sign(
-    req_body: Json<SignRequest>,
+    req_body: Json<RsaSignRequest>,
     query: Query<UseFastQuery>,
 ) -> impl Responder {
     info!(
         "Endpunkt /rsa/sign wurde aufgerufen, use_fast: {}",
         query.use_fast
     );
-    let req_body: SignRequest = req_body.into_inner();
+    let req_body: RsaSignRequest = req_body.into_inner();
     let use_fast = query.use_fast;
 
     let plaintext = req_body.plaintext;
@@ -289,14 +289,14 @@ pub(crate) async fn sign(
 /// # Rückgabe
 /// * `HttpResponse` - Die Antwort, die den verifizierten Text enthält.
 pub(crate) async fn verify(
-    req_body: Json<VerifyRequest>,
+    req_body: Json<RsaVerifyRequest>,
     query: Query<UseFastQuery>,
 ) -> impl Responder {
     info!(
         "Endpunkt /rsa/verify wurde aufgerufen, use_fast: {}",
         query.use_fast
     );
-    let req_body: VerifyRequest = req_body.into_inner();
+    let req_body: RsaVerifyRequest = req_body.into_inner();
     let use_fast = query.use_fast;
 
     let plaintext = req_body.plaintext;
@@ -332,14 +332,14 @@ pub(crate) async fn verify(
 
 /// Multipliziert zwei Zahlen miteinander.
 pub(crate) async fn multiplication(
-    req_body: Json<MultiplicationRequest>,
+    req_body: Json<RsaMultiplicationRequest>,
     query: Query<UseFastQuery>,
 ) -> impl Responder {
     info!(
         "Endpunkt /rsa/multiplication wurde aufgerufen, use_fast: {}",
         query.use_fast
     );
-    let req_body: MultiplicationRequest = req_body.into_inner();
+    let req_body: RsaMultiplicationRequest = req_body.into_inner();
     let use_fast = query.use_fast;
 
     let number_theory_service = match use_fast {
@@ -363,7 +363,7 @@ pub(crate) async fn multiplication(
 
         let result = RsaScheme::decrypt(&private_key, &encrypted_result, number_theory_service);
 
-        let response = MultiplicationResponse {
+        let response = RsaMultiplicationResponse {
             encrypted_factor_one: encrypted_factor_one.to_str_radix(10),
             encrypted_factor_two: encrypted_factor_two.to_str_radix(10),
             encrypted_result: encrypted_result.to_str_radix(10),
