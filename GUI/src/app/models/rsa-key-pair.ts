@@ -1,7 +1,7 @@
 /**
  * Schnittstelle für ein KeyPair-Objekt.
  */
-export class KeyPair {
+export class RsaKeyPair {
 	modulus: string;
 	e: string;
 	d: string;
@@ -17,6 +17,6 @@ export class KeyPair {
 	}
 
 	public static createEmptyKeyPair() {
-		return new KeyPair("", "", "", "", "");
+		return new RsaKeyPair("", "", "", "", "");
 	}
 }

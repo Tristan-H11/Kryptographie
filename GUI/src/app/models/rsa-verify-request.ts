@@ -1,15 +1,15 @@
-import {KeyPair} from "./key-pair";
+import {RsaKeyPair} from "./rsa-key-pair";
 
 /**
  * Schnittstelle für die Anfrage zum Verifizieren einer Nachricht.
  */
-export class VerifyRequest {
+export class RsaVerifyRequest {
 	plaintext: string;
 	signature: string;
-	key_pair: KeyPair;
+	key_pair: RsaKeyPair;
     radix: number;
 
-	constructor(plaintext: string, signature: string, keyPair: KeyPair, radix: number) {
+	constructor(plaintext: string, signature: string, keyPair: RsaKeyPair, radix: number) {
 		this.plaintext = plaintext;
 		this.signature = signature;
 		this.key_pair = keyPair;

@@ -1,8 +1,8 @@
 import {Injectable, signal, WritableSignal} from "@angular/core";
 import {Client} from "../../models/client";
-import {KeyPair} from "../../models/key-pair";
+import {RsaKeyPair} from "../../models/rsa-key-pair";
 import {MessageSignatureContainer} from "../../models/message-signature-container";
-import {ConfigurationData} from "../../models/configuration-data";
+import {RsaConfigurationData} from "../../models/rsa-configuration-data";
 
 @Injectable({
     providedIn: "root"
@@ -11,9 +11,9 @@ export class StateManagementService {
 
     private server_url = signal("https://krypto-server.tristan-hoermann.de");
 
-    private configurationData = signal(ConfigurationData.createDefaultConfigurationData());
+    private configurationData = signal(RsaConfigurationData.createDefaultConfigurationData());
 
-    private clientKeyMap = new Map<Client, WritableSignal<KeyPair>>();
+    private clientKeyMap = new Map<Client, WritableSignal<RsaKeyPair>>();
 
     private clientMessageMap = new Map<Client, WritableSignal<MessageSignatureContainer>>();
 
@@ -52,7 +52,7 @@ export class StateManagementService {
         let client = new Client(clientName);
         console.log("Registering client " + client.name + " at all services");
         this.clients.add(client);
-        this.clientKeyMap.set(client, signal(KeyPair.createEmptyKeyPair()));
+        this.clientKeyMap.set(client, signal(RsaKeyPair.createEmptyKeyPair()));
         this.clientMessageMap.set(client, signal({plaintext: "", ciphertext: "", signature: ""}));
     }
 
@@ -92,13 +92,13 @@ export class StateManagementService {
         return this.configurationData;
     }
 
-    public getClientKey(client: Client): WritableSignal<KeyPair> {
+    public getClientKey(client: Client): WritableSignal<RsaKeyPair> {
         let entry = this.clientKeyMap.get(client);
         if (entry) {
             return entry;
         } else {
             console.log("Client " + client.name + " is not registered! Returning empty KeyPair and registering client.");
-            this.clientKeyMap.set(client, signal(KeyPair.createEmptyKeyPair()));
+            this.clientKeyMap.set(client, signal(RsaKeyPair.createEmptyKeyPair()));
             return this.clientKeyMap.get(client)!; // Wir erstellen es ja in der Zeile davor
         }
     }

@@ -6,8 +6,8 @@ import {MatFormFieldModule} from "@angular/material/form-field";
 import {MatInputModule} from "@angular/material/input";
 import {FormsModule, ReactiveFormsModule} from "@angular/forms";
 import {RsaBackendRequestService} from "../services/backend-api/rsa-backend-request.service";
-import {KeyPair} from "../models/key-pair";
-import {ConfigurationData} from "../models/configuration-data";
+import {RsaKeyPair} from "../models/rsa-key-pair";
+import {RsaConfigurationData} from "../models/rsa-configuration-data";
 import {MatDialog, MatDialogRef} from "@angular/material/dialog";
 import {LoadingDialogComponent} from "../loading-dialog/loading-dialog.component";
 import {MatSnackBar} from "@angular/material/snack-bar";
@@ -27,7 +27,7 @@ export class MultiplicationComponent {
     public millerRabinIterations: number = 100;
     public randomSeed: number = 34;
 
-    public keyPair: KeyPair = KeyPair.createEmptyKeyPair();
+    public keyPair: RsaKeyPair = RsaKeyPair.createEmptyKeyPair();
 
     public parameterA: String = "";
     public parameterB: String = "";
@@ -46,7 +46,7 @@ export class MultiplicationComponent {
      * Fragt die Schlüsselerzeugung an und gibt das Ergebnis zurück.
      */
     public generateKeys(): void {
-        let requestContent = new ConfigurationData(
+        let requestContent = new RsaConfigurationData(
             this.modulusWidth,
             this.millerRabinIterations,
             this.randomSeed,
@@ -73,7 +73,7 @@ export class MultiplicationComponent {
      * Leert das Schlüsselpaar.
      */
     public clearKeyPair(): void {
-        this.keyPair = KeyPair.createEmptyKeyPair();
+        this.keyPair = RsaKeyPair.createEmptyKeyPair();
     }
 
     /**

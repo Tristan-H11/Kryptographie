@@ -1,7 +1,7 @@
 /**
- * ConfigurationData stellt die Datenstruktur für die Konfiguration der wichtigen RSA Eigenschaften bereit.
+ * RsaConfigurationData stellt die Datenstruktur für die Konfiguration der wichtigen RSA Eigenschaften bereit.
  */
-export class ConfigurationData {
+export class RsaConfigurationData {
 	modulus_width: number;
 	miller_rabin_rounds: number;
 	random_seed: number;
@@ -17,8 +17,8 @@ export class ConfigurationData {
 		this.number_system_base = number_system_base;
 	}
 
-	public static createDefaultConfigurationData(): ConfigurationData {
-		return new ConfigurationData(4096, 100, 13, 55296);
+	public static createDefaultConfigurationData(): RsaConfigurationData {
+		return new RsaConfigurationData(4096, 100, 13, 55296);
 	}
 }
 

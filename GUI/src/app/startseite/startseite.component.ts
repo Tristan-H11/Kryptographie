@@ -5,7 +5,7 @@ import {MatFormFieldModule} from "@angular/material/form-field";
 import {MatButtonModule} from "@angular/material/button";
 import {FormsModule} from "@angular/forms";
 import {Client} from "../models/client";
-import {ConfigurationData} from "../models/configuration-data";
+import {RsaConfigurationData} from "../models/rsa-configuration-data";
 import {MatSnackBar} from "@angular/material/snack-bar";
 import {NgForOf, NgIf} from "@angular/common";
 import {MatIconModule} from "@angular/material/icon";
@@ -93,7 +93,7 @@ export class StartseiteComponent {
      * Generiert ein Schlüsselpaar für den Client.
      */
     public generateKeys(client: Client) {
-        let requestContent = new ConfigurationData(
+        let requestContent = new RsaConfigurationData(
             this.modulusWidth,
             this.millerRabinIterations,
             this.randomSeed,
@@ -193,7 +193,7 @@ export class StartseiteComponent {
     /**
      * Generiert ein Schlüsselpaar mit der gegebenen Konfiguration für den Client.
      */
-    private generateKeyPair(requestContent: ConfigurationData, client: Client): void {
+    private generateKeyPair(requestContent: RsaConfigurationData, client: Client): void {
         let loadingDialog = this.openLoadDialog();
         const startTime = Date.now();
         this.backendRequestService.createKeyPair(requestContent).then(

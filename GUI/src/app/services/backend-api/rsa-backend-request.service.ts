@@ -2,12 +2,12 @@ import {Injectable} from "@angular/core";
 import {HttpClient, HttpParams} from "@angular/common/http";
 import {EndpointsService} from "./endpoints.service";
 import {firstValueFrom, Observable} from "rxjs";
-import {ConfigurationData} from "../../models/configuration-data";
-import {KeyPair} from "../../models/key-pair";
-import {EncryptDecryptRequest} from "../../models/encrypt-decrypt-request";
+import {RsaConfigurationData} from "../../models/rsa-configuration-data";
+import {RsaKeyPair} from "../../models/rsa-key-pair";
+import {RsaEncryptDecryptRequest} from "../../models/rsa-encrypt-decrypt-request";
 import {SingleMessageModel} from "../../models/SingleMessageModel";
-import {SignRequest} from "../../models/sign-request";
-import {VerifyRequest} from "../../models/verify-request";
+import {RsaSignRequest} from "../../models/rsa-sign-request";
+import {RsaVerifyRequest} from "../../models/rsa-verify-request";
 import {ExponentiationRequest} from "../../models/exponentiation-request";
 import {ExtendedEuclidRequest} from "../../models/extended-euclid-request";
 import {ExtendedEuclidResponse} from "../../models/extended-euclid-response";
@@ -49,18 +49,18 @@ export class RsaBackendRequestService {
     /**
      * Fragt den Post Endpunkt zum Erstellen eines neuen Schlüsselpaares ab.
      */
-    public async createKeyPair(body: ConfigurationData): Promise<KeyPair> {
+    public async createKeyPair(body: RsaConfigurationData): Promise<RsaKeyPair> {
         const params = this.getParams();
         const options = {params};
         return firstValueFrom(
-            this.http.post<KeyPair>(this.endpointsService.getRsaCreateKeyPairEndpoint(), body, options)
+            this.http.post<RsaKeyPair>(this.endpointsService.getRsaCreateKeyPairEndpoint(), body, options)
         );
     }
 
     /**
      * Fragt den Post Endpunkt zum Verschlüsseln einer Nachricht ab.
      */
-    public async encrypt(body: EncryptDecryptRequest): Promise<SingleMessageModel> {
+    public async encrypt(body: RsaEncryptDecryptRequest): Promise<SingleMessageModel> {
         const params = this.getParams();
         const options = {params};
         return firstValueFrom(
@@ -71,7 +71,7 @@ export class RsaBackendRequestService {
     /**
      * Fragt den Post Endpunkt zum Entschlüsseln einer Nachricht ab.
      */
-    public async decrypt(body: EncryptDecryptRequest): Promise<SingleMessageModel> {
+    public async decrypt(body: RsaEncryptDecryptRequest): Promise<SingleMessageModel> {
         const params = this.getParams();
         const options = {params};
         return firstValueFrom(
@@ -82,7 +82,7 @@ export class RsaBackendRequestService {
     /**
      * Fragt den Post Endpunkt zum Signieren einer Nachricht ab.
      */
-    public async sign(body: SignRequest): Promise<SingleMessageModel> {
+    public async sign(body: RsaSignRequest): Promise<SingleMessageModel> {
         const params = this.getParams();
         const options = {params};
         return firstValueFrom(
@@ -93,7 +93,7 @@ export class RsaBackendRequestService {
     /**
      * Fragt den Post Endpunkt zum Verifizieren einer Nachricht ab.
      */
-    public async verify(body: VerifyRequest): Promise<SingleMessageModel> {
+    public async verify(body: RsaVerifyRequest): Promise<SingleMessageModel> {
         const params = this.getParams();
         const options = {params};
         return firstValueFrom(

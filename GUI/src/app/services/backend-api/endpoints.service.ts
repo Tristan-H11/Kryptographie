@@ -25,6 +25,27 @@ export class EndpointsService {
     }
 
     /**
+     * Gibt den Endpoint zum Erstellen eines neuen MenezesVanstone Schlüsselpaares zurück.
+     */
+    public getMvCreateKeyPairEndpoint(): string {
+        return this.domain + this.mvEndpoint + "/createKeyPair";
+    }
+
+    /**
+     * Gibt den Endpoint zum MenezesVanstone Verschlüsseln einer Nachricht zurück.
+     */
+    public getMvEncryptEndpoint(): string {
+        return this.domain + this.mvEndpoint + "/encrypt";
+    }
+
+    /**
+     * Gibt den Endpoint zum MenezesVanstone Entschlüsseln einer Nachricht zurück.
+     */
+    public getMvDecryptEndpoint(): string {
+        return this.domain + this.mvEndpoint + "/decrypt";
+    }
+
+    /**
      * Gibt den Endpoint zum Erstellen eines RSA Schlüsselpaares zurück.
      */
     public getRsaCreateKeyPairEndpoint(): string {

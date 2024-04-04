@@ -14,10 +14,10 @@ import {MatSelectModule} from "@angular/material/select";
 import {MatCardModule} from "@angular/material/card";
 import {MatMenuModule} from "@angular/material/menu";
 import {StateManagementService} from "../services/management/state-management.service";
-import {KeyPair} from "../models/key-pair";
-import {EncryptDecryptRequest} from "../models/encrypt-decrypt-request";
-import {SignRequest} from "../models/sign-request";
-import {VerifyRequest} from "../models/verify-request";
+import {RsaKeyPair} from "../models/rsa-key-pair";
+import {RsaEncryptDecryptRequest} from "../models/rsa-encrypt-decrypt-request";
+import {RsaSignRequest} from "../models/rsa-sign-request";
+import {RsaVerifyRequest} from "../models/rsa-verify-request";
 
 @Component({
     selector: "client",
@@ -68,9 +68,9 @@ export class ClientComponent implements OnInit {
         return this._client;
     }
 
-    private _clientKeyPair: WritableSignal<KeyPair> | undefined;
+    private _clientKeyPair: WritableSignal<RsaKeyPair> | undefined;
 
-    public get clientKeyPair(): WritableSignal<KeyPair> {
+    public get clientKeyPair(): WritableSignal<RsaKeyPair> {
         if (!this._clientKeyPair) {
             throw new Error("ClientKeyPair is undefined!");
         }
@@ -171,7 +171,7 @@ export class ClientComponent implements OnInit {
      * Verschlüsselt die Nachricht.
      */
     public encrypt() {
-        const requestBody = new EncryptDecryptRequest(
+        const requestBody = new RsaEncryptDecryptRequest(
             this.plainText,
             this.stateService.getClientKey(this.sendingTo)(),
             this.configurationData().number_system_base
@@ -188,7 +188,7 @@ export class ClientComponent implements OnInit {
      * Entschlüsselt die Nachricht.
      */
     public decrypt() {
-        const requestBody = new EncryptDecryptRequest(
+        const requestBody = new RsaEncryptDecryptRequest(
             this.cipherText,
             this.clientKeyPair(),
             this.configurationData().number_system_base
@@ -205,7 +205,7 @@ export class ClientComponent implements OnInit {
      * Berechnet die Signatur des Klartextes.
      */
     public signPlaintext() {
-        const requestBody = new SignRequest(
+        const requestBody = new RsaSignRequest(
             this.plainText,
             this.clientKeyPair(),
             this.configurationData().number_system_base
@@ -222,7 +222,7 @@ export class ClientComponent implements OnInit {
      * Berechnet die Signatur des Chiffrats.
      */
     public signCiphertext() {
-        const requestBody = new SignRequest(
+        const requestBody = new RsaSignRequest(
             this.cipherText,
             this.clientKeyPair(),
             this.configurationData().number_system_base
@@ -239,7 +239,7 @@ export class ClientComponent implements OnInit {
      * Verifiziert die Signatur des Klartextes.
      */
     public verifyPlaintext() {
-        const requestBody = new VerifyRequest(
+        const requestBody = new RsaVerifyRequest(
             this.plainText,
             this.signature,
             this.stateService.getClientKey(this.receivedFrom)(),
@@ -259,7 +259,7 @@ export class ClientComponent implements OnInit {
      * Verifiziert die Signatur des Chiffrats.
      */
     public verifyCiphertext() {
-        const requestBody = new VerifyRequest(
+        const requestBody = new RsaVerifyRequest(
             this.cipherText,
             this.signature,
             this.stateService.getClientKey(this.receivedFrom)(),

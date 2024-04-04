@@ -1,14 +1,14 @@
-import {KeyPair} from "./key-pair";
+import {RsaKeyPair} from "./rsa-key-pair";
 
 /**
  * Schnittstelle für die Anfrage zum Signieren einer Nachricht.
  */
-export class SignRequest {
+export class RsaSignRequest {
 	plaintext: string;
-	key_pair: KeyPair;
+	key_pair: RsaKeyPair;
     radix: number;
 
-	constructor(plaintext: string, keyPair: KeyPair, radix: number) {
+	constructor(plaintext: string, keyPair: RsaKeyPair, radix: number) {
 		this.plaintext = plaintext;
 		this.key_pair = keyPair;
         this.radix = radix;
