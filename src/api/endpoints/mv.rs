@@ -48,6 +48,18 @@ pub struct MvKeyPair {
     pub private_key: MvPrivateKey,
 }
 
+#[derive(Deserialize)]
+pub struct MvEncryptRequest {
+    pub public_key: MvPublicKey,
+    pub message: String,
+}
+
+#[derive(Serialize)]
+pub struct MvEncryptResponse {
+    pub encrypted_message: String,
+    pub points: Vec<EcPoint>,
+}
+
 /// Erstellt ein neues Schlüsselpaar für das MenezesVanstone-Schema.
 ///
 /// # Arguments
@@ -76,4 +88,27 @@ pub(crate) async fn create_key_pair(
     let mv_key_pair = MvKeyPair::default();
 
     HttpResponse::Ok().json(mv_key_pair)
+}
+
+/// Verschlüsselt eine Nachricht mit dem MenezesVanstone-Schema.
+///
+/// # Arguments
+/// * `req_body` - Die Anfrage, die die Nachricht und den öffentlichen Schlüssel enthält.
+///
+/// # Returns
+/// * `HttpResponse` - Die Antwort, die die verschlüsselte Nachricht enthält.
+pub(crate) async fn encrypt(req_body: Json<MvEncryptRequest>) -> impl Responder {
+    info!("Endpunkt /menezesVanstone/encrypt wurde aufgerufen");
+    let _req_body: MvEncryptRequest = req_body.into_inner();
+
+    // TODO
+
+    let encrypted_message = "TODO".to_string();
+
+    let response = MvEncryptResponse {
+        encrypted_message,
+        points: vec![EcPoint::default()],
+    };
+
+    HttpResponse::Ok().json(response)
 }

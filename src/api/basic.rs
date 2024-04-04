@@ -1,12 +1,12 @@
-use crate::api::endpoints::math_endpoints::{
-    euclid_endpoint, exponentiation, modular_inverse_endpoint, shanks_endpoint,
-};
 use actix_web::{web, HttpResponse, Responder};
 use bigdecimal::num_bigint::ParseBigIntError;
 use log::info;
 use serde::Serialize;
 
-use crate::api::endpoints::{menezes_vanstone_endpoints, rsa_endpoints};
+use crate::api::endpoints::math_endpoints::{
+    euclid_endpoint, exponentiation, modular_inverse_endpoint, shanks_endpoint,
+};
+use crate::api::endpoints::{mv, rsa};
 use crate::api::serializable_models::SingleStringResponse;
 
 #[derive(Serialize)]
@@ -18,23 +18,18 @@ pub fn config_app(cfg: &mut web::ServiceConfig) {
     cfg.service(web::scope("/health").route("", web::get().to(healthcheck)))
         .service(
             web::scope("/rsa")
-                .route(
-                    "/createKeyPair",
-                    web::post().to(rsa_endpoints::create_key_pair),
-                )
-                .route("/encrypt", web::post().to(rsa_endpoints::encrypt))
-                .route("/decrypt", web::post().to(rsa_endpoints::decrypt))
-                .route("/sign", web::post().to(rsa_endpoints::sign))
-                .route("/verify", web::post().to(rsa_endpoints::verify))
-                .route(
-                    "/multiplication",
-                    web::post().to(rsa_endpoints::multiplication),
-                ),
+                .route("/createKeyPair", web::post().to(rsa::create_key_pair))
+                .route("/encrypt", web::post().to(rsa::encrypt))
+                .route("/decrypt", web::post().to(rsa::decrypt))
+                .route("/sign", web::post().to(rsa::sign))
+                .route("/verify", web::post().to(rsa::verify))
+                .route("/multiplication", web::post().to(rsa::multiplication)),
         )
-        .service(web::scope("/menezesVanstone").route(
-            "/createKeyPair",
-            web::post().to(menezes_vanstone_endpoints::create_key_pair),
-        ))
+        .service(
+            web::scope("/menezesVanstone")
+                .route("/createKeyPair", web::post().to(mv::create_key_pair))
+                .route("/encrypt", web::post().to(mv::encrypt)),
+        )
         .service(
             web::scope("/math")
                 .route("/exponentiation", web::post().to(exponentiation))
