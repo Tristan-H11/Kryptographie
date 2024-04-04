@@ -6,9 +6,7 @@ use bigdecimal::num_bigint::ParseBigIntError;
 use log::info;
 use serde::Serialize;
 
-use crate::api::endpoints::rsa_endpoints::{
-    create_key_pair, decrypt, encrypt, multiplication, sign, verify,
-};
+use crate::api::endpoints::{menezes_vanstone_endpoints, rsa_endpoints};
 use crate::api::serializable_models::SingleStringResponse;
 
 #[derive(Serialize)]
@@ -20,13 +18,23 @@ pub fn config_app(cfg: &mut web::ServiceConfig) {
     cfg.service(web::scope("/health").route("", web::get().to(healthcheck)))
         .service(
             web::scope("/rsa")
-                .route("/createKeyPair", web::post().to(create_key_pair))
-                .route("/encrypt", web::post().to(encrypt))
-                .route("/decrypt", web::post().to(decrypt))
-                .route("/sign", web::post().to(sign))
-                .route("/verify", web::post().to(verify))
-                .route("/multiplication", web::post().to(multiplication)),
+                .route(
+                    "/createKeyPair",
+                    web::post().to(rsa_endpoints::create_key_pair),
+                )
+                .route("/encrypt", web::post().to(rsa_endpoints::encrypt))
+                .route("/decrypt", web::post().to(rsa_endpoints::decrypt))
+                .route("/sign", web::post().to(rsa_endpoints::sign))
+                .route("/verify", web::post().to(rsa_endpoints::verify))
+                .route(
+                    "/multiplication",
+                    web::post().to(rsa_endpoints::multiplication),
+                ),
         )
+        .service(web::scope("/menezesVanstone").route(
+            "/createKeyPair",
+            web::post().to(menezes_vanstone_endpoints::create_key_pair),
+        ))
         .service(
             web::scope("/math")
                 .route("/exponentiation", web::post().to(exponentiation))
