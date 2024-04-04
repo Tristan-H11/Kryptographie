@@ -8,7 +8,7 @@ import {MatInputModule} from "@angular/material/input";
 import {Client} from "../models/client";
 import {MatIconModule} from "@angular/material/icon";
 import {MatSnackBar} from "@angular/material/snack-bar";
-import {BackendRequestService} from "../services/backend-api/backend-request.service";
+import {RsaBackendRequestService} from "../services/backend-api/rsa-backend-request.service";
 import {ActivatedRoute} from "@angular/router";
 import {MatSelectModule} from "@angular/material/select";
 import {MatCardModule} from "@angular/material/card";
@@ -50,7 +50,7 @@ export class ClientComponent implements OnInit {
     /**
      * Konstruktor der Komponente.
      */
-    constructor(private backendRequestService: BackendRequestService,
+    constructor(private backendRequestService: RsaBackendRequestService,
                 private stateService: StateManagementService,
                 private route: ActivatedRoute,
                 private snackBar: MatSnackBar) {

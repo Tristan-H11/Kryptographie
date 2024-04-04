@@ -5,7 +5,7 @@ import {MatExpansionModule} from "@angular/material/expansion";
 import {MatFormFieldModule} from "@angular/material/form-field";
 import {MatInputModule} from "@angular/material/input";
 import {FormsModule, ReactiveFormsModule} from "@angular/forms";
-import {BackendRequestService} from "../services/backend-api/backend-request.service";
+import {RsaBackendRequestService} from "../services/backend-api/rsa-backend-request.service";
 import {ExtendedEuclidRequest} from "../models/extended-euclid-request";
 import {catchError, EMPTY} from "rxjs";
 import {ErrorDialogComponent} from "../error-dialog/error-dialog.component";
@@ -25,7 +25,7 @@ export class ExtendedGcdComponent {
 	public coefficientX: string = "";
 	public coefficientY: string = "";
 
-	constructor(private backendRequestService: BackendRequestService, private dialog: MatDialog) {
+	constructor(private backendRequestService: RsaBackendRequestService, private dialog: MatDialog) {
 	}
 
 	/**

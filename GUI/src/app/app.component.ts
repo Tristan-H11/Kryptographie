@@ -5,7 +5,7 @@ import {MatSidenavModule} from "@angular/material/sidenav";
 import {MatIconModule} from "@angular/material/icon";
 import {MatDividerModule} from "@angular/material/divider";
 import {MatButtonModule} from "@angular/material/button";
-import {BackendRequestService} from "./services/backend-api/backend-request.service";
+import {RsaBackendRequestService} from "./services/backend-api/rsa-backend-request.service";
 import {MatSnackBar} from "@angular/material/snack-bar";
 import {Client} from "./models/client";
 import {StateManagementService} from "./services/management/state-management.service";
@@ -44,7 +44,7 @@ export class AppComponent implements OnInit {
         this.stateService.getUseFastMath().update(value => useFastMath);
     }
 
-	constructor(private backendRequestService: BackendRequestService,
+	constructor(private backendRequestService: RsaBackendRequestService,
 				private stateService: StateManagementService,
 				private snackBar: MatSnackBar) {
 	}

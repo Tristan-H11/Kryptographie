@@ -5,7 +5,7 @@ import {MatExpansionModule} from "@angular/material/expansion";
 import {MatFormFieldModule} from "@angular/material/form-field";
 import {MatInputModule} from "@angular/material/input";
 import {FormsModule, ReactiveFormsModule} from "@angular/forms";
-import {BackendRequestService} from "../services/backend-api/backend-request.service";
+import {RsaBackendRequestService} from "../services/backend-api/rsa-backend-request.service";
 import {KeyPair} from "../models/key-pair";
 import {ConfigurationData} from "../models/configuration-data";
 import {MatDialog, MatDialogRef} from "@angular/material/dialog";
@@ -37,7 +37,7 @@ export class MultiplicationComponent {
     public resultEncrypted: String = "";
     public resultDecrypted: String = "";
 
-    constructor(private backendRequestService: BackendRequestService,
+    constructor(private backendRequestService: RsaBackendRequestService,
                 public dialog: MatDialog,
                 private snackBar: MatSnackBar) {
     }

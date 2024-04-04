@@ -21,9 +21,9 @@ import {MultiplicationResponse} from "../../models/multiplication-response";
     providedIn: "root"
 })
 /**
- * Service zum Abfragen der Backend-Endpunkte.
+ * Service zum Abfragen der RSA Backend-Endpunkte.
  */
-export class BackendRequestService {
+export class RsaBackendRequestService {
 
     constructor(
         private endpointsService: EndpointsService,
@@ -47,13 +47,13 @@ export class BackendRequestService {
     }
 
     /**
-     * Fragt den Post Endpunkt zum Ertellen eines neuen Schlüsselpaares ab.
+     * Fragt den Post Endpunkt zum Erstellen eines neuen Schlüsselpaares ab.
      */
     public async createKeyPair(body: ConfigurationData): Promise<KeyPair> {
         const params = this.getParams();
         const options = {params};
         return firstValueFrom(
-            this.http.post<KeyPair>(this.endpointsService.getCreateKeyPairEndpoint(), body, options)
+            this.http.post<KeyPair>(this.endpointsService.getRsaCreateKeyPairEndpoint(), body, options)
         );
     }
 
@@ -64,7 +64,7 @@ export class BackendRequestService {
         const params = this.getParams();
         const options = {params};
         return firstValueFrom(
-            this.http.post<SingleMessageModel>(this.endpointsService.getEncryptEndpoint(), body, options)
+            this.http.post<SingleMessageModel>(this.endpointsService.getRsaEncryptEndpoint(), body, options)
         );
     }
 
@@ -75,7 +75,7 @@ export class BackendRequestService {
         const params = this.getParams();
         const options = {params};
         return firstValueFrom(
-            this.http.post<SingleMessageModel>(this.endpointsService.getDecryptEndpoint(), body, options)
+            this.http.post<SingleMessageModel>(this.endpointsService.getRsaDecryptEndpoint(), body, options)
         );
     }
 
@@ -86,7 +86,7 @@ export class BackendRequestService {
         const params = this.getParams();
         const options = {params};
         return firstValueFrom(
-            this.http.post<SingleMessageModel>(this.endpointsService.getSignEndpoint(), body, options)
+            this.http.post<SingleMessageModel>(this.endpointsService.getRsaSignEndpoint(), body, options)
         );
     }
 
@@ -97,7 +97,7 @@ export class BackendRequestService {
         const params = this.getParams();
         const options = {params};
         return firstValueFrom(
-            this.http.post<SingleMessageModel>(this.endpointsService.getVerifyEndpoint(), body, options)
+            this.http.post<SingleMessageModel>(this.endpointsService.getRsaVerifyEndpoint(), body, options)
         );
     }
 

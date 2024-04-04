@@ -4,7 +4,7 @@ import {MatExpansionModule} from "@angular/material/expansion";
 import {MatFormFieldModule} from "@angular/material/form-field";
 import {MatInputModule} from "@angular/material/input";
 import {FormsModule, ReactiveFormsModule} from "@angular/forms";
-import {BackendRequestService} from "../services/backend-api/backend-request.service";
+import {RsaBackendRequestService} from "../services/backend-api/rsa-backend-request.service";
 import {MatButtonModule} from "@angular/material/button";
 import {ExponentiationRequest} from "../models/exponentiation-request";
 import {catchError, EMPTY} from "rxjs";
@@ -25,7 +25,7 @@ export class ExponentiationComponent {
 	public modulus = "";
 	public result = "";
 
-	constructor(private backendRequestService: BackendRequestService, private dialog: MatDialog) {
+	constructor(private backendRequestService: RsaBackendRequestService, private dialog: MatDialog) {
 	}
 
 	/**

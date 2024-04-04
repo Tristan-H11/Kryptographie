@@ -1,6 +1,6 @@
 import {Component} from "@angular/core";
 import {CommonModule} from "@angular/common";
-import {BackendRequestService} from "../services/backend-api/backend-request.service";
+import {RsaBackendRequestService} from "../services/backend-api/rsa-backend-request.service";
 import {ShanksRequest} from "../models/shanks-request";
 import {FormsModule} from "@angular/forms";
 import {MatButtonModule} from "@angular/material/button";
@@ -27,7 +27,7 @@ export class ShanksComponent {
     //Output field
     public result = "";
 
-    constructor(private backendRequestService: BackendRequestService, private dialog: MatDialog) {
+    constructor(private backendRequestService: RsaBackendRequestService, private dialog: MatDialog) {
     }
 
     /**

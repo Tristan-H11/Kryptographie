@@ -11,6 +11,7 @@ export class EndpointsService {
 
     private domain: string = this.stateService.getServerUrl()();
     private rsaEndpoint: string = "/rsa";
+    private mvEndpoint: string = "/menezesVanstone";
     private mathEndpoint: string = "/math";
 
     constructor(private stateService: StateManagementService) {
@@ -24,37 +25,37 @@ export class EndpointsService {
     }
 
     /**
-     * Gibt den Endpoint zum Erstellen eines Schlüsselpaares zurück.
+     * Gibt den Endpoint zum Erstellen eines RSA Schlüsselpaares zurück.
      */
-    public getCreateKeyPairEndpoint(): string {
+    public getRsaCreateKeyPairEndpoint(): string {
         return this.domain + this.rsaEndpoint + "/createKeyPair";
     }
 
     /**
-     * Gibt den Endpoint zum Verschlüsseln einer Nachricht zurück.
+     * Gibt den Endpoint zum RSA Verschlüsseln einer Nachricht zurück.
      */
-    public getEncryptEndpoint(): string {
+    public getRsaEncryptEndpoint(): string {
         return this.domain + this.rsaEndpoint + "/encrypt";
     }
 
     /**
-     * Gibt den Endpoint zum Entschlüsseln einer Nachricht zurück.
+     * Gibt den Endpoint zum RSA Entschlüsseln einer Nachricht zurück.
      */
-    public getDecryptEndpoint(): string {
+    public getRsaDecryptEndpoint(): string {
         return this.domain + this.rsaEndpoint + "/decrypt";
     }
 
     /**
-     * Gibt den Endpoint zum Signieren einer Nachricht zurück.
+     * Gibt den Endpoint zum RSA Signieren einer Nachricht zurück.
      */
-    public getSignEndpoint(): string {
+    public getRsaSignEndpoint(): string {
         return this.domain + this.rsaEndpoint + "/sign";
     }
 
     /**
-     * Gibt den Endpoint zum Verifizieren einer Nachricht zurück.
+     * Gibt den Endpoint zum RSA Verifizieren einer Nachricht zurück.
      */
-    public getVerifyEndpoint(): string {
+    public getRsaVerifyEndpoint(): string {
         return this.domain + this.rsaEndpoint + "/verify";
     }
 

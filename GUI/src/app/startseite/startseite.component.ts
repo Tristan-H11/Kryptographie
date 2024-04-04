@@ -13,7 +13,7 @@ import {MatDialog, MatDialogRef} from "@angular/material/dialog";
 import {SimpleDialogComponent} from "../simple-dialog/simple-dialog.component";
 import {LoadingDialogComponent} from "../loading-dialog/loading-dialog.component";
 import {StateManagementService} from "../services/management/state-management.service";
-import {BackendRequestService} from "../services/backend-api/backend-request.service";
+import {RsaBackendRequestService} from "../services/backend-api/rsa-backend-request.service";
 
 
 @Component({
@@ -41,7 +41,7 @@ export class StartseiteComponent {
 
     constructor(private stateService: StateManagementService,
                 public dialog: MatDialog,
-                private backendRequestService: BackendRequestService,
+                private backendRequestService: RsaBackendRequestService,
                 private snackBar: MatSnackBar) {
     }
 

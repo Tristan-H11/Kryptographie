@@ -5,7 +5,7 @@ import {MatButtonModule} from "@angular/material/button";
 import {MatExpansionModule} from "@angular/material/expansion";
 import {MatFormFieldModule} from "@angular/material/form-field";
 import {MatInputModule} from "@angular/material/input";
-import {BackendRequestService} from "../services/backend-api/backend-request.service";
+import {RsaBackendRequestService} from "../services/backend-api/rsa-backend-request.service";
 import {ModularInversRequest} from "../models/modular-invers-request";
 import {MatDialog} from "@angular/material/dialog";
 import {catchError, EMPTY} from "rxjs";
@@ -24,7 +24,7 @@ export class ModularInverseComponent {
     public modul = "";
     public result = "";
 
-    constructor(private backendRequestService: BackendRequestService, private dialog: MatDialog) {
+    constructor(private backendRequestService: RsaBackendRequestService, private dialog: MatDialog) {
     }
 
     /**
