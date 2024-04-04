@@ -16,16 +16,36 @@ pub struct MvCreateKeyPairRequest {
     pub coef_a: u32,
 }
 
-#[derive(Serialize)]
-pub struct MvKeyPair {
-    pub coef_a: u32,
-    pub coef_b: u32,
+#[derive(Serialize, Deserialize, Default)]
+pub struct EllipticCurve {
+    pub a: u32,
+    pub b: u32,
     pub prime: String,
-    pub generator_x: String,
-    pub generator_y: String,
-    pub public_key_x: String,
-    pub public_key_y: String,
-    pub private_key: String,
+}
+
+#[derive(Serialize, Deserialize, Default)]
+pub struct EcPoint {
+    pub x: String,
+    pub y: String,
+}
+
+#[derive(Serialize, Deserialize, Default)]
+pub struct MvPublicKey {
+    pub curve: EllipticCurve,
+    pub generator: EcPoint,
+    pub y: EcPoint,
+}
+
+#[derive(Serialize, Deserialize, Default)]
+pub struct MvPrivateKey {
+    pub curve: EllipticCurve,
+    pub x: String,
+}
+
+#[derive(Serialize, Default)]
+pub struct MvKeyPair {
+    pub public_key: MvPublicKey,
+    pub private_key: MvPrivateKey,
 }
 
 /// Erstellt ein neues Schlüsselpaar für das MenezesVanstone-Schema.
@@ -53,16 +73,7 @@ pub(crate) async fn create_key_pair(
 
     // TODO
 
-    let key_pair = MvKeyPair {
-        coef_a: 2,
-        coef_b: 3,
-        prime: "17".to_string(),
-        generator_x: "2".to_string(),
-        generator_y: "3".to_string(),
-        public_key_x: "6".to_string(),
-        public_key_y: "4".to_string(),
-        private_key: "1".to_string(),
-    };
+    let mv_key_pair = MvKeyPair::default();
 
-    HttpResponse::Ok().json(key_pair)
+    HttpResponse::Ok().json(mv_key_pair)
 }
