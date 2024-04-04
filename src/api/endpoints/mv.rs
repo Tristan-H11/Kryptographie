@@ -1,13 +1,26 @@
-use crate::api::serializable_models::{SingleStringResponse, UseFastQuery};
-
-use crate::math_core::number_theory::number_theory_service::NumberTheoryService;
-use crate::math_core::number_theory::number_theory_service::NumberTheoryServiceSpeed::{
-    Fast, Slow,
-};
 use actix_web::web::{Json, Query};
 use actix_web::{HttpResponse, Responder};
 use log::info;
 use serde::{Deserialize, Serialize};
+
+use crate::api::basic::call_checked_with_parsed_big_ints;
+use crate::api::serializable_models::{SingleStringResponse, UseFastQuery};
+use crate::encryption::asymmetric_encryption_types::{AsymmetricDecryptor, AsymmetricEncryptor};
+use crate::encryption::core::menezes_vanstone::keys::{
+    MenezesVanstonePrivateKey, MenezesVanstonePublicKey,
+};
+use crate::encryption::string_schemes::menezes_vanstone::keys::{
+    MenezesVanstoneStringPrivateKey, MenezesVanstoneStringPublicKey,
+};
+use crate::encryption::string_schemes::menezes_vanstone::menezes_vanstone_string_scheme::{
+    MenezesVanstoneStringScheme, MvStringCiphertext,
+};
+use crate::math_core::ecc::finite_field_elliptic_curve::FiniteFieldEllipticCurve;
+use crate::math_core::ecc::finite_field_elliptic_curve_point::FiniteFieldEllipticCurvePoint;
+use crate::math_core::number_theory::number_theory_service::NumberTheoryService;
+use crate::math_core::number_theory::number_theory_service::NumberTheoryServiceSpeed::{
+    Fast, Slow,
+};
 
 #[derive(Deserialize)]
 pub struct MvCreateKeyPairRequest {
@@ -18,8 +31,8 @@ pub struct MvCreateKeyPairRequest {
 
 #[derive(Serialize, Deserialize, Default)]
 pub struct EllipticCurve {
-    pub a: u32,
-    pub b: u32,
+    pub a: i32,
+    pub b: i32,
     pub prime: String,
 }
 
@@ -52,17 +65,20 @@ pub struct MvKeyPair {
 pub struct MvEncryptRequest {
     pub public_key: MvPublicKey,
     pub message: String,
+    pub radix: u32,
 }
 
-#[derive(Serialize)]
+#[derive(Deserialize, Serialize)]
 pub struct MvCipherText {
     pub encrypted_message: String,
     pub points: Vec<EcPoint>,
 }
 
+#[derive(Deserialize)]
 pub struct MvDecryptRequest {
     pub private_key: MvPrivateKey,
     pub cipher_text: MvCipherText,
+    pub radix: u32,
 }
 
 /// Erstellt ein neues Schlüsselpaar für das MenezesVanstone-Schema.
@@ -102,20 +118,68 @@ pub(crate) async fn create_key_pair(
 ///
 /// # Returns
 /// * `HttpResponse` - Die Antwort, die die verschlüsselte Nachricht enthält.
-pub(crate) async fn encrypt(req_body: Json<MvEncryptRequest>) -> impl Responder {
+pub(crate) async fn encrypt(
+    req_body: Json<MvEncryptRequest>,
+    query: Query<UseFastQuery>,
+) -> impl Responder {
     info!("Endpunkt /menezesVanstone/encrypt wurde aufgerufen");
-    let _req_body: MvEncryptRequest = req_body.into_inner();
+    let req_body: MvEncryptRequest = req_body.into_inner();
 
-    // TODO
+    call_checked_with_parsed_big_ints(|| {
+        let generator = FiniteFieldEllipticCurvePoint {
+            x: req_body.public_key.generator.x.parse().unwrap(),
+            y: req_body.public_key.generator.y.parse().unwrap(),
+            is_infinite: false,
+        };
 
-    let encrypted_message = "TODO".to_string();
+        let curve = FiniteFieldEllipticCurve {
+            a: req_body.public_key.curve.a,
+            b: req_body.public_key.curve.b,
+            prime: req_body.public_key.curve.prime.parse().unwrap(),
+        };
 
-    let response = MvCipherText {
-        encrypted_message,
-        points: vec![EcPoint::default()],
-    };
+        let y = FiniteFieldEllipticCurvePoint {
+            x: req_body.public_key.y.x.parse().unwrap(),
+            y: req_body.public_key.y.y.parse().unwrap(),
+            is_infinite: false,
+        };
 
-    HttpResponse::Ok().json(response)
+        let public_key = MenezesVanstonePublicKey {
+            curve,
+            generator,
+            y,
+        };
+
+        let public_key = MenezesVanstoneStringPublicKey {
+            mv_key: public_key,
+            radix: req_body.radix,
+        };
+
+        let message = &req_body.message;
+
+        let service = match query.use_fast {
+            true => NumberTheoryService::new(Fast),
+            false => NumberTheoryService::new(Slow),
+        };
+
+        let ciphertext = MenezesVanstoneStringScheme::encrypt(&public_key, &message, service);
+
+        let points = ciphertext
+            .points
+            .iter()
+            .map(|point| EcPoint {
+                x: point.x.to_string(),
+                y: point.y.to_string(),
+            })
+            .collect();
+
+        let response = MvCipherText {
+            encrypted_message: ciphertext.ciphertext,
+            points,
+        };
+
+        Ok(HttpResponse::Ok().json(response))
+    })
 }
 
 /// Entschlüsselt eine Nachricht mit dem MenezesVanstone-Schema.
@@ -125,15 +189,53 @@ pub(crate) async fn encrypt(req_body: Json<MvEncryptRequest>) -> impl Responder 
 ///
 /// # Returns
 /// * `HttpResponse` - Die Antwort, die die entschlüsselte Nachricht enthält.
-pub(crate) async fn decrypt(req_body: Json<MvEncryptRequest>) -> impl Responder {
+pub(crate) async fn decrypt(
+    req_body: Json<MvDecryptRequest>,
+    query: Query<UseFastQuery>,
+) -> impl Responder {
     info!("Endpunkt /menezesVanstone/decrypt wurde aufgerufen");
-    let _req_body: MvEncryptRequest = req_body.into_inner();
+    let req_body: MvDecryptRequest = req_body.into_inner();
 
-    // TODO
+    call_checked_with_parsed_big_ints(|| {
+        let curve = FiniteFieldEllipticCurve {
+            a: req_body.private_key.curve.a,
+            b: req_body.private_key.curve.b,
+            prime: req_body.private_key.curve.prime.parse().unwrap(),
+        };
 
-    let decrypted_message = "TODO".to_string();
+        let private_key = MenezesVanstonePrivateKey {
+            curve,
+            x: req_body.private_key.x.parse().unwrap(),
+        };
 
-    HttpResponse::Ok().json(SingleStringResponse {
-        message: decrypted_message,
+        let private_key = MenezesVanstoneStringPrivateKey {
+            mv_key: private_key,
+            radix: req_body.radix,
+        };
+
+        let ciphertext = MvStringCiphertext {
+            ciphertext: req_body.cipher_text.encrypted_message.clone(),
+            points: req_body
+                .cipher_text
+                .points
+                .iter()
+                .map(|point| FiniteFieldEllipticCurvePoint {
+                    x: point.x.parse().unwrap(),
+                    y: point.y.parse().unwrap(),
+                    is_infinite: false,
+                })
+                .collect(),
+        };
+
+        let service = match query.use_fast {
+            true => NumberTheoryService::new(Fast),
+            false => NumberTheoryService::new(Slow),
+        };
+
+        let plaintext = MenezesVanstoneStringScheme::decrypt(&private_key, &ciphertext, service);
+
+        let response = SingleStringResponse { message: plaintext };
+
+        Ok(HttpResponse::Ok().json(response))
     })
 }
