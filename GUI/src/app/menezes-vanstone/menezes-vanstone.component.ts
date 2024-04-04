@@ -19,13 +19,12 @@ import {
     copyMvKeyPair,
     copyMvPublicKey,
     MvCipherText, MvDecryptRequest,
-    MvEncryptRequest,
-    MvBeans
+    MvEncryptRequest, MvKeyPair,
 } from "../models/mv-beans";
 
 interface ClientData {
     name: string;
-    keyPair: MvBeans;
+    keyPair: MvKeyPair;
     plaintext: string;
     ciphertext: MvCipherText;
 }
