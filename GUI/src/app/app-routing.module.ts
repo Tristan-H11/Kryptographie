@@ -7,10 +7,12 @@ import {ShanksComponent} from "./shanks/shanks.component";
 import {ClientComponent} from "./client/client.component";
 import {ModularInverseComponent} from "./modular-inverse/modular-inverse.component";
 import {MultiplicationComponent} from "./multiplication/multiplication.component";
+import {MenezesVanstoneComponent} from "./menezes-vanstone/menezes-vanstone.component";
 
 export const routes: Routes = [
     {path: "startseite", component: StartseiteComponent},
     {path: "client/:client", component: ClientComponent},
+    {path: "menezesVanstone", component: MenezesVanstoneComponent},
     {path: "exponentiation", component: ExponentiationComponent},
     {path: "extendedGcd", component: ExtendedGcdComponent},
     {path: "shanks", component: ShanksComponent},
