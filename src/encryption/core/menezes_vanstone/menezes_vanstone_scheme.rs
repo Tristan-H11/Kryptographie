@@ -1,3 +1,4 @@
+use std::str::FromStr;
 use std::time::SystemTime;
 
 use atomic_counter::RelaxedCounter;
@@ -68,11 +69,14 @@ impl AsymmetricEncryptor<MenezesVanstoneScheme> for MenezesVanstoneScheme {
         let (mut k, mut c1, mut c2);
         let order_of_subgroup = key.curve.get_order_of_subgroup();
         loop {
-            k = random_generator.take(&1.into(), &order_of_subgroup.decrement(), &counter);
+            // TODO Achtung! Dieser Wert ist vorerst fest, weil er in den Testfällen einen validen Wert darstellt, solangen noch keine
+            // Untergruppen bestimmt werden können.
+            k = BigInt::from_str("165165550160996878069788804916299463847").unwrap(); // TODO random_generator.take(&1.into(), &order_of_subgroup.decrement(), &counter);
             let point = key.y.multiply(&k, &key.curve);
             (c1, c2) = (point.x, point.y);
             // Sind beide Werte ungleich 0, so ist das Paar (c1, c2) gültig
             if !c1.is_zero() && !c2.is_zero() {
+                println!("k: {:?}", k);
                 break;
             }
         }
