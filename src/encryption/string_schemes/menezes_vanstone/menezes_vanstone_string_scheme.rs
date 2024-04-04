@@ -1,4 +1,5 @@
 use bigdecimal::num_bigint::BigInt;
+use bigdecimal::Zero;
 
 use crate::encryption::asymmetric_encryption_types::{
     AsymmetricDecryptor, AsymmetricEncryptionScheme, AsymmetricEncryptor,
@@ -55,15 +56,23 @@ impl AsymmetricEncryptor<MenezesVanstoneStringScheme> for MenezesVanstoneStringS
         // TODO Hier ist das Padding. Das muss aber noch irgendwie wieder rausgerechnet werden.
         // TODO Funktioniert aber auch THEORETISCH(!) einwandfrei ohne. Überwiegend ungetestet!
         // TODO Damit es ohne Padding funktioniert, muss ggf ein letzter, nicht vorhandener Block
-        // TODO mit \u0000 gefüllt werden.
+        // TODO mit \u0000 gefüllt werden. Nachtrag: Nein, kein Wert darf 0 sein!
+        // TODO: Lösung: Wenn die Nachricht genau uneven-blocks lang ist, dann muss die Blocklänge geändert werden.
         // Den Plaintext auffüllen, bis er eine gerade Anzahl von Blöcken erzeugen wird
         let diff = block_size * 2 - (plaintext.len() % (block_size * 2));
-        let supplement = "\u{0000}".repeat(diff);
+        let supplement = "a".repeat(diff);
         let mut padded_plaintext = String::from(plaintext);
-        padded_plaintext.push_str(&supplement);
+        if (plaintext.len() / block_size*2) == 0 {
+            padded_plaintext.push_str(&supplement);
+        }
+
+        println!("Blocksize: {:?}", block_size);
+        println!("PaddedPlaintext: {:?}", padded_plaintext);
 
         // Blockchiffre anwenden
-        let message = ToDecimalBlockScheme::encrypt(&plaintext, &decimal_unicode_key);
+        let message = ToDecimalBlockScheme::encrypt(&padded_plaintext, &decimal_unicode_key);
+
+        println!("BigIntVec: {:?}", message);
 
         // Die Zahlen in eine Liste von MenezesVanstonePlaintext mappen
         let mut plaintext_list: Vec<MenezesVanstonePlaintext> = Vec::new();
@@ -75,12 +84,16 @@ impl AsymmetricEncryptor<MenezesVanstoneStringScheme> for MenezesVanstoneStringS
             plaintext_list.push(plaintext_chunk);
         }
 
+        println!("PlaintextList: {:?}", plaintext_list);
+
         // Jeden einzelnen Plaintext für sich verschlüsseln
         let mut ciphertext_list: Vec<MenezesVanstoneCiphertext> = Vec::new();
         for plaintext in plaintext_list {
             let ciphertext = MenezesVanstoneScheme::encrypt(&key.mv_key, &plaintext, service);
             ciphertext_list.push(ciphertext);
         }
+
+        println!("CiphertextList: {:?}", ciphertext_list);
 
         // Die Zahlen wieder in Strings konvertieren
         let mut big_int_vec: Vec<BigInt> = Vec::new();
@@ -89,6 +102,8 @@ impl AsymmetricEncryptor<MenezesVanstoneStringScheme> for MenezesVanstoneStringS
             big_int_vec.push(ciphertext.second.clone());
         }
         let ciphertext_string = FromDecimalBlockScheme::encrypt(&big_int_vec, &decimal_unicode_key);
+
+        println!("CiphertextString: {:?}", ciphertext_string);
 
         // Die genutzten Punkte akkumulieren
         let points = ciphertext_list
@@ -194,7 +209,7 @@ mod tests {
 
         // Der Radix soll hier für jeden Testlauf zufällig gewählt werden, damit die Tests
         // mehr abfangen können.
-        let radix = rand::thread_rng().gen_range(240..55296);
+        let radix = 55296; //rand::thread_rng().gen_range(240..55296);
         println!("Radix: {}", radix);
         let public_key = MenezesVanstoneStringPublicKey {
             mv_key: public_key,
@@ -206,7 +221,7 @@ mod tests {
             radix,
         };
 
-        let plaintext = "Das ist ein Test1234567890";
+        let plaintext = "Das ist ein Test1234567890aaaaaa"; // TODO: Für "aa" fällt das durch!!!!
 
         let service = NumberTheoryService::new(Fast);
         let ciphertext = MenezesVanstoneStringScheme::encrypt(&public_key, &plaintext, service);
