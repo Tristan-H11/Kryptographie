@@ -28,7 +28,6 @@ pub fn get_educational_curve() -> FiniteFieldEllipticCurve {
         a,
         b: 9i32,
         prime: p,
-
     }
 }
 
@@ -67,7 +66,8 @@ impl FiniteFieldEllipticCurve {
     pub fn is_singular(&self) -> bool {
         let four_a_cubed = 4 * &self.a.pow(3);
         let twenty_seven_b_squared = 27 * &self.b.pow(2);
-        (BigInt::from(four_a_cubed) + BigInt::from(twenty_seven_b_squared)).rem_euclid(&self.prime) == BigInt::zero()
+        (BigInt::from(four_a_cubed) + BigInt::from(twenty_seven_b_squared)).rem_euclid(&self.prime)
+            == BigInt::zero()
     }
 
     pub fn get_order_of_subgroup(&self) -> BigInt {

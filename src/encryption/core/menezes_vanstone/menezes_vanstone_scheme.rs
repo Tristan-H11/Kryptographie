@@ -1,4 +1,3 @@
-use std::str::FromStr;
 use std::time::SystemTime;
 
 use atomic_counter::RelaxedCounter;
