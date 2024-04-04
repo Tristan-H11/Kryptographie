@@ -5,8 +5,7 @@ import {HttpClient, HttpParams} from "@angular/common/http";
 import {firstValueFrom} from "rxjs";
 import {SingleMessageModel} from "../../models/SingleMessageModel";
 import {MvKeygenConfig} from "../../models/mv-keygen-config";
-import {MvCipherText, MvDecryptRequest, MvEncryptRequest} from "../../models/mv-encrypt-request";
-import {MvKeyPair} from "../../models/mv-key-pair";
+import {MvCipherText, MvDecryptRequest, MvEncryptRequest, MvKeyPair} from "../../models/mv-beans";
 
 @Injectable({
     providedIn: "root"
