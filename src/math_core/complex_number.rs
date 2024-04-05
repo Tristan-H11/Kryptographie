@@ -1,15 +1,15 @@
 use bigdecimal::num_bigint::BigInt;
-use bigdecimal::{Signed, Zero};
+use bigdecimal::{BigDecimal, Signed, Zero};
 use std::ops::{Add, Div, Mul, Sub};
 
 #[derive(Clone, Debug, PartialEq)]
 pub struct ComplexNumber {
-    pub real: BigInt,
-    pub imaginary: BigInt,
+    pub real: BigDecimal,
+    pub imaginary: BigDecimal,
 }
 
 impl ComplexNumber {
-    pub fn new(real: BigInt, imaginary: BigInt) -> Self {
+    pub fn new(real: BigDecimal, imaginary: BigDecimal) -> Self {
         Self { real, imaginary }
     }
 
@@ -32,15 +32,23 @@ impl ComplexNumber {
     pub fn is_zero(&self) -> bool {
         self.real.is_zero() && self.imaginary.is_zero()
     }
+
+    pub fn gaussian_integer(self) -> Self {
+        Self {
+            real: self.real.round(0),
+            imaginary: self.imaginary.round(0),
+        }
+    }
 }
 
 pub fn complex_euclidean_algorithm(a: ComplexNumber, b: ComplexNumber) -> ComplexNumber {
+
     let mut g = a;
     let mut g_prev = b;
 
     while !g.is_zero() {
         let tmp = g.clone();
-        g = &g_prev - &(&g * &(&g_prev / &g));
+        g = &g_prev - &(&g * &(&g_prev / &g).gaussian_integer());
         g_prev = tmp.clone();
     }
     ComplexNumber {
@@ -148,12 +156,12 @@ mod tests {
     #[test]
     fn complex_test() {
         let x = ComplexNumber {
-            real: BigInt::from(-6),
-            imaginary: BigInt::from(17),
+            real: BigDecimal::from(-6),
+            imaginary: BigDecimal::from(17),
         };
         let y = ComplexNumber {
-            real: BigInt::from(3),
-            imaginary: BigInt::from(4),
+            real: BigDecimal::from(3),
+            imaginary: BigDecimal::from(4),
         };
         assert_eq!(complex_euclidean_algorithm(y.clone(), x.clone()), y);
         assert_eq!(complex_euclidean_algorithm(x.clone(), y.clone()), y);
