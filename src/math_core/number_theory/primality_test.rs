@@ -130,9 +130,8 @@ mod tests {
     use super::*;
 
     #[test]
-    #[should_panic]
-    fn test_panic_fast_with_small_p() {
-        PrimalityTest::fails_primitive_prime_checks(&11.into());
+    fn test_succeed_fast_with_small_p() {
+        assert!(!PrimalityTest::fails_primitive_prime_checks(&11.into()));
     }
 
     #[test]
