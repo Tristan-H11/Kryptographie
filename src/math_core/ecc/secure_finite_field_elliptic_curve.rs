@@ -131,10 +131,12 @@ impl SecureFiniteFieldEllipticCurve {
             q = big_n.div(8);
             // Ist q = N / 8 eine Primzahl, so wird die Schleife verlassen und das q ist gültig.
             if service.is_probably_prime(&q, miller_rabin_iterations, &prng) {
-                break;
+                return (prime, q);
             }
+            // Ist q keine Primzahl, wird prime um 8 erhöht und ein neuer Versuch gestartet.
+            // Es wird (wie oben auch) um 8 erhöht, da p = 5 (mod 8) gelten muss.
+            prime.add_assign(BigInt::from(8));
         }
-        (prime, q)
     }
 
     pub fn calculate_w(prime: &BigInt, z: BigInt) -> BigInt {
