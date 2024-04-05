@@ -141,9 +141,15 @@ mod tests {
         // SecureFiniteFieldEllipticCurve::new(5.into(), 32, 40);
 
         // random big int using the rand crate
-        let random = rand::thread_rng().gen_range(1..97);
-        let x = BigInt::from(random);
-        let y = curve.generator.multiply(&x, &curve);
+        let (mut x, mut y);
+        loop {
+            let random = rand::thread_rng().gen_range(1..58);
+            x = BigInt::from(random);
+            y = curve.generator.multiply(&x, &curve);
+            if !y.x.is_zero() && !y.y.is_zero() {
+                break;
+            }
+        }
 
         let public_key = MenezesVanstonePublicKey {
             curve: curve.clone(),
@@ -175,9 +181,15 @@ mod tests {
         };
         // SecureFiniteFieldEllipticCurve::new(5.into(), 32, 40);
 
-        let random = rand::thread_rng().gen_range(1..97);
-        let x = BigInt::from(random);
-        let y = curve.generator.multiply(&x, &curve);
+        let (mut x, mut y);
+        loop {
+            let random = rand::thread_rng().gen_range(1..58);
+            x = BigInt::from(random);
+            y = curve.generator.multiply(&x, &curve);
+            if !y.x.is_zero() && !y.y.is_zero() {
+                break;
+            }
+        }
 
         let public_key = MenezesVanstonePublicKey {
             curve: curve.clone(),

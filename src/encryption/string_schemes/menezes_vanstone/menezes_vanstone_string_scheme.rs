@@ -191,9 +191,15 @@ mod tests {
         // SecureFiniteFieldEllipticCurve::new(5.into(), 32, 40);
 
         // random big int using the rand crate
-        let random = rand::thread_rng().gen_range(1..5000);
-        let x = BigInt::from(random);
-        let y = curve.generator.multiply(&x, &curve);
+        let (mut x, mut y);
+        loop {
+            let random = rand::thread_rng().gen_range(1..5000);
+            x = BigInt::from(random);
+            y = curve.generator.multiply(&x, &curve);
+            if !y.x.is_zero() && !y.y.is_zero() {
+                break;
+            }
+        }
 
         let public_key = MenezesVanstonePublicKey {
             curve: curve.clone(),
@@ -224,5 +230,64 @@ mod tests {
             MenezesVanstoneStringScheme::decrypt(&private_key, &ciphertext, service);
         println!("{:?}", decrypted_plaintext);
         assert_eq!(plaintext, decrypted_plaintext);
+    }
+
+    // TODO: Flakey! Fixen!
+    #[test]
+    fn test_menezes_vanstone_encryption_decryption_100_times() {
+        let mut failed = 0;
+        for _ in 0..100 {
+            let curve = SecureFiniteFieldEllipticCurve {
+                a: -25,
+                prime: 10007.into(),
+                order_of_subgroup: 5004.into(),
+                generator: FiniteFieldEllipticCurvePoint::new(42.into(), 114.into()),
+            };
+            // SecureFiniteFieldEllipticCurve::new(5.into(), 32, 40);
+
+            // random big int using the rand crate
+            let (mut x, mut y);
+            loop {
+                let random = rand::thread_rng().gen_range(1..5000);
+                x = BigInt::from(random);
+                y = curve.generator.multiply(&x, &curve);
+                if !y.x.is_zero() && !y.y.is_zero() {
+                    break;
+                }
+            }
+
+            let public_key = MenezesVanstonePublicKey {
+                curve: curve.clone(),
+                generator: curve.generator.clone(),
+                y,
+            };
+
+            // Der Radix soll hier für jeden Testlauf zufällig gewählt werden, damit die Tests
+            // mehr abfangen können.
+            let radix = 100; //rand::thread_rng().gen_range(240..55296); //TODO Aktuell ist der radix so klein, weil die Kurve noch nicht mit größeren Modul generiert werden kann.
+            println!("Radix: {}", radix);
+            let public_key = MenezesVanstoneStringPublicKey {
+                mv_key: public_key,
+                radix,
+            };
+            let private_key = MenezesVanstonePrivateKey { curve, x };
+            let private_key = MenezesVanstoneStringPrivateKey {
+                mv_key: private_key,
+                radix,
+            };
+
+            let plaintext = "DAS IST EIN TEST \n HEHE \n";
+
+            let service = NumberTheoryService::new(Fast);
+            let ciphertext = MenezesVanstoneStringScheme::encrypt(&public_key, &plaintext, service);
+            println!("{:?}", ciphertext);
+            let decrypted_plaintext =
+                MenezesVanstoneStringScheme::decrypt(&private_key, &ciphertext, service);
+            println!("{:?}", decrypted_plaintext);
+            if plaintext != decrypted_plaintext {
+                failed += 1;
+            }
+        }
+        assert_eq!(failed, 0);
     }
 }
