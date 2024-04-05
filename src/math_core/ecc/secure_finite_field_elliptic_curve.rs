@@ -6,7 +6,7 @@ use bigdecimal::num_traits::Euclid;
 use bigdecimal::{One, Signed, Zero};
 use num::Integer;
 
-use crate::math_core::complex_number::ComplexNumber;
+use crate::math_core::complex_number::{complex_euclidean_algorithm, ComplexNumber};
 use crate::math_core::ecc::finite_field_elliptic_curve_point::FiniteFieldEllipticCurvePoint;
 use crate::math_core::number_theory::number_theory_service::NumberTheoryServiceSpeed::Fast;
 use crate::math_core::number_theory::number_theory_service::{
@@ -113,7 +113,7 @@ impl SecureFiniteFieldEllipticCurve {
             let first_complex_number = ComplexNumber::new(prime.clone(), BigInt::zero());
             let second_complex_number =
                 ComplexNumber::new(Self::calculate_w(&prime, 2.into()), BigInt::one());
-            let gg_t: ComplexNumber = ComplexNumber::new(0.into(), 0.into()); //TODO service.greatest_common_divisor(first_complex_number, second_complex_number); // TODO ggT einbauen
+            let gg_t: ComplexNumber = complex_euclidean_algorithm(first_complex_number, second_complex_number);
 
             // Der Realteil von alpha ist immer der ungerade Anteil des ggT von p und W(p, 2)
             // dadurch, dass das obige Verfahren immer einen geraden und ungeraden Anteil liefert,
