@@ -284,17 +284,17 @@ mod tests {
     //     assert!(!curve.has_point(&point));
     // }
     //
-    // #[test]
-    // fn test_has_point() {
-    //     let curve = SecureFiniteFieldEllipticCurve::new(7, 17.into());
-    //     let point = FiniteFieldEllipticCurvePoint::new(5.into(), 8.into());
-    //     // (5, 8) liegt auf y^2 = x^3 + 7 (mod 17)
-    //     assert!(curve.has_point(&point));
-    //
-    //     let point = FiniteFieldEllipticCurvePoint::new(5.into(), 9.into());
-    //     // (5, 8) liegt auf y^2 = x^3 + 7 (mod 17)
-    //     assert!(curve.has_point(&point));
-    // }
+    #[test]
+    fn test_has_point() {
+        let curve = SecureFiniteFieldEllipticCurve::new(5, 16, 40);
+        let point = curve.generator.multiply(&3.into(), &curve);
+        // (5, 8) liegt auf y^2 = x^3 + 7 (mod 17)
+        assert!(curve.has_point(&point));
+
+        let point = FiniteFieldEllipticCurvePoint::new(0.into(), 0.into());
+        // (5, 8) liegt auf y^2 = x^3 + 7 (mod 17)
+        assert!(curve.has_point(&point));
+    }
     //
     // #[test]
     // fn test_is_not_singular() {
