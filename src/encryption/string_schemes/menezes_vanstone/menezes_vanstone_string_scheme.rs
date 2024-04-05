@@ -189,7 +189,8 @@ mod tests {
     fn test_menezes_vanstone_encryption_decryption() {
         let curve = SecureFiniteFieldEllipticCurve::new(
             5.into(),
-            BigInt::from_str("259421157018863391010844302469063884861").unwrap(),
+            32,
+            40
         );
         let generator = FiniteFieldEllipticCurvePoint::new(
             BigInt::from_str("152198469913648308717544634828661961231").unwrap(),

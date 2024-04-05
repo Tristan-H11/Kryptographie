@@ -134,8 +134,9 @@ pub(crate) async fn encrypt(
 
         let curve = SecureFiniteFieldEllipticCurve {
             a: req_body.public_key.curve.a,
-            b: req_body.public_key.curve.b,
             prime: req_body.public_key.curve.prime.parse().unwrap(),
+            order_of_subgroup: Default::default(), // TODO
+            generator: generator.clone(), // TODO
         };
 
         let y = FiniteFieldEllipticCurvePoint {
@@ -199,8 +200,9 @@ pub(crate) async fn decrypt(
     call_checked_with_parsed_big_ints(|| {
         let curve = SecureFiniteFieldEllipticCurve {
             a: req_body.private_key.curve.a,
-            b: req_body.private_key.curve.b,
             prime: req_body.private_key.curve.prime.parse().unwrap(),
+            order_of_subgroup: Default::default(), // TODO
+            generator: Default::default(), // TODO
         };
 
         let private_key = MenezesVanstonePrivateKey {
