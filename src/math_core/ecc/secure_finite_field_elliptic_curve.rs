@@ -71,12 +71,15 @@ impl SecureFiniteFieldEllipticCurve {
 
         let generator = Self::calculate_signature_generator(&prime, a);
 
-        Self {
+        let curve = Self {
             a,
             prime,
             order_of_subgroup,
             generator,
-        }
+        };
+
+        assert!(curve.has_point(&curve.generator), "Berechneter Generator ist kein Punkt der Kurve!");
+        curve
     }
 
     pub fn calculate_p_and_q(
