@@ -1,4 +1,5 @@
 use atomic_counter::RelaxedCounter;
+use log::warn;
 use num::{BigInt, One, Zero};
 use rayon::prelude::{IntoParallelIterator, ParallelIterator};
 
@@ -29,7 +30,10 @@ impl PrimalityTest {
     ///
     pub fn fails_primitive_prime_checks(p: &BigInt) -> bool {
         if p < &300.into() {
-            panic!("Primitive Primzahltests nur für p > 300 implementiert.");
+            warn!("Primitive Primzahltests nur für p > 300 implementiert.");
+            // Gibt ein "falsch, fällt nicht durch" zurück, wenn die Tests nicht ausgeführt werden
+            // können.
+            return false;
         }
         // Gerade Zahlen sind nie prim.
         if p.is_even() {
