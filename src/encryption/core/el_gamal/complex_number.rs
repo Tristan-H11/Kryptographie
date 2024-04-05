@@ -96,3 +96,37 @@ impl Div for &ComplexNumber{
         }
     }
 }
+
+impl ComplexNumber{
+    pub fn complex_conjugate(self) -> Self{
+        Self{
+            a: self.a,
+            b: self.b.neg()
+        }
+    }
+
+    pub fn is_zero(&self) -> bool{
+        self.a.is_zero() && self.b.is_zero()
+    }
+    pub fn gaussian_integer(self) -> Self{
+        Self{
+            a: self.a.round(0),
+            b: self.b.round(0)
+        }
+    }
+}
+
+pub fn euclidean_algorithm(a: ComplexNumber, b: ComplexNumber) -> ComplexNumber{
+    let mut g = a;
+    let mut g_prev = b;
+
+    while !g.is_zero(){
+        let tmp = g.clone();
+        g = &g_prev - &(&g * &((&g_prev/&g).gaussian_integer()));
+        g_prev = tmp.clone();
+    }
+    ComplexNumber{
+        a: g_prev.a.clone(),
+        b: g_prev.b.clone()
+    }
+}
