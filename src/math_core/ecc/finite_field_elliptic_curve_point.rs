@@ -175,25 +175,20 @@ mod tests {
     use super::*;
 
     fn get_curve() -> SecureFiniteFieldEllipticCurve {
-        SecureFiniteFieldEllipticCurve {
-            a: -25,
-            prime: 97.into(),
-            order_of_subgroup: 58.into(),
-            generator: FiniteFieldEllipticCurvePoint::new(18.into(), 12.into()),
-        }
-        //SecureFiniteFieldEllipticCurve::new(5, 32, 40)
+        SecureFiniteFieldEllipticCurve::new(5, 16, 40)
     }
 
     #[test]
     fn test_add_trivial() {
         let curve = get_curve();
+        assert!(curve.order_of_subgroup > 8.into());
         let p1 = curve.generator.clone();
         let p2 = curve.generator.multiply(&4.into(), &curve);
         let p3 = p1.add(&p2, &curve);
         let expected = p1.multiply(&5.into(), &curve);
         assert_eq!(p3, expected);
         let has_point = curve.has_point(&p3);
-        assert!(has_point);
+        assert!(has_point, "{:?}, {:?}", p3, curve);
     }
 
     #[test]
