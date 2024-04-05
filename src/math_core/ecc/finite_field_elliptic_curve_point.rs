@@ -144,25 +144,16 @@ impl FiniteFieldEllipticCurvePoint {
 
 #[cfg(test)]
 mod tests {
-    use crate::math_core::ecc::finite_field_elliptic_curve::get_educational_curve;
 
     use super::*;
 
     #[test]
     fn test_add_trivial() {
-        let curve = get_educational_curve();
-        let p1 = FiniteFieldEllipticCurvePoint::new(1.into(), 5.into());
-        let p2 = FiniteFieldEllipticCurvePoint::new(5.into(), 9.into());
+        let curve = SecureFiniteFieldEllipticCurve::new(5, 32, 40);
+        let p1 = curve.generator.clone();
+        let p2 = curve.generator.multiply(&4.into(), &curve);
         let p3 = p1.add(&p2, &curve.prime);
-        let expected = FiniteFieldEllipticCurvePoint::new(12.into(), 1.into());
-        assert_eq!(p3, expected);
-        let has_point = curve.has_point(&p3);
-        assert!(has_point);
-
-        let p1 = FiniteFieldEllipticCurvePoint::new(1.into(), 5.into());
-        let p2 = FiniteFieldEllipticCurvePoint::new(2.into(), 10.into());
-        let p3 = p1.add(&p2, &curve.prime);
-        let expected = FiniteFieldEllipticCurvePoint::new(5.into(), 9.into());
+        let expected = p1.multiply(&5.into(), &curve);
         assert_eq!(p3, expected);
         let has_point = curve.has_point(&p3);
         assert!(has_point);
@@ -171,52 +162,57 @@ mod tests {
     #[test]
     #[should_panic]
     fn test_identic_points_panics() {
-        let curve = &get_educational_curve();
-        let p1 = FiniteFieldEllipticCurvePoint::new(1.into(), 5.into());
+        let curve = SecureFiniteFieldEllipticCurve::new(5, 32, 40);
+        let p1 = curve.generator;
         let prime = &curve.prime;
         p1.add(&p1, prime);
     }
 
     #[test]
     fn test_multiply_trivial() {
-        let curve = &get_educational_curve();
-        let p1 = FiniteFieldEllipticCurvePoint::new(12.into(), 16.into());
-        let p2 = p1.multiply(&1.into(), curve);
-        assert_eq!(p1, p2);
+        let curve = SecureFiniteFieldEllipticCurve::new(5, 32, 40);
+        let p1 = curve.generator.clone();
+        let identical = p1.multiply(&1.into(), &curve);
+        assert_eq!(p1, identical);
 
-        let p3 = p1.multiply(&2.into(), curve);
-        let expected = FiniteFieldEllipticCurvePoint::new(1.into(), 5.into());
-        assert_eq!(p3, expected);
+        let doubled = p1.multiply(&2.into(), &curve);
+        let expected = curve.generator.double(&curve);
+        assert_eq!(doubled, expected);
 
-        let p4 = p1.multiply(&8.into(), curve);
-        let expected = FiniteFieldEllipticCurvePoint::new(12.into(), 1.into());
-        assert_eq!(p4, expected);
+        let p2 = doubled.multiply(&8.into(), &curve);
+        let expected = curve.generator.multiply(&16.into(), &curve);
+        assert_eq!(p2, expected);
+    }
 
-        let p5 = p1.multiply(&14.into(), curve);
-        let expected = FiniteFieldEllipticCurvePoint::new(2.into(), 7.into());
-        assert_eq!(p5, expected);
+    #[test]
+    fn test_multiply_by_order_gives_infinity() {
+        let curve = SecureFiniteFieldEllipticCurve::new(5, 32, 40);
+        let p1 = curve.generator.clone();
+        let p2 = p1.multiply(&curve.order_of_subgroup, &curve);
+        let expected = FiniteFieldEllipticCurvePoint::infinite();
+        assert_eq!(p2, expected);
     }
 
     #[test]
     fn test_multiply_with_zero() {
-        let curve = get_educational_curve();
-        let p1 = FiniteFieldEllipticCurvePoint::new(12.into(), 16.into());
-        let p2 = p1.multiply(&0.into(), &curve);
+        let curve = SecureFiniteFieldEllipticCurve::new(5, 32, 40);
+        let p2 = curve.generator.multiply(&0.into(), &curve);
         let expected = FiniteFieldEllipticCurvePoint::new(BigInt::zero(), BigInt::zero());
         assert_eq!(p2, expected);
     }
 
     #[test]
-    fn test_add_with_zero() {
-        let curve = get_educational_curve();
-        let p1 = FiniteFieldEllipticCurvePoint::new(12.into(), 16.into());
+    fn test_add_with_infinity() {
+        let curve = SecureFiniteFieldEllipticCurve::new(5, 32, 40);
+        let generator = curve.generator;
+        let infinity = FiniteFieldEllipticCurvePoint::infinite();
 
         // Point + 0 = Point
-        let p2 = p1.add(&Default::default(), &curve.prime);
-        assert_eq!(p2, p1);
+        let p2 = generator.add(&infinity, &curve.prime);
+        assert_eq!(p2, generator);
 
         // 0 + Point = Point
-        let p3 = FiniteFieldEllipticCurvePoint::default().add(&p1, &curve.prime);
-        assert_eq!(p3, p1);
+        let p3 = infinity.add(&generator, &curve.prime);
+        assert_eq!(p3, generator);
     }
 }
