@@ -67,9 +67,8 @@ impl AsymmetricEncryptor<MenezesVanstoneScheme> for MenezesVanstoneScheme {
 
         // Bestimmen von c1 und c2
         let (mut k, mut c1, mut c2);
-        let order_of_subgroup = key.curve.get_order_of_subgroup();
         loop {
-            // TODO Achtung! Dieser Wert ist vorerst fest, weil er in den Testfällen einen validen Wert darstellt, solangen noch keine
+            // TODO Achtung! Dieser Wert ist vorerst fest, weil er in den Testfällen einen validen Wert darstellt, solange noch keine
             // Untergruppen bestimmt werden können.
             k = BigInt::from_str("165165550160996878069788804916299463847").unwrap(); // TODO random_generator.take(&1.into(), &order_of_subgroup.decrement(), &counter);
             let point = key.y.multiply(&k, &key.curve);
@@ -123,7 +122,7 @@ impl AsymmetricDecryptor<MenezesVanstoneScheme> for MenezesVanstoneScheme {
 
 #[cfg(test)]
 mod tests {
-    use crate::math_core::ecc::finite_field_elliptic_curve::FiniteFieldEllipticCurve;
+    use crate::math_core::ecc::finite_field_elliptic_curve::SecureFiniteFieldEllipticCurve;
     use crate::math_core::number_theory::number_theory_service::NumberTheoryServiceSpeed::Fast;
     use std::str::FromStr;
 
@@ -131,7 +130,7 @@ mod tests {
 
     #[test]
     fn test_menezes_vanstone_encryption_decryption() {
-        let curve = FiniteFieldEllipticCurve::new(
+        let curve = SecureFiniteFieldEllipticCurve::new(
             5.into(),
             BigInt::from_str("259421157018863391010844302469063884861").unwrap(),
         );

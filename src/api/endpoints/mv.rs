@@ -15,7 +15,7 @@ use crate::encryption::string_schemes::menezes_vanstone::keys::{
 use crate::encryption::string_schemes::menezes_vanstone::menezes_vanstone_string_scheme::{
     MenezesVanstoneStringScheme, MvStringCiphertext,
 };
-use crate::math_core::ecc::finite_field_elliptic_curve::FiniteFieldEllipticCurve;
+use crate::math_core::ecc::finite_field_elliptic_curve::SecureFiniteFieldEllipticCurve;
 use crate::math_core::ecc::finite_field_elliptic_curve_point::FiniteFieldEllipticCurvePoint;
 use crate::math_core::number_theory::number_theory_service::NumberTheoryService;
 use crate::math_core::number_theory::number_theory_service::NumberTheoryServiceSpeed::{
@@ -132,7 +132,7 @@ pub(crate) async fn encrypt(
             is_infinite: false,
         };
 
-        let curve = FiniteFieldEllipticCurve {
+        let curve = SecureFiniteFieldEllipticCurve {
             a: req_body.public_key.curve.a,
             b: req_body.public_key.curve.b,
             prime: req_body.public_key.curve.prime.parse().unwrap(),
@@ -197,7 +197,7 @@ pub(crate) async fn decrypt(
     let req_body: MvDecryptRequest = req_body.into_inner();
 
     call_checked_with_parsed_big_ints(|| {
-        let curve = FiniteFieldEllipticCurve {
+        let curve = SecureFiniteFieldEllipticCurve {
             a: req_body.private_key.curve.a,
             b: req_body.private_key.curve.b,
             prime: req_body.private_key.curve.prime.parse().unwrap(),

@@ -6,12 +6,12 @@ use crate::encryption::asymmetric_encryption_types::{
 };
 use crate::encryption::core::menezes_vanstone::menezes_vanstone_scheme::MenezesVanstoneScheme;
 use crate::encryption::encryption_types::Key;
-use crate::math_core::ecc::finite_field_elliptic_curve::FiniteFieldEllipticCurve;
+use crate::math_core::ecc::finite_field_elliptic_curve::SecureFiniteFieldEllipticCurve;
 use crate::math_core::ecc::finite_field_elliptic_curve_point::FiniteFieldEllipticCurvePoint;
 
 #[derive(Clone, Debug)]
 pub struct MenezesVanstonePublicKey {
-    pub curve: FiniteFieldEllipticCurve,
+    pub curve: SecureFiniteFieldEllipticCurve,
     pub generator: FiniteFieldEllipticCurvePoint,
     pub y: FiniteFieldEllipticCurvePoint,
 }
@@ -23,7 +23,7 @@ impl AsymmetricEncryptionKey<MenezesVanstoneScheme> for MenezesVanstonePublicKey
 
 #[derive(Clone, Debug)]
 pub struct MenezesVanstonePrivateKey {
-    pub curve: FiniteFieldEllipticCurve,
+    pub curve: SecureFiniteFieldEllipticCurve,
     pub x: BigInt,
 }
 

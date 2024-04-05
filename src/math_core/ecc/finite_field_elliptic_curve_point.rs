@@ -2,7 +2,7 @@ use bigdecimal::num_bigint::BigInt;
 use bigdecimal::num_traits::Euclid;
 use bigdecimal::Zero;
 
-use crate::math_core::ecc::finite_field_elliptic_curve::FiniteFieldEllipticCurve;
+use crate::math_core::ecc::finite_field_elliptic_curve::SecureFiniteFieldEllipticCurve;
 use crate::math_core::number_theory::number_theory_service::NumberTheoryServiceSpeed::Fast;
 use crate::math_core::number_theory::number_theory_service::{
     NumberTheoryService, NumberTheoryServiceTrait,
@@ -75,7 +75,7 @@ impl FiniteFieldEllipticCurvePoint {
     ///
     /// Verdoppelt einen Punkt auf einer elliptischen Kurve.
     /// TODO: Infinity Point
-    pub fn double(&self, curve: &FiniteFieldEllipticCurve) -> Self {
+    pub fn double(&self, curve: &SecureFiniteFieldEllipticCurve) -> Self {
         let service = NumberTheoryService::new(Fast); // TODO X: Später korrigieren
         let p = &curve.prime;
         // Zähler der Steigung berechnen
@@ -98,7 +98,7 @@ impl FiniteFieldEllipticCurvePoint {
     /// Bei Multiplikation mit 0 wird der Punkt im Ursprung mit Bezug auf die ursprüngliche Kurve
     /// zurückgegeben.
     /// TODO: Infinity Point
-    pub fn multiply(&self, scalar: &BigInt, curve: &FiniteFieldEllipticCurve) -> Self {
+    pub fn multiply(&self, scalar: &BigInt, curve: &SecureFiniteFieldEllipticCurve) -> Self {
         if scalar.is_zero() {
             return FiniteFieldEllipticCurvePoint::new(BigInt::zero(), BigInt::zero());
         }

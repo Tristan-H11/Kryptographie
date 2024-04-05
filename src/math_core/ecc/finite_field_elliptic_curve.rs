@@ -13,23 +13,42 @@ use crate::math_core::ecc::finite_field_elliptic_curve_point::FiniteFieldEllipti
 /// Um die Kurve über einem endlichen Körper zu definieren, wird auch der Modulus p benötigt.
 ///
 #[derive(Clone, PartialEq, Debug)]
-pub struct FiniteFieldEllipticCurve {
     // Die Koeffizienten a und b der elliptischen Kurve
+pub struct SecureFiniteFieldEllipticCurve {
     pub a: i32,
     pub b: i32,
     // Der Modulus p der elliptischen Kurve, um sie über einem endlichen Körper zu definieren
     pub prime: BigInt,
 }
 
-pub fn get_educational_curve() -> FiniteFieldEllipticCurve {
-    let p = 11.into();
-    let a = 3.into();
-    FiniteFieldEllipticCurve {
-        a,
-        b: 9i32,
-        prime: p,
-    }
-}
+impl SecureFiniteFieldEllipticCurve {
+    /// Erstellt eine neue elliptische Kurve der Form y^2 = x^3 + (-n^2)*x (mod p) unter
+    /// Angabe von n und der bitbreite des Modulus p.
+    /// Die Kurve wird dabei kryptografisch sicher sein und dafür eine Reihe von Bedingungen
+    /// erfüllen:
+    /// TODO
+    pub fn new(n: i32, modul_width: u32, miller_rabin_iterations: u32) -> Self {
+        if n.is_zero() {
+            panic!("Der Koeffizient a darf nicht 0 sein!"); // TODO Error Handling
+        }
+        if modul_width < 4u32 {
+            panic!("Der Modulus p muss mindestens 4 Bit breit sein!"); // TODO Error Handling
+        }
+        let a = n.pow(2).neg();
+
+        // Wird für einen späteren Vergleich benötigt
+        let double_n = BigInt::from(n).double();
+
+        let prng = PseudoRandomNumberGenerator::new_seeded();
+        let counter = RelaxedCounter::new(1);
+        let mut prime: BigInt;
+        loop {
+            prime = prng.generate_prime(modul_width, miller_rabin_iterations, &counter);
+            // Die Primzahl muss mod 8 kongruent 5 genügen und darf 2n nicht teilen
+            if prime.rem_euclid(&8.into()) == 5.into() && !double_n.is_multiple_of(&prime) {
+                break;
+            }
+        }
 
 impl FiniteFieldEllipticCurve {
     ///

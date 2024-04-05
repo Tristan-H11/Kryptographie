@@ -180,14 +180,14 @@ mod tests {
     use crate::encryption::core::menezes_vanstone::keys::{
         MenezesVanstonePrivateKey, MenezesVanstonePublicKey,
     };
-    use crate::math_core::ecc::finite_field_elliptic_curve::FiniteFieldEllipticCurve;
+    use crate::math_core::ecc::finite_field_elliptic_curve::SecureFiniteFieldEllipticCurve;
     use crate::math_core::number_theory::number_theory_service::NumberTheoryServiceSpeed::Fast;
 
     use super::*;
 
     #[test]
     fn test_menezes_vanstone_encryption_decryption() {
-        let curve = FiniteFieldEllipticCurve::new(
+        let curve = SecureFiniteFieldEllipticCurve::new(
             5.into(),
             BigInt::from_str("259421157018863391010844302469063884861").unwrap(),
         );
