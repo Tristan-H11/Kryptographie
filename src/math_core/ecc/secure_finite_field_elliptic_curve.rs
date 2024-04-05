@@ -216,8 +216,7 @@ impl SecureFiniteFieldEllipticCurve {
             // Schleife, die bis zum Fund eines validen quadratischen Rests läuft
             loop {
                 x = prng.take(&BigInt::one(), &prime.decrement(), &counter);
-                let exponent = BigInt::from(3) + a * &x;
-                r = service.fast_exponentiation(&x, &exponent, prime);
+                r = service.fast_exponentiation(&x, &BigInt::from(3), prime) + a * &x;
                 // Kriterium für den quadratischen Rest
                 if service
                     .fast_exponentiation(&r, &prime.decrement().half(), &prime)
