@@ -166,7 +166,7 @@ impl SecureFiniteFieldEllipticCurve {
             );
             let two_two = ComplexNumber::new(2.into(), 2.into());
             // Produkt aus der Differenz von alpha und dessen Legendre-Symbol und dem konjugierten Wert von 2 + 2i
-            let product = (alpha.subtract(&complex_legendre_symbol)).multiply(&two_two.conjugate());
+            let product = (&alpha - &complex_legendre_symbol) * two_two.conjugate();
 
             // Rückgabe des validen Realteils von alpha
             if product.real.rem_euclid(&8.into()).is_zero() {
