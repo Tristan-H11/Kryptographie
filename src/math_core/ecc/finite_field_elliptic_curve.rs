@@ -66,7 +66,7 @@ impl SecureFiniteFieldEllipticCurve {
 
         let (prime, order_of_subgroup) = Self::calculate_p_and_q(&prime, n, miller_rabin_iterations);
 
-        let generator = Self::calculate_signature_generator(&prime, a, &order_of_subgroup, miller_rabin_iterations);
+        let generator = Self::calculate_signature_generator(&prime, a);
 
         Self {
             a,
@@ -79,7 +79,7 @@ impl SecureFiniteFieldEllipticCurve {
     pub fn calculate_p_and_q(prime: &BigInt, n: i32, miller_rabin_iterations: u32) -> (BigInt, BigInt) {
         let double_n = BigInt::from(n).double();
         let mut prime = prime.clone();
-        let q: BigInt;
+        let mut q: BigInt;
         let service = NumberTheoryService::new(Fast); // TODO übergeben lassen
         let prng = PseudoRandomNumberGenerator::new_seeded(); // TODO übergeben lassen
 
@@ -97,12 +97,12 @@ impl SecureFiniteFieldEllipticCurve {
                     break;
                 }
                 // Treffen diese Bedingungen nicht zu, wird kongruenzerhaltend eine neue getestet.
-                prime.add_assign(8.into());
+                prime.add_assign(BigInt::from(8));
             }
 
             let first_complex_number = ComplexNumber::new(prime.clone(), BigInt::zero());
             let second_complex_number = ComplexNumber::new(Self::calculate_w(&prime, 2.into()), BigInt::one());
-            let gg_t: ComplexNumber = service.greatest_common_divisor(first_complex_number, second_complex_number); // TODO ggT einbauen
+            let gg_t: ComplexNumber = ComplexNumber::new(0.into(), 0.into()); //TODO service.greatest_common_divisor(first_complex_number, second_complex_number); // TODO ggT einbauen
 
             // Der Realteil von alpha ist immer der ungerade Anteil des ggT von p und W(p, 2)
             // dadurch, dass das obige Verfahren immer einen geraden und ungeraden Anteil liefert,
@@ -114,7 +114,7 @@ impl SecureFiniteFieldEllipticCurve {
                 alpha = ComplexNumber::new(gg_t.real.clone().abs(), gg_t.imaginary.clone().abs());
             }
 
-            let big_n: BigInt = prime.increment() - 2.into() * Self::calculate_real_part(alpha, &prime);
+            let big_n: BigInt = prime.increment() - Self::calculate_real_part(alpha, &prime).double();
 
             q = big_n.div(8);
             // Ist q = N / 8 eine Primzahl, so wird die Schleife verlassen und das q ist gültig.
@@ -187,7 +187,7 @@ impl SecureFiniteFieldEllipticCurve {
         }
     }
 
-    pub fn calculate_signature_generator(prime: &BigInt, a: i32, order_of_subgroup: &BigInt, miller_rabin_iterations: u32) -> FiniteFieldEllipticCurvePoint {
+    pub fn calculate_signature_generator(prime: &BigInt, a: i32) -> FiniteFieldEllipticCurvePoint {
         // Schleife, die läuft, bis ein Generator gefunden wurde, der nicht den Punkt im Unendlichen
         // darstellt.
         let mut generator: FiniteFieldEllipticCurvePoint;
@@ -216,7 +216,7 @@ impl SecureFiniteFieldEllipticCurve {
             if condition.is_one() {
                 y = service.fast_exponentiation(&r, &exponent, &prime);
             } else {
-                y = service.fast_exponentiation(&(4.into() * r), &exponent, &prime).half();
+                y = service.fast_exponentiation(&(BigInt::from(4) * r), &exponent, &prime).half();
             }
             // Den Generator mit den berechnen Koordinaten erstellen und prüfen.
             generator = FiniteFieldEllipticCurvePoint::new(x, y);
