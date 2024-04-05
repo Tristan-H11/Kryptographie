@@ -3,7 +3,8 @@ use num::integer::Average;
 use std::ops::{Add, Div, Mul, Neg, Sub};
 
 ///Complex Number: a+bi
-#[derive(Debug, Clone)]
+///mit entsprechenden Operationen
+#[derive(Debug, Clone, PartialEq)]
 pub struct ComplexNumber {
     a: BigDecimal,
     b: BigDecimal,
@@ -108,6 +109,7 @@ impl ComplexNumber {
     pub fn is_zero(&self) -> bool {
         self.a.is_zero() && self.b.is_zero()
     }
+    ///konvertiert beliebige komplexe Zahl in nächste Gauß'sche Zahl
     pub fn gaussian_integer(self) -> Self {
         Self {
             a: self.a.round(0),
@@ -116,6 +118,7 @@ impl ComplexNumber {
     }
 }
 
+///Berechnet ggT von zwei Gauß'schen Zahlen,
 pub fn euclidean_algorithm(a: ComplexNumber, b: ComplexNumber) -> ComplexNumber {
     let mut g = a;
     let mut g_prev = b;
@@ -128,5 +131,25 @@ pub fn euclidean_algorithm(a: ComplexNumber, b: ComplexNumber) -> ComplexNumber 
     ComplexNumber {
         a: g_prev.a.clone(),
         b: g_prev.b.clone(),
+    }
+}
+
+
+#[cfg(test)]
+mod complex_test {
+    use bigdecimal::BigDecimal;
+    use crate::encryption::core::el_gamal::complex_number::{ComplexNumber, euclidean_algorithm};
+
+    #[test]
+    fn complex_test() {
+        let x = ComplexNumber{
+            a: BigDecimal::from(-6),
+            b: BigDecimal::from(17)
+        };
+        let y = ComplexNumber{
+            a: BigDecimal::from(3),
+            b: BigDecimal::from(4)
+        };
+        assert_eq!(euclidean_algorithm(y.clone(),x),y);
     }
 }
