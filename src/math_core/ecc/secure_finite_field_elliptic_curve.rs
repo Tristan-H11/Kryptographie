@@ -206,11 +206,11 @@ impl SecureFiniteFieldEllipticCurve {
     }
 
     pub fn calculate_signature_generator(prime: &BigInt, a: i32) -> FiniteFieldEllipticCurvePoint {
-        // Schleife, die läuft, bis ein Generator gefunden wurde, der nicht den Punkt im Unendlichen
-        // darstellt.
         let mut generator: FiniteFieldEllipticCurvePoint;
         let service = NumberTheoryService::new(Fast); // TODO übergeben lassen
         let counter = RelaxedCounter::new(1);
+        // Schleife, die läuft, bis ein Generator gefunden wurde, der nicht den Punkt im Unendlichen
+        // darstellt.
         loop {
             let prng = PseudoRandomNumberGenerator::new_seeded(); // TODO übergeben lassen
             let (mut x, mut r);
