@@ -155,6 +155,7 @@ mod tests {
             real: BigInt::from(3),
             imaginary: BigInt::from(4),
         };
-        assert_eq!(complex_euclidean_algorithm(y.clone(), x), y);
+        assert_eq!(complex_euclidean_algorithm(y.clone(), x.clone()), y);
+        assert_eq!(complex_euclidean_algorithm(x.clone(), y.clone()), y);
     }
 }
