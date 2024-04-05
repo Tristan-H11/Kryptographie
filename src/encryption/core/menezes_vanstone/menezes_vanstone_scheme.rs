@@ -72,6 +72,9 @@ impl AsymmetricEncryptor<MenezesVanstoneScheme> for MenezesVanstoneScheme {
             // im Unendlichen liegen wird.
             k = random_generator.take(&1.into(), &curve.order_of_subgroup.decrement(), &counter);
             let point = key.y.multiply(&k, curve);
+            if point.is_infinite {
+                panic!("Point is infinite")
+            }
             (c1, c2) = (point.x, point.y);
             // Sind beide Werte ungleich 0, so ist das Paar (c1, c2) gültig
             if !c1.is_zero() && !c2.is_zero() {
