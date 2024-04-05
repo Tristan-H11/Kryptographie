@@ -7,6 +7,8 @@ use bigdecimal::num_bigint::{BigInt, ToBigInt};
 use bigdecimal::{BigDecimal, One};
 use log::{debug, trace};
 use num::Integer;
+use rand::Rng;
+use crate::math_core::number_theory::number_theory_service::NumberTheoryServiceSpeed::Fast;
 
 use crate::math_core::traits::increment::Increment;
 
@@ -50,6 +52,12 @@ impl PseudoRandomNumberGenerator {
             sqrt_m,
             number_theory_service,
         };
+    }
+
+    /// Initialisert eine neue Instanz des PseudoRandomNumberGenerator mit einer zufälligen Seed.
+    pub fn new_seeded() -> Self {
+        let random_seed = rand::thread_rng().gen();
+        Self::new(random_seed, NumberTheoryService::new(Fast))
     }
 
     /// Diese Methode gibt eine Zufallszahl im Bereich von a bis b zurück.
