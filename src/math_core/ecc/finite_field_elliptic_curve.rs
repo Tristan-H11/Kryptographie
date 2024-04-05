@@ -1,15 +1,17 @@
 use std::ops::{AddAssign, Div, Neg, Sub};
 
 use atomic_counter::RelaxedCounter;
-use bigdecimal::{One, Signed, Zero};
 use bigdecimal::num_bigint::BigInt;
 use bigdecimal::num_traits::Euclid;
+use bigdecimal::{One, Signed, Zero};
 use num::Integer;
 
 use crate::math_core::complex_number::ComplexNumber;
 use crate::math_core::ecc::finite_field_elliptic_curve_point::FiniteFieldEllipticCurvePoint;
-use crate::math_core::number_theory::number_theory_service::{NumberTheoryService, NumberTheoryServiceTrait};
 use crate::math_core::number_theory::number_theory_service::NumberTheoryServiceSpeed::Fast;
+use crate::math_core::number_theory::number_theory_service::{
+    NumberTheoryService, NumberTheoryServiceTrait,
+};
 use crate::math_core::pseudo_random_number_generator::PseudoRandomNumberGenerator;
 use crate::math_core::traits::divisible::Divisible;
 use crate::math_core::traits::increment::Increment;
@@ -64,7 +66,8 @@ impl SecureFiniteFieldEllipticCurve {
             }
         }
 
-        let (prime, order_of_subgroup) = Self::calculate_p_and_q(&prime, n, miller_rabin_iterations);
+        let (prime, order_of_subgroup) =
+            Self::calculate_p_and_q(&prime, n, miller_rabin_iterations);
 
         let generator = Self::calculate_signature_generator(&prime, a);
 
@@ -76,7 +79,11 @@ impl SecureFiniteFieldEllipticCurve {
         }
     }
 
-    pub fn calculate_p_and_q(prime: &BigInt, n: i32, miller_rabin_iterations: u32) -> (BigInt, BigInt) {
+    pub fn calculate_p_and_q(
+        prime: &BigInt,
+        n: i32,
+        miller_rabin_iterations: u32,
+    ) -> (BigInt, BigInt) {
         let double_n = BigInt::from(n).double();
         let mut prime = prime.clone();
         let mut q: BigInt;
@@ -92,8 +99,11 @@ impl SecureFiniteFieldEllipticCurve {
                 // 2. Sie ist ein quadratischer Rest zu p, also n^((p-1)/2) = 1 (mod p)
                 // 3. Sie ist kein Vielfaches von 2n
                 if service.is_probably_prime(&prime, miller_rabin_iterations, &prng)
-                    && service.fast_exponentiation(&n.into(), &prime.decrement().half(), &prime).is_one()
-                    && !double_n.is_multiple_of(&prime) {
+                    && service
+                        .fast_exponentiation(&n.into(), &prime.decrement().half(), &prime)
+                        .is_one()
+                    && !double_n.is_multiple_of(&prime)
+                {
                     break;
                 }
                 // Treffen diese Bedingungen nicht zu, wird kongruenzerhaltend eine neue getestet.
@@ -101,7 +111,8 @@ impl SecureFiniteFieldEllipticCurve {
             }
 
             let first_complex_number = ComplexNumber::new(prime.clone(), BigInt::zero());
-            let second_complex_number = ComplexNumber::new(Self::calculate_w(&prime, 2.into()), BigInt::one());
+            let second_complex_number =
+                ComplexNumber::new(Self::calculate_w(&prime, 2.into()), BigInt::one());
             let gg_t: ComplexNumber = ComplexNumber::new(0.into(), 0.into()); //TODO service.greatest_common_divisor(first_complex_number, second_complex_number); // TODO ggT einbauen
 
             // Der Realteil von alpha ist immer der ungerade Anteil des ggT von p und W(p, 2)
@@ -114,7 +125,8 @@ impl SecureFiniteFieldEllipticCurve {
                 alpha = ComplexNumber::new(gg_t.real.clone().abs(), gg_t.imaginary.clone().abs());
             }
 
-            let big_n: BigInt = prime.increment() - Self::calculate_real_part(alpha, &prime).double();
+            let big_n: BigInt =
+                prime.increment() - Self::calculate_real_part(alpha, &prime).double();
 
             q = big_n.div(8);
             // Ist q = N / 8 eine Primzahl, so wird die Schleife verlassen und das q ist gültig.
@@ -134,7 +146,8 @@ impl SecureFiniteFieldEllipticCurve {
         let mut w: BigInt;
         loop {
             w = service.fast_exponentiation(&z, &(prime.decrement().div(4)), prime);
-            if (w.pow(2) + BigInt::one()).rem_euclid(prime).is_zero() { // TODO gegen Service.fastExponentiation austauschen
+            if (w.pow(2) + BigInt::one()).rem_euclid(prime).is_zero() {
+                // TODO gegen Service.fastExponentiation austauschen
                 break;
             }
             z.add_assign(BigInt::from(2));
@@ -149,7 +162,8 @@ impl SecureFiniteFieldEllipticCurve {
         loop {
             let complex_legendre_symbol = ComplexNumber::new(
                 Self::calculate_legendre_symbol(&alpha.real, prime),
-                0.into());
+                0.into(),
+            );
             let two_two = ComplexNumber::new(2.into(), 2.into());
             // Produkt aus der Differenz von alpha und dessen Legendre-Symbol und dem konjugierten Wert von 2 + 2i
             let product = (alpha.subtract(&complex_legendre_symbol)).multiply(&two_two.conjugate());
@@ -177,6 +191,7 @@ impl SecureFiniteFieldEllipticCurve {
 
     pub fn calculate_legendre_symbol(a: &BigInt, b: &BigInt) -> BigInt {
         let service = NumberTheoryService::new(Fast); // TODO übergeben lassen
+
         // legendre_symbol = a ^ ((b - 1) / 2) (mod b)
         let legendre_symbol = service.fast_exponentiation(&a, &b.decrement().half(), &b);
         if legendre_symbol.is_one() {
@@ -202,7 +217,10 @@ impl SecureFiniteFieldEllipticCurve {
                 let exponent = BigInt::from(3) + a * &x;
                 r = service.fast_exponentiation(&x, &exponent, prime);
                 // Kriterium für den quadratischen Rest
-                if service.fast_exponentiation(&r, &prime.decrement().half(), &prime).is_one() {
+                if service
+                    .fast_exponentiation(&r, &prime.decrement().half(), &prime)
+                    .is_one()
+                {
                     break;
                 }
             }
@@ -216,7 +234,9 @@ impl SecureFiniteFieldEllipticCurve {
             if condition.is_one() {
                 y = service.fast_exponentiation(&r, &exponent, &prime);
             } else {
-                y = service.fast_exponentiation(&(BigInt::from(4) * r), &exponent, &prime).half();
+                y = service
+                    .fast_exponentiation(&(BigInt::from(4) * r), &exponent, &prime)
+                    .half();
             }
             // Den Generator mit den berechnen Koordinaten erstellen und prüfen.
             generator = FiniteFieldEllipticCurvePoint::new(x, y);
@@ -226,7 +246,6 @@ impl SecureFiniteFieldEllipticCurve {
         }
         generator
     }
-
 
     ///
     /// Überprüft, ob ein Punkt auf der elliptischen Kurve liegt.

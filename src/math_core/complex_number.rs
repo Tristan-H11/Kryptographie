@@ -9,10 +9,7 @@ pub struct ComplexNumber {
 
 impl ComplexNumber {
     pub fn new(real: BigInt, imaginary: BigInt) -> Self {
-        Self {
-            real,
-            imaginary,
-        }
+        Self { real, imaginary }
     }
 
     pub fn conjugate(&self) -> ComplexNumber {
@@ -24,17 +21,11 @@ impl ComplexNumber {
     }
 
     pub fn add(&self, other: &ComplexNumber) -> ComplexNumber {
-        ComplexNumber::new(
-            &self.real + &other.real,
-            &self.imaginary + &other.imaginary,
-        )
+        ComplexNumber::new(&self.real + &other.real, &self.imaginary + &other.imaginary)
     }
 
     pub fn subtract(&self, other: &ComplexNumber) -> ComplexNumber {
-        ComplexNumber::new(
-            &self.real - &other.real,
-            &self.imaginary - &other.imaginary,
-        )
+        ComplexNumber::new(&self.real - &other.real, &self.imaginary - &other.imaginary)
     }
 
     pub fn multiply(&self, other: &ComplexNumber) -> ComplexNumber {

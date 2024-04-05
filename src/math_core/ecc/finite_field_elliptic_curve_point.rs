@@ -59,7 +59,7 @@ impl FiniteFieldEllipticCurvePoint {
         }
 
         // Handelt es sich um identische Punkte, so wird der Punkt verdoppelt.
-        if self == other{
+        if self == other {
             return self.double(curve);
         }
 
@@ -174,7 +174,7 @@ mod tests {
 
     use super::*;
 
-    fn get_curve() ->  SecureFiniteFieldEllipticCurve {
+    fn get_curve() -> SecureFiniteFieldEllipticCurve {
         SecureFiniteFieldEllipticCurve {
             a: -25,
             prime: 97.into(),

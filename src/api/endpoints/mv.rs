@@ -136,7 +136,7 @@ pub(crate) async fn encrypt(
             a: req_body.public_key.curve.a,
             prime: req_body.public_key.curve.prime.parse().unwrap(),
             order_of_subgroup: Default::default(), // TODO
-            generator: generator.clone(), // TODO
+            generator: generator.clone(),          // TODO
         };
 
         let y = FiniteFieldEllipticCurvePoint {
@@ -202,7 +202,7 @@ pub(crate) async fn decrypt(
             a: req_body.private_key.curve.a,
             prime: req_body.private_key.curve.prime.parse().unwrap(),
             order_of_subgroup: Default::default(), // TODO
-            generator: Default::default(), // TODO
+            generator: Default::default(),         // TODO
         };
 
         let private_key = MenezesVanstonePrivateKey {

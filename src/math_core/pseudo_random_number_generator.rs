@@ -1,3 +1,4 @@
+use crate::math_core::number_theory::number_theory_service::NumberTheoryServiceSpeed::Fast;
 use crate::math_core::number_theory::number_theory_service::{
     NumberTheoryService, NumberTheoryServiceTrait,
 };
@@ -8,7 +9,6 @@ use bigdecimal::{BigDecimal, One};
 use log::{debug, trace};
 use num::Integer;
 use rand::Rng;
-use crate::math_core::number_theory::number_theory_service::NumberTheoryServiceSpeed::Fast;
 
 use crate::math_core::traits::increment::Increment;
 
