@@ -1,4 +1,3 @@
-use std::str::FromStr;
 use std::time::SystemTime;
 
 use atomic_counter::RelaxedCounter;
@@ -64,22 +63,22 @@ impl AsymmetricEncryptor<MenezesVanstoneScheme> for MenezesVanstoneScheme {
             .as_secs() as u16;
         let random_generator = PseudoRandomNumberGenerator::new(random_seed as u32, service);
         let counter = RelaxedCounter::new(1);
+        let curve = &key.curve;
 
         // Bestimmen von c1 und c2
         let (mut k, mut c1, mut c2);
         loop {
-            // TODO Achtung! Dieser Wert ist vorerst fest, weil er in den Testfällen einen validen Wert darstellt, solange noch keine
-            // Untergruppen bestimmt werden können.
-            k = BigInt::from_str("165165550160996878069788804916299463847").unwrap(); // TODO random_generator.take(&1.into(), &order_of_subgroup.decrement(), &counter);
-            let point = key.y.multiply(&k, &key.curve);
+            // Dadurch, dass ein Wert < |H| gewählt wird, ist garantiert, dass der Punkt k*g niemals
+            // im Unendlichen liegen wird.
+            k = random_generator.take(&1.into(), &curve.order_of_subgroup.decrement(), &counter);
+            let point = key.y.multiply(&k, curve);
             (c1, c2) = (point.x, point.y);
             // Sind beide Werte ungleich 0, so ist das Paar (c1, c2) gültig
             if !c1.is_zero() && !c2.is_zero() {
-                println!("k: {:?}", k);
                 break;
             }
         }
-        let a = key.generator.multiply(&k, &key.curve);
+        let a = key.generator.multiply(&k, curve);
         let b1 = (c1 * m1) % prime;
         let b2 = (c2 * m2) % prime;
 
@@ -124,34 +123,36 @@ impl AsymmetricDecryptor<MenezesVanstoneScheme> for MenezesVanstoneScheme {
 mod tests {
     use crate::math_core::ecc::finite_field_elliptic_curve::SecureFiniteFieldEllipticCurve;
     use crate::math_core::number_theory::number_theory_service::NumberTheoryServiceSpeed::Fast;
-    use std::str::FromStr;
+    use rand::Rng;
 
     use super::*;
 
     #[test]
     fn test_menezes_vanstone_encryption_decryption() {
-        let curve = SecureFiniteFieldEllipticCurve::new(5.into(), 32, 40);
-        let generator = FiniteFieldEllipticCurvePoint::new(
-            BigInt::from_str("152198469913648308717544634828661961231").unwrap(),
-            BigInt::from_str("50296851635441247077790719368115682846").unwrap(),
-        );
-        let y = FiniteFieldEllipticCurvePoint::new(
-            BigInt::from_str("26370934085012164485153092381593646122").unwrap(),
-            BigInt::from_str("126290671313284822425335475919650022666").unwrap(),
-        );
-        let x = BigInt::from_str("12401522966815986254216934185370504355").unwrap();
+        let curve = SecureFiniteFieldEllipticCurve {
+            a: -25,
+            prime: 97.into(),
+            order_of_subgroup: 58.into(),
+            generator: FiniteFieldEllipticCurvePoint::new(18.into(), 12.into()),
+        };
+        // SecureFiniteFieldEllipticCurve::new(5.into(), 32, 40);
+
+        // random big int using the rand crate
+        let random = rand::thread_rng().gen_range(1..97);
+        let x = BigInt::from(random);
+        let y = curve.generator.multiply(&x, &curve);
 
         let public_key = MenezesVanstonePublicKey {
             curve: curve.clone(),
-            generator,
+            generator: curve.generator.clone(),
             y,
         };
 
         let private_key = MenezesVanstonePrivateKey { curve, x };
 
         let plaintext = MenezesVanstonePlaintext {
-            first: 123.into(),
-            second: 456.into(),
+            first: 96.into(),
+            second: 96.into(),
         };
 
         let service = NumberTheoryService::new(Fast);
@@ -159,5 +160,40 @@ mod tests {
         let decrypted_plaintext =
             MenezesVanstoneScheme::decrypt(&private_key, &ciphertext, service);
         assert_eq!(plaintext, decrypted_plaintext);
+    }
+
+    #[test]
+    fn test_encryption_decryption_fails_when_message_greater_prime() {
+        let curve = SecureFiniteFieldEllipticCurve {
+            a: -25,
+            prime: 97.into(),
+            order_of_subgroup: 58.into(),
+            generator: FiniteFieldEllipticCurvePoint::new(18.into(), 12.into()),
+        };
+        // SecureFiniteFieldEllipticCurve::new(5.into(), 32, 40);
+
+        let random = rand::thread_rng().gen_range(1..97);
+        let x = BigInt::from(random);
+        let y = curve.generator.multiply(&x, &curve);
+
+        let public_key = MenezesVanstonePublicKey {
+            curve: curve.clone(),
+            generator: curve.generator.clone(),
+            y,
+        };
+
+        let private_key = MenezesVanstonePrivateKey { curve, x };
+
+        // 100 ist größer als 97
+        let plaintext = MenezesVanstonePlaintext {
+            first: 100.into(),
+            second: 100.into(),
+        };
+
+        let service = NumberTheoryService::new(Fast);
+        let ciphertext = MenezesVanstoneScheme::encrypt(&public_key, &plaintext, service);
+        let decrypted_plaintext =
+            MenezesVanstoneScheme::decrypt(&private_key, &ciphertext, service);
+        assert_ne!(plaintext, decrypted_plaintext);
     }
 }

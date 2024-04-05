@@ -46,45 +46,45 @@ impl AsymmetricEncryptor<MenezesVanstoneStringScheme> for MenezesVanstoneStringS
         service: NumberTheoryService,
     ) -> Self::Output {
         let radix = key.radix;
-        let mut block_size = key.mv_key.curve.prime.log(&radix.into());
-        if block_size < 2 {
-            // TODO Korrigieren, BlockSize einheitlich irgendwo berechnen und ein Minimum festlegen
-            block_size = 2;
+        let block_size = key.mv_key.curve.prime.log(&radix.into());
+        if block_size < 1 {
+            panic!("Verhältnis von Basis und Modul ist zu klein.")
         }
         let decimal_unicode_key = DecimalUnicodeConversionSchemeKey { radix, block_size };
 
         // TODO Hier ist das Padding. Das muss aber noch irgendwie wieder rausgerechnet werden.
         // TODO Funktioniert aber auch THEORETISCH(!) einwandfrei ohne. Überwiegend ungetestet!
-        // TODO Damit es ohne Padding funktioniert, muss ggf ein letzter, nicht vorhandener Block
-        // TODO mit \u0000 gefüllt werden. Nachtrag: Nein, kein Wert darf 0 sein!
-        // TODO: Lösung: Wenn die Nachricht genau uneven-blocks lang ist, dann muss die Blocklänge geändert werden.
+        // TODO Wenn die Nachricht genau uneven-blocks lang ist, wird ein letzter Block
+        // TODO mit Wert 0 eingefügt.
         // Den Plaintext auffüllen, bis er eine gerade Anzahl von Blöcken erzeugen wird
-        let diff = block_size * 2 - (plaintext.len() % (block_size * 2));
-        let supplement = "a".repeat(diff);
-        let mut padded_plaintext = String::from(plaintext);
-        if (plaintext.len() / block_size * 2) == 0 {
-            padded_plaintext.push_str(&supplement);
-        }
-
-        println!("Blocksize: {:?}", block_size);
-        println!("PaddedPlaintext: {:?}", padded_plaintext);
+        // let diff = block_size * 2 - (plaintext.len() % (block_size * 2));
+        // let supplement = "\u{0000}".repeat(diff);
+        // let mut padded_plaintext = String::from(plaintext);
+        // if (plaintext.len() / block_size * 2) == 0 {
+        //     padded_plaintext.push_str(&supplement);
+        // }
 
         // Blockchiffre anwenden
-        let message = ToDecimalBlockScheme::encrypt(&padded_plaintext, &decimal_unicode_key);
-
-        println!("BigIntVec: {:?}", message);
+        let message = ToDecimalBlockScheme::encrypt(&plaintext, &decimal_unicode_key);
 
         // Die Zahlen in eine Liste von MenezesVanstonePlaintext mappen
         let mut plaintext_list: Vec<MenezesVanstonePlaintext> = Vec::new();
-        for chunk in message.chunks_exact(2) {
-            let plaintext_chunk = MenezesVanstonePlaintext {
-                first: chunk[0].clone(),
-                second: chunk[1].clone(),
-            };
-            plaintext_list.push(plaintext_chunk);
+        for chunk in message.chunks(2) {
+            // Falls es den zweiten Block nicht gibt, soll eine 0 eingefügt werden.
+            if chunk.len() < 2 {
+                let plaintext_chunk = MenezesVanstonePlaintext {
+                    first: chunk[0].clone(),
+                    second: BigInt::zero(),
+                };
+                plaintext_list.push(plaintext_chunk);
+            } else {
+                let plaintext_chunk = MenezesVanstonePlaintext {
+                    first: chunk[0].clone(),
+                    second: chunk[1].clone(),
+                };
+                plaintext_list.push(plaintext_chunk);
+            }
         }
-
-        println!("PlaintextList: {:?}", plaintext_list);
 
         // Jeden einzelnen Plaintext für sich verschlüsseln
         let mut ciphertext_list: Vec<MenezesVanstoneCiphertext> = Vec::new();
@@ -93,8 +93,6 @@ impl AsymmetricEncryptor<MenezesVanstoneStringScheme> for MenezesVanstoneStringS
             ciphertext_list.push(ciphertext);
         }
 
-        println!("CiphertextList: {:?}", ciphertext_list);
-
         // Die Zahlen wieder in Strings konvertieren
         let mut big_int_vec: Vec<BigInt> = Vec::new();
         for ciphertext in &ciphertext_list {
@@ -102,8 +100,6 @@ impl AsymmetricEncryptor<MenezesVanstoneStringScheme> for MenezesVanstoneStringS
             big_int_vec.push(ciphertext.second.clone());
         }
         let ciphertext_string = FromDecimalBlockScheme::encrypt(&big_int_vec, &decimal_unicode_key);
-
-        println!("CiphertextString: {:?}", ciphertext_string);
 
         // Die genutzten Punkte akkumulieren
         let points = ciphertext_list
@@ -133,7 +129,7 @@ impl AsymmetricDecryptor<MenezesVanstoneStringScheme> for MenezesVanstoneStringS
         let ciphertext_string = &ciphertext.ciphertext;
         let points = &ciphertext.points;
         let radix = key.radix;
-        let block_size = key.mv_key.curve.prime.log(&radix.into()) + 1;
+        let block_size = key.mv_key.curve.prime.log(&radix.into()); // TODO ACHTUNG!! Was ist mit der +1?
 
         // Blockchiffre anwenden
         let decimal_unicode_key = DecimalUnicodeConversionSchemeKey { radix, block_size };
@@ -175,7 +171,6 @@ impl AsymmetricDecryptor<MenezesVanstoneStringScheme> for MenezesVanstoneStringS
 #[cfg(test)]
 mod tests {
     use rand::Rng;
-    use std::str::FromStr;
 
     use crate::encryption::core::menezes_vanstone::keys::{
         MenezesVanstonePrivateKey, MenezesVanstonePublicKey,
@@ -187,26 +182,28 @@ mod tests {
 
     #[test]
     fn test_menezes_vanstone_encryption_decryption() {
-        let curve = SecureFiniteFieldEllipticCurve::new(5.into(), 32, 40);
-        let generator = FiniteFieldEllipticCurvePoint::new(
-            BigInt::from_str("152198469913648308717544634828661961231").unwrap(),
-            BigInt::from_str("50296851635441247077790719368115682846").unwrap(),
-        );
-        let y = FiniteFieldEllipticCurvePoint::new(
-            BigInt::from_str("26370934085012164485153092381593646122").unwrap(),
-            BigInt::from_str("126290671313284822425335475919650022666").unwrap(),
-        );
-        let x = BigInt::from_str("12401522966815986254216934185370504355").unwrap();
+        let curve = SecureFiniteFieldEllipticCurve {
+            a: -25,
+            prime: 10007.into(),
+            order_of_subgroup: 5004.into(),
+            generator: FiniteFieldEllipticCurvePoint::new(42.into(), 114.into()),
+        };
+        // SecureFiniteFieldEllipticCurve::new(5.into(), 32, 40);
+
+        // random big int using the rand crate
+        let random = rand::thread_rng().gen_range(1..5000);
+        let x = BigInt::from(random);
+        let y = curve.generator.multiply(&x, &curve);
 
         let public_key = MenezesVanstonePublicKey {
             curve: curve.clone(),
-            generator,
+            generator: curve.generator.clone(),
             y,
         };
 
         // Der Radix soll hier für jeden Testlauf zufällig gewählt werden, damit die Tests
         // mehr abfangen können.
-        let radix = 55296; //rand::thread_rng().gen_range(240..55296);
+        let radix = 100; //rand::thread_rng().gen_range(240..55296); //TODO Aktuell ist der radix so klein, weil die Kurve noch nicht mit größeren Modul generiert werden kann.
         println!("Radix: {}", radix);
         let public_key = MenezesVanstoneStringPublicKey {
             mv_key: public_key,
@@ -218,7 +215,7 @@ mod tests {
             radix,
         };
 
-        let plaintext = "Das ist ein Test1234567890aaaaaa"; // TODO: Für "aa" fällt das durch!!!!
+        let plaintext = "DAS IST EIN TEST \n HEHE \n";
 
         let service = NumberTheoryService::new(Fast);
         let ciphertext = MenezesVanstoneStringScheme::encrypt(&public_key, &plaintext, service);
