@@ -6,8 +6,8 @@ use crate::encryption::asymmetric_encryption_types::{
 };
 use crate::encryption::core::menezes_vanstone::menezes_vanstone_scheme::MenezesVanstoneScheme;
 use crate::encryption::encryption_types::Key;
-use crate::math_core::ecc::secure_finite_field_elliptic_curve::SecureFiniteFieldEllipticCurve;
 use crate::math_core::ecc::finite_field_elliptic_curve_point::FiniteFieldEllipticCurvePoint;
+use crate::math_core::ecc::secure_finite_field_elliptic_curve::SecureFiniteFieldEllipticCurve;
 
 #[derive(Clone, Debug)]
 pub struct MenezesVanstonePublicKey {

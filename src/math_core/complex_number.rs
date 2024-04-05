@@ -40,7 +40,7 @@ pub fn complex_euclidean_algorithm(a: ComplexNumber, b: ComplexNumber) -> Comple
 
     while !g.is_zero() {
         let tmp = g.clone();
-        g = &g_prev - &(&g * &((&g_prev / &g)));
+        g = &g_prev - &(&g * &(&g_prev / &g));
         g_prev = tmp.clone();
     }
     ComplexNumber {

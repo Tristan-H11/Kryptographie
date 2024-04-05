@@ -113,7 +113,8 @@ impl SecureFiniteFieldEllipticCurve {
             let first_complex_number = ComplexNumber::new(prime.clone(), BigInt::zero());
             let second_complex_number =
                 ComplexNumber::new(Self::calculate_w(&prime, 2.into()), BigInt::one());
-            let gg_t: ComplexNumber = complex_euclidean_algorithm(first_complex_number, second_complex_number);
+            let gg_t: ComplexNumber =
+                complex_euclidean_algorithm(first_complex_number, second_complex_number);
 
             // Der Realteil von alpha ist immer der ungerade Anteil des ggT von p und W(p, 2)
             // dadurch, dass das obige Verfahren immer einen geraden und ungeraden Anteil liefert,
