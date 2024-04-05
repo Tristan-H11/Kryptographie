@@ -4,6 +4,7 @@ use atomic_counter::RelaxedCounter;
 use bigdecimal::num_bigint::BigInt;
 use bigdecimal::num_traits::Euclid;
 use bigdecimal::{One, Signed, Zero};
+use log::warn;
 use num::Integer;
 
 use crate::math_core::complex_number::{complex_euclidean_algorithm, ComplexNumber};
@@ -66,20 +67,31 @@ impl SecureFiniteFieldEllipticCurve {
             }
         }
 
-        let (prime, order_of_subgroup) =
-            Self::calculate_p_and_q(&prime, n, miller_rabin_iterations);
+        let counter = RelaxedCounter::new(1);
 
-        let generator = Self::calculate_signature_generator(&prime, a);
+        // Manchmal wird ein Generator bestimmt, der nicht auf der Kurve liegt. In dem Fall soll
+        // die Berechnung wiederholt werden, bis ein gültiger Generator gefunden wurde.
+        loop {
+            let (prime, order_of_subgroup) =
+                Self::calculate_p_and_q(&prime, n, miller_rabin_iterations);
 
-        let curve = Self {
-            a,
-            prime,
-            order_of_subgroup,
-            generator,
-        };
+            let generator = Self::calculate_signature_generator(&prime, a, &counter);
 
-        assert!(curve.has_point(&curve.generator), "Berechneter Generator ist kein Punkt der Kurve!");
-        curve
+            let curve = Self {
+                a,
+                prime,
+                order_of_subgroup,
+                generator,
+            };
+
+            if curve.has_point(&curve.generator) {
+                return curve;
+            }
+            warn!(
+                "Berechneter Generator ist kein Punkt der Kurve! \
+            Es wird ein neuer Generator berechnet."
+            );
+        }
     }
 
     pub fn calculate_p_and_q(
@@ -208,10 +220,14 @@ impl SecureFiniteFieldEllipticCurve {
         }
     }
 
-    pub fn calculate_signature_generator(prime: &BigInt, a: i32) -> FiniteFieldEllipticCurvePoint {
+    pub fn calculate_signature_generator(
+        prime: &BigInt,
+        a: i32,
+        counter: &RelaxedCounter,
+    ) -> FiniteFieldEllipticCurvePoint {
         let mut generator: FiniteFieldEllipticCurvePoint;
         let service = NumberTheoryService::new(Fast); // TODO übergeben lassen
-        let counter = RelaxedCounter::new(1);
+
         // Schleife, die läuft, bis ein Generator gefunden wurde, der nicht den Punkt im Unendlichen
         // darstellt.
         loop {
