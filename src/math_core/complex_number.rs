@@ -1,15 +1,18 @@
-use bigdecimal::num_bigint::BigInt;
+use std::cmp::Ordering;
 use bigdecimal::{BigDecimal, Signed, Zero};
 use std::ops::{Add, Div, Mul, Sub};
+use bigdecimal::num_traits::Euclid;
+use num::BigInt;
+use sha2::digest::typenum::private::IsGreaterOrEqualPrivate;
 
 #[derive(Clone, Debug, PartialEq)]
 pub struct ComplexNumber {
-    pub real: BigDecimal,
-    pub imaginary: BigDecimal,
+    pub real: BigInt,
+    pub imaginary: BigInt,
 }
 
 impl ComplexNumber {
-    pub fn new(real: BigDecimal, imaginary: BigDecimal) -> Self {
+    pub fn new(real: BigInt, imaginary: BigInt) -> Self {
         Self { real, imaginary }
     }
 
@@ -29,26 +32,46 @@ impl ComplexNumber {
         self.real.is_negative() && self.imaginary.is_negative()
     }
 
+    pub fn absolute_value(&self) -> Option<BigDecimal>{
+        BigDecimal::from(&self.real * &self.real + &self.imaginary * &self.imaginary).sqrt()
+    }
+
+    pub fn is_greater_than(&self, other: &Self) -> bool{
+        self.absolute_value() > other.absolute_value()
+    }
+
+    pub fn is_less_than(&self, other: &Self) -> bool{
+        self.absolute_value() < other.absolute_value()
+    }
+
     pub fn is_zero(&self) -> bool {
         self.real.is_zero() && self.imaginary.is_zero()
     }
 
-    pub fn gaussian_integer(self) -> Self {
-        Self {
-            real: self.real.round(0),
-            imaginary: self.imaginary.round(0),
+    pub fn div_euclid(&self, rhs: &Self) -> Self {
+        Self{
+            real: (&self.real * &rhs.real + &self.imaginary * &rhs.imaginary)
+                .div_euclid(&(&rhs.real * &rhs.real + &rhs.imaginary * &rhs.imaginary)),
+            imaginary: (&self.imaginary * &rhs.real - &self.real * &rhs.imaginary)
+                .div_euclid(&(&rhs.real * &rhs.real + &rhs.imaginary * &rhs.imaginary)),
         }
     }
 }
 
 pub fn complex_euclidean_algorithm(a: ComplexNumber, b: ComplexNumber) -> ComplexNumber {
-
-    let mut g = a;
-    let mut g_prev = b;
+    let mut g:ComplexNumber;
+    let mut g_prev:ComplexNumber;
+    if a.is_greater_than(&b){
+        g = b;
+        g_prev = a;
+    } else {
+        g = a;
+        g_prev = b;
+    }
 
     while !g.is_zero() {
         let tmp = g.clone();
-        g = &g_prev - &(&g * &(&g_prev / &g).gaussian_integer());
+        g = &g_prev - &(&g * &(&g_prev.div_euclid(&g)));
         g_prev = tmp.clone();
     }
     ComplexNumber {
@@ -156,12 +179,12 @@ mod tests {
     #[test]
     fn complex_test() {
         let x = ComplexNumber {
-            real: BigDecimal::from(-6),
-            imaginary: BigDecimal::from(17),
+            real: BigInt::from(-6),
+            imaginary: BigInt::from(17),
         };
         let y = ComplexNumber {
-            real: BigDecimal::from(3),
-            imaginary: BigDecimal::from(4),
+            real: BigInt::from(3),
+            imaginary: BigInt::from(4),
         };
         assert_eq!(complex_euclidean_algorithm(y.clone(), x.clone()), y);
         assert_eq!(complex_euclidean_algorithm(x.clone(), y.clone()), y);
