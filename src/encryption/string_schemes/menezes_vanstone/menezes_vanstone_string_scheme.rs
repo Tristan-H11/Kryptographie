@@ -175,7 +175,7 @@ mod tests {
     use crate::encryption::core::menezes_vanstone::keys::{
         MenezesVanstonePrivateKey, MenezesVanstonePublicKey,
     };
-    use crate::math_core::ecc::finite_field_elliptic_curve::SecureFiniteFieldEllipticCurve;
+    use crate::math_core::ecc::secure_finite_field_elliptic_curve::SecureFiniteFieldEllipticCurve;
     use crate::math_core::number_theory::number_theory_service::NumberTheoryServiceSpeed::Fast;
 
     use super::*;

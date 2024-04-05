@@ -3,7 +3,7 @@ use bigdecimal::num_traits::Euclid;
 use bigdecimal::{One, Zero};
 use std::ops::Add;
 
-use crate::math_core::ecc::finite_field_elliptic_curve::SecureFiniteFieldEllipticCurve;
+use crate::math_core::ecc::secure_finite_field_elliptic_curve::SecureFiniteFieldEllipticCurve;
 use crate::math_core::number_theory::number_theory_service::NumberTheoryServiceSpeed::Fast;
 use crate::math_core::number_theory::number_theory_service::{
     NumberTheoryService, NumberTheoryServiceTrait,

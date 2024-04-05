@@ -15,7 +15,7 @@ use crate::encryption::string_schemes::menezes_vanstone::keys::{
 use crate::encryption::string_schemes::menezes_vanstone::menezes_vanstone_string_scheme::{
     MenezesVanstoneStringScheme, MvStringCiphertext,
 };
-use crate::math_core::ecc::finite_field_elliptic_curve::SecureFiniteFieldEllipticCurve;
+use crate::math_core::ecc::secure_finite_field_elliptic_curve::SecureFiniteFieldEllipticCurve;
 use crate::math_core::ecc::finite_field_elliptic_curve_point::FiniteFieldEllipticCurvePoint;
 use crate::math_core::number_theory::number_theory_service::NumberTheoryService;
 use crate::math_core::number_theory::number_theory_service::NumberTheoryServiceSpeed::{
