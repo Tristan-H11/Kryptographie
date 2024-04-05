@@ -132,15 +132,8 @@ mod tests {
 
     #[test]
     fn test_menezes_vanstone_encryption_decryption() {
-        let curve = SecureFiniteFieldEllipticCurve {
-            a: -25,
-            prime: 97.into(),
-            order_of_subgroup: 58.into(),
-            generator: FiniteFieldEllipticCurvePoint::new(18.into(), 12.into()),
-        };
-        // SecureFiniteFieldEllipticCurve::new(5.into(), 32, 40);
+        let curve = SecureFiniteFieldEllipticCurve::new(5.into(), 32, 40);
 
-        // random big int using the rand crate
         let (mut x, mut y);
         loop {
             let random = rand::thread_rng().gen_range(1..58);
@@ -173,17 +166,11 @@ mod tests {
 
     #[test]
     fn test_encryption_decryption_fails_when_message_greater_prime() {
-        let curve = SecureFiniteFieldEllipticCurve {
-            a: -25,
-            prime: 97.into(),
-            order_of_subgroup: 58.into(),
-            generator: FiniteFieldEllipticCurvePoint::new(18.into(), 12.into()),
-        };
-        // SecureFiniteFieldEllipticCurve::new(5.into(), 32, 40);
+        let curve = SecureFiniteFieldEllipticCurve::new(5.into(), 8, 40);
 
         let (mut x, mut y);
         loop {
-            let random = rand::thread_rng().gen_range(1..58);
+            let random = rand::thread_rng().gen_range(1..255);
             x = BigInt::from(random);
             y = curve.generator.multiply(&x, &curve);
             if !y.x.is_zero() && !y.y.is_zero() {
@@ -199,10 +186,10 @@ mod tests {
 
         let private_key = MenezesVanstonePrivateKey { curve, x };
 
-        // 100 ist größer als 97
+        // 300 ist größer als 2^8
         let plaintext = MenezesVanstonePlaintext {
-            first: 100.into(),
-            second: 100.into(),
+            first: 300.into(),
+            second: 300.into(),
         };
 
         let service = NumberTheoryService::new(Fast);
