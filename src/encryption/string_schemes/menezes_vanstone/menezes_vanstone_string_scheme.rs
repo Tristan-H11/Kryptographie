@@ -130,7 +130,7 @@ impl AsymmetricDecryptor<MenezesVanstoneStringScheme> for MenezesVanstoneStringS
         service: NumberTheoryService,
     ) -> Self::Output {
         let ciphertext_string = &ciphertext.ciphertext;
-        let point = &ciphertext.points[0];
+        let points = &ciphertext.points;
         let radix = key.radix;
         let block_size = key.mv_key.curve.prime.log(&radix.into()) + 1;
 
@@ -141,27 +141,24 @@ impl AsymmetricDecryptor<MenezesVanstoneStringScheme> for MenezesVanstoneStringS
         // Wenn wir hier keine zusammenpassende Anzahl von Punkten und Tupeln haben,
         // dann ist die Nachricht nicht korrekt verschlüsselt worden.
         // Durch '*2' wird ebenfalls sichergestellt, dass es eine gerade Anzahl von Tupeln gibt.
-        // assert_eq!(points.len() * 2, big_int_vec.len(), "Ungültiger Ciphertext"); // TODO Achtung! Hier wurde von einem Punkt pro Block auf insgesamt einen Punkt geändert.
+        assert_eq!(points.len() * 2, big_int_vec.len(), "Ungültiger Ciphertext");
 
         // Die Zahlen in eine Liste von MenezesVanstoneCiphertext mappen
         let mut ciphertext_list: Vec<MenezesVanstoneCiphertext> = Vec::new();
-        for chunk in big_int_vec.chunks(2) {
-            // Falls es den zweiten Block nicht gibt, soll eine 0 eingefügt werden.
-            if chunk.len() < 2 {
-                let ciphertext = MenezesVanstoneCiphertext {
-                    point: point.clone(), // TODO Achtung! Hier wurde von einem Punkt pro Block auf insgesamt einen Punkt geändert.
-                    first: chunk[0].clone(),
-                    second: BigInt::zero(),
-                };
-                ciphertext_list.push(ciphertext);
+        for mut i in (0..big_int_vec.len()).step_by(2) { // TODO Aufhübschen
+            let first = big_int_vec[i].clone();
+            let second = if i + 1 < big_int_vec.len() {
+                big_int_vec[i + 1].clone()
             } else {
-                let ciphertext = MenezesVanstoneCiphertext {
-                    point: point.clone(), // TODO Achtung! Hier wurde von einem Punkt pro Block auf insgesamt einen Punkt geändert.
-                    first: chunk[0].clone(),
-                    second: chunk[1].clone(),
-                };
-                ciphertext_list.push(ciphertext);
-            }
+                BigInt::zero()
+            };
+
+            let ciphertext = MenezesVanstoneCiphertext {
+                point: points[i / 2].clone(),
+                first,
+                second,
+            };
+            ciphertext_list.push(ciphertext);
         }
 
         // Jeden einzelnen Ciphertext für sich entschlüsseln
