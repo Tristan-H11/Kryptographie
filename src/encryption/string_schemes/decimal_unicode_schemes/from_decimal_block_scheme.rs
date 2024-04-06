@@ -1,4 +1,5 @@
 use bigdecimal::num_bigint::BigInt;
+use bigdecimal::{One, Zero};
 
 use crate::encryption::encryption_types::{Decryptor, EncryptionScheme, Encryptor};
 use crate::encryption::string_schemes::decimal_unicode_schemes::decimal_unicode_conversion_core::ToRadixString;
@@ -107,6 +108,9 @@ mod tests {
         };
 
         let ciphertext = FromDecimalBlockScheme::encrypt(&m, &key);
+        println!("{}", ciphertext);
+
+        assert_eq!(ciphertext.chars().count() % &key.block_size, 0);
 
         assert_eq!(
             ciphertext,
@@ -193,6 +197,8 @@ mod tests {
 
         let ciphertext = FromDecimalBlockScheme::encrypt(&m, &key);
 
+        assert_eq!(ciphertext.chars().count() % key.block_size, 0);
+
         let mut manipulated_ciphertext = ciphertext.clone();
         manipulated_ciphertext.remove(0);
 
@@ -203,8 +209,34 @@ mod tests {
                 BigInt::from_str("154287324233491923008251865530564709").unwrap(),
                 BigInt::from_str("165979152362535971847205438623910004").unwrap(),
                 BigInt::from_str("173882400154251057641497437834283008").unwrap(),
-                5750900.into()
+                5750900.into(),
             ]
         );
+    }
+
+    #[test]
+    fn test_blocks_which_need_padding() {
+        let m = vec![BigInt::from_str("141003468806831291709021908155318047884").unwrap(),
+                     BigInt::from_str("92324319300612212196142259885788683544").unwrap(),
+                     BigInt::from_str("56230357520496568317607899257571094993").unwrap(),
+                     BigInt::from_str("2205566786287507744272597928496806444").unwrap(),
+                     BigInt::from_str("97117935781375881927035254884658165460").unwrap()
+        ];
+        let key = DecimalUnicodeConversionSchemeKey {
+            radix: 55296,
+            block_size: 9,
+        };
+
+        for element in &m {
+            let upper_bound = BigInt::from(key.radix).pow(key.block_size as u32);
+            assert!(element < &upper_bound);
+        }
+
+        let ciphertext = FromDecimalBlockScheme::encrypt(&m, &key);
+
+
+        let plaintext = FromDecimalBlockScheme::decrypt(&ciphertext, &key);
+
+        assert_eq!(m, plaintext);
     }
 }
