@@ -99,7 +99,10 @@ impl AsymmetricEncryptor<MenezesVanstoneStringScheme> for MenezesVanstoneStringS
             big_int_vec.push(ciphertext.first.clone());
             big_int_vec.push(ciphertext.second.clone());
         }
-        let ciphertext_string = FromDecimalBlockScheme::encrypt(&big_int_vec, &decimal_unicode_key);
+
+        let conversion_post_key = DecimalUnicodeConversionSchemeKey { radix, block_size: block_size + 1 };
+        println!("Encrypt Post Blocksize: {:?}", block_size + 1);
+        let ciphertext_string = FromDecimalBlockScheme::encrypt(&big_int_vec, &conversion_post_key);
 
         // Die genutzten Punkte akkumulieren
         let points = ciphertext_list
@@ -127,9 +130,9 @@ impl AsymmetricDecryptor<MenezesVanstoneStringScheme> for MenezesVanstoneStringS
         service: NumberTheoryService,
     ) -> Self::Output {
         let ciphertext_string = &ciphertext.ciphertext;
-        let points = &ciphertext.points;
+        let point = &ciphertext.points[0];
         let radix = key.radix;
-        let block_size = key.mv_key.curve.prime.log(&radix.into()); // TODO ACHTUNG!! Was ist mit der +1?
+        let block_size = key.mv_key.curve.prime.log(&radix.into()) + 1; // TODO ACHTUNG!! Was ist mit der +1?
 
         // Blockchiffre anwenden
         let decimal_unicode_key = DecimalUnicodeConversionSchemeKey { radix, block_size };
@@ -138,17 +141,27 @@ impl AsymmetricDecryptor<MenezesVanstoneStringScheme> for MenezesVanstoneStringS
         // Wenn wir hier keine zusammenpassende Anzahl von Punkten und Tupeln haben,
         // dann ist die Nachricht nicht korrekt verschlüsselt worden.
         // Durch '*2' wird ebenfalls sichergestellt, dass es eine gerade Anzahl von Tupeln gibt.
-        assert_eq!(points.len() * 2, big_int_vec.len(), "Ungültiger Ciphertext");
+        // assert_eq!(points.len() * 2, big_int_vec.len(), "Ungültiger Ciphertext"); // TODO Achtung! Hier wurde von einem Punkt pro Block auf insgesamt einen Punkt geändert.
 
         // Die Zahlen in eine Liste von MenezesVanstoneCiphertext mappen
         let mut ciphertext_list: Vec<MenezesVanstoneCiphertext> = Vec::new();
-        for i in 0..big_int_vec.len() / 2 {
-            let ciphertext = MenezesVanstoneCiphertext {
-                point: points[i].clone(),
-                first: big_int_vec[i * 2].clone(),
-                second: big_int_vec[i * 2 + 1].clone(),
-            };
-            ciphertext_list.push(ciphertext);
+        for chunk in big_int_vec.chunks(2) {
+            // Falls es den zweiten Block nicht gibt, soll eine 0 eingefügt werden.
+            if chunk.len() < 2 {
+                let ciphertext = MenezesVanstoneCiphertext {
+                    point: point.clone(), // TODO Achtung! Hier wurde von einem Punkt pro Block auf insgesamt einen Punkt geändert.
+                    first: chunk[0].clone(),
+                    second: BigInt::zero(),
+                };
+                ciphertext_list.push(ciphertext);
+            } else {
+                let ciphertext = MenezesVanstoneCiphertext {
+                    point: point.clone(), // TODO Achtung! Hier wurde von einem Punkt pro Block auf insgesamt einen Punkt geändert.
+                    first: chunk[0].clone(),
+                    second: chunk[1].clone(),
+                };
+                ciphertext_list.push(ciphertext);
+            }
         }
 
         // Jeden einzelnen Ciphertext für sich entschlüsseln
@@ -182,13 +195,7 @@ mod tests {
 
     #[test]
     fn test_menezes_vanstone_encryption_decryption() {
-        let curve = SecureFiniteFieldEllipticCurve {
-            a: -25,
-            prime: 10007.into(),
-            order_of_subgroup: 5004.into(),
-            generator: FiniteFieldEllipticCurvePoint::new(42.into(), 114.into()),
-        };
-        // SecureFiniteFieldEllipticCurve::new(5.into(), 32, 40);
+        let curve = SecureFiniteFieldEllipticCurve::new(5.into(), 128, 40);
 
         // random big int using the rand crate
         let (mut x, mut y);
@@ -209,7 +216,7 @@ mod tests {
 
         // Der Radix soll hier für jeden Testlauf zufällig gewählt werden, damit die Tests
         // mehr abfangen können.
-        let radix = 100; //rand::thread_rng().gen_range(240..55296); //TODO Aktuell ist der radix so klein, weil die Kurve noch nicht mit größeren Modul generiert werden kann.
+        let radix = rand::thread_rng().gen_range(240..55296);
         println!("Radix: {}", radix);
         let public_key = MenezesVanstoneStringPublicKey {
             mv_key: public_key,
