@@ -1,6 +1,7 @@
 use std::cmp::Ordering;
 use bigdecimal::{BigDecimal, Signed, Zero};
 use std::ops::{Add, Div, Mul, Sub};
+use bigdecimal::num_bigint::ToBigInt;
 use bigdecimal::num_traits::Euclid;
 use num::BigInt;
 use sha2::digest::typenum::private::IsGreaterOrEqualPrivate;
@@ -48,12 +49,12 @@ impl ComplexNumber {
         self.real.is_zero() && self.imaginary.is_zero()
     }
 
-    pub fn div_euclid(&self, rhs: &Self) -> Self {
+    pub fn div_round(&self, rhs: &Self) -> Self {
         Self{
-            real: (&self.real * &rhs.real + &self.imaginary * &rhs.imaginary)
-                .div_euclid(&(&rhs.real * &rhs.real + &rhs.imaginary * &rhs.imaginary)),
-            imaginary: (&self.imaginary * &rhs.real - &self.real * &rhs.imaginary)
-                .div_euclid(&(&rhs.real * &rhs.real + &rhs.imaginary * &rhs.imaginary)),
+            real: (BigDecimal::from(&self.real * &rhs.real + &self.imaginary * &rhs.imaginary) /
+                BigDecimal::from(&rhs.real * &rhs.real + &rhs.imaginary * &rhs.imaginary)).round(0).to_bigint().unwrap(),
+            imaginary: (BigDecimal::from(&self.imaginary * &rhs.real - &self.real * &rhs.imaginary) /
+                BigDecimal::from(&rhs.real * &rhs.real + &rhs.imaginary * &rhs.imaginary)).round(0).to_bigint().unwrap()
         }
     }
 }
@@ -71,7 +72,7 @@ pub fn complex_euclidean_algorithm(a: ComplexNumber, b: ComplexNumber) -> Comple
 
     while !g.is_zero() {
         let tmp = g.clone();
-        g = &g_prev - &(&g * &(&g_prev.div_euclid(&g)));
+        g = &g_prev - &(&g * &(&g_prev.div_round(&g)));
         g_prev = tmp.clone();
     }
     ComplexNumber {
@@ -174,6 +175,7 @@ impl Div for &ComplexNumber {
 
 #[cfg(test)]
 mod tests {
+    use num::Integer;
     use super::*;
 
     #[test]
@@ -186,6 +188,7 @@ mod tests {
             real: BigInt::from(3),
             imaginary: BigInt::from(4),
         };
+
         assert_eq!(complex_euclidean_algorithm(y.clone(), x.clone()), y);
         assert_eq!(complex_euclidean_algorithm(x.clone(), y.clone()), y);
     }
