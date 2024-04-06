@@ -102,7 +102,6 @@ impl AsymmetricEncryptor<MenezesVanstoneStringScheme> for MenezesVanstoneStringS
         }
 
         let conversion_post_key = DecimalUnicodeConversionSchemeKey { radix, block_size: block_size + 1 };
-        println!("Encrypt Post Blocksize: {:?}", block_size + 1);
         let ciphertext_string = FromDecimalBlockScheme::encrypt(&big_int_vec, &conversion_post_key);
 
         // Die genutzten Punkte akkumulieren
@@ -133,7 +132,7 @@ impl AsymmetricDecryptor<MenezesVanstoneStringScheme> for MenezesVanstoneStringS
         let ciphertext_string = &ciphertext.ciphertext;
         let point = &ciphertext.points[0];
         let radix = key.radix;
-        let block_size = key.mv_key.curve.prime.log(&radix.into()) + 1; // TODO ACHTUNG!! Was ist mit der +1?
+        let block_size = key.mv_key.curve.prime.log(&radix.into()) + 1;
 
         // Blockchiffre anwenden
         let decimal_unicode_key = DecimalUnicodeConversionSchemeKey { radix, block_size };
