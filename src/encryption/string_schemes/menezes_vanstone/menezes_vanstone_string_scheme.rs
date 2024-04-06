@@ -101,7 +101,10 @@ impl AsymmetricEncryptor<MenezesVanstoneStringScheme> for MenezesVanstoneStringS
             big_int_vec.push(ciphertext.second.clone());
         }
 
-        let conversion_post_key = DecimalUnicodeConversionSchemeKey { radix, block_size: block_size + 1 };
+        let conversion_post_key = DecimalUnicodeConversionSchemeKey {
+            radix,
+            block_size: block_size + 1,
+        };
         let ciphertext_string = FromDecimalBlockScheme::encrypt(&big_int_vec, &conversion_post_key);
 
         // Die genutzten Punkte akkumulieren
@@ -145,7 +148,8 @@ impl AsymmetricDecryptor<MenezesVanstoneStringScheme> for MenezesVanstoneStringS
 
         // Die Zahlen in eine Liste von MenezesVanstoneCiphertext mappen
         let mut ciphertext_list: Vec<MenezesVanstoneCiphertext> = Vec::new();
-        for mut i in (0..big_int_vec.len()).step_by(2) { // TODO Aufhübschen
+        for mut i in (0..big_int_vec.len()).step_by(2) {
+            // TODO Aufhübschen
             let first = big_int_vec[i].clone();
             let second = if i + 1 < big_int_vec.len() {
                 big_int_vec[i + 1].clone()

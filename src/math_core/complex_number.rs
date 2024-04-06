@@ -1,10 +1,10 @@
-use std::cmp::Ordering;
-use bigdecimal::{BigDecimal, Signed, Zero};
-use std::ops::{Add, Div, Mul, Sub};
 use bigdecimal::num_bigint::ToBigInt;
 use bigdecimal::num_traits::Euclid;
+use bigdecimal::{BigDecimal, Signed, Zero};
 use num::BigInt;
 use sha2::digest::typenum::private::IsGreaterOrEqualPrivate;
+use std::cmp::Ordering;
+use std::ops::{Add, Div, Mul, Sub};
 
 #[derive(Clone, Debug, PartialEq)]
 pub struct ComplexNumber {
@@ -33,15 +33,15 @@ impl ComplexNumber {
         self.real.is_negative() && self.imaginary.is_negative()
     }
 
-    pub fn absolute_value(&self) -> Option<BigDecimal>{
+    pub fn absolute_value(&self) -> Option<BigDecimal> {
         BigDecimal::from(&self.real * &self.real + &self.imaginary * &self.imaginary).sqrt()
     }
 
-    pub fn is_greater_than(&self, other: &Self) -> bool{
+    pub fn is_greater_than(&self, other: &Self) -> bool {
         self.absolute_value() > other.absolute_value()
     }
 
-    pub fn is_less_than(&self, other: &Self) -> bool{
+    pub fn is_less_than(&self, other: &Self) -> bool {
         self.absolute_value() < other.absolute_value()
     }
 
@@ -50,19 +50,28 @@ impl ComplexNumber {
     }
 
     pub fn div_round(&self, rhs: &Self) -> Self {
-        Self{
-            real: (BigDecimal::from(&self.real * &rhs.real + &self.imaginary * &rhs.imaginary) /
-                BigDecimal::from(&rhs.real * &rhs.real + &rhs.imaginary * &rhs.imaginary)).round(0).to_bigint().unwrap(),
-            imaginary: (BigDecimal::from(&self.imaginary * &rhs.real - &self.real * &rhs.imaginary) /
-                BigDecimal::from(&rhs.real * &rhs.real + &rhs.imaginary * &rhs.imaginary)).round(0).to_bigint().unwrap()
+        Self {
+            real: (BigDecimal::from(&self.real * &rhs.real + &self.imaginary * &rhs.imaginary)
+                / BigDecimal::from(&rhs.real * &rhs.real + &rhs.imaginary * &rhs.imaginary))
+            .round(0)
+            .to_bigint()
+            .unwrap(),
+            imaginary: (BigDecimal::from(
+                &self.imaginary * &rhs.real - &self.real * &rhs.imaginary,
+            ) / BigDecimal::from(
+                &rhs.real * &rhs.real + &rhs.imaginary * &rhs.imaginary,
+            ))
+            .round(0)
+            .to_bigint()
+            .unwrap(),
         }
     }
 }
 
 pub fn complex_euclidean_algorithm(a: ComplexNumber, b: ComplexNumber) -> ComplexNumber {
-    let mut g:ComplexNumber;
-    let mut g_prev:ComplexNumber;
-    if a.is_greater_than(&b){
+    let mut g: ComplexNumber;
+    let mut g_prev: ComplexNumber;
+    if a.is_greater_than(&b) {
         g = b;
         g_prev = a;
     } else {
@@ -175,8 +184,8 @@ impl Div for &ComplexNumber {
 
 #[cfg(test)]
 mod tests {
-    use num::Integer;
     use super::*;
+    use num::Integer;
 
     #[test]
     fn complex_test() {

@@ -216,11 +216,12 @@ mod tests {
 
     #[test]
     fn test_blocks_which_need_padding() {
-        let m = vec![BigInt::from_str("141003468806831291709021908155318047884").unwrap(),
-                     BigInt::from_str("92324319300612212196142259885788683544").unwrap(),
-                     BigInt::from_str("56230357520496568317607899257571094993").unwrap(),
-                     BigInt::from_str("2205566786287507744272597928496806444").unwrap(),
-                     BigInt::from_str("97117935781375881927035254884658165460").unwrap()
+        let m = vec![
+            BigInt::from_str("141003468806831291709021908155318047884").unwrap(),
+            BigInt::from_str("92324319300612212196142259885788683544").unwrap(),
+            BigInt::from_str("56230357520496568317607899257571094993").unwrap(),
+            BigInt::from_str("2205566786287507744272597928496806444").unwrap(),
+            BigInt::from_str("97117935781375881927035254884658165460").unwrap(),
         ];
         let key = DecimalUnicodeConversionSchemeKey {
             radix: 55296,
@@ -233,7 +234,6 @@ mod tests {
         }
 
         let ciphertext = FromDecimalBlockScheme::encrypt(&m, &key);
-
 
         let plaintext = FromDecimalBlockScheme::decrypt(&ciphertext, &key);
 
