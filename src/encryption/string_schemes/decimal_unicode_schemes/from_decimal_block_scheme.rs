@@ -206,8 +206,5 @@ mod tests {
                 5750900.into()
             ]
         );
-        // Hier ist nur der erste Block manipuliert, die anderen Blöcke sind noch valide.
-        // Das Zeichen ggf am Ende sieht nur aus, als wäre es dort falsch, es steht aber an der richtigen Stelle.
-        // Das ist ein Zeichen, das von rechts nach links gelesen wird, also muss es rechts stehen, gehört aber zum ersten Block.
     }
 }
