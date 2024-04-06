@@ -7,6 +7,7 @@ use crate::encryption::symmetric_encryption_types::{
 
 // Ein Schlüssel, welcher für Verschlüsselungsschemata verwendet wird,
 // die zwischen Blöcken in Dezimalform und Klartext zu einer Basis radix konvertieren.
+#[derive(Debug)]
 pub struct DecimalUnicodeConversionSchemeKey {
     pub block_size: usize,
     pub radix: u32,
