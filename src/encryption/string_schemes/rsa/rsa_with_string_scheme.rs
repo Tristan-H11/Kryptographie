@@ -259,7 +259,7 @@ mod tests {
                 random_seed: 73,
                 number_theory_service: service.clone(),
             };
-            encryption_decryption_assert(config, 55296, message, service);
+            encryption_decryption_assert(config, message, service);
         });
     }
 
@@ -274,7 +274,7 @@ mod tests {
                 random_seed: 3,
                 number_theory_service: service.clone(),
             };
-            encryption_decryption_assert(config, 55296, message, service);
+            encryption_decryption_assert(config, message, service);
         });
     }
 
@@ -289,7 +289,7 @@ mod tests {
                 random_seed: 874,
                 number_theory_service: service.clone(),
             };
-            encryption_decryption_assert(config, 55296, message, service);
+            encryption_decryption_assert(config, message, service);
         });
     }
 
@@ -297,7 +297,6 @@ mod tests {
     /// gegebenen Schlüssel durch und prüft, ob die ursprüngliche Nachricht wiederhergestellt werden kann.
     fn encryption_decryption_assert(
         config: RsaKeyGenConfig,
-        _radix: u32,
         message: &str,
         service: NumberTheoryService,
     ) {
