@@ -306,7 +306,6 @@ mod tests {
         let random_seed = 73; //rand::thread_rng().gen_range(1..1000);
         let key_pair = MenezesVanstoneScheme::generate_keypair(n, modul_width, 40, random_seed);
 
-
         let public_key = key_pair.public_key;
         let private_key = key_pair.private_key;
 
