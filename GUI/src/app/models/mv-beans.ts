@@ -1,17 +1,18 @@
 export interface EllipticCurve {
     a: number;
-    b: number;
     prime: string;
+    order_of_subgroup: string;
+    generator: EcPoint;
 }
 
 export interface EcPoint {
     x: string;
     y: string;
+    is_infinity: boolean;
 }
 
 export interface MvPublicKey {
     curve: EllipticCurve;
-    generator: EcPoint;
     y: EcPoint;
 }
 
@@ -44,7 +45,10 @@ export interface MvDecryptRequest {
 
 // Deep Copy Function for EllipticCurve
 export function copyEllipticCurve(curve: EllipticCurve): EllipticCurve {
-    return { ...curve };
+    return {
+        ...curve,
+        generator: copyEcPoint(curve.generator)
+    };
 }
 
 // Deep Copy Function for EcPoint
@@ -56,7 +60,6 @@ export function copyEcPoint(point: EcPoint): EcPoint {
 export function copyMvPublicKey(publicKey: MvPublicKey): MvPublicKey {
     return {
         curve: copyEllipticCurve(publicKey.curve),
-        generator: copyEcPoint(publicKey.generator),
         y: copyEcPoint(publicKey.y)
     };
 }

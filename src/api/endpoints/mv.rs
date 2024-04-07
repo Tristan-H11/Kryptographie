@@ -1,3 +1,4 @@
+use std::thread::current;
 use actix_web::web::{Json, Query};
 use actix_web::{HttpResponse, Responder};
 use log::info;
@@ -27,19 +28,22 @@ pub struct MvCreateKeyPairRequest {
     pub modulus_width: u32,
     pub miller_rabin_rounds: u32,
     pub coef_a: u32,
+    pub random_seed: u32,
 }
 
 #[derive(Serialize, Deserialize, Default)]
 pub struct EllipticCurve {
     pub a: i32,
-    pub b: i32,
     pub prime: String,
+    pub order_of_subgroup: String,
+    pub generator: EcPoint,
 }
 
 #[derive(Serialize, Deserialize, Default)]
 pub struct EcPoint {
     pub x: String,
     pub y: String,
+    pub is_infinite: bool,
 }
 
 #[derive(Serialize, Deserialize, Default)]
@@ -129,20 +133,20 @@ pub(crate) async fn encrypt(
         let generator = FiniteFieldEllipticCurvePoint {
             x: req_body.public_key.generator.x.parse().unwrap(),
             y: req_body.public_key.generator.y.parse().unwrap(),
-            is_infinite: false,
+            is_infinite: req_body.public_key.generator.is_infinite,
         };
 
         let curve = SecureFiniteFieldEllipticCurve {
             a: req_body.public_key.curve.a,
             prime: req_body.public_key.curve.prime.parse().unwrap(),
-            order_of_subgroup: Default::default(), // TODO
-            generator: generator.clone(),          // TODO
+            order_of_subgroup: req_body.public_key.curve.order_of_subgroup.parse().unwrap(),
+            generator,
         };
 
         let y = FiniteFieldEllipticCurvePoint {
             x: req_body.public_key.y.x.parse().unwrap(),
             y: req_body.public_key.y.y.parse().unwrap(),
-            is_infinite: false,
+            is_infinite: req_body.public_key.y.is_infinite,
         };
 
         let public_key = MenezesVanstonePublicKey {
@@ -170,6 +174,7 @@ pub(crate) async fn encrypt(
             .map(|point| EcPoint {
                 x: point.x.to_string(),
                 y: point.y.to_string(),
+                is_infinite: point.is_infinite,
             })
             .collect();
 
@@ -197,11 +202,17 @@ pub(crate) async fn decrypt(
     let req_body: MvDecryptRequest = req_body.into_inner();
 
     call_checked_with_parsed_big_ints(|| {
+
+        let generator = FiniteFieldEllipticCurvePoint {
+            x: req_body.private_key.curve.generator.x.parse().unwrap(),
+            y: req_body.private_key.curve.generator.y.parse().unwrap(),
+            is_infinite: req_body.private_key.curve.generator.is_infinite,
+        };
         let curve = SecureFiniteFieldEllipticCurve {
             a: req_body.private_key.curve.a,
             prime: req_body.private_key.curve.prime.parse().unwrap(),
-            order_of_subgroup: Default::default(), // TODO
-            generator: Default::default(),         // TODO
+            order_of_subgroup: req_body.private_key.curve.order_of_subgroup.parse().unwrap(),
+            generator,
         };
 
         let private_key = MenezesVanstonePrivateKey {
