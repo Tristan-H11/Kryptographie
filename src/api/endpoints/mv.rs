@@ -1,14 +1,18 @@
-use std::thread::current;
 use actix_web::web::{Json, Query};
 use actix_web::{HttpResponse, Responder};
 use log::info;
 use serde::{Deserialize, Serialize};
+use std::thread::current;
 
 use crate::api::basic::call_checked_with_parsed_big_ints;
 use crate::api::serializable_models::{SingleStringResponse, UseFastQuery};
 use crate::encryption::asymmetric_encryption_types::{AsymmetricDecryptor, AsymmetricEncryptor};
-use crate::encryption::core::menezes_vanstone::keys::{MenezesVanstoneKeyPair, MenezesVanstonePrivateKey, MenezesVanstonePublicKey};
-use crate::encryption::core::menezes_vanstone::menezes_vanstone_scheme::{MenezesVanstoneCiphertext, MenezesVanstoneScheme};
+use crate::encryption::core::menezes_vanstone::keys::{
+    MenezesVanstoneKeyPair, MenezesVanstonePrivateKey, MenezesVanstonePublicKey,
+};
+use crate::encryption::core::menezes_vanstone::menezes_vanstone_scheme::{
+    MenezesVanstoneCiphertext, MenezesVanstoneScheme,
+};
 use crate::encryption::string_schemes::menezes_vanstone::keys::{
     MenezesVanstoneStringPrivateKey, MenezesVanstoneStringPublicKey,
 };
@@ -81,7 +85,6 @@ impl From<MenezesVanstonePublicKey> for MvPublicKey {
     }
 }
 
-
 #[derive(Serialize, Deserialize, Default)]
 pub struct MvPrivateKey {
     pub curve: EllipticCurve,
@@ -110,7 +113,6 @@ impl From<MenezesVanstoneKeyPair> for MvKeyPair {
             private_key: MvPrivateKey::from(key_pair.private_key),
         }
     }
-
 }
 
 #[derive(Deserialize)]
@@ -165,7 +167,6 @@ pub(crate) async fn create_key_pair(
 
     let response = MvKeyPair::from(key_pair);
 
-
     HttpResponse::Ok().json(response)
 }
 
@@ -203,10 +204,7 @@ pub(crate) async fn encrypt(
             is_infinite: req_body.public_key.y.is_infinite,
         };
 
-        let public_key = MenezesVanstonePublicKey {
-            curve,
-            y,
-        };
+        let public_key = MenezesVanstonePublicKey { curve, y };
 
         let public_key = MenezesVanstoneStringPublicKey {
             mv_key: public_key,
@@ -256,7 +254,6 @@ pub(crate) async fn decrypt(
     let req_body: MvDecryptRequest = req_body.into_inner();
 
     call_checked_with_parsed_big_ints(|| {
-
         let generator = FiniteFieldEllipticCurvePoint {
             x: req_body.private_key.curve.generator.x.parse().unwrap(),
             y: req_body.private_key.curve.generator.y.parse().unwrap(),
@@ -265,7 +262,12 @@ pub(crate) async fn decrypt(
         let curve = SecureFiniteFieldEllipticCurve {
             a: req_body.private_key.curve.a,
             prime: req_body.private_key.curve.prime.parse().unwrap(),
-            order_of_subgroup: req_body.private_key.curve.order_of_subgroup.parse().unwrap(),
+            order_of_subgroup: req_body
+                .private_key
+                .curve
+                .order_of_subgroup
+                .parse()
+                .unwrap(),
             generator,
         };
 
