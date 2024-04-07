@@ -46,6 +46,9 @@ import {ClientData} from "../models/client";
     templateUrl: "./menezes-vanstone.component.html",
     styleUrl: "./menezes-vanstone.component.scss"
 })
+/**
+ * Component for the Menezes Vanstone Encryption and Decryption.
+ */
 export class MenezesVanstoneComponent {
     public modulusWidth: number = 128;
     public numberSystem: number = 55296;
