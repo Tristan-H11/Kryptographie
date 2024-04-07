@@ -6,6 +6,7 @@ import {firstValueFrom} from "rxjs";
 import {SingleMessageModel} from "../../models/SingleMessageModel";
 import {MvKeygenConfig} from "../../models/mv-keygen-config";
 import {MvCipherText, MvDecryptRequest, MvEncryptRequest, MvKeyPair} from "../../models/mv-beans";
+import {MvConfigurationData} from "../../models/mv-configuration-data";
 
 @Injectable({
     providedIn: "root"
@@ -24,7 +25,7 @@ export class MvBackendRequestService {
     /**
      * Fragt den Post Endpunkt zum Erstellen eines neuen Schlüsselpaares ab.
      */
-    public async createKeyPair(body: MvKeygenConfig): Promise<MvKeyPair> {
+    public async createKeyPair(body: MvConfigurationData): Promise<MvKeyPair> {
         const params = this.getParams();
         const options = {params};
         return firstValueFrom(

@@ -36,12 +36,14 @@ import {SimpleDialogComponent} from "../simple-dialog/simple-dialog.component";
  */
 export class RsaComponent {
     // Value for configuration Data which is provided by the global state management service
-    private configurationData = this.stateService.getConfigurationData();
+    private configurationData = this.stateService.getConfigurationDataForRSA();
 
-    constructor(private stateService: StateManagementService,
-                public dialog: MatDialog,
-                private backendRequestService: RsaBackendRequestService,
-                private snackBar: MatSnackBar) {
+    constructor(
+        private stateService: StateManagementService,
+        public dialog: MatDialog,
+        private backendRequestService: RsaBackendRequestService,
+        private snackBar: MatSnackBar
+    ) {
     }
 
     /**
@@ -143,7 +145,7 @@ export class RsaComponent {
      * @param client
      */
     public getModulus(client: Client): string {
-        const keyPairSignal = this.stateService.getClientKey(client);
+        const keyPairSignal = this.stateService.getClientKeyForRSA(client);
         return keyPairSignal().modulus || "";
     }
 
@@ -153,7 +155,7 @@ export class RsaComponent {
      * @param modulus
      */
     public setModulus(client: Client, modulus: string): void {
-        const keyPairSignal = this.stateService.getClientKey(client);
+        const keyPairSignal = this.stateService.getClientKeyForRSA(client);
         keyPairSignal.update(keyPair => ({
             ...keyPair,
             modulus
@@ -165,7 +167,7 @@ export class RsaComponent {
      * @param client
      */
     public getExponent(client: Client): string {
-        const keyPairSignal = this.stateService.getClientKey(client);
+        const keyPairSignal = this.stateService.getClientKeyForRSA(client);
         return keyPairSignal().e || "";
     }
 
@@ -175,7 +177,7 @@ export class RsaComponent {
      * @param value
      */
     public setExponent(client: Client, value: string): void {
-        const keyPair = this.stateService.getClientKey(client);
+        const keyPair = this.stateService.getClientKeyForRSA(client);
         keyPair.update(keyPair => ({
             ...keyPair,
             e: value
@@ -187,7 +189,7 @@ export class RsaComponent {
      * @param client
      */
     public getBlockSizePub(client: Client): string {
-        const keyPairSignal = this.stateService.getClientKey(client);
+        const keyPairSignal = this.stateService.getClientKeyForRSA(client);
         return keyPairSignal().block_size_pub || "";
     }
 
@@ -235,7 +237,7 @@ export class RsaComponent {
         this.backendRequestService.createKeyPair(requestContent).then(
             (keyPair) => {
                 const duration = Date.now() - startTime;
-                let entry = this.stateService.getClientKey(client);
+                let entry = this.stateService.getClientKeyForRSA(client);
                 if (entry) {
                     entry.set(keyPair);
                 } else {

@@ -45,7 +45,7 @@ export class ClientComponent implements OnInit {
 
     protected signatureVerificationCalculated: boolean = false;
     protected signatureValid: boolean = false;
-    private configurationData = this.stateService.getConfigurationData();
+    private configurationData = this.stateService.getConfigurationDataForRSA();
 
     /**
      * Konstruktor der Komponente.
@@ -173,7 +173,7 @@ export class ClientComponent implements OnInit {
     public encrypt() {
         const requestBody = new RsaEncryptDecryptRequest(
             this.plainText,
-            this.stateService.getClientKey(this.sendingTo)(),
+            this.stateService.getClientKeyForRSA(this.sendingTo)(),
             this.configurationData().number_system_base
         );
         const start = Date.now();
@@ -242,7 +242,7 @@ export class ClientComponent implements OnInit {
         const requestBody = new RsaVerifyRequest(
             this.plainText,
             this.signature,
-            this.stateService.getClientKey(this.receivedFrom)(),
+            this.stateService.getClientKeyForRSA(this.receivedFrom)(),
             this.configurationData().number_system_base
         );
         const start = Date.now();
@@ -262,7 +262,7 @@ export class ClientComponent implements OnInit {
         const requestBody = new RsaVerifyRequest(
             this.cipherText,
             this.signature,
-            this.stateService.getClientKey(this.receivedFrom)(),
+            this.stateService.getClientKeyForRSA(this.receivedFrom)(),
             this.configurationData().number_system_base
         );
         const start = Date.now();
@@ -352,7 +352,7 @@ export class ClientComponent implements OnInit {
         this._client = this.stateService.getClientByName(name);
         this.sendingTo = this.getOtherClients().values().next().value;
         console.log(this.client);
-        this._clientKeyPair = this.stateService.getClientKey(this.client);
+        this._clientKeyPair = this.stateService.getClientKeyForRSA(this.client);
     }
 
     /**

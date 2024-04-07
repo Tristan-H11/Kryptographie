@@ -3,6 +3,8 @@ import {Client} from "../../models/client";
 import {RsaKeyPair} from "../../models/rsa-key-pair";
 import {MessageSignatureContainer} from "../../models/message-signature-container";
 import {RsaConfigurationData} from "../../models/rsa-configuration-data";
+import {MvConfigurationData} from "../../models/mv-configuration-data";
+import {MvKeyPair} from "../../models/mv-beans";
 
 @Injectable({
     providedIn: "root"
@@ -13,9 +15,15 @@ export class StateManagementService {
 
     private configurationDataRSA = signal(RsaConfigurationData.createDefaultConfigurationDataForRSA());
 
-    private clientKeyMap = new Map<Client, WritableSignal<RsaKeyPair>>();
+    private configurationDataMV = signal(MvConfigurationData.createDefaultConfigurationDataForMV());
 
-    private clientMessageMap = new Map<Client, WritableSignal<MessageSignatureContainer>>();
+    private clientKeyMapRSA = new Map<Client, WritableSignal<RsaKeyPair>>();
+
+    private clientKeyMapMV = new Map<Client, WritableSignal<MvKeyPair>>();
+
+    private clientMessageMapRSA = new Map<Client, WritableSignal<MessageSignatureContainer>>();
+
+    private clientMessageMapMV = new Map<Client, WritableSignal<MessageSignatureContainer>>();
 
     private clients = new Set<Client>();
 
@@ -52,8 +60,8 @@ export class StateManagementService {
         let client = new Client(clientName);
         console.log("Registering client " + client.name + " at all services");
         this.clients.add(client);
-        this.clientKeyMap.set(client, signal(RsaKeyPair.createEmptyKeyPair()));
-        this.clientMessageMap.set(client, signal({plaintext: "", ciphertext: "", signature: ""}));
+        this.clientKeyMapRSA.set(client, signal(RsaKeyPair.createEmptyKeyPair()));
+        this.clientMessageMapRSA.set(client, signal({plaintext: "", ciphertext: "", signature: ""}));
     }
 
     /**
@@ -81,25 +89,40 @@ export class StateManagementService {
      */
     public deleteClient(client: Client): void {
         this.clients.delete(client);
-        this.clientKeyMap.delete(client);
-        this.clientMessageMap.delete(client);
+        this.clientKeyMapRSA.delete(client);
+        this.clientMessageMapRSA.delete(client);
     }
 
     /**
      * Gibt die Konfigurationsdaten zurück.
      */
-    public getConfigurationData() {
+    public getConfigurationDataForRSA() {
         return this.configurationDataRSA;
     }
+    public getConfigurationDataForMV() {
+        return this.configurationDataMV;
+    }
 
-    public getClientKey(client: Client): WritableSignal<RsaKeyPair> {
-        let entry = this.clientKeyMap.get(client);
+    public getClientKeyForRSA(client: Client): WritableSignal<RsaKeyPair> {
+        let entry = this.clientKeyMapRSA.get(client);
         if (entry) {
             return entry;
         } else {
             console.log("Client " + client.name + " is not registered! Returning empty KeyPair and registering client.");
-            this.clientKeyMap.set(client, signal(RsaKeyPair.createEmptyKeyPair()));
-            return this.clientKeyMap.get(client)!; // Wir erstellen es ja in der Zeile davor
+            this.clientKeyMapRSA.set(client, signal(RsaKeyPair.createEmptyKeyPair()));
+            return this.clientKeyMapRSA.get(client)!; // Wir erstellen es ja in der Zeile davor
+        }
+    }
+
+    public getClientKeyForMV(client: Client): WritableSignal<MvKeyPair> {
+        let entry = this.clientKeyMapMV.get(client);
+        if (entry) {
+            return entry;
+        } else {
+            console.log("Client " + client.name + " is not registered! Returning empty KeyPair and registering client.");
+            // todo tristan: methode so anpassen, dass man einen leeren KeyPair zurückgibt ???
+            //this.clientKeyMapMV.set(client, signal(MVKeyPair.createEmptyKeyPair()));
+            return this.clientKeyMapMV.get(client)!; // Wir erstellen es ja in der Zeile davor
         }
     }
 
@@ -107,13 +130,13 @@ export class StateManagementService {
      * Gibt den MessageSignatureContainer für den Client zurück.
      */
     public getClientMessage(client: Client): WritableSignal<MessageSignatureContainer> {
-        let entry = this.clientMessageMap.get(client);
+        let entry = this.clientMessageMapRSA.get(client);
         if (entry) {
             return entry;
         } else {
             console.log("Client " + client.name + " is not registered! Returning empty MessageSignatureContainer and registering client.");
-            this.clientMessageMap.set(client, signal({plaintext: "", ciphertext: "", signature: ""}));
-            return this.clientMessageMap.get(client)!; // Wir erstellen es ja in der Zeile davor
+            this.clientMessageMapRSA.set(client, signal({plaintext: "", ciphertext: "", signature: ""}));
+            return this.clientMessageMapRSA.get(client)!; // Wir erstellen es ja in der Zeile davor
         }
     }
 

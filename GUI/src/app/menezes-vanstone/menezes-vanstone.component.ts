@@ -23,8 +23,12 @@ import {
     MvEncryptRequest,
     MvKeyPair,
 } from "../models/mv-beans";
-import {ClientData} from "../models/client";
+import {Client, ClientData} from "../models/client";
 import {StateManagementService} from "../services/management/state-management.service";
+import {MatDialog, MatDialogRef} from "@angular/material/dialog";
+import {MatSnackBar} from "@angular/material/snack-bar";
+import {MvConfigurationData} from "../models/mv-configuration-data";
+import {LoadingDialogComponent} from "../loading-dialog/loading-dialog.component";
 
 @Component({
     selector: "app-menezes-vanstone",
@@ -53,13 +57,8 @@ import {StateManagementService} from "../services/management/state-management.se
  * Component for the Menezes Vanstone Encryption and Decryption.
  */
 export class MenezesVanstoneComponent {
-    public modulusWidth: number = 128;
-    public numberSystem: number = 55296;
-    public millerRabinIterations: number = 100;
-    public coefficientA: number = 5;
-    public random_seed: number= 3;
-
-    private configurationData = this.stateService.getConfigurationData();
+    // Value for configuration Data which is provided by the global state management service
+    private configurationData = this.stateService.getConfigurationDataForMV();
 
     public clients: ClientData[] =
         [
@@ -137,25 +136,151 @@ export class MenezesVanstoneComponent {
 
     constructor(
         private stateService: StateManagementService,
-        private backendRequestService: MvBackendRequestService) {
+        public dialog: MatDialog,
+        private backendRequestService: MvBackendRequestService,
+        private snackBar: MatSnackBar
+    ) {
     }
 
-    public generateKeys(client: string) {
-        let config: MvKeygenConfig = {
-            modulus_width: this.modulusWidth,
-            miller_rabin_rounds: this.millerRabinIterations,
-            coef_a: this.coefficientA,
-            random_seed: this.random_seed
+    /**
+     * Returns the modulus width for the Menezes Vanstone key pair.
+     */
+    public get modulusWidth(): number {
+        return this.configurationData().modulus_width;
+    }
+
+    /**
+     * Sets the modulus width for the Menezes Vanstone key pair.
+     * @param modulus_width
+     */
+    public set modulusWidth(modulus_width: number) {
+        this.configurationData.update(value => ({
+            ...value,
+            modulus_width
+        }));
+    }
+
+    /**
+     * Returns the number system base for the Menezes Vanstone key pair.
+     */
+    public get numberSystem(): number {
+        return this.configurationData().numberSystem;
+    }
+
+    /**
+     * Sets the number system base for the Menezes Vanstone key pair.
+     * @param value
+     */
+    public set numberSystem(value: number) {
+        this.configurationData.update(data => ({
+            ...data,
+            numberSystem: value
+        }));
+    }
+
+    /**
+     * Returns the number of Miller-Rabin iterations for the Menezes Vanstone key pair.
+     */
+    public get millerRabinIterations(): number {
+        return this.configurationData().millerRabinIterations;
+    }
+
+    /**
+     * Sets the number of Miller-Rabin iterations for the Menezes Vanstone key pair.
+     * @param value
+     */
+    public set millerRabinIterations(value: number) {
+        this.configurationData.update(data => ({
+            ...data,
+            millerRabinIterations: value
+        }));
+    }
+
+    /**
+     * Returns the coefficient A for the Menezes Vanstone key pair.
+     */
+    public get coefficientA(): number {
+        return this.configurationData().coefficientA;
+    }
+
+    /**
+     * Sets the coefficient A for the Menezes Vanstone key pair.
+     * @param value
+     */
+    public set coefficientA(value: number) {
+        this.configurationData.update(data => ({
+            ...data,
+            coefficientA: value
+        }));
+    }
+
+    /**
+     * Returns the random seed for the Menezes Vanstone key pair.
+     */
+    public get randomSeed(): number {
+        return this.configurationData().random_seed;
+    }
+
+    /**
+     * Sets the random seed for the Menezes Vanstone key pair.
+     * @param value
+     */
+    public set randomSeed(value: number) {
+        this.configurationData.update(data => ({
+            ...data,
+            random_seed: value
+        }));
+    }
+
+    /**
+     * Generates a Menezes Vanstone key pair for the given client.
+     * @param client
+     */
+    public generateKeys(client: Client): void {
+        let requestContent = new MvConfigurationData(
+            this.modulusWidth,
+            this.numberSystem,
+            this.millerRabinIterations,
+            this.coefficientA,
+            this.randomSeed
+        );
+            this.generateKeyPair(requestContent, client);
         };
-        this.backendRequestService.createKeyPair(config).then(key => {
-            if (client === "Alice") {
-                this.clients[0].keyPair = copyMvKeyPair(key);
-            } else {
-                this.clients[1].keyPair = copyMvKeyPair(key);
-            }
-            console.log("Generated key pair for " + client);
-            console.log(key);
-            console.log(this.clients);
+
+    public generateKeyPair(requestContent: MvConfigurationData, client: Client): void {
+        let loadingDialog = this.openLoadDialog();
+        const startTime = Date.now();
+        this.backendRequestService.createKeyPair(requestContent).then(
+            // todo tristan keyPair is not defined and should be defined, after that, the code should work
+        //     keyPair) => {
+        //         const duration = Date.now() - startTime;
+        //         let entry = this.stateService.getClientKeyForMV(client);
+        //         if(entry) {
+        //             entry.set(keyPair);
+        //         } else {
+        //             console.log("Client " + client.name + " is not registered! Returning empty KeyPair and registering client.");
+        //         }
+        //         loadingDialog.close();
+        //         this.showSnackbar("Schlüsselpaar für " + client.name + " generiert. Dauer: " + duration + "ms");
+        //     }
+        );
+    }
+
+    /**
+     * Shows a snackbar with the given message.
+     */
+    private showSnackbar(message: string) {
+        this.snackBar.open(message, "Ok", {
+            duration: 5000,
+        });
+    }
+
+    /**
+     * Open a dialog to show a loading spinner.
+     */
+    public openLoadDialog(): MatDialogRef<LoadingDialogComponent> {
+        return this.dialog.open(LoadingDialogComponent, {
+            disableClose: true // Verhindert das Schließen durch den Benutzer
         });
     }
 
