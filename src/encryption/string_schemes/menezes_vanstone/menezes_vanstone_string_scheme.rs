@@ -193,7 +193,7 @@ impl AsymmetricDecryptor<MenezesVanstoneStringScheme> for MenezesVanstoneStringS
 
         // Die Zahlen in eine Liste von MenezesVanstoneCiphertext mappen
         let mut ciphertext_list: Vec<MenezesVanstoneCiphertext> = Vec::new();
-        for mut i in (0..big_int_vec.len()).step_by(2) {
+        for i in (0..big_int_vec.len()).step_by(2) {
             // TODO Aufhübschen
             let first = big_int_vec[i].clone();
             let second = if i + 1 < big_int_vec.len() {
@@ -229,12 +229,9 @@ impl AsymmetricDecryptor<MenezesVanstoneStringScheme> for MenezesVanstoneStringS
 
 #[cfg(test)]
 mod tests {
+    use rand::distributions::{Uniform};
     use rand::Rng;
 
-    use crate::encryption::core::menezes_vanstone::keys::{
-        MenezesVanstonePrivateKey, MenezesVanstonePublicKey,
-    };
-    use crate::math_core::ecc::secure_finite_field_elliptic_curve::SecureFiniteFieldEllipticCurve;
     use crate::math_core::number_theory::number_theory_service::NumberTheoryServiceSpeed::Fast;
 
     use super::*;
@@ -253,14 +250,18 @@ mod tests {
         let public_key = key_pair.public_key;
         let private_key = key_pair.private_key;
 
-        let plaintext = "DAS IST EIN TEST \n HEHE \n";
+        // Es soll ein zufälliger String erzeugt werden, der zwischen 0 und 400 Zeichen lang ist.
+        let random_string_length = rand::thread_rng().gen_range(0..400);
+        // siehe https://stackoverflow.com/a/54277357
+        let plaintext: String = rand::thread_rng()
+            .sample_iter(Uniform::new(char::from(0), char::from_u32(radix).unwrap())) // Sollte nicht panicen, weil radix immer innerhalb der Unicode-Zeichen liegt
+            .take(random_string_length)
+            .collect();
 
         let service = NumberTheoryService::new(Fast);
         let ciphertext = MenezesVanstoneStringScheme::encrypt(&public_key, &plaintext, service);
-        println!("{:?}", ciphertext);
         let decrypted_plaintext =
             MenezesVanstoneStringScheme::decrypt(&private_key, &ciphertext, service);
-        println!("{:?}", decrypted_plaintext);
         assert_eq!(plaintext, decrypted_plaintext);
     }
 }
