@@ -12,7 +12,7 @@ use crate::encryption::string_schemes::decimal_unicode_schemes::from_decimal_blo
 use crate::encryption::string_schemes::decimal_unicode_schemes::keys::DecimalUnicodeConversionSchemeKey;
 use crate::encryption::string_schemes::decimal_unicode_schemes::to_decimal_block_scheme::ToDecimalBlockScheme;
 use crate::encryption::string_schemes::menezes_vanstone::keys::{
-    MenezesVanstoneStringPrivateKey, MenezesVanstoneStringPublicKey,
+    MenezesVanstoneStringKeyPair, MenezesVanstoneStringPrivateKey, MenezesVanstoneStringPublicKey,
 };
 use crate::encryption::symmetric_encryption_types::{SymmetricDecryptor, SymmetricEncryptor};
 use crate::math_core::ecc::finite_field_elliptic_curve_point::FiniteFieldEllipticCurvePoint;
@@ -31,7 +31,52 @@ pub struct MvStringCiphertext {
     pub points: Vec<FiniteFieldEllipticCurvePoint>,
 }
 
-// TODO: KeyGen für MenezesVanstoneScheme implementieren
+impl MenezesVanstoneStringScheme {
+    pub fn generate_keypair(
+        n: i32,
+        modul_width: u32,
+        miller_rabin_iterations: u32,
+        random_seed: u32,
+        radix: u32,
+    ) -> MenezesVanstoneStringKeyPair {
+        assert_ne!(n, 0, "n darf nicht 0 sein, ist aber {}.", n);
+        assert!(
+            modul_width > 3,
+            "Die Modulbreite muss mindestens 4 Bit betragen, ist aber {}.",
+            modul_width
+        );
+        assert_ne!(
+            radix, 0,
+            "Die Basis des Zeichensatzes muss größer als 0 sein, ist aber {}.",
+            radix
+        );
+
+        let key_pair = MenezesVanstoneScheme::generate_keypair(
+            n,
+            modul_width,
+            miller_rabin_iterations,
+            random_seed,
+        );
+
+        let public_key = key_pair.public_key;
+        let private_key = key_pair.private_key;
+
+        let public_key = MenezesVanstoneStringPublicKey {
+            mv_key: public_key,
+            radix,
+        };
+
+        let private_key = MenezesVanstoneStringPrivateKey {
+            mv_key: private_key,
+            radix,
+        };
+
+        MenezesVanstoneStringKeyPair {
+            public_key,
+            private_key,
+        }
+    }
+}
 
 impl<'a> Encryptor<MenezesVanstoneStringScheme> for MenezesVanstoneStringScheme {
     type Input = str;
