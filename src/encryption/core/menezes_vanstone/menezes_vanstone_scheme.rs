@@ -168,7 +168,6 @@ impl AsymmetricDecryptor<MenezesVanstoneScheme> for MenezesVanstoneScheme {
 
 #[cfg(test)]
 mod tests {
-    use crate::math_core::ecc::secure_finite_field_elliptic_curve::SecureFiniteFieldEllipticCurve;
     use crate::math_core::number_theory::number_theory_service::NumberTheoryServiceSpeed::Fast;
     use rand::Rng;
 
@@ -176,29 +175,21 @@ mod tests {
 
     #[test]
     fn test_menezes_vanstone_encryption_decryption() {
-        let curve = SecureFiniteFieldEllipticCurve::new(5.into(), 32, 40);
+        // Die Parameter sollen hier für jeden Testlauf zufällig gewählt werden, damit flakiness
+        // eher auffällt.
+        let radix = rand::thread_rng().gen_range(240..55296);
+        let n = rand::thread_rng().gen_range(1..30);
+        let modul_width = rand::thread_rng().gen_range(4..256);
+        let random_seed = rand::thread_rng().gen_range(1..1000);
+        let key_pair = MenezesVanstoneScheme::generate_keypair(n, modul_width, 40, random_seed);
 
-        let (mut x, mut y);
-        loop {
-            let random = rand::thread_rng().gen_range(1..58);
-            x = BigInt::from(random);
-            y = curve.generator.multiply(&x, &curve);
-            if !y.x.is_zero() && !y.y.is_zero() {
-                break;
-            }
-        }
+        let public_key = key_pair.public_key;
+        let private_key = key_pair.private_key;
 
-        let public_key = MenezesVanstonePublicKey {
-            curve: curve.clone(),
-            generator: curve.generator.clone(),
-            y,
-        };
-
-        let private_key = MenezesVanstonePrivateKey { curve, x };
-
+        // 3 und 5 sind definitiv kleiner als jeder generierte 4Bit Modul
         let plaintext = MenezesVanstonePlaintext {
-            first: 96.into(),
-            second: 96.into(),
+            first: 3.into(),
+            second: 5.into(),
         };
 
         let service = NumberTheoryService::new(Fast);
@@ -210,30 +201,21 @@ mod tests {
 
     #[test]
     fn test_encryption_decryption_fails_when_message_greater_prime() {
-        let curve = SecureFiniteFieldEllipticCurve::new(5.into(), 8, 40);
+        // Die Parameter sollen hier für jeden Testlauf zufällig gewählt werden, damit flakiness
+        // eher auffällt.
+        let radix = rand::thread_rng().gen_range(240..55296);
+        let n = rand::thread_rng().gen_range(1..30);
+        let modul_width = rand::thread_rng().gen_range(4..256);
+        let random_seed = rand::thread_rng().gen_range(1..1000);
+        let key_pair = MenezesVanstoneScheme::generate_keypair(n, modul_width, 40, random_seed);
 
-        let (mut x, mut y);
-        loop {
-            let random = rand::thread_rng().gen_range(1..255);
-            x = BigInt::from(random);
-            y = curve.generator.multiply(&x, &curve);
-            if !y.x.is_zero() && !y.y.is_zero() {
-                break;
-            }
-        }
+        let public_key = key_pair.public_key;
+        let private_key = key_pair.private_key;
 
-        let public_key = MenezesVanstonePublicKey {
-            curve: curve.clone(),
-            generator: curve.generator.clone(),
-            y,
-        };
-
-        let private_key = MenezesVanstonePrivateKey { curve, x };
-
-        // 300 ist größer als 2^8
+        let value_bigger_prime = BigInt::from(2).pow(modul_width) + 1;
         let plaintext = MenezesVanstonePlaintext {
-            first: 300.into(),
-            second: 300.into(),
+            first: value_bigger_prime.clone(),
+            second: value_bigger_prime,
         };
 
         let service = NumberTheoryService::new(Fast);
