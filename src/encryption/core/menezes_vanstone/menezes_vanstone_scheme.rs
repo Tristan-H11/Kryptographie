@@ -70,7 +70,6 @@ impl MenezesVanstoneScheme {
 
         let public_key = MenezesVanstonePublicKey {
             curve: curve.clone(),
-            generator: curve.generator.clone(),
             y,
         };
 
@@ -125,7 +124,7 @@ impl AsymmetricEncryptor<MenezesVanstoneScheme> for MenezesVanstoneScheme {
                 break;
             }
         }
-        let a = key.generator.multiply(&k, curve);
+        let a = key.curve.generator.multiply(&k, curve);
         let b1 = (c1 * m1) % prime;
         let b2 = (c2 * m2) % prime;
 

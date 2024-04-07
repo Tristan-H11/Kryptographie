@@ -12,7 +12,6 @@ use crate::math_core::ecc::secure_finite_field_elliptic_curve::SecureFiniteField
 #[derive(Clone, Debug)]
 pub struct MenezesVanstonePublicKey {
     pub curve: SecureFiniteFieldEllipticCurve,
-    pub generator: FiniteFieldEllipticCurvePoint,
     pub y: FiniteFieldEllipticCurvePoint,
 }
 

@@ -147,7 +147,6 @@ pub(crate) async fn encrypt(
 
         let public_key = MenezesVanstonePublicKey {
             curve,
-            generator,
             y,
         };
 
