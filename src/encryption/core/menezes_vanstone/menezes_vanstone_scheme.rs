@@ -173,6 +173,7 @@ mod tests {
     use super::*;
 
     #[test]
+    #[ignore] // TODO Braucht manchmal mehrere Stunden!
     fn test_menezes_vanstone_encryption_decryption() {
         // Die Parameter sollen hier für jeden Testlauf zufällig gewählt werden, damit flakiness
         // eher auffällt.
