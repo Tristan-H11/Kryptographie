@@ -185,9 +185,9 @@ pub(crate) async fn encrypt(
 
     call_checked_with_parsed_big_ints(|| {
         let generator = FiniteFieldEllipticCurvePoint {
-            x: req_body.public_key.generator.x.parse().unwrap(),
-            y: req_body.public_key.generator.y.parse().unwrap(),
-            is_infinite: req_body.public_key.generator.is_infinite,
+            x: req_body.public_key.curve.generator.x.parse().unwrap(),
+            y: req_body.public_key.curve.generator.y.parse().unwrap(),
+            is_infinite: req_body.public_key.curve.generator.is_infinite,
         };
 
         let curve = SecureFiniteFieldEllipticCurve {
