@@ -8,10 +8,12 @@ use crate::encryption::asymmetric_encryption_types::{
     AsymmetricDecryptor, AsymmetricEncryptionScheme, AsymmetricEncryptor,
 };
 use crate::encryption::core::menezes_vanstone::keys::{
-    MenezesVanstonePrivateKey, MenezesVanstonePublicKey,
+    MenezesVanstoneKeyPair, MenezesVanstonePrivateKey, MenezesVanstonePublicKey,
 };
 use crate::encryption::encryption_types::{Decryptor, EncryptionScheme, Encryptor};
 use crate::math_core::ecc::finite_field_elliptic_curve_point::FiniteFieldEllipticCurvePoint;
+use crate::math_core::ecc::secure_finite_field_elliptic_curve::SecureFiniteFieldEllipticCurve;
+use crate::math_core::number_theory::number_theory_service::NumberTheoryServiceSpeed::Fast;
 use crate::math_core::number_theory::number_theory_service::{
     NumberTheoryService, NumberTheoryServiceTrait,
 };
@@ -37,7 +39,49 @@ impl EncryptionScheme for MenezesVanstoneScheme {}
 
 impl AsymmetricEncryptionScheme for MenezesVanstoneScheme {}
 
-// TODO: KeyGen für MenezesVanstoneScheme implementieren
+impl MenezesVanstoneScheme {
+    pub fn generate_keypair(
+        n: i32,
+        modul_width: u32,
+        miller_rabin_iterations: u32,
+        random_seed: u32,
+    ) -> MenezesVanstoneKeyPair {
+        assert_ne!(n, 0, "n darf nicht 0 sein, ist aber {}", n); // TODO error Handling
+        assert!(
+            modul_width > 3,
+            "Die Modulbreite muss mindestens 4 Bit betragen, ist aber {}",
+            modul_width
+        ); // TODO error Handling
+
+        let curve =
+            SecureFiniteFieldEllipticCurve::new(n.into(), modul_width, miller_rabin_iterations);
+
+        let prng = PseudoRandomNumberGenerator::new(random_seed, NumberTheoryService::new(Fast)); // TODO übergeben
+        let counter = RelaxedCounter::new(1);
+        let order_of_subgroup = &curve.order_of_subgroup;
+        let (mut x, mut y);
+        loop {
+            x = prng.take(&1.into(), &order_of_subgroup.decrement(), &counter);
+            y = curve.generator.multiply(&x, &curve);
+            if !y.x.is_zero() && !y.y.is_zero() {
+                break;
+            }
+        }
+
+        let public_key = MenezesVanstonePublicKey {
+            curve: curve.clone(),
+            generator: curve.generator.clone(),
+            y,
+        };
+
+        let private_key = MenezesVanstonePrivateKey { curve, x };
+
+        MenezesVanstoneKeyPair {
+            public_key,
+            private_key,
+        }
+    }
+}
 
 impl Encryptor<MenezesVanstoneScheme> for MenezesVanstoneScheme {
     type Input = MenezesVanstonePlaintext;
