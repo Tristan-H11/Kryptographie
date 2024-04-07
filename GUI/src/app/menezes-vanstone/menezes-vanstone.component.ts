@@ -18,8 +18,10 @@ import {
     copyMvCipherText,
     copyMvKeyPair,
     copyMvPublicKey,
-    MvCipherText, MvDecryptRequest,
-    MvEncryptRequest, MvKeyPair,
+    MvCipherText,
+    MvDecryptRequest,
+    MvEncryptRequest,
+    MvKeyPair,
 } from "../models/mv-beans";
 import {ClientData} from "../models/client";
 import {StateManagementService} from "../services/management/state-management.service";
@@ -55,6 +57,7 @@ export class MenezesVanstoneComponent {
     public numberSystem: number = 55296;
     public millerRabinIterations: number = 100;
     public coefficientA: number = 5;
+    public random_seed: number= 3;
 
     private configurationData = this.stateService.getConfigurationData();
 
@@ -64,12 +67,31 @@ export class MenezesVanstoneComponent {
                 name: "Alice",
                 keyPair: {
                     public_key: {
-                        curve: {a: -25, b: 0, prime: "259421157018863391010844302469063884861"},
-                        generator: {x: "152198469913648308717544634828661961231", y: "50296851635441247077790719368115682846"},
-                        y: {x: "26370934085012164485153092381593646122", y: "126290671313284822425335475919650022666"}
+                        curve: {
+                            a: -25, prime: "259421157018863391010844302469063884861",
+                            generator: {
+                                x: "152198469913648308717544634828661961231",
+                                y: "50296851635441247077790719368115682846",
+                                is_infinite: false
+                            },
+                            order_of_subgroup: "2"
+                        },
+                        y: {
+                            x: "26370934085012164485153092381593646122",
+                            y: "126290671313284822425335475919650022666",
+                            is_infinite: false
+                        }
                     },
                     private_key: {
-                        curve: {a: -25, b: 0, prime: "259421157018863391010844302469063884861"},
+                        curve: {
+                            a: -25, prime: "259421157018863391010844302469063884861",
+                            generator: {
+                                x: "152198469913648308717544634828661961231",
+                                y: "50296851635441247077790719368115682846",
+                                is_infinite: false
+                            },
+                            order_of_subgroup: "2"
+                        },
                         x: "12401522966815986254216934185370504355"
                     }
                 },
@@ -80,12 +102,31 @@ export class MenezesVanstoneComponent {
                 name: "Bob",
                 keyPair: {
                     public_key: {
-                        curve: {a: -25, b: 0, prime: "259421157018863391010844302469063884861"},
-                        generator: {x: "152198469913648308717544634828661961231", y: "50296851635441247077790719368115682846"},
-                        y: {x: "26370934085012164485153092381593646122", y: "126290671313284822425335475919650022666"}
+                        curve: {
+                            a: -25, prime: "259421157018863391010844302469063884861",
+                            generator: {
+                                x: "152198469913648308717544634828661961231",
+                                y: "50296851635441247077790719368115682846",
+                                is_infinite: false
+                            },
+                            order_of_subgroup: "2"
+                        },
+                        y: {
+                            x: "26370934085012164485153092381593646122",
+                            y: "126290671313284822425335475919650022666",
+                            is_infinite: false
+                        }
                     },
                     private_key: {
-                        curve: {a: -25, b: 0, prime: "259421157018863391010844302469063884861"},
+                        curve: {
+                            a: -25, prime: "259421157018863391010844302469063884861",
+                            generator: {
+                                x: "152198469913648308717544634828661961231",
+                                y: "50296851635441247077790719368115682846",
+                                is_infinite: false
+                            },
+                            order_of_subgroup: "2"
+                        },
                         x: "12401522966815986254216934185370504355"
                     }
                 },
@@ -103,7 +144,8 @@ export class MenezesVanstoneComponent {
         let config: MvKeygenConfig = {
             modulus_width: this.modulusWidth,
             miller_rabin_rounds: this.millerRabinIterations,
-            coef_a: this.coefficientA
+            coef_a: this.coefficientA,
+            random_seed: this.random_seed
         };
         this.backendRequestService.createKeyPair(config).then(key => {
             if (client === "Alice") {
@@ -128,7 +170,7 @@ export class MenezesVanstoneComponent {
         };
         this.backendRequestService.encrypt(request).then(ciphertext => {
             client.ciphertext = copyMvCipherText(ciphertext);
-            console.log("Encrypted message: ", JSON.stringify(ciphertext))
+            console.log("Encrypted message: ", JSON.stringify(ciphertext));
         });
     }
 
@@ -138,7 +180,7 @@ export class MenezesVanstoneComponent {
             private_key: copyMvKeyPair(client.keyPair).private_key,
             cipher_text: copyMvCipherText(client.ciphertext),
             radix: this.numberSystem
-        }
+        };
         this.backendRequestService.decrypt(request).then(plaintext => {
             client.plaintext = plaintext.message;
         });
@@ -149,7 +191,23 @@ export class MenezesVanstoneComponent {
         let client = (name === "Alice") ? this.clients[0] : this.clients[1];
         let partner = (name === "Alice") ? this.clients[1] : this.clients[0];
         partner.ciphertext = copyMvCipherText(client.ciphertext);
+        client.plaintext = "";
+        client.ciphertext = {encrypted_message: "", points: []};
+    }
+
+    public clearFields(name: string) {
+        let client = (name === "Alice") ? this.clients[0] : this.clients[1];
+        client.plaintext = "";
+        client.ciphertext = {encrypted_message: "", points: []};
     }
 
     protected readonly JSON = JSON;
+
+    public calcMinimumBitsize(): number {
+        return Math.ceil(Math.log2(this.numberSystem));
+    }
+
+    public calcMaxNumbersystem(): number {
+        return 2 ** this.modulusWidth;
+    }
 }

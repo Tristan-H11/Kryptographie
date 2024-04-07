@@ -12,7 +12,7 @@ use crate::encryption::string_schemes::decimal_unicode_schemes::from_decimal_blo
 use crate::encryption::string_schemes::decimal_unicode_schemes::keys::DecimalUnicodeConversionSchemeKey;
 use crate::encryption::string_schemes::decimal_unicode_schemes::to_decimal_block_scheme::ToDecimalBlockScheme;
 use crate::encryption::string_schemes::menezes_vanstone::keys::{
-    MenezesVanstoneStringPrivateKey, MenezesVanstoneStringPublicKey,
+    MenezesVanstoneStringKeyPair, MenezesVanstoneStringPrivateKey, MenezesVanstoneStringPublicKey,
 };
 use crate::encryption::symmetric_encryption_types::{SymmetricDecryptor, SymmetricEncryptor};
 use crate::math_core::ecc::finite_field_elliptic_curve_point::FiniteFieldEllipticCurvePoint;
@@ -31,7 +31,52 @@ pub struct MvStringCiphertext {
     pub points: Vec<FiniteFieldEllipticCurvePoint>,
 }
 
-// TODO: KeyGen für MenezesVanstoneScheme implementieren
+impl MenezesVanstoneStringScheme {
+    pub fn generate_keypair(
+        n: i32,
+        modul_width: u32,
+        miller_rabin_iterations: u32,
+        random_seed: u32,
+        radix: u32,
+    ) -> MenezesVanstoneStringKeyPair {
+        assert_ne!(n, 0, "n darf nicht 0 sein, ist aber {}.", n);
+        assert!(
+            modul_width > 3,
+            "Die Modulbreite muss mindestens 4 Bit betragen, ist aber {}.",
+            modul_width
+        );
+        assert_ne!(
+            radix, 0,
+            "Die Basis des Zeichensatzes muss größer als 0 sein, ist aber {}.",
+            radix
+        );
+
+        let key_pair = MenezesVanstoneScheme::generate_keypair(
+            n,
+            modul_width,
+            miller_rabin_iterations,
+            random_seed,
+        );
+
+        let public_key = key_pair.public_key;
+        let private_key = key_pair.private_key;
+
+        let public_key = MenezesVanstoneStringPublicKey {
+            mv_key: public_key,
+            radix,
+        };
+
+        let private_key = MenezesVanstoneStringPrivateKey {
+            mv_key: private_key,
+            radix,
+        };
+
+        MenezesVanstoneStringKeyPair {
+            public_key,
+            private_key,
+        }
+    }
+}
 
 impl<'a> Encryptor<MenezesVanstoneStringScheme> for MenezesVanstoneStringScheme {
     type Input = str;
@@ -148,7 +193,7 @@ impl AsymmetricDecryptor<MenezesVanstoneStringScheme> for MenezesVanstoneStringS
 
         // Die Zahlen in eine Liste von MenezesVanstoneCiphertext mappen
         let mut ciphertext_list: Vec<MenezesVanstoneCiphertext> = Vec::new();
-        for mut i in (0..big_int_vec.len()).step_by(2) {
+        for i in (0..big_int_vec.len()).step_by(2) {
             // TODO Aufhübschen
             let first = big_int_vec[i].clone();
             let second = if i + 1 < big_int_vec.len() {
@@ -184,59 +229,39 @@ impl AsymmetricDecryptor<MenezesVanstoneStringScheme> for MenezesVanstoneStringS
 
 #[cfg(test)]
 mod tests {
+    use rand::distributions::Uniform;
     use rand::Rng;
 
-    use crate::encryption::core::menezes_vanstone::keys::{
-        MenezesVanstonePrivateKey, MenezesVanstonePublicKey,
-    };
-    use crate::math_core::ecc::secure_finite_field_elliptic_curve::SecureFiniteFieldEllipticCurve;
     use crate::math_core::number_theory::number_theory_service::NumberTheoryServiceSpeed::Fast;
 
     use super::*;
 
     #[test]
     fn test_menezes_vanstone_encryption_decryption() {
-        let curve = SecureFiniteFieldEllipticCurve::new(5.into(), 128, 40);
-
-        // random big int using the rand crate
-        let (mut x, mut y);
-        loop {
-            let random = rand::thread_rng().gen_range(1..5000);
-            x = BigInt::from(random);
-            y = curve.generator.multiply(&x, &curve);
-            if !y.x.is_zero() && !y.y.is_zero() {
-                break;
-            }
-        }
-
-        let public_key = MenezesVanstonePublicKey {
-            curve: curve.clone(),
-            generator: curve.generator.clone(),
-            y,
-        };
-
-        // Der Radix soll hier für jeden Testlauf zufällig gewählt werden, damit die Tests
-        // mehr abfangen können.
+        // Die Parameter sollen hier für jeden Testlauf zufällig gewählt werden, damit flakiness
+        // eher auffällt.
         let radix = rand::thread_rng().gen_range(240..55296);
-        println!("Radix: {}", radix);
-        let public_key = MenezesVanstoneStringPublicKey {
-            mv_key: public_key,
-            radix,
-        };
-        let private_key = MenezesVanstonePrivateKey { curve, x };
-        let private_key = MenezesVanstoneStringPrivateKey {
-            mv_key: private_key,
-            radix,
-        };
+        let n = rand::thread_rng().gen_range(1..30);
+        let modul_width = rand::thread_rng().gen_range(4..256);
+        let random_seed = rand::thread_rng().gen_range(1..1000);
+        let key_pair =
+            MenezesVanstoneStringScheme::generate_keypair(n, modul_width, 40, random_seed, radix);
 
-        let plaintext = "DAS IST EIN TEST \n HEHE \n";
+        let public_key = key_pair.public_key;
+        let private_key = key_pair.private_key;
+
+        // Es soll ein zufälliger String erzeugt werden, der zwischen 0 und 400 Zeichen lang ist.
+        let random_string_length = rand::thread_rng().gen_range(0..400);
+        // siehe https://stackoverflow.com/a/54277357
+        let plaintext: String = rand::thread_rng()
+            .sample_iter(Uniform::new(char::from(0), char::from_u32(radix).unwrap())) // Sollte nicht panicen, weil radix immer innerhalb der Unicode-Zeichen liegt
+            .take(random_string_length)
+            .collect();
 
         let service = NumberTheoryService::new(Fast);
         let ciphertext = MenezesVanstoneStringScheme::encrypt(&public_key, &plaintext, service);
-        println!("{:?}", ciphertext);
         let decrypted_plaintext =
             MenezesVanstoneStringScheme::decrypt(&private_key, &ciphertext, service);
-        println!("{:?}", decrypted_plaintext);
         assert_eq!(plaintext, decrypted_plaintext);
     }
 }
