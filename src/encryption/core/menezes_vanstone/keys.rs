@@ -2,7 +2,7 @@ use num::BigInt;
 
 use crate::encryption::asymmetric_encryption_types::{
     AsymmetricDecryptionKey, AsymmetricEncryptionKey, AsymmetricKey, AsymmetricKeyPair, PrivateKey,
-    PublicKey,
+    PublicKey, SignatureKey, VerificationKey,
 };
 use crate::encryption::core::menezes_vanstone::menezes_vanstone_scheme::MenezesVanstoneScheme;
 use crate::encryption::encryption_types::Key;
@@ -19,6 +19,7 @@ impl Key<MenezesVanstoneScheme> for MenezesVanstonePublicKey {}
 impl AsymmetricKey<MenezesVanstoneScheme> for MenezesVanstonePublicKey {}
 impl PublicKey<MenezesVanstoneScheme> for MenezesVanstonePublicKey {}
 impl AsymmetricEncryptionKey<MenezesVanstoneScheme> for MenezesVanstonePublicKey {}
+impl VerificationKey<MenezesVanstoneScheme> for MenezesVanstonePublicKey {}
 
 #[derive(Clone, Debug)]
 pub struct MenezesVanstonePrivateKey {
@@ -33,6 +34,8 @@ impl AsymmetricKey<MenezesVanstoneScheme> for MenezesVanstonePrivateKey {}
 impl PrivateKey<MenezesVanstoneScheme> for MenezesVanstonePrivateKey {}
 
 impl AsymmetricDecryptionKey<MenezesVanstoneScheme> for MenezesVanstonePrivateKey {}
+
+impl SignatureKey<MenezesVanstoneScheme> for MenezesVanstonePrivateKey {}
 
 #[derive(Clone, Debug)]
 pub struct MenezesVanstoneKeyPair {
