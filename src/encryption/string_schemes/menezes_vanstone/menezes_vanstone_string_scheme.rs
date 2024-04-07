@@ -229,7 +229,7 @@ impl AsymmetricDecryptor<MenezesVanstoneStringScheme> for MenezesVanstoneStringS
 
 #[cfg(test)]
 mod tests {
-    use rand::distributions::{Uniform};
+    use rand::distributions::Uniform;
     use rand::Rng;
 
     use crate::math_core::number_theory::number_theory_service::NumberTheoryServiceSpeed::Fast;

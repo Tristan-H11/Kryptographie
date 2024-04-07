@@ -1,9 +1,8 @@
 use bigdecimal::num_bigint::ToBigInt;
-use bigdecimal::num_traits::Euclid;
+
 use bigdecimal::{BigDecimal, Signed, Zero};
 use num::BigInt;
-use sha2::digest::typenum::private::IsGreaterOrEqualPrivate;
-use std::cmp::Ordering;
+
 use std::ops::{Add, Div, Mul, Sub};
 
 #[derive(Clone, Debug, PartialEq)]
@@ -185,7 +184,6 @@ impl Div for &ComplexNumber {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use num::Integer;
 
     #[test]
     fn complex_test() {
