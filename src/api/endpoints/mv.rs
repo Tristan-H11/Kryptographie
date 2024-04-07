@@ -26,7 +26,7 @@ use crate::math_core::number_theory::number_theory_service::NumberTheoryServiceS
 pub struct MvCreateKeyPairRequest {
     pub modulus_width: u32,
     pub miller_rabin_rounds: u32,
-    pub coef_a: u32,
+    pub coef_a: i32,
     pub random_seed: u32,
 }
 
@@ -148,7 +148,7 @@ pub(crate) async fn create_key_pair(
         "Endpunkt /rsa/createKeyPair wurde aufgerufen, use_fast: {}",
         query.use_fast
     );
-    let _req_body: MvCreateKeyPairRequest = req_body.into_inner();
+    let req_body: MvCreateKeyPairRequest = req_body.into_inner();
     let use_fast = query.use_fast;
 
     let _number_theory_service = match use_fast {
@@ -156,11 +156,17 @@ pub(crate) async fn create_key_pair(
         false => NumberTheoryService::new(Slow),
     };
 
-    // TODO
+    let key_pair = MenezesVanstoneScheme::generate_keypair(
+        req_body.coef_a,
+        req_body.modulus_width,
+        req_body.miller_rabin_rounds,
+        req_body.random_seed,
+    );
 
-    let mv_key_pair = MvKeyPair::default();
+    let response = MvKeyPair::from(key_pair);
 
-    HttpResponse::Ok().json(mv_key_pair)
+
+    HttpResponse::Ok().json(response)
 }
 
 /// Verschlüsselt eine Nachricht mit dem MenezesVanstone-Schema.
