@@ -46,6 +46,20 @@ export class EndpointsService {
     }
 
     /**
+     * Gibt den Endpoint zum MenezesVanstone Signieren einer Nachricht zurück.
+     */
+    public getMvSignEndpoint(): string {
+        return this.domain + this.mvEndpoint + "/sign";
+    }
+
+    /**
+     * Gibt den Endpoint zum MenezesVanstone Verifizieren einer Nachricht zurück.
+     */
+    public getMvVerifyEndpoint(): string {
+        return this.domain + this.mvEndpoint + "/verify";
+    }
+
+    /**
      * Gibt den Endpoint zum Erstellen eines RSA Schlüsselpaares zurück.
      */
     public getRsaCreateKeyPairEndpoint(): string {

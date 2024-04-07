@@ -50,6 +50,22 @@ export interface MvDecryptRequest {
     radix: number;
 }
 
+export interface MvSignRequest {
+    private_key: MvPrivateKey;
+    message: string;
+}
+
+export interface MvSignature {
+    r: string,
+    s: string
+}
+
+export interface MvVerifyRequest {
+    public_key: MvPublicKey;
+    message: string;
+    signature: MvSignature;
+}
+
 export function copyEllipticCurve(curve: EllipticCurve): EllipticCurve {
     return {
         ...curve,
@@ -86,5 +102,27 @@ export function copyMvCipherText(cipherText: MvCipherText): MvCipherText {
     return {
         encrypted_message: cipherText.encrypted_message,
         points: cipherText.points.map(copyEcPoint)
+    };
+}
+
+export function copyMvSignRequest(signRequest: MvSignRequest): MvSignRequest {
+    return {
+        private_key: copyMvPrivateKey(signRequest.private_key),
+        message: signRequest.message
+    };
+}
+
+export function copyMvSignature(signature: MvSignature): MvSignature {
+    return {
+        r: signature.r,
+        s: signature.s
+    };
+}
+
+export function copyMvVerifyRequest(verifyRequest: MvVerifyRequest): MvVerifyRequest {
+    return {
+        public_key: copyMvPublicKey(verifyRequest.public_key),
+        message: verifyRequest.message,
+        signature: copyMvSignature(verifyRequest.signature)
     };
 }
