@@ -1,0 +1,22 @@
+<mat-accordion multi>
+    <div class="encription-container">
+        <mat-expansion-panel expanded>
+            <mat-expansion-panel-header>
+                <mat-panel-title>
+                    <!-- todo, text auslagern in component für besseres databinding (two-way-binding)-->
+                    Wählen Sie eine Art ver Verschlüsselung aus
+                </mat-panel-title>
+            </mat-expansion-panel-header>
+
+            <div class="button-container">
+                <button mat-raised-button routerLink="/menezesVanstone" color="primary">Menezes-Vanstone</button>
+                <button mat-raised-button routerLink="/rsa" color="primary">RSA</button>
+            </div>
+        </mat-expansion-panel>
+    </div>
+</mat-accordion>
+<div class="element-below-accordion-container">
+    <button mat-fab color="primary" (click)="openNameInputDialog()">
+        <mat-icon>person_add</mat-icon>
+    </button>
+</div>

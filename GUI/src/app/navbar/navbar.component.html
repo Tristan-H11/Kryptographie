@@ -1,0 +1,37 @@
+<div class="inner-sidenav-container">
+    <div class="sidenav-header">
+        <div>Encryption Tool</div>
+    </div>
+    <button mat-stroked-button
+            *ngIf="!isTurboMode"
+            (click)="toggleTurboMode()"
+            class="turbo-toggle-button">
+        Aktiver Modus: Normal
+    </button>
+    <button mat-flat-button
+            *ngIf="isTurboMode"
+            (click)="toggleTurboMode()"
+            class="turbo-toggle-button"
+            color="warn">
+        Aktiver Modus: Turbo
+    </button>
+
+    <button mat-stroked-button routerLink="/startseite" class="sidenav-button">Startseite</button>
+    <mat-divider></mat-divider>
+    <div class="sidenav-client-button-container">
+        <button *ngFor="let client of getClients()" color="primary" mat-raised-button
+                routerLink="/client/{{client.name}}">{{ client.name }}
+        </button>
+    </div>
+    <button mat-stroked-button routerLink="/exponentiation" class="sidenav-button">Exponentiation</button>
+    <button mat-stroked-button routerLink="/extendedGcd" class="sidenav-button">Extended GCD</button>
+    <button mat-stroked-button routerLink="/shanks" class="sidenav-button">Shanks</button>
+    <button mat-stroked-button routerLink="/modularInverse" class="sidenav-button">Modulo Inverse</button>
+    <button mat-stroked-button routerLink="/multiplication" class="sidenav-button">Multiplikation</button>
+
+    <img src="assets/bgi_01.jpg" alt="Beschreibung des Bildes" class="navbar-image">
+
+    <div class="sidenav-footer">
+        Integrationsprojekt Kryptographie
+    </div>
+</div>

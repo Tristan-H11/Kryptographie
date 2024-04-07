@@ -23,13 +23,8 @@ import {
     MvEncryptRequest,
     MvKeyPair,
 } from "../models/mv-beans";
-
-interface ClientData {
-    name: string;
-    keyPair: MvKeyPair;
-    plaintext: string;
-    ciphertext: MvCipherText;
-}
+import {ClientData} from "../models/client";
+import {StateManagementService} from "../services/management/state-management.service";
 
 @Component({
     selector: "app-menezes-vanstone",
@@ -54,12 +49,17 @@ interface ClientData {
     templateUrl: "./menezes-vanstone.component.html",
     styleUrl: "./menezes-vanstone.component.scss"
 })
+/**
+ * Component for the Menezes Vanstone Encryption and Decryption.
+ */
 export class MenezesVanstoneComponent {
     public modulusWidth: number = 128;
     public numberSystem: number = 55296;
     public millerRabinIterations: number = 100;
     public coefficientA: number = 5;
     public random_seed: number= 3;
+
+    private configurationData = this.stateService.getConfigurationData();
 
     public clients: ClientData[] =
         [
@@ -135,7 +135,9 @@ export class MenezesVanstoneComponent {
             }
         ];
 
-    constructor(private backendRequestService: MvBackendRequestService) {
+    constructor(
+        private stateService: StateManagementService,
+        private backendRequestService: MvBackendRequestService) {
     }
 
     public generateKeys(client: string) {

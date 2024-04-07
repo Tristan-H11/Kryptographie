@@ -17,8 +17,8 @@ export class RsaConfigurationData {
 		this.number_system_base = number_system_base;
 	}
 
-	public static createDefaultConfigurationData(): RsaConfigurationData {
-		return new RsaConfigurationData(4096, 100, 13, 55296);
+	public static createDefaultConfigurationDataForRSA(): RsaConfigurationData {
+		return new RsaConfigurationData(1024, 10, 13, 55296);
 	}
 }
 
