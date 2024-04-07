@@ -42,7 +42,10 @@ impl FiniteFieldEllipticCurvePoint {
     pub fn add(&self, other: &Self, curve: &SecureFiniteFieldEllipticCurve) -> Self {
         // Liegen die Punkte nicht auf der gleichen Kurve, ist das Ergebnis undefiniert.
         if !curve.has_point(self) || !curve.has_point(other) {
-            panic!("Points are not on the curve");
+            panic!(
+                "Points are not on the curve. P1: {:?}, P2: {:?}, Curve: {:?}",
+                self, other, curve
+            );
         }
 
         // Liegt einer der beiden Punkte im Unendlichen, so ist das Ergebnis der je andere Punkt.
