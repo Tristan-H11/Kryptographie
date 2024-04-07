@@ -21,13 +21,7 @@ import {
     MvCipherText, MvDecryptRequest,
     MvEncryptRequest, MvKeyPair,
 } from "../models/mv-beans";
-
-interface ClientData {
-    name: string;
-    keyPair: MvKeyPair;
-    plaintext: string;
-    ciphertext: MvCipherText;
-}
+import {ClientData} from "../models/client";
 
 @Component({
     selector: "app-menezes-vanstone",
