@@ -1,6 +1,6 @@
 import {NgModule} from "@angular/core";
 import {RouterModule, Routes} from "@angular/router";
-import {HomepageComponent} from "./homepage/homepage.component";
+import {StartseiteComponent} from "./homepage/startseite.component";
 import {ExponentiationComponent} from "./exponentiation/exponentiation.component";
 import {ExtendedGcdComponent} from "./extendedgcd/extended-gcd.component";
 import {ShanksComponent} from "./shanks/shanks.component";
@@ -15,7 +15,7 @@ import {RsaComponent} from "./rsa/rsa.component";
  * The routing takes place in navbar.component.html and homepage.html
  */
 export const routes: Routes = [
-    {path: "homepage", component: HomepageComponent},
+    {path: "homepage", component: StartseiteComponent},
     {path: "client/:client", component: ClientComponent},
     {path: "menezesVanstone", component: MenezesVanstoneComponent},
     {path: "rsa", component: RsaComponent},
@@ -25,7 +25,7 @@ export const routes: Routes = [
     {path: "modularInverse", component: ModularInverseComponent},
     {path: `multiplication`, component: MultiplicationComponent},
     {path: "", redirectTo: "/homepage", pathMatch: "full"},
-    {path: "**", component: HomepageComponent}
+    {path: "**", component: StartseiteComponent}
 ];
 
 @NgModule({

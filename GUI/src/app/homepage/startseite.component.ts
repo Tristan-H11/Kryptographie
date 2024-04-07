@@ -30,13 +30,13 @@ import {RouterLink, RouterLinkActive, RouterOutlet} from "@angular/router";
         RouterLink,
         RouterLinkActive
     ],
-    templateUrl: "./homepage.component.html",
-    styleUrl: "./homepage.component.scss"
+    templateUrl: "./startseite.component.html",
+    styleUrl: "./startseite.component.scss"
 })
 /**
  * Komponente für die Darstellung der Startseite inklusive der Konfigurationsmöglichkeiten.
  */
-export class HomepageComponent implements OnInit{
+export class StartseiteComponent implements OnInit{
 
     constructor() {
     }
