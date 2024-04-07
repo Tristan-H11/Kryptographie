@@ -11,7 +11,7 @@ use crate::encryption::core::menezes_vanstone::keys::{
     MenezesVanstoneKeyPair, MenezesVanstonePrivateKey, MenezesVanstonePublicKey,
 };
 use crate::encryption::core::menezes_vanstone::menezes_vanstone_scheme::{
-    MenezesVanstoneCiphertext, MenezesVanstoneScheme,
+    MenezesVanstoneCiphertext, MenezesVanstoneScheme, MenezesVanstoneSignature,
 };
 use crate::encryption::string_schemes::menezes_vanstone::keys::{
     MenezesVanstoneStringPrivateKey, MenezesVanstoneStringPublicKey,
@@ -133,6 +133,34 @@ pub struct MvDecryptRequest {
     pub private_key: MvPrivateKey,
     pub cipher_text: MvCipherText,
     pub radix: u32,
+}
+
+#[derive(Serialize, Deserialize)]
+pub struct MvSignature {
+    pub r: EcPoint,
+    pub s: String,
+}
+
+impl From<MenezesVanstoneSignature> for MvSignature {
+    fn from(signature: MenezesVanstoneSignature) -> Self {
+        MvSignature {
+            r: EcPoint::from(signature.r),
+            s: signature.s.to_string(),
+        }
+    }
+}
+
+#[derive(Deserialize)]
+pub struct MvSignRequest {
+    pub private_key: MvPrivateKey,
+    pub message: String,
+}
+
+#[derive(Deserialize)]
+pub struct MvVerifyRequest {
+    pub public_key: MvPublicKey,
+    pub message: String,
+    pub signature: MvSignature,
 }
 
 /// Erstellt ein neues Schlüsselpaar für das MenezesVanstone-Schema.
