@@ -26,6 +26,13 @@ export interface MvKeyPair {
     private_key: MvPrivateKey;
 }
 
+export interface MvCreateKeyPairRequest {
+    modulus_width: number;
+    miller_rabin_rounds: number;
+    coef_a: number;
+    random_seed: number;
+}
+
 export interface MvEncryptRequest {
     public_key: MvPublicKey;
     message: string;
@@ -43,7 +50,6 @@ export interface MvDecryptRequest {
     radix: number;
 }
 
-// Deep Copy Function for EllipticCurve
 export function copyEllipticCurve(curve: EllipticCurve): EllipticCurve {
     return {
         ...curve,
@@ -51,12 +57,10 @@ export function copyEllipticCurve(curve: EllipticCurve): EllipticCurve {
     };
 }
 
-// Deep Copy Function for EcPoint
 export function copyEcPoint(point: EcPoint): EcPoint {
     return { ...point };
 }
 
-// Deep Copy Function for MvPublicKey
 export function copyMvPublicKey(publicKey: MvPublicKey): MvPublicKey {
     return {
         curve: copyEllipticCurve(publicKey.curve),
@@ -64,7 +68,6 @@ export function copyMvPublicKey(publicKey: MvPublicKey): MvPublicKey {
     };
 }
 
-// Deep Copy Function for MvPrivateKey
 export function copyMvPrivateKey(privateKey: MvPrivateKey): MvPrivateKey {
     return {
         curve: copyEllipticCurve(privateKey.curve),
@@ -72,7 +75,6 @@ export function copyMvPrivateKey(privateKey: MvPrivateKey): MvPrivateKey {
     };
 }
 
-// Deep Copy Function for MvBeans
 export function copyMvKeyPair(keyPair: MvKeyPair): MvKeyPair {
     return {
         public_key: copyMvPublicKey(keyPair.public_key),
@@ -80,28 +82,9 @@ export function copyMvKeyPair(keyPair: MvKeyPair): MvKeyPair {
     };
 }
 
-// Deep Copy Function for MvEncryptRequest
-export function copyMvEncryptRequest(request: MvEncryptRequest): MvEncryptRequest {
-    return {
-        public_key: copyMvPublicKey(request.public_key),
-        message: request.message,
-        radix: request.radix
-    };
-}
-
-// Deep Copy Function for MvCipherText
 export function copyMvCipherText(cipherText: MvCipherText): MvCipherText {
     return {
         encrypted_message: cipherText.encrypted_message,
         points: cipherText.points.map(copyEcPoint)
-    };
-}
-
-// Deep Copy Function for MvDecryptRequest
-export function copyMvDecryptRequest(request: MvDecryptRequest): MvDecryptRequest {
-    return {
-        private_key: copyMvPrivateKey(request.private_key),
-        cipher_text: copyMvCipherText(request.cipher_text),
-        radix: request.radix
     };
 }
