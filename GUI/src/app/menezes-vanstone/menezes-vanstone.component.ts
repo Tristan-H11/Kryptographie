@@ -71,14 +71,14 @@ export class MenezesVanstoneComponent {
                             generator: {
                                 x: "152198469913648308717544634828661961231",
                                 y: "50296851635441247077790719368115682846",
-                                is_infinity: false
+                                is_infinite: false
                             },
                             order_of_subgroup: "2"
                         },
                         y: {
                             x: "26370934085012164485153092381593646122",
                             y: "126290671313284822425335475919650022666",
-                            is_infinity: false
+                            is_infinite: false
                         }
                     },
                     private_key: {
@@ -87,7 +87,7 @@ export class MenezesVanstoneComponent {
                             generator: {
                                 x: "152198469913648308717544634828661961231",
                                 y: "50296851635441247077790719368115682846",
-                                is_infinity: false
+                                is_infinite: false
                             },
                             order_of_subgroup: "2"
                         },
@@ -106,14 +106,14 @@ export class MenezesVanstoneComponent {
                             generator: {
                                 x: "152198469913648308717544634828661961231",
                                 y: "50296851635441247077790719368115682846",
-                                is_infinity: false
+                                is_infinite: false
                             },
                             order_of_subgroup: "2"
                         },
                         y: {
                             x: "26370934085012164485153092381593646122",
                             y: "126290671313284822425335475919650022666",
-                            is_infinity: false
+                            is_infinite: false
                         }
                     },
                     private_key: {
@@ -122,7 +122,7 @@ export class MenezesVanstoneComponent {
                             generator: {
                                 x: "152198469913648308717544634828661961231",
                                 y: "50296851635441247077790719368115682846",
-                                is_infinity: false
+                                is_infinite: false
                             },
                             order_of_subgroup: "2"
                         },

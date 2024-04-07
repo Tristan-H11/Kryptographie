@@ -8,7 +8,7 @@ export interface EllipticCurve {
 export interface EcPoint {
     x: string;
     y: string;
-    is_infinity: boolean;
+    is_infinite: boolean;
 }
 
 export interface MvPublicKey {
