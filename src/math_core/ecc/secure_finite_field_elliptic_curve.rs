@@ -1,5 +1,6 @@
 use std::ops::{AddAssign, Div, Neg, Sub};
 
+use crate::api::endpoints::mv::EllipticCurve;
 use atomic_counter::RelaxedCounter;
 use bigdecimal::num_bigint::BigInt;
 use bigdecimal::num_traits::Euclid;
@@ -36,6 +37,18 @@ pub struct SecureFiniteFieldEllipticCurve {
     pub order_of_subgroup: BigInt,
     /// Der Generator der zyklischen Untergruppe
     pub generator: FiniteFieldEllipticCurvePoint,
+}
+
+impl From<EllipticCurve> for SecureFiniteFieldEllipticCurve {
+    /// Mapped die Bean in das Domain-Modell
+    fn from(curve: EllipticCurve) -> Self {
+        SecureFiniteFieldEllipticCurve {
+            a: curve.a,
+            prime: BigInt::from(curve.prime),
+            order_of_subgroup: BigInt::from(curve.order_of_subgroup),
+            generator: FiniteFieldEllipticCurvePoint::from(curve.generator),
+        }
+    }
 }
 
 impl SecureFiniteFieldEllipticCurve {

@@ -1,3 +1,4 @@
+use crate::api::endpoints::mv::EcPoint;
 use bigdecimal::num_bigint::BigInt;
 use bigdecimal::num_traits::Euclid;
 use bigdecimal::{One, Zero};
@@ -18,6 +19,17 @@ pub struct FiniteFieldEllipticCurvePoint {
     pub x: BigInt,
     pub y: BigInt,
     pub is_infinite: bool,
+}
+
+impl From<EcPoint> for FiniteFieldEllipticCurvePoint {
+    /// Mapped die Bean in das Domain-Modell
+    fn from(point: EcPoint) -> Self {
+        Self {
+            x: point.x.parse().unwrap(),
+            y: point.y.parse().unwrap(),
+            is_infinite: point.is_infinite,
+        }
+    }
 }
 
 impl FiniteFieldEllipticCurvePoint {
