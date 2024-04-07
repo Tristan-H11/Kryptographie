@@ -177,7 +177,6 @@ mod tests {
     fn test_menezes_vanstone_encryption_decryption() {
         // Die Parameter sollen hier für jeden Testlauf zufällig gewählt werden, damit flakiness
         // eher auffällt.
-        let radix = rand::thread_rng().gen_range(240..55296);
         let n = rand::thread_rng().gen_range(1..30);
         let modul_width = rand::thread_rng().gen_range(4..256);
         let random_seed = rand::thread_rng().gen_range(1..1000);
@@ -203,7 +202,6 @@ mod tests {
     fn test_encryption_decryption_fails_when_message_greater_prime() {
         // Die Parameter sollen hier für jeden Testlauf zufällig gewählt werden, damit flakiness
         // eher auffällt.
-        let radix = rand::thread_rng().gen_range(240..55296);
         let n = rand::thread_rng().gen_range(1..30);
         let modul_width = rand::thread_rng().gen_range(4..256);
         let random_seed = rand::thread_rng().gen_range(1..1000);
@@ -212,7 +210,7 @@ mod tests {
         let public_key = key_pair.public_key;
         let private_key = key_pair.private_key;
 
-        let value_bigger_prime = BigInt::from(2).pow(modul_width) + 1;
+        let value_bigger_prime: BigInt = BigInt::from(2).pow(modul_width) + 1;
         let plaintext = MenezesVanstonePlaintext {
             first: value_bigger_prime.clone(),
             second: value_bigger_prime,
