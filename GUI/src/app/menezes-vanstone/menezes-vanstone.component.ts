@@ -187,6 +187,8 @@ export class MenezesVanstoneComponent {
         let client = (name === "Alice") ? this.clients[0] : this.clients[1];
         let partner = (name === "Alice") ? this.clients[1] : this.clients[0];
         partner.ciphertext = copyMvCipherText(client.ciphertext);
+        client.plaintext = "";
+        client.ciphertext = {encrypted_message: "", points: []};
     }
 
     protected readonly JSON = JSON;
