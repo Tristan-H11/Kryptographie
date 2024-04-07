@@ -26,7 +26,7 @@ export interface MvKeyPair {
     private_key: MvPrivateKey;
 }
 
-export interface MvCreateKeyPairRequest {
+export interface MvCreateKeyPairRequest { // TODO Mit Lucas KeyGenConfig zusammenführen
     modulus_width: number;
     miller_rabin_rounds: number;
     coef_a: number;

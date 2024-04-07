@@ -1,4 +1,4 @@
-export class MvKeygenConfig {
+export class MvKeygenConfig { // TODO Mit MvCreateKeyPairRequest zusammenführen
     modulus_width: number;
     miller_rabin_rounds: number;
     coef_a: number;
