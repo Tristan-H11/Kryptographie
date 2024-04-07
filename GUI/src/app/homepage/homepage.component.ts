@@ -33,13 +33,13 @@ import {StateManagementService} from "../services/management/state-management.se
         RouterLink,
         RouterLinkActive
     ],
-    templateUrl: "./startseite.component.html",
-    styleUrl: "./startseite.component.scss"
+    templateUrl: "./homepage.component.html",
+    styleUrl: "./homepage.component.scss"
 })
 /**
  * Komponente für die Darstellung der Startseite inklusive der Konfigurationsmöglichkeiten.
  */
-export class StartseiteComponent implements OnInit {
+export class HomepageComponent implements OnInit {
 
     constructor(
         private stateService: StateManagementService,

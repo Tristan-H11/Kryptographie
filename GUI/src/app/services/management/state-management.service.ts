@@ -11,7 +11,7 @@ export class StateManagementService {
 
     private server_url = signal("https://krypto-server.tristan-hoermann.de");
 
-    private configurationData = signal(RsaConfigurationData.createDefaultConfigurationData());
+    private configurationDataRSA = signal(RsaConfigurationData.createDefaultConfigurationDataForRSA());
 
     private clientKeyMap = new Map<Client, WritableSignal<RsaKeyPair>>();
 
@@ -89,7 +89,7 @@ export class StateManagementService {
      * Gibt die Konfigurationsdaten zurück.
      */
     public getConfigurationData() {
-        return this.configurationData;
+        return this.configurationDataRSA;
     }
 
     public getClientKey(client: Client): WritableSignal<RsaKeyPair> {
