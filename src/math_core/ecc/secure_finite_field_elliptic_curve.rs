@@ -75,7 +75,22 @@ impl SecureFiniteFieldEllipticCurve {
             let (prime, order_of_subgroup) =
                 Self::calculate_p_and_q(&prime, n, miller_rabin_iterations);
 
-            let generator = Self::calculate_signature_generator(&prime, a, &counter);
+            let curve = Self {
+                a,
+                prime: prime.clone(),
+                order_of_subgroup: order_of_subgroup.clone(),
+                generator: Default::default(),
+            };
+            // Hier kann die Kurve mit dem Defaultwert für den Generator mitgegeben werden, weil dieser
+            // für das Multiplizieren in der Bestimmung des Generators nicht notwendig ist.
+            // Anschließend wird die Kurve mit dem Generator neu erstellt.
+            let generator = Self::calculate_signature_generator(
+                &prime,
+                a,
+                &order_of_subgroup,
+                &curve,
+                &counter,
+            );
 
             let curve = Self {
                 a,
@@ -223,13 +238,15 @@ impl SecureFiniteFieldEllipticCurve {
     pub fn calculate_signature_generator(
         prime: &BigInt,
         a: i32,
+        q: &BigInt,
+        curve: &SecureFiniteFieldEllipticCurve,
         counter: &RelaxedCounter,
     ) -> FiniteFieldEllipticCurvePoint {
         let mut generator: FiniteFieldEllipticCurvePoint;
         let service = NumberTheoryService::new(Fast); // TODO übergeben lassen
 
         // Schleife, die läuft, bis ein Generator gefunden wurde, der nicht den Punkt im Unendlichen
-        // darstellt.
+        // darstellt oder dessen Ordnung nicht N/8 ist.
         loop {
             let prng = PseudoRandomNumberGenerator::new_seeded(); // TODO übergeben lassen
             let (mut x, mut r);
@@ -249,7 +266,6 @@ impl SecureFiniteFieldEllipticCurve {
             // Bedingung, anhand derer bestimmt wird, welche der beiden Formeln nach Satz 4.1 zu
             // verwenden ist
             let condition = service.fast_exponentiation(&r, &prime.decrement().div(4), &prime);
-
             let y: BigInt;
             let exponent: BigInt = (prime + BigInt::from(3)).div(8);
             if condition.is_one() {
@@ -261,7 +277,15 @@ impl SecureFiniteFieldEllipticCurve {
             }
             // Den Generator mit den berechnen Koordinaten erstellen und prüfen.
             generator = FiniteFieldEllipticCurvePoint::new(x, y);
-            if !generator.is_infinite {
+
+            // Falls der generierte Punkt nicht auf der Kurve liegt, wird ein neuer Punkt generiert.
+            if !curve.has_point(&generator) {
+                continue;
+            }
+
+            // Der Generator selber darf nicht im Unendlichen liegen und auch die Ordnung
+            // des Punktes muss gleich q sein, also muss Generator*q im Unendlichen liegen.
+            if !generator.is_infinite && generator.multiply(q, curve).is_infinite {
                 break;
             }
         }
