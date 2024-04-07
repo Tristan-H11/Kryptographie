@@ -1,6 +1,6 @@
+use crate::api::endpoints::mv::MvCipherText;
 use bigdecimal::num_bigint::BigInt;
 use bigdecimal::Zero;
-use crate::api::endpoints::mv::MvCipherText;
 
 use crate::encryption::asymmetric_encryption_types::{
     AsymmetricDecryptor, AsymmetricEncryptionScheme, AsymmetricEncryptor,
@@ -36,11 +36,7 @@ impl From<MvCipherText> for MvStringCiphertext {
     fn from(ciphertext: MvCipherText) -> Self {
         MvStringCiphertext {
             ciphertext: ciphertext.encrypted_message,
-            points: ciphertext
-                .points
-                .into_iter()
-                .map(Into::into)
-                .collect(),
+            points: ciphertext.points.into_iter().map(Into::into).collect(),
         }
     }
 }

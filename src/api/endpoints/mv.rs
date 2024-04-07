@@ -2,16 +2,17 @@ use actix_web::web::{Json, Query};
 use actix_web::{HttpResponse, Responder};
 use log::info;
 use serde::{Deserialize, Serialize};
-use std::thread::current;
 
 use crate::api::basic::call_checked_with_parsed_big_ints;
 use crate::api::serializable_models::{SingleStringResponse, UseFastQuery};
-use crate::encryption::asymmetric_encryption_types::{AsymmetricDecryptor, AsymmetricEncryptor};
+use crate::encryption::asymmetric_encryption_types::{
+    AsymmetricDecryptor, AsymmetricEncryptor, Signer, Verifier,
+};
 use crate::encryption::core::menezes_vanstone::keys::{
     MenezesVanstoneKeyPair, MenezesVanstonePrivateKey, MenezesVanstonePublicKey,
 };
 use crate::encryption::core::menezes_vanstone::menezes_vanstone_scheme::{
-    MenezesVanstoneCiphertext, MenezesVanstoneScheme, MenezesVanstoneSignature,
+    MenezesVanstoneScheme, MenezesVanstoneSignature,
 };
 use crate::encryption::string_schemes::menezes_vanstone::keys::{
     MenezesVanstoneStringPrivateKey, MenezesVanstoneStringPublicKey,
@@ -26,7 +27,7 @@ use crate::math_core::number_theory::number_theory_service::NumberTheoryServiceS
     Fast, Slow,
 };
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Clone)]
 pub struct MvCreateKeyPairRequest {
     pub modulus_width: u32,
     pub miller_rabin_rounds: u32,
@@ -34,7 +35,7 @@ pub struct MvCreateKeyPairRequest {
     pub random_seed: u32,
 }
 
-#[derive(Serialize, Deserialize, Default)]
+#[derive(Serialize, Deserialize, Clone)]
 pub struct EllipticCurve {
     pub a: i32,
     pub prime: String,
@@ -53,7 +54,7 @@ impl From<SecureFiniteFieldEllipticCurve> for EllipticCurve {
     }
 }
 
-#[derive(Serialize, Deserialize, Default)]
+#[derive(Serialize, Deserialize, Clone)]
 pub struct EcPoint {
     pub x: String,
     pub y: String,
@@ -70,7 +71,7 @@ impl From<FiniteFieldEllipticCurvePoint> for EcPoint {
     }
 }
 
-#[derive(Serialize, Deserialize, Default)]
+#[derive(Serialize, Deserialize, Clone)]
 pub struct MvPublicKey {
     pub curve: EllipticCurve,
     pub y: EcPoint,
@@ -85,7 +86,7 @@ impl From<MenezesVanstonePublicKey> for MvPublicKey {
     }
 }
 
-#[derive(Serialize, Deserialize, Default)]
+#[derive(Serialize, Deserialize, Clone)]
 pub struct MvPrivateKey {
     pub curve: EllipticCurve,
     pub x: String,
@@ -100,7 +101,7 @@ impl From<MenezesVanstonePrivateKey> for MvPrivateKey {
     }
 }
 
-#[derive(Serialize, Default)]
+#[derive(Serialize, Clone)]
 pub struct MvKeyPair {
     pub public_key: MvPublicKey,
     pub private_key: MvPrivateKey,
@@ -122,7 +123,7 @@ pub struct MvEncryptRequest {
     pub radix: u32,
 }
 
-#[derive(Deserialize, Serialize)]
+#[derive(Deserialize, Serialize, Clone)]
 pub struct MvCipherText {
     pub encrypted_message: String,
     pub points: Vec<EcPoint>,
@@ -150,7 +151,7 @@ pub struct MvDecryptRequest {
     pub radix: u32,
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Clone)]
 pub struct MvSignature {
     pub r: String,
     pub s: String,
@@ -165,13 +166,13 @@ impl From<MenezesVanstoneSignature> for MvSignature {
     }
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Clone)]
 pub struct MvSignRequest {
     pub private_key: MvPrivateKey,
     pub message: String,
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Clone)]
 pub struct MvVerifyRequest {
     pub public_key: MvPublicKey,
     pub message: String,

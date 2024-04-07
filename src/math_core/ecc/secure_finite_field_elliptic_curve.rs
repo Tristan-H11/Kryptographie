@@ -44,8 +44,8 @@ impl From<EllipticCurve> for SecureFiniteFieldEllipticCurve {
     fn from(curve: EllipticCurve) -> Self {
         SecureFiniteFieldEllipticCurve {
             a: curve.a,
-            prime: BigInt::from(curve.prime),
-            order_of_subgroup: BigInt::from(curve.order_of_subgroup),
+            prime: curve.prime.parse().unwrap(),
+            order_of_subgroup: curve.order_of_subgroup.parse().unwrap(),
             generator: FiniteFieldEllipticCurvePoint::from(curve.generator),
         }
     }
