@@ -304,31 +304,24 @@ impl SecureFiniteFieldEllipticCurve {
         let remainder = (x_cubed + &self.a * &point.x - y_squared).rem_euclid(&self.prime);
         remainder == BigInt::zero()
     }
-
-    ///
-    /// Gibt zurück, ob die Kurve die Bedingung 4a^3 + 27b^2 = 0 erfüllt, also ob die Kurve singulär ist.
-    ///
-    pub fn is_singular(&self) -> bool {
-        self.a.is_zero() // Weil der Koeffizient b nicht existiert, muss nur a betrachtet werden
-    }
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
 
-    // #[test]
-    // fn test_has_point_not() {
-    //     let curve = SecureFiniteFieldEllipticCurve::new(7, 17.into());
-    //     let point = FiniteFieldEllipticCurvePoint::new(5.into(), 7.into());
-    //     // (5, 7) liegt nicht auf y^2 = x^3 + 7 (mod 17)
-    //     assert!(!curve.has_point(&point));
-    //
-    //     let point = FiniteFieldEllipticCurvePoint::new(4.into(), 6.into());
-    //     // (4, 6) liegt nicht auf y^2 = x^3 + 7 (mod 17). Genaugenommen tut es keiner mit x=4.
-    //     assert!(!curve.has_point(&point));
-    // }
-    //
+    #[test]
+    fn test_has_point_not() {
+        let curve = SecureFiniteFieldEllipticCurve::new(7, 17, 20);
+        let point = FiniteFieldEllipticCurvePoint::new(5.into(), 7.into());
+        // (5, 7) liegt nicht auf y^2 = x^3 + 7 (mod 17)
+        assert!(!curve.has_point(&point));
+
+        let point = FiniteFieldEllipticCurvePoint::new(4.into(), 6.into());
+        // (4, 6) liegt nicht auf y^2 = x^3 + 7 (mod 17). Genaugenommen tut es keiner mit x=4.
+        assert!(!curve.has_point(&point));
+    }
+
     #[test]
     fn test_has_point() {
         let curve = SecureFiniteFieldEllipticCurve::new(5, 16, 40);
@@ -340,25 +333,4 @@ mod tests {
         // (5, 8) liegt auf y^2 = x^3 + 7 (mod 17)
         assert!(curve.has_point(&point));
     }
-    //
-    // #[test]
-    // fn test_is_not_singular() {
-    //     let curve = SecureFiniteFieldEllipticCurve::new(0, 17.into());
-    //     // 4 * 0^3 + 27 * 7^2 = 0 + 1323 = 1323 (mod 17)= 14 != 0
-    //     assert!(!curve.is_singular());
-    // }
-    //
-    // #[test]
-    // fn test_is_singular_trivial() {
-    //     let curve = SecureFiniteFieldEllipticCurve::new(0.into(), 17.into());
-    //     // 4 * 0^3 + 27 * 0^2 = 0 + 0 = 0 (mod 17) = 0
-    //     assert!(curve.is_singular());
-    // }
-    //
-    // #[test]
-    // fn test_is_singular_non_trivial() {
-    //     let curve = SecureFiniteFieldEllipticCurve::new(-3, 17.into());
-    //     // 4 * (-3)^3 + 27 * 2^2 = -108 + 108 = 0 (mod 17) = 0
-    //     assert!(curve.is_singular());
-    // }
 }
