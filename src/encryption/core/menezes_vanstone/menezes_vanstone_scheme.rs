@@ -5,6 +5,7 @@ use bigdecimal::num_bigint::BigInt;
 use bigdecimal::num_traits::Euclid;
 use bigdecimal::Zero;
 use sha2::Digest;
+use crate::api::endpoints::mv::MvSignature;
 
 use crate::encryption::asymmetric_encryption_types::{
     AsymmetricDecryptor, AsymmetricEncryptionScheme, AsymmetricEncryptor, Signer, Verifier,
@@ -40,6 +41,16 @@ pub struct MenezesVanstoneCiphertext {
 pub struct MenezesVanstoneSignature {
     pub r: BigInt,
     pub s: BigInt,
+}
+
+impl From<MvSignature> for MenezesVanstoneSignature {
+    /// Mapped die Bean in das Domain-Modell
+    fn from(signature: MvSignature) -> Self {
+        MenezesVanstoneSignature {
+            r: signature.r.parse().unwrap(),
+            s: signature.s.parse().unwrap(),
+        }
+    }
 }
 
 pub struct MenezesVanstoneScheme {}

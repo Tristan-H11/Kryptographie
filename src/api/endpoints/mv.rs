@@ -128,6 +128,21 @@ pub struct MvCipherText {
     pub points: Vec<EcPoint>,
 }
 
+impl From<MvStringCiphertext> for MvCipherText {
+    fn from(ciphertext: MvStringCiphertext) -> Self {
+        let points = ciphertext
+            .points
+            .into_iter()
+            .map(Into::into)
+            .collect();
+
+        MvCipherText {
+            encrypted_message: ciphertext.ciphertext,
+            points,
+        }
+    }
+}
+
 #[derive(Deserialize)]
 pub struct MvDecryptRequest {
     pub private_key: MvPrivateKey,
@@ -137,14 +152,14 @@ pub struct MvDecryptRequest {
 
 #[derive(Serialize, Deserialize)]
 pub struct MvSignature {
-    pub r: EcPoint,
+    pub r: String,
     pub s: String,
 }
 
 impl From<MenezesVanstoneSignature> for MvSignature {
     fn from(signature: MenezesVanstoneSignature) -> Self {
         MvSignature {
-            r: EcPoint::from(signature.r),
+            r: signature.r.to_string(),
             s: signature.s.to_string(),
         }
     }
