@@ -213,21 +213,6 @@ export class RsaComponent {
     }
 
     /**
-     * Open a dialog to show a loading spinner.
-     */
-    public openNameInputDialog(): void {
-        const dialogRef = this.dialog.open(SimpleDialogComponent, {
-            data: {name: "", aborted: false},
-        });
-        dialogRef.afterClosed().subscribe(result => {
-            if (result.aborted) {
-                return;
-            }
-            this.stateService.createClient(result.name);
-        });
-    }
-
-    /**
      * Returns all clients.
      */
     public getClients(): Set<Client> {

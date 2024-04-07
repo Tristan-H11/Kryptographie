@@ -9,6 +9,9 @@ import {MatIconModule} from "@angular/material/icon";
 import {MatSidenavContainer, MatSidenavContent} from "@angular/material/sidenav";
 import {NavbarComponent} from "../navbar/navbar.component";
 import {RouterLink, RouterLinkActive, RouterOutlet} from "@angular/router";
+import {SimpleDialogComponent} from "../simple-dialog/simple-dialog.component";
+import {MatDialog} from "@angular/material/dialog";
+import {StateManagementService} from "../services/management/state-management.service";
 
 
 @Component({
@@ -36,14 +39,30 @@ import {RouterLink, RouterLinkActive, RouterOutlet} from "@angular/router";
 /**
  * Komponente für die Darstellung der Startseite inklusive der Konfigurationsmöglichkeiten.
  */
-export class StartseiteComponent implements OnInit{
+export class StartseiteComponent implements OnInit {
 
-    constructor() {
+    constructor(
+        private stateService: StateManagementService,
+        public dialog: MatDialog,) {
     }
 
-    ngOnInit(): void {}
+    ngOnInit(): void {
+    }
 
-
+    /**
+     * Open a dialog to show a loading spinner.
+     */
+    public openNameInputDialog(): void {
+        const dialogRef = this.dialog.open(SimpleDialogComponent, {
+            data: {name: "", aborted: false},
+        });
+        dialogRef.afterClosed().subscribe(result => {
+            if (result.aborted) {
+                return;
+            }
+            this.stateService.createClient(result.name);
+        });
+    }
 
 }
 

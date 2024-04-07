@@ -18,7 +18,7 @@ export class RsaConfigurationData {
 	}
 
 	public static createDefaultConfigurationData(): RsaConfigurationData {
-		return new RsaConfigurationData(4096, 100, 13, 55296);
+		return new RsaConfigurationData(1024, 10, 13, 55296);
 	}
 }
 
