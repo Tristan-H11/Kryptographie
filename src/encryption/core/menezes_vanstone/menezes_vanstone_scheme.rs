@@ -1,6 +1,6 @@
 use std::time::SystemTime;
 
-use crate::api::endpoints::mv::MvSignature;
+use crate::api::endpoints::mv::MvSignatureBean;
 use atomic_counter::RelaxedCounter;
 use bigdecimal::num_bigint::BigInt;
 use bigdecimal::num_traits::Euclid;
@@ -43,9 +43,9 @@ pub struct MenezesVanstoneSignature {
     pub s: BigInt,
 }
 
-impl From<MvSignature> for MenezesVanstoneSignature {
+impl From<MvSignatureBean> for MenezesVanstoneSignature {
     /// Mapped die Bean in das Domain-Modell
-    fn from(signature: MvSignature) -> Self {
+    fn from(signature: MvSignatureBean) -> Self {
         MenezesVanstoneSignature {
             r: signature.r.parse().unwrap(),
             s: signature.s.parse().unwrap(),

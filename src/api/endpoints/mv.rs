@@ -28,7 +28,7 @@ use crate::math_core::number_theory::number_theory_service::NumberTheoryServiceS
 };
 
 #[derive(Deserialize, Clone)]
-pub struct MvCreateKeyPairRequest {
+pub struct MvCreateKeyPairRequestBean {
     pub modulus_width: u32,
     pub miller_rabin_rounds: u32,
     pub coef_a: i32,
@@ -36,34 +36,34 @@ pub struct MvCreateKeyPairRequest {
 }
 
 #[derive(Serialize, Deserialize, Clone)]
-pub struct EllipticCurve {
+pub struct EllipticCurveBean {
     pub a: i32,
     pub prime: String,
     pub order_of_subgroup: String,
-    pub generator: EcPoint,
+    pub generator: EcPointBean,
 }
 
-impl From<SecureFiniteFieldEllipticCurve> for EllipticCurve {
+impl From<SecureFiniteFieldEllipticCurve> for EllipticCurveBean {
     fn from(curve: SecureFiniteFieldEllipticCurve) -> Self {
-        EllipticCurve {
+        EllipticCurveBean {
             a: curve.a,
             prime: curve.prime.to_string(),
             order_of_subgroup: curve.order_of_subgroup.to_string(),
-            generator: EcPoint::from(curve.generator),
+            generator: EcPointBean::from(curve.generator),
         }
     }
 }
 
 #[derive(Serialize, Deserialize, Clone)]
-pub struct EcPoint {
+pub struct EcPointBean {
     pub x: String,
     pub y: String,
     pub is_infinite: bool,
 }
 
-impl From<FiniteFieldEllipticCurvePoint> for EcPoint {
+impl From<FiniteFieldEllipticCurvePoint> for EcPointBean {
     fn from(point: FiniteFieldEllipticCurvePoint) -> Self {
-        EcPoint {
+        EcPointBean {
             x: point.x.to_string(),
             y: point.y.to_string(),
             is_infinite: point.is_infinite,
@@ -72,68 +72,68 @@ impl From<FiniteFieldEllipticCurvePoint> for EcPoint {
 }
 
 #[derive(Serialize, Deserialize, Clone)]
-pub struct MvPublicKey {
-    pub curve: EllipticCurve,
-    pub y: EcPoint,
+pub struct MvPublicKeyBean {
+    pub curve: EllipticCurveBean,
+    pub y: EcPointBean,
 }
 
-impl From<MenezesVanstonePublicKey> for MvPublicKey {
+impl From<MenezesVanstonePublicKey> for MvPublicKeyBean {
     fn from(key: MenezesVanstonePublicKey) -> Self {
-        MvPublicKey {
-            curve: EllipticCurve::from(key.curve),
-            y: EcPoint::from(key.y),
+        MvPublicKeyBean {
+            curve: EllipticCurveBean::from(key.curve),
+            y: EcPointBean::from(key.y),
         }
     }
 }
 
 #[derive(Serialize, Deserialize, Clone)]
-pub struct MvPrivateKey {
-    pub curve: EllipticCurve,
+pub struct MvPrivateKeyBean {
+    pub curve: EllipticCurveBean,
     pub x: String,
 }
 
-impl From<MenezesVanstonePrivateKey> for MvPrivateKey {
+impl From<MenezesVanstonePrivateKey> for MvPrivateKeyBean {
     fn from(key: MenezesVanstonePrivateKey) -> Self {
-        MvPrivateKey {
-            curve: EllipticCurve::from(key.curve),
+        MvPrivateKeyBean {
+            curve: EllipticCurveBean::from(key.curve),
             x: key.x.to_string(),
         }
     }
 }
 
 #[derive(Serialize, Clone)]
-pub struct MvKeyPair {
-    pub public_key: MvPublicKey,
-    pub private_key: MvPrivateKey,
+pub struct MvKeyPairBean {
+    pub public_key: MvPublicKeyBean,
+    pub private_key: MvPrivateKeyBean,
 }
 
-impl From<MenezesVanstoneKeyPair> for MvKeyPair {
+impl From<MenezesVanstoneKeyPair> for MvKeyPairBean {
     fn from(key_pair: MenezesVanstoneKeyPair) -> Self {
-        MvKeyPair {
-            public_key: MvPublicKey::from(key_pair.public_key),
-            private_key: MvPrivateKey::from(key_pair.private_key),
+        MvKeyPairBean {
+            public_key: MvPublicKeyBean::from(key_pair.public_key),
+            private_key: MvPrivateKeyBean::from(key_pair.private_key),
         }
     }
 }
 
 #[derive(Deserialize)]
-pub struct MvEncryptRequest {
-    pub public_key: MvPublicKey,
+pub struct MvEncryptRequestBean {
+    pub public_key: MvPublicKeyBean,
     pub message: String,
     pub radix: u32,
 }
 
 #[derive(Deserialize, Serialize, Clone)]
-pub struct MvCipherText {
+pub struct MvCipherTextBean {
     pub encrypted_message: String,
-    pub points: Vec<EcPoint>,
+    pub points: Vec<EcPointBean>,
 }
 
-impl From<MvStringCiphertext> for MvCipherText {
+impl From<MvStringCiphertext> for MvCipherTextBean {
     fn from(ciphertext: MvStringCiphertext) -> Self {
         let points = ciphertext.points.into_iter().map(Into::into).collect();
 
-        MvCipherText {
+        MvCipherTextBean {
             encrypted_message: ciphertext.ciphertext,
             points,
         }
@@ -141,21 +141,21 @@ impl From<MvStringCiphertext> for MvCipherText {
 }
 
 #[derive(Deserialize)]
-pub struct MvDecryptRequest {
-    pub private_key: MvPrivateKey,
-    pub cipher_text: MvCipherText,
+pub struct MvDecryptRequestBean {
+    pub private_key: MvPrivateKeyBean,
+    pub cipher_text: MvCipherTextBean,
     pub radix: u32,
 }
 
 #[derive(Serialize, Deserialize, Clone)]
-pub struct MvSignature {
+pub struct MvSignatureBean {
     pub r: String,
     pub s: String,
 }
 
-impl From<MenezesVanstoneSignature> for MvSignature {
+impl From<MenezesVanstoneSignature> for MvSignatureBean {
     fn from(signature: MenezesVanstoneSignature) -> Self {
-        MvSignature {
+        MvSignatureBean {
             r: signature.r.to_string(),
             s: signature.s.to_string(),
         }
@@ -163,16 +163,16 @@ impl From<MenezesVanstoneSignature> for MvSignature {
 }
 
 #[derive(Deserialize, Clone)]
-pub struct MvSignRequest {
-    pub private_key: MvPrivateKey,
+pub struct MvSignRequestBean {
+    pub private_key: MvPrivateKeyBean,
     pub message: String,
 }
 
 #[derive(Deserialize, Clone)]
-pub struct MvVerifyRequest {
-    pub public_key: MvPublicKey,
+pub struct MvVerifyRequestBean {
+    pub public_key: MvPublicKeyBean,
     pub message: String,
-    pub signature: MvSignature,
+    pub signature: MvSignatureBean,
 }
 
 /// Erstellt ein neues Schlüsselpaar für das MenezesVanstone-Schema.
@@ -183,14 +183,14 @@ pub struct MvVerifyRequest {
 /// # Returns
 /// * `HttpResponse` - Die Antwort, die das Schlüsselpaar enthält.
 pub(crate) async fn create_key_pair(
-    req_body: Json<MvCreateKeyPairRequest>,
+    req_body: Json<MvCreateKeyPairRequestBean>,
     query: Query<UseFastQuery>,
 ) -> impl Responder {
     info!(
         "Endpunkt /rsa/createKeyPair wurde aufgerufen, use_fast: {}",
         query.use_fast
     );
-    let req_body: MvCreateKeyPairRequest = req_body.into_inner();
+    let req_body: MvCreateKeyPairRequestBean = req_body.into_inner();
     let use_fast = query.use_fast;
 
     let _number_theory_service = match use_fast {
@@ -205,7 +205,7 @@ pub(crate) async fn create_key_pair(
         req_body.random_seed,
     );
 
-    let response = MvKeyPair::from(key_pair);
+    let response = MvKeyPairBean::from(key_pair);
 
     HttpResponse::Ok().json(response)
 }
@@ -218,11 +218,11 @@ pub(crate) async fn create_key_pair(
 /// # Returns
 /// * `HttpResponse` - Die Antwort, die die verschlüsselte Nachricht enthält.
 pub(crate) async fn encrypt(
-    req_body: Json<MvEncryptRequest>,
+    req_body: Json<MvEncryptRequestBean>,
     query: Query<UseFastQuery>,
 ) -> impl Responder {
     info!("Endpunkt /menezesVanstone/encrypt wurde aufgerufen");
-    let req_body: MvEncryptRequest = req_body.into_inner();
+    let req_body: MvEncryptRequestBean = req_body.into_inner();
 
     call_checked_with_parsed_big_ints(|| {
         let public_key = req_body.public_key.clone().into();
@@ -241,7 +241,7 @@ pub(crate) async fn encrypt(
 
         let ciphertext = MenezesVanstoneStringScheme::encrypt(&public_key, &message, service);
 
-        let response = MvCipherText::from(ciphertext);
+        let response = MvCipherTextBean::from(ciphertext);
 
         Ok(HttpResponse::Ok().json(response))
     })
@@ -255,11 +255,11 @@ pub(crate) async fn encrypt(
 /// # Returns
 /// * `HttpResponse` - Die Antwort, die die entschlüsselte Nachricht enthält.
 pub(crate) async fn decrypt(
-    req_body: Json<MvDecryptRequest>,
+    req_body: Json<MvDecryptRequestBean>,
     query: Query<UseFastQuery>,
 ) -> impl Responder {
     info!("Endpunkt /menezesVanstone/decrypt wurde aufgerufen");
-    let req_body: MvDecryptRequest = req_body.into_inner();
+    let req_body: MvDecryptRequestBean = req_body.into_inner();
 
     call_checked_with_parsed_big_ints(|| {
         let private_key = req_body.private_key.clone().into();
@@ -285,12 +285,12 @@ pub(crate) async fn decrypt(
 }
 
 pub(crate) async fn sign(
-    req_body: Json<MvSignRequest>,
+    req_body: Json<MvSignRequestBean>,
     query: Query<UseFastQuery>,
 ) -> impl Responder {
     info!("Endpunkt /menezesVanstone/sign wurde aufgerufen");
 
-    let req_body: &MvSignRequest = &req_body.into_inner();
+    let req_body: &MvSignRequestBean = &req_body.into_inner();
     call_checked_with_parsed_big_ints(|| {
         let private_key = req_body.private_key.clone().into();
         let message = &req_body.message;
@@ -302,19 +302,19 @@ pub(crate) async fn sign(
 
         let signature = MenezesVanstoneScheme::sign(&private_key, message, service);
 
-        let response = MvSignature::from(signature);
+        let response = MvSignatureBean::from(signature);
 
         Ok(HttpResponse::Ok().json(response))
     })
 }
 
 pub(crate) async fn verify(
-    req_body: Json<MvVerifyRequest>,
+    req_body: Json<MvVerifyRequestBean>,
     query: Query<UseFastQuery>,
 ) -> impl Responder {
     info!("Endpunkt /menezesVanstone/verify wurde aufgerufen");
 
-    let req_body: &MvVerifyRequest = &req_body.into_inner();
+    let req_body: &MvVerifyRequestBean = &req_body.into_inner();
     call_checked_with_parsed_big_ints(|| {
         let public_key = req_body.public_key.clone().into();
         let message = &req_body.message;

@@ -1,4 +1,4 @@
-use crate::api::endpoints::mv::MvCipherText;
+use crate::api::endpoints::mv::MvCipherTextBean;
 use bigdecimal::num_bigint::BigInt;
 use bigdecimal::Zero;
 
@@ -32,8 +32,8 @@ pub struct MvStringCiphertext {
     pub points: Vec<FiniteFieldEllipticCurvePoint>,
 }
 
-impl From<MvCipherText> for MvStringCiphertext {
-    fn from(ciphertext: MvCipherText) -> Self {
+impl From<MvCipherTextBean> for MvStringCiphertext {
+    fn from(ciphertext: MvCipherTextBean) -> Self {
         MvStringCiphertext {
             ciphertext: ciphertext.encrypted_message,
             points: ciphertext.points.into_iter().map(Into::into).collect(),

@@ -1,6 +1,6 @@
 use std::ops::{AddAssign, Div, Neg, Sub};
 
-use crate::api::endpoints::mv::EllipticCurve;
+use crate::api::endpoints::mv::EllipticCurveBean;
 use atomic_counter::RelaxedCounter;
 use bigdecimal::num_bigint::BigInt;
 use bigdecimal::num_traits::Euclid;
@@ -39,9 +39,9 @@ pub struct SecureFiniteFieldEllipticCurve {
     pub generator: FiniteFieldEllipticCurvePoint,
 }
 
-impl From<EllipticCurve> for SecureFiniteFieldEllipticCurve {
+impl From<EllipticCurveBean> for SecureFiniteFieldEllipticCurve {
     /// Mapped die Bean in das Domain-Modell
-    fn from(curve: EllipticCurve) -> Self {
+    fn from(curve: EllipticCurveBean) -> Self {
         SecureFiniteFieldEllipticCurve {
             a: curve.a,
             prime: curve.prime.parse().unwrap(),
