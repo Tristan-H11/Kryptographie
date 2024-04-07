@@ -7,9 +7,8 @@ use serde::{Deserialize, Serialize};
 use crate::api::basic::call_checked_with_parsed_big_ints;
 use crate::api::serializable_models::{SingleStringResponse, UseFastQuery};
 use crate::encryption::asymmetric_encryption_types::{AsymmetricDecryptor, AsymmetricEncryptor};
-use crate::encryption::core::menezes_vanstone::keys::{
-    MenezesVanstonePrivateKey, MenezesVanstonePublicKey,
-};
+use crate::encryption::core::menezes_vanstone::keys::{MenezesVanstoneKeyPair, MenezesVanstonePrivateKey, MenezesVanstonePublicKey};
+use crate::encryption::core::menezes_vanstone::menezes_vanstone_scheme::{MenezesVanstoneCiphertext, MenezesVanstoneScheme};
 use crate::encryption::string_schemes::menezes_vanstone::keys::{
     MenezesVanstoneStringPrivateKey, MenezesVanstoneStringPublicKey,
 };
@@ -39,6 +38,17 @@ pub struct EllipticCurve {
     pub generator: EcPoint,
 }
 
+impl From<SecureFiniteFieldEllipticCurve> for EllipticCurve {
+    fn from(curve: SecureFiniteFieldEllipticCurve) -> Self {
+        EllipticCurve {
+            a: curve.a,
+            prime: curve.prime.to_string(),
+            order_of_subgroup: curve.order_of_subgroup.to_string(),
+            generator: EcPoint::from(curve.generator),
+        }
+    }
+}
+
 #[derive(Serialize, Deserialize, Default)]
 pub struct EcPoint {
     pub x: String,
@@ -46,12 +56,31 @@ pub struct EcPoint {
     pub is_infinite: bool,
 }
 
+impl From<FiniteFieldEllipticCurvePoint> for EcPoint {
+    fn from(point: FiniteFieldEllipticCurvePoint) -> Self {
+        EcPoint {
+            x: point.x.to_string(),
+            y: point.y.to_string(),
+            is_infinite: point.is_infinite,
+        }
+    }
+}
+
 #[derive(Serialize, Deserialize, Default)]
 pub struct MvPublicKey {
     pub curve: EllipticCurve,
-    pub generator: EcPoint,
     pub y: EcPoint,
 }
+
+impl From<MenezesVanstonePublicKey> for MvPublicKey {
+    fn from(key: MenezesVanstonePublicKey) -> Self {
+        MvPublicKey {
+            curve: EllipticCurve::from(key.curve),
+            y: EcPoint::from(key.y),
+        }
+    }
+}
+
 
 #[derive(Serialize, Deserialize, Default)]
 pub struct MvPrivateKey {
@@ -59,10 +88,29 @@ pub struct MvPrivateKey {
     pub x: String,
 }
 
+impl From<MenezesVanstonePrivateKey> for MvPrivateKey {
+    fn from(key: MenezesVanstonePrivateKey) -> Self {
+        MvPrivateKey {
+            curve: EllipticCurve::from(key.curve),
+            x: key.x.to_string(),
+        }
+    }
+}
+
 #[derive(Serialize, Default)]
 pub struct MvKeyPair {
     pub public_key: MvPublicKey,
     pub private_key: MvPrivateKey,
+}
+
+impl From<MenezesVanstoneKeyPair> for MvKeyPair {
+    fn from(key_pair: MenezesVanstoneKeyPair) -> Self {
+        MvKeyPair {
+            public_key: MvPublicKey::from(key_pair.public_key),
+            private_key: MvPrivateKey::from(key_pair.private_key),
+        }
+    }
+
 }
 
 #[derive(Deserialize)]
