@@ -59,6 +59,7 @@ export class MenezesVanstoneComponent {
     public numberSystem: number = 55296;
     public millerRabinIterations: number = 100;
     public coefficientA: number = 5;
+    public random_seed: number= 3;
 
     public clients: ClientData[] =
         [
@@ -141,7 +142,8 @@ export class MenezesVanstoneComponent {
         let config: MvKeygenConfig = {
             modulus_width: this.modulusWidth,
             miller_rabin_rounds: this.millerRabinIterations,
-            coef_a: this.coefficientA
+            coef_a: this.coefficientA,
+            random_seed: this.random_seed
         };
         this.backendRequestService.createKeyPair(config).then(key => {
             if (client === "Alice") {
@@ -191,5 +193,19 @@ export class MenezesVanstoneComponent {
         client.ciphertext = {encrypted_message: "", points: []};
     }
 
+    public clearFields(name: string) {
+        let client = (name === "Alice") ? this.clients[0] : this.clients[1];
+        client.plaintext = "";
+        client.ciphertext = {encrypted_message: "", points: []};
+    }
+
     protected readonly JSON = JSON;
+
+    public calcMinimumBitsize(): number {
+        return Math.ceil(Math.log2(this.numberSystem));
+    }
+
+    public calcMaxNumbersystem(): number {
+        return 2 ** this.modulusWidth;
+    }
 }

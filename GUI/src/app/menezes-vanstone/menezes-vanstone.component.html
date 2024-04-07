@@ -13,11 +13,13 @@
             <mat-label>Modulbreite</mat-label>
             <input class="text-align-right" matInput type="number" [(ngModel)]="modulusWidth">
             <span matTextSuffix>-Bit</span>
+            <mat-hint>Bei {{numberSystem}} mindestens {{calcMinimumBitsize()}} Bit</mat-hint>
         </mat-form-field>
 
         <mat-form-field appearance="outline" class="config-form-field">
             <mat-label>Zahlensystem</mat-label>
             <input class="text-align-right" matInput type="number" [(ngModel)]="numberSystem">
+            <mat-hint>Bei {{modulusWidth}}-Bit maximal {{calcMaxNumbersystem()}}</mat-hint>
         </mat-form-field>
 
         <mat-form-field appearance="outline" class="config-form-field">
@@ -30,6 +32,11 @@
             <mat-label>Koeffizient a</mat-label>
             <input class="text-align-right" matInput type="number" [(ngModel)]="coefficientA">
             <mat-hint>wird '-a^2'</mat-hint>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="config-form-field">
+            <mat-label>Seed</mat-label>
+            <input class="text-align-right" matInput type="number" [(ngModel)]="random_seed">
         </mat-form-field>
 
         <mat-action-row class="action-row-content-left">
@@ -63,6 +70,7 @@
         Punkte: {{JSON.stringify(client.ciphertext.points)}}
 
         <mat-action-row>
+            <button mat-flat-button color="primary" (click)="clearFields(client.name)">Löschen</button>
             <button mat-flat-button color="primary" [disabled]="client.plaintext.length<1" (click)="encrypt(client.name)">Verschlüsseln</button>
             <button mat-flat-button color="primary" [disabled]="client.ciphertext.encrypted_message.length<1" (click)="decrypt(client.name)">Entschlüsseln</button>
             <button mat-flat-button color="primary" (click)="send(client.name)">Senden</button>
