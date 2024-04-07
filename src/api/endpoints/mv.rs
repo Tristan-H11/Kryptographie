@@ -351,3 +351,54 @@ pub(crate) async fn decrypt(
         Ok(HttpResponse::Ok().json(response))
     })
 }
+
+pub(crate) async fn sign(
+    req_body: Json<MvSignRequest>,
+    query: Query<UseFastQuery>,
+) -> impl Responder {
+    info!("Endpunkt /menezesVanstone/sign wurde aufgerufen");
+
+    let req_body: &MvSignRequest = &req_body.into_inner();
+    call_checked_with_parsed_big_ints(|| {
+        let private_key = req_body.private_key.clone().into();
+        let message = &req_body.message;
+
+        let service = match query.use_fast {
+            true => NumberTheoryService::new(Fast),
+            false => NumberTheoryService::new(Slow),
+        };
+
+        let signature = MenezesVanstoneScheme::sign(&private_key, message, service);
+
+        let response = MvSignature::from(signature);
+
+        Ok(HttpResponse::Ok().json(response))
+    })
+}
+
+pub(crate) async fn verify(
+    req_body: Json<MvVerifyRequest>,
+    query: Query<UseFastQuery>,
+) -> impl Responder {
+    info!("Endpunkt /menezesVanstone/verify wurde aufgerufen");
+
+    let req_body: &MvVerifyRequest = &req_body.into_inner();
+    call_checked_with_parsed_big_ints(|| {
+        let public_key = req_body.public_key.clone().into();
+        let message = &req_body.message;
+        let signature = &req_body.signature.clone().into();
+
+        let service = match query.use_fast {
+            true => NumberTheoryService::new(Fast),
+            false => NumberTheoryService::new(Slow),
+        };
+
+        let verified = MenezesVanstoneScheme::verify(&public_key, signature, message, service);
+
+        let response = SingleStringResponse {
+            message: verified.to_string(),
+        };
+
+        Ok(HttpResponse::Ok().json(response))
+    })
+}
