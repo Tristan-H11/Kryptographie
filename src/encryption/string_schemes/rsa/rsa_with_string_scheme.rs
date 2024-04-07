@@ -146,7 +146,8 @@ impl<'a> Signer<RsaWithStringScheme> for RsaWithStringScheme {
 }
 
 impl<'a> Verifier<RsaWithStringScheme> for RsaWithStringScheme {
-    type Input = str;
+    type Signature = str;
+    type Message = str;
     type Output = bool;
     type Key = RsaWithStringPublicKey;
 
@@ -162,8 +163,8 @@ impl<'a> Verifier<RsaWithStringScheme> for RsaWithStringScheme {
     /// * `bool` - Gibt an, ob die Verifizierung erfolgreich war.
     fn verify(
         key: &Self::Key,
-        signature: &Self::Input,
-        message: &Self::Input,
+        signature: &Self::Signature,
+        message: &Self::Signature,
         service: NumberTheoryService,
     ) -> Self::Output {
         let radix = key.radix;

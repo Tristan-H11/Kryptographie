@@ -140,7 +140,8 @@ pub trait Signer<T: AsymmetricEncryptionScheme> {
 
 /// Ein Verifizierer für das asymmetrische Verschlüsselungsschema.
 pub trait Verifier<T: AsymmetricEncryptionScheme> {
-    type Input: ?Sized;
+    type Signature: ?Sized;
+    type Message: ?Sized;
     type Output;
     type Key: VerificationKey<T>;
     /// Überprüft die gegebene Signatur für die gegebene Nachricht mit dem gegebenen Schlüssel.
@@ -155,8 +156,8 @@ pub trait Verifier<T: AsymmetricEncryptionScheme> {
     /// `true`, wenn die Signatur korrekt ist, ansonsten `false`.
     fn verify(
         key: &Self::Key,
-        signature: &Self::Input,
-        message: &Self::Input,
+        signature: &Self::Signature,
+        message: &Self::Message,
         service: NumberTheoryService,
     ) -> Self::Output;
 }
