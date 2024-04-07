@@ -241,38 +241,17 @@ mod tests {
 
     #[test]
     fn test_menezes_vanstone_encryption_decryption() {
-        let curve = SecureFiniteFieldEllipticCurve::new(5.into(), 128, 40);
-
-        // random big int using the rand crate
-        let (mut x, mut y);
-        loop {
-            let random = rand::thread_rng().gen_range(1..5000);
-            x = BigInt::from(random);
-            y = curve.generator.multiply(&x, &curve);
-            if !y.x.is_zero() && !y.y.is_zero() {
-                break;
-            }
-        }
-
-        let public_key = MenezesVanstonePublicKey {
-            curve: curve.clone(),
-            generator: curve.generator.clone(),
-            y,
-        };
-
-        // Der Radix soll hier für jeden Testlauf zufällig gewählt werden, damit die Tests
-        // mehr abfangen können.
+        // Die Parameter sollen hier für jeden Testlauf zufällig gewählt werden, damit flakiness
+        // eher auffällt.
         let radix = rand::thread_rng().gen_range(240..55296);
-        println!("Radix: {}", radix);
-        let public_key = MenezesVanstoneStringPublicKey {
-            mv_key: public_key,
-            radix,
-        };
-        let private_key = MenezesVanstonePrivateKey { curve, x };
-        let private_key = MenezesVanstoneStringPrivateKey {
-            mv_key: private_key,
-            radix,
-        };
+        let n = rand::thread_rng().gen_range(1..30);
+        let modul_width = rand::thread_rng().gen_range(4..256);
+        let random_seed = rand::thread_rng().gen_range(1..1000);
+        let key_pair =
+            MenezesVanstoneStringScheme::generate_keypair(n, modul_width, 40, random_seed, radix);
+
+        let public_key = key_pair.public_key;
+        let private_key = key_pair.private_key;
 
         let plaintext = "DAS IST EIN TEST \n HEHE \n";
 
