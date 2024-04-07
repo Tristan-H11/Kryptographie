@@ -1,54 +1,18 @@
-<mat-sidenav-container *ngIf="isServerReachable" class="global-container">
-    <mat-sidenav class="sidenav" mode="side" opened>
-        <div class="inner-sidenav-container">
-            <button mat-stroked-button
-                    *ngIf="!isTurboMode"
-                    (click)="toggleTurboMode()"
-                    class="turbo-toggle-button">
-                Normaler Modus aktiv
-            </button>
-            <button mat-flat-button
-                    *ngIf="isTurboMode"
-                    (click)="toggleTurboMode()"
-                    class="turbo-toggle-button"
-                    color="warn">
-                Turbo Modus aktiv
-            </button>
-            <div class="sidenav-header">
-
-                <div>Encryption Tool</div>
-            </div>
-
-            <button mat-stroked-button routerLink="/startseite">Startseite</button>
-            <mat-divider></mat-divider>
-            <div class="sidenav-client-button-container">
-                <button *ngFor="let client of getClients()" color="primary" mat-raised-button
-                        routerLink="/client/{{client.name}}">{{client.name}}</button>
-            </div>
-            <mat-divider></mat-divider>
-            <button mat-stroked-button routerLink="/exponentiation">Exponentiation</button>
-            <mat-divider></mat-divider>
-            <button mat-stroked-button routerLink="/extendedGcd">Extended GCD</button>
-            <mat-divider></mat-divider>
-            <button mat-stroked-button routerLink="/shanks">Shanks</button>
-            <mat-divider></mat-divider>
-            <button mat-stroked-button routerLink="/modularInverse">Modulo Inverse</button>
-            <mat-divider></mat-divider>
-            <button mat-stroked-button routerLink="/multiplication">Multiplikation</button>
-            <mat-divider></mat-divider>
-            <button mat-stroked-button routerLink="/menezesVanstone">MenezesVanstone</button>
-
-            <div class="sidenav-footer">
-                <mat-divider></mat-divider>
-                Integrationsprojekt Kryptographie
-            </div>
-        </div>
+<!--
+If the server is reachable, the navbar and the main content are displayed.
+-->
+<mat-sidenav-container *ngIf="isServerReachable" class="sidenav-container">
+    <mat-sidenav mode="side" opened class="sidenav">
+        <app-navbar></app-navbar>
     </mat-sidenav>
-    <mat-sidenav-content class="sidenav-content">
+    <mat-sidenav-content class="main-content">
         <router-outlet></router-outlet>
     </mat-sidenav-content>
 </mat-sidenav-container>
 
+<!--
+If the server is not reachable, a message is displayed to the user.
+-->
 <div *ngIf="!isServerReachable" class="big-server-not-reachable-text">
     Der Server ist derzeit nicht erreichbar.
     <br><br>
@@ -61,5 +25,4 @@
     </mat-form-field>
     <!-- Button zum Speichern der server IP -->
     <button mat-raised-button (click)="saveServerURL()">Speichern</button>
-
 </div>
