@@ -131,11 +131,7 @@ pub struct MvCipherText {
 
 impl From<MvStringCiphertext> for MvCipherText {
     fn from(ciphertext: MvStringCiphertext) -> Self {
-        let points = ciphertext
-            .points
-            .into_iter()
-            .map(Into::into)
-            .collect();
+        let points = ciphertext.points.into_iter().map(Into::into).collect();
 
         MvCipherText {
             encrypted_message: ciphertext.ciphertext,
@@ -229,26 +225,7 @@ pub(crate) async fn encrypt(
     let req_body: MvEncryptRequest = req_body.into_inner();
 
     call_checked_with_parsed_big_ints(|| {
-        let generator = FiniteFieldEllipticCurvePoint {
-            x: req_body.public_key.curve.generator.x.parse().unwrap(),
-            y: req_body.public_key.curve.generator.y.parse().unwrap(),
-            is_infinite: req_body.public_key.curve.generator.is_infinite,
-        };
-
-        let curve = SecureFiniteFieldEllipticCurve {
-            a: req_body.public_key.curve.a,
-            prime: req_body.public_key.curve.prime.parse().unwrap(),
-            order_of_subgroup: req_body.public_key.curve.order_of_subgroup.parse().unwrap(),
-            generator,
-        };
-
-        let y = FiniteFieldEllipticCurvePoint {
-            x: req_body.public_key.y.x.parse().unwrap(),
-            y: req_body.public_key.y.y.parse().unwrap(),
-            is_infinite: req_body.public_key.y.is_infinite,
-        };
-
-        let public_key = MenezesVanstonePublicKey { curve, y };
+        let public_key = req_body.public_key.clone().into();
 
         let public_key = MenezesVanstoneStringPublicKey {
             mv_key: public_key,
@@ -264,20 +241,7 @@ pub(crate) async fn encrypt(
 
         let ciphertext = MenezesVanstoneStringScheme::encrypt(&public_key, &message, service);
 
-        let points = ciphertext
-            .points
-            .iter()
-            .map(|point| EcPoint {
-                x: point.x.to_string(),
-                y: point.y.to_string(),
-                is_infinite: point.is_infinite,
-            })
-            .collect();
-
-        let response = MvCipherText {
-            encrypted_message: ciphertext.ciphertext,
-            points,
-        };
+        let response = MvCipherText::from(ciphertext);
 
         Ok(HttpResponse::Ok().json(response))
     })
@@ -298,46 +262,14 @@ pub(crate) async fn decrypt(
     let req_body: MvDecryptRequest = req_body.into_inner();
 
     call_checked_with_parsed_big_ints(|| {
-        let generator = FiniteFieldEllipticCurvePoint {
-            x: req_body.private_key.curve.generator.x.parse().unwrap(),
-            y: req_body.private_key.curve.generator.y.parse().unwrap(),
-            is_infinite: req_body.private_key.curve.generator.is_infinite,
-        };
-        let curve = SecureFiniteFieldEllipticCurve {
-            a: req_body.private_key.curve.a,
-            prime: req_body.private_key.curve.prime.parse().unwrap(),
-            order_of_subgroup: req_body
-                .private_key
-                .curve
-                .order_of_subgroup
-                .parse()
-                .unwrap(),
-            generator,
-        };
-
-        let private_key = MenezesVanstonePrivateKey {
-            curve,
-            x: req_body.private_key.x.parse().unwrap(),
-        };
+        let private_key = req_body.private_key.clone().into();
 
         let private_key = MenezesVanstoneStringPrivateKey {
             mv_key: private_key,
             radix: req_body.radix,
         };
 
-        let ciphertext = MvStringCiphertext {
-            ciphertext: req_body.cipher_text.encrypted_message.clone(),
-            points: req_body
-                .cipher_text
-                .points
-                .iter()
-                .map(|point| FiniteFieldEllipticCurvePoint {
-                    x: point.x.parse().unwrap(),
-                    y: point.y.parse().unwrap(),
-                    is_infinite: false,
-                })
-                .collect(),
-        };
+        let ciphertext = req_body.cipher_text.clone().into();
 
         let service = match query.use_fast {
             true => NumberTheoryService::new(Fast),
