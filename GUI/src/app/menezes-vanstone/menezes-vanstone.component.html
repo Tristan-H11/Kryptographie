@@ -67,6 +67,11 @@
             <mat-label>Geheimtext</mat-label>
             <textarea matInput placeholder="Qnf vfg rva jhaqreonere Gnt..." [(ngModel)]="client.ciphertext.encrypted_message"></textarea>
         </mat-form-field>
+        Signature: {{JSON.stringify(client.signature)}}
+        <br>
+        Die soeben entschlüsselte Nachricht ist {{client.signature_valid}}
+        <br>
+        <br>
         Punkte: {{JSON.stringify(client.ciphertext.points)}}
 
         <mat-action-row>

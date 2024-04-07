@@ -17,11 +17,11 @@ import {MvKeygenConfig} from "../models/mv-keygen-config";
 import {
     copyMvCipherText,
     copyMvKeyPair,
-    copyMvPublicKey,
-    MvCipherText,
+    copyMvPublicKey, copyMvSignature,
     MvDecryptRequest,
     MvEncryptRequest,
-    MvKeyPair,
+    MvSignRequest,
+    MvVerifyRequest,
 } from "../models/mv-beans";
 import {ClientData} from "../models/client";
 import {StateManagementService} from "../services/management/state-management.service";
@@ -57,10 +57,11 @@ export class MenezesVanstoneComponent {
     public numberSystem: number = 55296;
     public millerRabinIterations: number = 100;
     public coefficientA: number = 5;
-    public random_seed: number= 3;
+    public random_seed: number = 3;
 
     private configurationData = this.stateService.getConfigurationData();
 
+    // TODO: Vorläufige Dummy-Implementierung. Wird noch überarbeitet
     public clients: ClientData[] =
         [
             {
@@ -68,70 +69,74 @@ export class MenezesVanstoneComponent {
                 keyPair: {
                     public_key: {
                         curve: {
-                            a: -25, prime: "259421157018863391010844302469063884861",
+                            a: NaN, prime: "Empty",
                             generator: {
-                                x: "152198469913648308717544634828661961231",
-                                y: "50296851635441247077790719368115682846",
+                                x: "Empty",
+                                y: "Empty",
                                 is_infinite: false
                             },
-                            order_of_subgroup: "2"
+                            order_of_subgroup: "Empty"
                         },
                         y: {
-                            x: "26370934085012164485153092381593646122",
-                            y: "126290671313284822425335475919650022666",
+                            x: "Empty",
+                            y: "Empty",
                             is_infinite: false
                         }
                     },
                     private_key: {
                         curve: {
-                            a: -25, prime: "259421157018863391010844302469063884861",
+                            a: NaN, prime: "Empty",
                             generator: {
-                                x: "152198469913648308717544634828661961231",
-                                y: "50296851635441247077790719368115682846",
+                                x: "Empty",
+                                y: "Empty",
                                 is_infinite: false
                             },
-                            order_of_subgroup: "2"
+                            order_of_subgroup: "Empty"
                         },
-                        x: "12401522966815986254216934185370504355"
+                        x: "Empty"
                     }
                 },
                 plaintext: "",
-                ciphertext: {encrypted_message: "", points: []}
+                ciphertext: {encrypted_message: "", points: []},
+                signature: {r: "Empty", s: "Empty"},
+                signature_valid: "ungeprüft"
             },
             {
                 name: "Bob",
                 keyPair: {
                     public_key: {
                         curve: {
-                            a: -25, prime: "259421157018863391010844302469063884861",
+                            a: NaN, prime: "Empty",
                             generator: {
-                                x: "152198469913648308717544634828661961231",
-                                y: "50296851635441247077790719368115682846",
+                                x: "Empty",
+                                y: "Empty",
                                 is_infinite: false
                             },
-                            order_of_subgroup: "2"
+                            order_of_subgroup: "Empty"
                         },
                         y: {
-                            x: "26370934085012164485153092381593646122",
-                            y: "126290671313284822425335475919650022666",
+                            x: "Empty",
+                            y: "Empty",
                             is_infinite: false
                         }
                     },
                     private_key: {
                         curve: {
-                            a: -25, prime: "259421157018863391010844302469063884861",
+                            a: NaN, prime: "Empty",
                             generator: {
-                                x: "152198469913648308717544634828661961231",
-                                y: "50296851635441247077790719368115682846",
+                                x: "Empty",
+                                y: "Empty",
                                 is_infinite: false
                             },
-                            order_of_subgroup: "2"
+                            order_of_subgroup: "Empty"
                         },
-                        x: "12401522966815986254216934185370504355"
+                        x: "Empty"
                     }
                 },
                 plaintext: "",
-                ciphertext: {encrypted_message: "", points: []}
+                ciphertext: {encrypted_message: "", points: []},
+                signature: {r: "Empty", s: "Empty"},
+                signature_valid: "ungeprüft"
             }
         ];
 
@@ -162,20 +167,30 @@ export class MenezesVanstoneComponent {
     public encrypt(name: string): void {
         let client = (name === "Alice") ? this.clients[0] : this.clients[1];
         let partner = (name === "Alice") ? this.clients[1] : this.clients[0];
-        console.log("Encrypting with key: ", partner.keyPair.public_key);
         let request: MvEncryptRequest = {
             public_key: copyMvPublicKey(partner.keyPair.public_key),
             message: client.plaintext,
             radix: this.numberSystem
         };
+        // TODO Refactor! Verschachtelte Request sind ein NO-GO!
         this.backendRequestService.encrypt(request).then(ciphertext => {
             client.ciphertext = copyMvCipherText(ciphertext);
-            console.log("Encrypted message: ", JSON.stringify(ciphertext));
+
+            let body: MvSignRequest = {
+                private_key: client.keyPair.private_key,
+                message: client.plaintext
+            };
+            this.backendRequestService.sign(body).then(signature => {
+                client.signature = signature;
+                client.signature_valid = "ungeprüft";
+            });
         });
     }
 
     public decrypt(name: string): void {
         let client = (name === "Alice") ? this.clients[0] : this.clients[1];
+        let partner = (name === "Alice") ? this.clients[1] : this.clients[0];
+
         let request: MvDecryptRequest = {
             private_key: copyMvKeyPair(client.keyPair).private_key,
             cipher_text: copyMvCipherText(client.ciphertext),
@@ -183,6 +198,19 @@ export class MenezesVanstoneComponent {
         };
         this.backendRequestService.decrypt(request).then(plaintext => {
             client.plaintext = plaintext.message;
+
+            let body: MvVerifyRequest = {
+                public_key: partner.keyPair.public_key,
+                message: client.plaintext,
+                signature: client.signature
+            };
+            this.backendRequestService.verify(body).then(result => {
+                if (result.message === "true") {
+                    client.signature_valid = "gültig";
+                } else {
+                    client.signature_valid = "ungültig";
+                }
+            });
         });
     }
 
@@ -191,6 +219,10 @@ export class MenezesVanstoneComponent {
         let client = (name === "Alice") ? this.clients[0] : this.clients[1];
         let partner = (name === "Alice") ? this.clients[1] : this.clients[0];
         partner.ciphertext = copyMvCipherText(client.ciphertext);
+        partner.signature = copyMvSignature(client.signature);
+
+        client.signature_valid = "ungeprüft";
+        client.signature = {r: "Empty", s: "Empty"};
         client.plaintext = "";
         client.ciphertext = {encrypted_message: "", points: []};
     }

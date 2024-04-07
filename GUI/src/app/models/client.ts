@@ -1,4 +1,4 @@
-import {MvCipherText, MvKeyPair} from "./mv-beans";
+import {MvCipherText, MvKeyPair, MvSignature} from "./mv-beans";
 
 /**
  * Darstellung der Clients.
@@ -18,4 +18,6 @@ export interface ClientData {
 	keyPair: MvKeyPair;
 	plaintext: string;
 	ciphertext: MvCipherText;
+    signature: MvSignature;
+    signature_valid: string;
 }
