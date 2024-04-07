@@ -9,7 +9,7 @@ import {RsaConfigurationData} from "../../models/rsa-configuration-data";
 })
 export class StateManagementService {
 
-    private server_url = signal("http://localhost:8080");
+    private server_url = signal("https://krypto-server.tristan-hoermann.de");
 
     private configurationDataRSA = signal(RsaConfigurationData.createDefaultConfigurationDataForRSA());
 
