@@ -249,4 +249,13 @@ export class MenezesVanstoneComponent {
     public calcMaxNumbersystem(): number {
         return 2 ** this.modulusWidth;
     }
+
+    // TODO überarbeiten
+    /**
+     * Hat der Partner keine Primzahl gesetzt, so hat er kein Schlüsselpaar
+     */
+    public partnerHasNoKeyPairSet(name: string): boolean {
+        let partner = (name === "Alice") ? this.clients[1] : this.clients[0];
+        return partner.keyPair.public_key.curve.prime === "Empty";
+    }
 }
