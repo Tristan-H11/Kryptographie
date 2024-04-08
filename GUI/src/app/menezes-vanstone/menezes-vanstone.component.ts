@@ -231,6 +231,8 @@ export class MenezesVanstoneComponent {
         let client = (name === "Alice") ? this.clients[0] : this.clients[1];
         client.plaintext = "";
         client.ciphertext = {encrypted_message: "", points: []};
+        client.signature = {r: "Empty", s: "Empty"};
+        client.signature_valid = "ungeprüft";
     }
 
     protected readonly JSON = JSON;

@@ -64,15 +64,16 @@
             <textarea matInput placeholder="Das ist ein wunderbarer Tag..." [(ngModel)]="client.plaintext"></textarea>
         </mat-form-field>
         <mat-form-field appearance="outline" class="width-100">
-            <mat-label>Geheimtext</mat-label>
+            <mat-label>Geheimtext - Zeichenkette</mat-label>
             <textarea matInput placeholder="Qnf vfg rva jhaqreonere Gnt..." [(ngModel)]="client.ciphertext.encrypted_message"></textarea>
+        </mat-form-field>
+        <mat-form-field appearance="outline" class="width-100">
+            <mat-label>Geheimtext - Punkte</mat-label>
+            <textarea matInput [disabled]="true">{{JSON.stringify(client.ciphertext.points)}}</textarea>
         </mat-form-field>
         Signature: {{JSON.stringify(client.signature)}}
         <br>
         Die soeben entschlüsselte Nachricht ist {{client.signature_valid}}
-        <br>
-        <br>
-        Punkte: {{JSON.stringify(client.ciphertext.points)}}
 
         <mat-action-row>
             <button mat-flat-button color="primary" (click)="clearFields(client.name)">Löschen</button>
