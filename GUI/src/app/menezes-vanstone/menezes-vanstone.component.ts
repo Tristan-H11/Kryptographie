@@ -25,6 +25,7 @@ import {
 } from "../models/mv-beans";
 import {ClientData} from "../models/client";
 import {StateManagementService} from "../services/management/state-management.service";
+import {MatCard, MatCardContent, MatCardHeader, MatCardTitle} from "@angular/material/card";
 
 @Component({
     selector: "app-menezes-vanstone",
@@ -44,7 +45,11 @@ import {StateManagementService} from "../services/management/state-management.se
         MatSuffix,
         NgForOf,
         ReactiveFormsModule,
-        FormsModule
+        FormsModule,
+        MatCard,
+        MatCardTitle,
+        MatCardHeader,
+        MatCardContent
     ],
     templateUrl: "./menezes-vanstone.component.html",
     styleUrl: "./menezes-vanstone.component.scss"
