@@ -236,6 +236,7 @@ impl SecureFiniteFieldEllipticCurve {
     }
 
     //TODO Doku: Nach Satz 1.15 und Definition 1.27 (Kryptographie 2)
+    //TODO Auch aufnehmen, dass b eine Primzahl > 3 sein muss
     pub fn calculate_legendre_symbol(a: &BigInt, b: &BigInt) -> BigInt {
         let service = NumberTheoryService::new(Fast); // TODO übergeben lassen
 
