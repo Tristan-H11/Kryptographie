@@ -235,8 +235,16 @@ impl SecureFiniteFieldEllipticCurve {
         }
     }
 
+    //TODO Doku: Nach Satz 1.15 und Definition 1.27 (Kryptographie 2)
     pub fn calculate_legendre_symbol(a: &BigInt, b: &BigInt) -> BigInt {
         let service = NumberTheoryService::new(Fast); // TODO übergeben lassen
+
+        // TODO: Fall von b teilt a = 0 zurückgeben
+        // Danach kann das Kriterium auf Rückgabe von fastExp(a, b/2 -1, b) reduziert werden, weil
+        // nur noch 1 und -1 als Ergebnis herauskommen können.
+
+        // TODO Nach Satz 1.18 (p-1 / p) = (-1)^((p-1)/2). Dabei Parität des Exponenten prüfen
+        // TODO Nach Satz 1.19 (2 / p) = (-1)^((p^2 - 1) / 8).  Dabei Parität des Exponenten prüfen
 
         // legendre_symbol = a ^ ((b - 1) / 2) (mod b)
         let legendre_symbol = service.fast_exponentiation(&a, &b.decrement().half(), &b);
