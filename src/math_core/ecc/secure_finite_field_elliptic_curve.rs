@@ -1,4 +1,4 @@
-use std::ops::{AddAssign, Div, Neg, Sub};
+use std::ops::{AddAssign, Div, Neg};
 
 use crate::api::endpoints::mv::EllipticCurveBean;
 use atomic_counter::RelaxedCounter;
@@ -153,24 +153,7 @@ impl SecureFiniteFieldEllipticCurve {
                 prime.add_assign(BigInt::from(8));
             }
 
-            let first_complex_number = ComplexNumber::new(prime.clone(), BigInt::zero());
-            let second_complex_number =
-                ComplexNumber::new(Self::calculate_w(&prime, 2.into()), BigInt::one());
-            let gg_t: ComplexNumber =
-                complex_euclidean_algorithm(first_complex_number, second_complex_number);
-
-            // Der Realteil von alpha ist immer der ungerade Anteil des ggT von p und W(p, 2)
-            // dadurch, dass das obige Verfahren immer einen geraden und ungeraden Anteil liefert,
-            // lässt sich alpha problemlos bestimmen. D.W. muss alpha die Absolutwerte enthalten.
-            let alpha: ComplexNumber;
-            if gg_t.real.is_even() {
-                alpha = ComplexNumber::new(gg_t.imaginary.clone().abs(), gg_t.real.clone().abs());
-            } else {
-                alpha = ComplexNumber::new(gg_t.real.clone().abs(), gg_t.imaginary.clone().abs());
-            }
-
-            let big_n: BigInt =
-                prime.increment() - Self::calculate_real_part(alpha, &prime).double();
+            let big_n = Self::calculate_big_n(&prime, n);
 
             q = big_n.div(8);
             // Ist q = N / 8 eine Primzahl, so wird die Schleife verlassen und das q ist gültig.
@@ -181,6 +164,26 @@ impl SecureFiniteFieldEllipticCurve {
             // Es wird (wie oben auch) um 8 erhöht, da p = 5 (mod 8) gelten muss.
             prime.add_assign(BigInt::from(8));
         }
+    }
+
+    fn calculate_big_n(prime: &BigInt, n: i32) -> BigInt {
+        let first_complex_number = ComplexNumber::new(prime.clone(), BigInt::zero());
+        let second_complex_number =
+            ComplexNumber::new(Self::calculate_w(&prime, 2.into()), BigInt::one());
+        let gg_t: ComplexNumber =
+            complex_euclidean_algorithm(first_complex_number, second_complex_number);
+
+        // Der Realteil von alpha ist immer der ungerade Anteil des ggT von p und W(p, 2)
+        // dadurch, dass das obige Verfahren immer einen geraden und ungeraden Anteil liefert,
+        // lässt sich alpha problemlos bestimmen. D.W. muss alpha die Absolutwerte enthalten.
+        let alpha: ComplexNumber;
+        if gg_t.real.is_even() {
+            alpha = ComplexNumber::new(gg_t.imaginary.clone().abs(), gg_t.real.clone().abs());
+        } else {
+            alpha = ComplexNumber::new(gg_t.real.clone().abs(), gg_t.imaginary.clone().abs());
+        }
+
+        prime.increment() - Self::calculate_real_part(alpha, &prime, n).double()
     }
 
     pub fn calculate_w(prime: &BigInt, z: BigInt) -> BigInt {
@@ -201,15 +204,13 @@ impl SecureFiniteFieldEllipticCurve {
         w
     }
 
-    pub fn calculate_real_part(alpha: ComplexNumber, prime: &BigInt) -> BigInt {
+    pub fn calculate_real_part(alpha: ComplexNumber, prime: &BigInt, n: i32) -> BigInt {
         let mut count = 4;
         let mut alpha = alpha.clone();
         // Schleife, die alle möglichen Konjugationen von alpha durchgeht
         loop {
-            let complex_legendre_symbol = ComplexNumber::new(
-                Self::calculate_legendre_symbol(&alpha.real, prime),
-                0.into(),
-            );
+            let complex_legendre_symbol =
+                ComplexNumber::new(Self::calculate_legendre_symbol(&n.into(), prime), 0.into());
             let two_two = ComplexNumber::new(2.into(), 2.into());
             // Produkt aus der Differenz von alpha und dessen Legendre-Symbol und dem konjugierten Wert von 2 + 2i
             let product = (&alpha - &complex_legendre_symbol) * two_two.conjugate();
@@ -237,23 +238,40 @@ impl SecureFiniteFieldEllipticCurve {
 
     //TODO Doku: Nach Satz 1.15 und Definition 1.27 (Kryptographie 2)
     //TODO Auch aufnehmen, dass b eine Primzahl > 3 sein muss
-    pub fn calculate_legendre_symbol(a: &BigInt, b: &BigInt) -> BigInt {
+    pub fn calculate_legendre_symbol(a: &BigInt, prime: &BigInt) -> BigInt {
         let service = NumberTheoryService::new(Fast); // TODO übergeben lassen
 
         // TODO: Fall von b teilt a = 0 zurückgeben
-        // Danach kann das Kriterium auf Rückgabe von fastExp(a, b/2 -1, b) reduziert werden, weil
+        // Danach kann das Kriterium auf Rückgabe von fastExp(a, prime/2 -1, prime) reduziert werden, weil
         // nur noch 1 und -1 als Ergebnis herauskommen können.
 
-        // TODO Nach Satz 1.18 (p-1 / p) = (-1)^((p-1)/2). Dabei Parität des Exponenten prüfen
-        // TODO Nach Satz 1.19 (2 / p) = (-1)^((p^2 - 1) / 8).  Dabei Parität des Exponenten prüfen
+        let negative_one = BigInt::from(-1);
+        if a == &prime.decrement() {
+            // Satz 1.18
+            let exponent: BigInt = prime.decrement().div(2);
+            return if exponent.is_even() {
+                BigInt::one()
+            } else {
+                negative_one
+            };
+        }
+
+        if a == &BigInt::from(2) {
+            // Satz 1.19
+            let exponent: BigInt = prime.pow(2).decrement().div(8);
+            return if exponent.is_even() {
+                BigInt::one()
+            } else {
+                negative_one
+            };
+        }
 
         // legendre_symbol = a ^ ((b - 1) / 2) (mod b)
-        let legendre_symbol = service.fast_exponentiation(&a, &b.decrement().half(), &b);
+        let legendre_symbol = service.fast_exponentiation(&a, &prime.decrement().half(), &prime);
         if legendre_symbol.is_one() {
             BigInt::one()
         } else {
-            // legendre_symbol - b (mod b)
-            legendre_symbol.sub(b).rem_euclid(b)
+            negative_one
         }
     }
 
@@ -331,6 +349,39 @@ impl SecureFiniteFieldEllipticCurve {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn test_calculate_big_n() {
+        let mut prime = BigInt::from(17);
+        let n = 2;
+        let big_n = SecureFiniteFieldEllipticCurve::calculate_big_n(&mut prime, n);
+        assert_eq!(big_n, BigInt::from(16));
+
+        let mut prime = BigInt::from(13);
+        let n = 1;
+        let big_n = SecureFiniteFieldEllipticCurve::calculate_big_n(&mut prime, n);
+        assert_eq!(big_n, BigInt::from(8));
+
+        let mut prime = BigInt::from(17);
+        let n = 1;
+        let big_n = SecureFiniteFieldEllipticCurve::calculate_big_n(&mut prime, n);
+        assert_eq!(big_n, BigInt::from(16));
+
+        let mut prime = BigInt::from(13);
+        let n = 3;
+        let big_n = SecureFiniteFieldEllipticCurve::calculate_big_n(&mut prime, n);
+        assert_eq!(big_n, BigInt::from(8));
+
+        let mut prime = BigInt::from(13);
+        let n = 2;
+        let big_n = SecureFiniteFieldEllipticCurve::calculate_big_n(&mut prime, n);
+        assert_eq!(big_n, BigInt::from(20));
+
+        let mut prime = BigInt::from(509);
+        let n = 2;
+        let big_n = SecureFiniteFieldEllipticCurve::calculate_big_n(&mut prime, n);
+        assert_eq!(big_n, BigInt::from(500));
+    }
 
     #[test]
     fn test_has_point_not() {
