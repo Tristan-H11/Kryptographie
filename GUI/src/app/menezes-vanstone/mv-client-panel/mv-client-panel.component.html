@@ -21,7 +21,8 @@
                     <mat-card-title>Domainparameter</mat-card-title>
                 </mat-card-header>
                 <mat-card-content>
-                    Kurve: y² = x³ + <strong>({{ client.keyPair | emptyIfUndefined:'public_key.curve.a' }})</strong> x (mod
+                    Kurve: y² = x³ + <strong>({{ client.keyPair | emptyIfUndefined:'public_key.curve.a' }})</strong> x
+                    (mod
                     <strong>{{ client.keyPair | emptyIfUndefined:'public_key.curve.prime' }}</strong>)
                     <br>
                     Generator: <strong>G({{ client.keyPair | emptyIfUndefined:'public_key.curve.generator.x' }}
@@ -92,13 +93,13 @@
     </div>
 
     <mat-action-row>
-        <!-- A dropdown showing all possibleTargetClients and setting the value to sendingToClient -->
         <mat-form-field appearance="outline">
             <mat-label>Senden an</mat-label>
             <mat-select [(value)]="this.client.sendingTo">
                 <mat-option *ngFor="let client of possibleTargetClients" [value]="client">{{ client.name }}</mat-option>
             </mat-select>
         </mat-form-field>
+        <button mat-flat-button color="warn" (click)="delete()">{{ client.name }} löschen</button>
         <button mat-flat-button color="primary" (click)="clearFields()">Felder leeren</button>
         <button mat-flat-button color="primary"
                 [disabled]="client.plaintext.length<1 || !client.sendingTo?.keyPair"

@@ -7,6 +7,7 @@
     <mv-client-panel *ngFor="let client of clients"
                      [client]="client"
                      [possibleTargetClients]="getPossibleTargetClients(client)"
-                     [config]="this.config"/>
+                     [config]="this.config"
+                     (deleteSelf)="deleteClient(client)"/>
 
 </mat-accordion>

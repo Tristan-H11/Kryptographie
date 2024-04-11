@@ -1,4 +1,4 @@
-import {Component, Input} from "@angular/core";
+import {Component, EventEmitter, Input, Output} from "@angular/core";
 import {MatFormField, MatLabel} from "@angular/material/form-field";
 import {FormsModule} from "@angular/forms";
 import {MatCard, MatCardContent, MatCardHeader, MatCardTitle} from "@angular/material/card";
@@ -61,8 +61,6 @@ export class MvClientPanelComponent {
     @Input()
     public possibleTargetClients: MvClientData[] = [];
 
-    // Dieser Input ist ein Workaround, weil Objekte per @Input() als Referenz übergeben werden und damit immer
-    // der aktuelle Wert vorliegt.
     @Input()
     public config: MvConfiguration = {
         modulusWidth: 0,
@@ -72,17 +70,19 @@ export class MvClientPanelComponent {
         numberSystem: 0
     };
 
+    @Output()
+    public deleteSelf: EventEmitter<void> = new EventEmitter<void>();
+
     protected readonly JSON = JSON;
 
     constructor(private backendRequestService: MvBackendRequestService,) {
-
     }
 
     /**
      * Verschlüsselt die Nachricht für das gewählte Ziel.
      */
     public encrypt(): void {
-        if (!this.client.sendingTo || !this.client.sendingTo!.keyPair) {
+        if (!this.client.sendingTo || !this.client.sendingTo.keyPair) {
             return;
         }
 
@@ -176,5 +176,12 @@ export class MvClientPanelComponent {
      */
     public sendingToNotSet(): boolean {
         return this.client.sendingTo === undefined;
+    }
+
+    /**
+     * Löscht sich selber aus der Liste der Clients.
+     */
+    public delete(): void {
+        this.deleteSelf.emit();
     }
 }

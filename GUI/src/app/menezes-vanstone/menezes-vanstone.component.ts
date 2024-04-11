@@ -81,6 +81,14 @@ export class MenezesVanstoneComponent {
         ];
 
     /**
+     * Löscht den übergebenen Client aus der Liste der Clients.
+     * @param client
+     */
+    public deleteClient(client: MvClientData) {
+        this.clients = this.clients.filter(c => c !== client);
+    }
+
+    /**
      * Gibt eine shallow copy (!) der Clients zurück, die nicht der übergebene Client sind.
      * Damit bleiben alle Referenzen erhalten, nur der Client selbst wird nicht zurückgegeben.
      */
