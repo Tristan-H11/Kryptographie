@@ -26,6 +26,7 @@ import {
 import {ClientData} from "../models/client";
 import {StateManagementService} from "../services/management/state-management.service";
 import {MatCard, MatCardContent, MatCardHeader, MatCardTitle} from "@angular/material/card";
+import {MvBasicsPanelComponent} from "./mv-basics-panel/mv-basics-panel.component";
 
 @Component({
     selector: "app-menezes-vanstone",
@@ -49,7 +50,8 @@ import {MatCard, MatCardContent, MatCardHeader, MatCardTitle} from "@angular/mat
         MatCard,
         MatCardTitle,
         MatCardHeader,
-        MatCardContent
+        MatCardContent,
+        MvBasicsPanelComponent
     ],
     templateUrl: "./menezes-vanstone.component.html",
     styleUrl: "./menezes-vanstone.component.scss"
