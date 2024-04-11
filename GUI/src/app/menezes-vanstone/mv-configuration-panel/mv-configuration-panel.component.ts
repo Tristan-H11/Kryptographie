@@ -61,7 +61,7 @@ export class MvConfigurationPanelComponent {
      * Generiert Schlüsselpaare für den gewählten Client.
      */
     public generateKeys(name: string) {
-        let loadingDialog = this.dialogService.openLoadDialog();
+        let loadingCalcKey = this.dialogService.startTimedCalc();
         let config: MvKeygenConfig = {
             modulus_width: this.config.modulusWidth,
             miller_rabin_rounds: this.config.millerRabinRounds,
@@ -78,7 +78,7 @@ export class MvConfigurationPanelComponent {
             } else {
                 console.error("MV-KeypairGen: Client not found: " + name);
             }
-            loadingDialog.close();
+            this.dialogService.endTimedCalc(loadingCalcKey, "Schlüsselpaar für " + name + " generiert.");
         });
     }
 

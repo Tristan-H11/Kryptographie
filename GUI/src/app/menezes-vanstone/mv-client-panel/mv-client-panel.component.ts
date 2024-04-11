@@ -88,7 +88,7 @@ export class MvClientPanelComponent {
             return;
         }
 
-        let loadingDialog = this.dialogService.openLoadDialog();
+        let loadingCalcKey = this.dialogService.startTimedCalc();
         let request: MvEncryptRequest = {
             public_key: copyMvPublicKey(this.client.sendingTo.keyPair.public_key),
             message: this.client.plaintext,
@@ -99,7 +99,7 @@ export class MvClientPanelComponent {
             this.client.ciphertext = copyMvCipherText(ciphertext);
 
             if (!this.client.keyPair) {
-                loadingDialog.close();
+                this.dialogService.endTimedCalc(loadingCalcKey, "Nachricht verschlüsselt.");
                 return;
             }
 
@@ -110,7 +110,7 @@ export class MvClientPanelComponent {
             this.backendRequestService.sign(body).then(signature => {
                 this.client.signature = signature;
                 this.client.signature_valid = "ungeprüft";
-                loadingDialog.close();
+                this.dialogService.endTimedCalc(loadingCalcKey, "Nachricht verschlüsselt.");
             });
         });
 
@@ -124,7 +124,7 @@ export class MvClientPanelComponent {
             return;
         }
 
-        let loadingDialog = this.dialogService.openLoadDialog();
+        let loadingCalcKey = this.dialogService.startTimedCalc();
         let request: MvDecryptRequest = {
             private_key: copyMvKeyPair(this.client.keyPair).private_key,
             cipher_text: copyMvCipherText(this.client.ciphertext),
@@ -134,7 +134,7 @@ export class MvClientPanelComponent {
             this.client.plaintext = plaintext.message;
 
             if (!this.client.receivedFrom || !this.client.receivedFrom.keyPair) {
-                loadingDialog.close();
+                this.dialogService.endTimedCalc(loadingCalcKey, "Nachricht entschlüsselt.");
                 return;
             }
             let body: MvVerifyRequest = {
@@ -148,7 +148,7 @@ export class MvClientPanelComponent {
                 } else {
                     this.client.signature_valid = "ungültig";
                 }
-                loadingDialog.close();
+                this.dialogService.endTimedCalc(loadingCalcKey, "Nachricht entschlüsselt.");
             });
         });
     }

@@ -40,17 +40,17 @@ export class DialogService {
         }
         const duration = Date.now() - calculation.startTime;
         calculation.loadingDialogRef.close();
-        this.showSnackbar(`${message}. Dauer: ${duration}ms`);
+        this.showSnackbar(`${message} Dauer: ${duration}ms`);
         this.calculations.delete(key); // Entfernt die Berechnung aus der Map, da sie abgeschlossen ist
     }
 
-    showSnackbar(message: string) {
+    private showSnackbar(message: string) {
         this.snackBar.open(message, "Ok", {
             duration: 5000,
         });
     }
 
-    openLoadDialog(): MatDialogRef<LoadingDialogComponent> {
+    private openLoadDialog(): MatDialogRef<LoadingDialogComponent> {
         return this.dialog.open(LoadingDialogComponent, {
             disableClose: true // Verhindert das Schließen durch den Benutzer
         });

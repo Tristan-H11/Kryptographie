@@ -222,19 +222,16 @@ export class RsaComponent {
      * Generates a new RSA key pair for the given client.
      */
     private generateKeyPair(requestContent: RsaConfigurationData, client: Client): void {
-        let loadingDialog = this.dialogService.openLoadDialog();
-        const startTime = Date.now();
+        let loadingCalcKey = this.dialogService.startTimedCalc();
         this.backendRequestService.createKeyPair(requestContent).then(
             (keyPair) => {
-                const duration = Date.now() - startTime;
                 let entry = this.stateService.getClientKey(client);
                 if (entry) {
                     entry.set(keyPair);
                 } else {
                     console.log("Client " + client + " is not registered!");
                 }
-                loadingDialog.close();
-                this.dialogService.showSnackbar("Schlüsselpaar für " + client.name + " generiert. Dauer: " + duration + "ms");
+                this.dialogService.endTimedCalc(loadingCalcKey, "Schlüsselpaar für " + client + " generiert.");
             }
         );
     }
