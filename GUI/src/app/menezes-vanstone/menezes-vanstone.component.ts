@@ -20,6 +20,7 @@ import {StateManagementService} from "../services/management/state-management.se
 import {MatCard, MatCardContent, MatCardHeader, MatCardTitle} from "@angular/material/card";
 import {MvBasicsPanelComponent} from "./mv-basics-panel/mv-basics-panel.component";
 import {MvClientPanelComponent} from "./mv-client-panel/mv-client-panel.component";
+import {MvConfigurationPanelComponent} from "./mv-configuration-panel/mv-configuration-panel.component";
 
 // TODO Auslagern
 export interface MvConfiguration {
@@ -54,7 +55,8 @@ export interface MvConfiguration {
         MatCardHeader,
         MatCardContent,
         MvBasicsPanelComponent,
-        MvClientPanelComponent
+        MvClientPanelComponent,
+        MvConfigurationPanelComponent
     ],
     templateUrl: "./menezes-vanstone.component.html",
     styleUrl: "./menezes-vanstone.component.scss"
@@ -77,39 +79,6 @@ export class MenezesVanstoneComponent {
             createDefaultMvClientData("Bob"),
             createDefaultMvClientData("Charlie")
         ];
-
-    constructor(
-        private stateService: StateManagementService,
-        private backendRequestService: MvBackendRequestService) {
-    }
-
-    public generateKeys(client: string) {
-        let config: MvKeygenConfig = {
-            modulus_width: this.config.modulusWidth,
-            miller_rabin_rounds: this.config.millerRabinRounds,
-            coef_a: this.config.coefA,
-            random_seed: this.config.randomSeed
-        };
-        this.backendRequestService.createKeyPair(config).then(key => {
-            if (client === "Alice") {
-                this.clients[0].keyPair = copyMvKeyPair(key);
-            } else {
-                this.clients[1].keyPair = copyMvKeyPair(key);
-            }
-            console.log("Generated key pair for " + client);
-            console.log(key);
-            console.log(this.clients);
-        });
-    }
-
-    public calcMinimumBitsize(): number {
-        return Math.ceil(Math.log2(this.config.numberSystem));
-    }
-
-    public calcMaxNumbersystem(): number {
-        return 2 ** this.config.modulusWidth;
-    }
-
 
     /**
      * Gibt eine shallow copy (!) der Clients zurück, die nicht der übergebene Client sind.

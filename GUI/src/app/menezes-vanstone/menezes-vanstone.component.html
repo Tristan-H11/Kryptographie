@@ -2,56 +2,11 @@
 
     <mv-basics-panel/>
 
-    <mat-expansion-panel [expanded]="true">
-        <mat-expansion-panel-header>
-            <mat-panel-title>
-                Allgemeine Konfiguration
-            </mat-panel-title>
-            <mat-panel-description>
-                Die Basis-Eigenschaften der Simulation
-            </mat-panel-description>
-        </mat-expansion-panel-header>
-
-        <mat-form-field appearance="outline" class="config-form-field">
-            <mat-label>Modulbreite</mat-label>
-            <input class="text-align-right" matInput type="number" [(ngModel)]="modulusWidth">
-            <span matTextSuffix>-Bit</span>
-            <mat-hint>Bei {{ numberSystem }} mindestens {{ calcMinimumBitsize() }} Bit</mat-hint>
-        </mat-form-field>
-
-        <mat-form-field appearance="outline" class="config-form-field">
-            <mat-label>Zahlensystem</mat-label>
-            <input class="text-align-right" matInput type="number" [(ngModel)]="numberSystem">
-            <mat-hint>Bei {{ modulusWidth }}-Bit maximal {{ calcMaxNumbersystem() }}</mat-hint>
-        </mat-form-field>
-
-        <mat-form-field appearance="outline" class="config-form-field">
-            <mat-label>Miller-Rabin Iterationen</mat-label>
-            <input class="text-align-right" matInput type="number" [(ngModel)]="millerRabinIterations">
-            <span matTextSuffix>-Runden</span>
-        </mat-form-field>
-
-        <mat-form-field appearance="outline" class="config-form-field">
-            <mat-label>Koeffizient a</mat-label>
-            <input class="text-align-right" matInput type="number" [(ngModel)]="coefficientA">
-            <mat-hint>wird '-a^2'</mat-hint>
-        </mat-form-field>
-
-        <mat-form-field appearance="outline" class="config-form-field">
-            <mat-label>Seed</mat-label>
-            <input class="text-align-right" matInput type="number" [(ngModel)]="random_seed.radix">
-        </mat-form-field>
-
-        <mat-action-row class="action-row-content-left">
-            <button mat-flat-button *ngFor="let client of clients" color="primary" (click)="generateKeys(client.name)">
-                Schlüsselpaar für {{ client.name }} erzeugen
-            </button>
-        </mat-action-row>
-    </mat-expansion-panel>
+    <mv-configuration-panel [config]="this.config" [clients]="clients"/>
 
     <mv-client-panel *ngFor="let client of clients"
                      [client]="client"
                      [possibleTargetClients]="getPossibleTargetClients(client)"
-                     [numberSystem]="random_seed"/>
+                     [config]="this.config"/>
 
 </mat-accordion>
