@@ -247,6 +247,18 @@ export class RsaComponent {
         );
     }
 
+    public openNameInputDialog(): void {
+        const dialogRef = this.dialog.open(SimpleDialogComponent, {
+            data: {name: "", aborted: false},
+        });
+        dialogRef.afterClosed().subscribe(result => {
+            if (result.aborted) {
+                return;
+            }
+            this.stateService.createClient(result.name);
+        });
+    }
+
     /**
      * Shows a snackbar with the given message.
      */
