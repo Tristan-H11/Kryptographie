@@ -56,7 +56,13 @@ impl SecureFiniteFieldEllipticCurve {
     /// Angabe von n und der bitbreite des Modulus p.
     /// Die Kurve wird dabei kryptografisch sicher sein und dafür eine Reihe von Bedingungen
     /// erfüllen:
-    /// TODO
+    /// - Es muss gelten n > 0,
+    /// - Es muss für den Modulus p gelten, dass
+    /// -- p mod 8 = 5 und
+    /// -- p nicht 2*n teilt (2n mod p != 0)
+    /// - Eine zyklische Untergruppe der Ordnung q muss existieren, wobei für q gilt:
+    /// -- q = N / 8, wobei N = |E(Z_p)| (Ordnung der Kurve) und
+    /// -- q muss eine Primzahl sein
     pub fn new(n: i32, modul_width: u32, miller_rabin_iterations: u32) -> Self {
         if n.is_zero() {
             panic!("Der Koeffizient a darf nicht 0 sein!"); // TODO Error Handling
