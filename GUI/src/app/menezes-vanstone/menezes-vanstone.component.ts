@@ -14,21 +14,21 @@ import {NgForOf} from "@angular/common";
 import {FormsModule, ReactiveFormsModule} from "@angular/forms";
 import {MvBackendRequestService} from "../services/backend-api/mv-backend-request.service";
 import {MvKeygenConfig} from "../models/mv-keygen-config";
-import {
-    copyMvCipherText,
-    copyMvKeyPair,
-    copyMvPublicKey,
-    copyMvSignature,
-    MvDecryptRequest,
-    MvEncryptRequest,
-    MvSignRequest,
-    MvVerifyRequest,
-} from "../models/mv-beans";
+import {copyMvKeyPair,} from "../models/mv-beans";
 import {createDefaultMvClientData, MvClientData} from "../models/client";
 import {StateManagementService} from "../services/management/state-management.service";
 import {MatCard, MatCardContent, MatCardHeader, MatCardTitle} from "@angular/material/card";
 import {MvBasicsPanelComponent} from "./mv-basics-panel/mv-basics-panel.component";
 import {MvClientPanelComponent} from "./mv-client-panel/mv-client-panel.component";
+
+// TODO Auslagern
+export interface MvConfiguration {
+    modulusWidth: number;
+    millerRabinRounds: number;
+    coefA: number;
+    randomSeed: number;
+    numberSystem: number;
+}
 
 @Component({
     selector: "app-menezes-vanstone",
@@ -63,15 +63,14 @@ import {MvClientPanelComponent} from "./mv-client-panel/mv-client-panel.componen
  * Component for the Menezes Vanstone Encryption and Decryption.
  */
 export class MenezesVanstoneComponent {
-    public modulusWidth: number = 128;
-    public numberSystem: number = 55296;
-    public millerRabinIterations: number = 100;
-    public coefficientA: number = 5;
-    public random_seed: { radix: number } = {radix: 55296};
+    public config: MvConfiguration = {
+        modulusWidth: 32,
+        millerRabinRounds: 100,
+        coefA: 5,
+        randomSeed: 3,
+        numberSystem: 55296
+    }
 
-    private configurationData = this.stateService.getConfigurationData();
-
-    // TODO: Vorläufige Dummy-Implementierung. Wird noch überarbeitet
     public clients: MvClientData[] =
         [
             createDefaultMvClientData("Alice"),
@@ -86,10 +85,10 @@ export class MenezesVanstoneComponent {
 
     public generateKeys(client: string) {
         let config: MvKeygenConfig = {
-            modulus_width: this.modulusWidth,
-            miller_rabin_rounds: this.millerRabinIterations,
-            coef_a: this.coefficientA,
-            random_seed: this.random_seed.radix
+            modulus_width: this.config.modulusWidth,
+            miller_rabin_rounds: this.config.millerRabinRounds,
+            coef_a: this.config.coefA,
+            random_seed: this.config.randomSeed
         };
         this.backendRequestService.createKeyPair(config).then(key => {
             if (client === "Alice") {
@@ -104,11 +103,11 @@ export class MenezesVanstoneComponent {
     }
 
     public calcMinimumBitsize(): number {
-        return Math.ceil(Math.log2(this.numberSystem));
+        return Math.ceil(Math.log2(this.config.numberSystem));
     }
 
     public calcMaxNumbersystem(): number {
-        return 2 ** this.modulusWidth;
+        return 2 ** this.config.modulusWidth;
     }
 
 

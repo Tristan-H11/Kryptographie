@@ -24,6 +24,7 @@ import {
     MvVerifyRequest
 } from "../../models/mv-beans";
 import {MvBackendRequestService} from "../../services/backend-api/mv-backend-request.service";
+import {MvConfiguration} from "../menezes-vanstone.component";
 
 @Component({
     selector: "mv-client-panel",
@@ -61,7 +62,13 @@ export class MvClientPanelComponent {
     // Dieser Input ist ein Workaround, weil Objekte per @Input() als Referenz übergeben werden und damit immer
     // der aktuelle Wert vorliegt.
     @Input()
-    public numberSystem: { radix: number } = {radix: 55296};
+    public config: MvConfiguration = {
+        modulusWidth: 0,
+        millerRabinRounds: 0,
+        coefA: 0,
+        randomSeed: 0,
+        numberSystem: 0
+    };
 
     protected readonly JSON = JSON;
 
@@ -80,7 +87,7 @@ export class MvClientPanelComponent {
         let request: MvEncryptRequest = {
             public_key: copyMvPublicKey(this.client.sendingTo.keyPair.public_key),
             message: this.client.plaintext,
-            radix: this.numberSystem.radix
+            radix: this.config.numberSystem
         };
         // TODO Refactor! Verschachtelte Request sind ein NO-GO!
         this.backendRequestService.encrypt(request).then(ciphertext => {
@@ -105,7 +112,7 @@ export class MvClientPanelComponent {
         let request: MvDecryptRequest = {
             private_key: copyMvKeyPair(this.client.keyPair).private_key,
             cipher_text: copyMvCipherText(this.client.ciphertext),
-            radix: this.numberSystem.radix
+            radix: this.config.numberSystem
         };
         this.backendRequestService.decrypt(request).then(plaintext => {
             this.client.plaintext = plaintext.message;
