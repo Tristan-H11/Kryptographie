@@ -16,6 +16,7 @@ import {MvKeygenConfig} from "../../models/mv-keygen-config";
 import {copyMvKeyPair} from "../../models/mv-beans";
 import {MvClientData} from "../../models/client";
 import {MvBackendRequestService} from "../../services/backend-api/mv-backend-request.service";
+import {DialogService} from "../../services/utility/dialogs.service";
 
 @Component({
     selector: "mv-configuration-panel",
@@ -52,13 +53,15 @@ export class MvConfigurationPanelComponent {
     @Input()
     public clients: MvClientData[] = [];
 
-    constructor(private backendRequestService: MvBackendRequestService) {
+    constructor(private backendRequestService: MvBackendRequestService,
+                private dialogService: DialogService) {
     }
 
     /**
      * Generiert Schlüsselpaare für den gewählten Client.
      */
     public generateKeys(name: string) {
+        let loadingDialog = this.dialogService.openLoadDialog();
         let config: MvKeygenConfig = {
             modulus_width: this.config.modulusWidth,
             miller_rabin_rounds: this.config.millerRabinRounds,
@@ -75,6 +78,7 @@ export class MvConfigurationPanelComponent {
             } else {
                 console.error("MV-KeypairGen: Client not found: " + name);
             }
+            loadingDialog.close();
         });
     }
 
@@ -91,5 +95,4 @@ export class MvConfigurationPanelComponent {
     public calcMaxNumbersystem(): number {
         return 2 ** this.config.modulusWidth;
     }
-
 }
