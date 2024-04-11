@@ -9,67 +9,63 @@
     </mat-expansion-panel-header>
 
     <div class="card-container">
-
         <mat-card class="spaced-card">
             <mat-card-header>
-                <mat-card-title>Elliptische Kurven</mat-card-title>
+                <mat-card-title>ElGamal auf Elliptischen Kurven E(Z<sub>p</sub>)</mat-card-title>
             </mat-card-header>
             <mat-card-content>
-                Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt
-                ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo
-                dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit
-                amet.
+                <p>Der klassische ElGamal wird auf einer Elliptischen Kurve über einem endlichen Körper definiert.
+                    Seine Sicherheit beruht auf dem Elliptischen Kurven Diskreten Logarithmus Problem (ECDLP) und ein
+                    Klartext für dieses Verfahren ist ein Punkt auf der Kurve.</p>
+                <p>Dies ist denkbar unpraktisch, weil eine beliebige Nachricht somit vorher immer in einen Punkt
+                    umgewandelt werden muss. Dafür ist bisher keine effiziente Methode bekannt.</p>
             </mat-card-content>
         </mat-card>
 
         <mat-card class="spaced-card">
             <mat-card-header>
-                <mat-card-title>Elliptische Kurven</mat-card-title>
+                <mat-card-title>Menezes-Vanstone Variante</mat-card-title>
             </mat-card-header>
             <mat-card-content>
-                Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt
-                ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo
-                dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit
-                amet.
+                <p>Menezes und Vanstone haben für dieses Problem eine Variation des ElGamal-Schemas entwickelt.
+                    Diese erlaubt es, dass der Klartext und als beliebiges Element aus
+                    Z<sup>*</sup><sub>p</sub> x Z<sup>*</sup><sub>p</sub> gewählt werden kann.</p>
+                <p>Der Geheimtext ist ein Triple aus einem Punkt auf der Kurve und zwei Körperelementen.</p>
             </mat-card-content>
         </mat-card>
     </div>
 
     <div class="card-container">
-
         <mat-card class="spaced-card">
             <mat-card-header>
-                <mat-card-title>Elliptische Kurven</mat-card-title>
+                <mat-card-title>Erzeugung der Kurve</mat-card-title>
             </mat-card-header>
             <mat-card-content>
-                Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt
-                ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo
-                dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit
-                amet.
+                <p>Die Generierung der Kurve y² = x³ + ax (mod p) erzeugt eine kryptographisch sichere Kurve. Dafür wird
+                    die Breite des zu
+                    verwendenden Moduls p gewählt, um den endlichen Körper unter der Kurve zu definieren. Des Weiteren
+                    wird
+                    eine natürliche Zahl n > 0 gewählt, welche als "-n²" den Koeffizienten a der Kurve definiert. </p>
+                <p>Für die Generierung der zufälligen Primzahl wird ein Seed für die Zufallsverteilung und die Anzahl
+                    der
+                    gewünschten Miller-Rabin Runden angegeben.</p>
             </mat-card-content>
         </mat-card>
 
         <mat-card class="spaced-card">
             <mat-card-header>
-                <mat-card-title>Elliptische Kurven</mat-card-title>
+                <mat-card-title>Wahl einer sicheren Kurve</mat-card-title>
             </mat-card-header>
             <mat-card-content>
-                Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt
-                ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo
-                dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit
-                amet.
-            </mat-card-content>
-        </mat-card>
-
-        <mat-card class="spaced-card">
-            <mat-card-header>
-                <mat-card-title>Elliptische Kurven</mat-card-title>
-            </mat-card-header>
-            <mat-card-content>
-                Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt
-                ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo
-                dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit
-                amet.
+                Die Parameter der Kurve müssen den folgenden Ansprüchen genügen, damit die Kurve als sicher gilt:
+                <ul>
+                    <li>p muss eine Primzahl sein mit p ≡ 5 (mod 8), p > 3 und p darf nicht 2*n teilen.</li>
+                    <li>Die Ordnung der Kurve muss einen großen Primfaktor haben.</li>
+                    <li>Die gewählte zyklische Untergruppe muss die Ordnung q = (|E(Z<sub>p</sub>)| / 8) haben, wobei q
+                        eine Primzahl ist.
+                    </li>
+                    <li>In der gewählten Untergruppe darf das ECDLP praktisch nicht lösbar sein.</li>
+                </ul>
             </mat-card-content>
         </mat-card>
     </div>
