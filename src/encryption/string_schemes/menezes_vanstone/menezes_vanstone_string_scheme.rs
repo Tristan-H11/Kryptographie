@@ -130,7 +130,7 @@ impl AsymmetricEncryptor<MenezesVanstoneStringScheme> for MenezesVanstoneStringS
             if chunk.len() < 2 {
                 let plaintext_chunk = MenezesVanstonePlaintext {
                     first: chunk[0].clone(),
-                    second: BigInt::zero(),
+                    second: BigInt::zero(), // TODO: Warum geht das? Eigentlich darf das nicht gewählt werden! Siehe Algorithmus 3.3, Auswahl von (m1, m2)
                 };
                 plaintext_list.push(plaintext_chunk);
             } else {
