@@ -15,7 +15,7 @@ export class Client {
 
 export interface MvClientData {
 	name: string;
-	keyPair: MvKeyPair;
+	keyPair: MvKeyPair | undefined;
 	plaintext: string;
 	ciphertext: MvCipherText;
     signature: MvSignature;

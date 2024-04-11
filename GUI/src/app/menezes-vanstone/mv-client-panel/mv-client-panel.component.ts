@@ -25,6 +25,7 @@ import {
 } from "../../models/mv-beans";
 import {MvBackendRequestService} from "../../services/backend-api/mv-backend-request.service";
 import {MvConfiguration} from "../menezes-vanstone.component";
+import {EmptyIfUndefinedPipe} from "../../services/pipes/empty-if-undefined";
 
 @Component({
     selector: "mv-client-panel",
@@ -47,6 +48,7 @@ import {MvConfiguration} from "../menezes-vanstone.component";
         MatSelect,
         MatOption,
         MatButton,
+        EmptyIfUndefinedPipe,
     ],
     templateUrl: "./mv-client-panel.component.html",
     styleUrl: "./mv-client-panel.component.scss"
@@ -80,7 +82,7 @@ export class MvClientPanelComponent {
      * Verschlüsselt die Nachricht für das gewählte Ziel.
      */
     public encrypt(): void {
-        if (!this.client.sendingTo) {
+        if (!this.client.sendingTo || !this.client.sendingTo!.keyPair) {
             return;
         }
 
@@ -92,6 +94,10 @@ export class MvClientPanelComponent {
         // TODO Refactor! Verschachtelte Request sind ein NO-GO!
         this.backendRequestService.encrypt(request).then(ciphertext => {
             this.client.ciphertext = copyMvCipherText(ciphertext);
+
+            if (!this.client.keyPair) {
+                return;
+            }
 
             let body: MvSignRequest = {
                 private_key: this.client.keyPair.private_key,
@@ -109,6 +115,10 @@ export class MvClientPanelComponent {
      * Entschlüsselt den Ciphertext und prüft die Signatur, falls vorhanden.
      */
     public decrypt(): void {
+        if (!this.client.keyPair) {
+            return;
+        }
+
         let request: MvDecryptRequest = {
             private_key: copyMvKeyPair(this.client.keyPair).private_key,
             cipher_text: copyMvCipherText(this.client.ciphertext),
@@ -117,7 +127,7 @@ export class MvClientPanelComponent {
         this.backendRequestService.decrypt(request).then(plaintext => {
             this.client.plaintext = plaintext.message;
 
-            if (!this.client.receivedFrom) {
+            if (!this.client.receivedFrom || !this.client.receivedFrom.keyPair) {
                 return;
             }
             let body: MvVerifyRequest = {
@@ -159,18 +169,6 @@ export class MvClientPanelComponent {
         this.client.signature.r = "Empty";
         this.client.signature.s = "Empty";
         this.client.signature_valid = "ungeprüft";
-    }
-
-    /**
-     * Gibt an, ob der ausgewählte Partner bereits ein Schlüsselpaar generiert hat, falls bereits ein Partner
-     * ausgwählt wurde.
-     * TODO: Ist noch ziemlich unschön.
-     */
-    public partnerHasNoKeyPairSet(): boolean {
-        if (this.client.sendingTo) {
-            return this.client.sendingTo.keyPair.public_key.curve.prime === "Empty";
-        }
-        return true;
     }
 
     /**

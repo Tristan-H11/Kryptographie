@@ -21,14 +21,14 @@
                     <mat-card-title>Domainparameter</mat-card-title>
                 </mat-card-header>
                 <mat-card-content>
-                    Kurve: y² = x³ + <strong>({{ client.keyPair.public_key.curve.a }})</strong> x (mod
-                    <strong>{{ client.keyPair.public_key.curve.prime }}</strong>)
+                    Kurve: y² = x³ + <strong>({{ client.keyPair | emptyIfUndefined:'public_key.curve.a' }})</strong> x (mod
+                    <strong>{{ client.keyPair | emptyIfUndefined:'public_key.curve.prime' }}</strong>)
                     <br>
-                    Generator: <strong>G({{ client.keyPair.public_key.curve.generator.x }}
-                    , {{ client.keyPair.public_key.curve.generator.y }})</strong>
+                    Generator: <strong>G({{ client.keyPair | emptyIfUndefined:'public_key.curve.generator.x' }}
+                    , {{ client.keyPair | emptyIfUndefined:'public_key.curve.generator.y' }})</strong>
                     <br>
                     Ordnung der von G erzeugten Untergruppe:
-                    <strong>{{ client.keyPair.public_key.curve.order_of_subgroup }}</strong>
+                    <strong>{{ client.keyPair | emptyIfUndefined:'public_key.curve.order_of_subgroup' }}</strong>
                 </mat-card-content>
             </mat-card>
 
@@ -37,8 +37,8 @@
                     <mat-card-title>Öffentliche Komponenten</mat-card-title>
                 </mat-card-header>
                 <mat-card-content>
-                    Gewähltes Gruppenelement: <strong>Y({{ client.keyPair.public_key.y.x }}
-                    , {{ client.keyPair.public_key.y.y }}
+                    Gewähltes Gruppenelement: <strong>Y({{ client.keyPair | emptyIfUndefined:'public_key.y.x' }}
+                    , {{ client.keyPair | emptyIfUndefined:'public_key.y.y' }}
                     )</strong>
                 </mat-card-content>
             </mat-card>
@@ -48,7 +48,7 @@
                     <mat-card-title>Private Komponenten</mat-card-title>
                 </mat-card-header>
                 <mat-card-content>
-                    Geheimwert x = <strong>{{ client.keyPair.private_key.x }}</strong>
+                    Geheimwert x = <strong>{{ client.keyPair | emptyIfUndefined:'private_key.x' }}</strong>
                 </mat-card-content>
             </mat-card>
         </div>
@@ -101,7 +101,7 @@
         </mat-form-field>
         <button mat-flat-button color="primary" (click)="clearFields()">Felder leeren</button>
         <button mat-flat-button color="primary"
-                [disabled]="client.plaintext.length<1 || partnerHasNoKeyPairSet()"
+                [disabled]="client.plaintext.length<1 || !client.sendingTo?.keyPair"
                 (click)="encrypt()">Verschlüsseln
         </button>
         <button mat-flat-button color="primary" [disabled]="client.ciphertext.encrypted_message.length<1"
