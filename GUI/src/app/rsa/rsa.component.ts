@@ -14,6 +14,7 @@ import {Client} from "../models/client";
 import {RsaConfigurationData} from "../models/rsa-configuration-data";
 import {LoadingDialogComponent} from "../loading-dialog/loading-dialog.component";
 import {SimpleDialogComponent} from "../simple-dialog/simple-dialog.component";
+import {DialogService} from "../services/utility/dialogs.service";
 
 @Component({
     selector: 'app-rsa',
@@ -39,9 +40,9 @@ export class RsaComponent {
     private configurationData = this.stateService.getConfigurationData();
 
     constructor(private stateService: StateManagementService,
-                public dialog: MatDialog,
-                private backendRequestService: RsaBackendRequestService,
-                private snackBar: MatSnackBar) {
+                public dialogService: DialogService,
+                private dialog: MatDialog,
+                private backendRequestService: RsaBackendRequestService) {
     }
 
     /**
@@ -127,15 +128,6 @@ export class RsaComponent {
             this.numberSystem
         );
         this.generateKeyPair(requestContent, client);
-    }
-
-    /**
-     * Open a dialog to show a loading spinner.
-     */
-    public openLoadDialog(): MatDialogRef<LoadingDialogComponent> {
-        return this.dialog.open(LoadingDialogComponent, {
-            disableClose: true // Verhindert das Schließen durch den Benutzer
-        });
     }
 
     /**
@@ -230,7 +222,7 @@ export class RsaComponent {
      * Generates a new RSA key pair for the given client.
      */
     private generateKeyPair(requestContent: RsaConfigurationData, client: Client): void {
-        let loadingDialog = this.openLoadDialog();
+        let loadingDialog = this.dialogService.openLoadDialog();
         const startTime = Date.now();
         this.backendRequestService.createKeyPair(requestContent).then(
             (keyPair) => {
@@ -242,7 +234,7 @@ export class RsaComponent {
                     console.log("Client " + client + " is not registered!");
                 }
                 loadingDialog.close();
-                this.showSnackbar("Schlüsselpaar für " + client.name + " generiert. Dauer: " + duration + "ms");
+                this.dialogService.showSnackbar("Schlüsselpaar für " + client.name + " generiert. Dauer: " + duration + "ms");
             }
         );
     }
@@ -256,15 +248,6 @@ export class RsaComponent {
                 return;
             }
             this.stateService.createClient(result.name);
-        });
-    }
-
-    /**
-     * Shows a snackbar with the given message.
-     */
-    private showSnackbar(message: string) {
-        this.snackBar.open(message, "Ok", {
-            duration: 5000,
         });
     }
 }
