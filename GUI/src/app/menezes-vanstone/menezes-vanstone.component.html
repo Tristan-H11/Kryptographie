@@ -1,4 +1,82 @@
 <mat-accordion class="accordion-container" multi="true">
+
+    <mat-expansion-panel>
+        <mat-expansion-panel-header>
+            <mat-panel-title>
+                Grundlagen
+            </mat-panel-title>
+            <mat-panel-description>
+                Beschreibung der theoretischen Grundlagen und Algorithmen
+            </mat-panel-description>
+        </mat-expansion-panel-header>
+
+        <div class="card-container">
+
+            <mat-card class="spaced-card">
+                <mat-card-header>
+                    <mat-card-title>Elliptische Kurven</mat-card-title>
+                </mat-card-header>
+                <mat-card-content>
+                    Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt
+                    ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo
+                    dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit
+                    amet.
+                </mat-card-content>
+            </mat-card>
+
+            <mat-card class="spaced-card">
+                <mat-card-header>
+                    <mat-card-title>Elliptische Kurven</mat-card-title>
+                </mat-card-header>
+                <mat-card-content>
+                    Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt
+                    ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo
+                    dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit
+                    amet.
+                </mat-card-content>
+            </mat-card>
+        </div>
+
+        <div class="card-container">
+
+            <mat-card class="spaced-card">
+                <mat-card-header>
+                    <mat-card-title>Elliptische Kurven</mat-card-title>
+                </mat-card-header>
+                <mat-card-content>
+                    Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt
+                    ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo
+                    dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit
+                    amet.
+                </mat-card-content>
+            </mat-card>
+
+            <mat-card class="spaced-card">
+                <mat-card-header>
+                    <mat-card-title>Elliptische Kurven</mat-card-title>
+                </mat-card-header>
+                <mat-card-content>
+                    Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt
+                    ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo
+                    dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit
+                    amet.
+                </mat-card-content>
+            </mat-card>
+
+            <mat-card class="spaced-card">
+                <mat-card-header>
+                    <mat-card-title>Elliptische Kurven</mat-card-title>
+                </mat-card-header>
+                <mat-card-content>
+                    Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt
+                    ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo
+                    dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit
+                    amet.
+                </mat-card-content>
+            </mat-card>
+        </div>
+    </mat-expansion-panel>
+
     <mat-expansion-panel [expanded]="true">
         <mat-expansion-panel-header>
             <mat-panel-title>
@@ -62,9 +140,9 @@
                     Schlüsselpaar
                 </mat-panel-title>
             </mat-expansion-panel-header>
-            <div style="display:flex; justify-content: space-between">
+            <div class="card-container">
 
-                <mat-card style="flex: 1; margin: 1%">
+                <mat-card class="spaced-card">
                     <mat-card-header>
                         <mat-card-title>Domainparameter</mat-card-title>
                     </mat-card-header>
@@ -80,12 +158,13 @@
                     </mat-card-content>
                 </mat-card>
 
-                <mat-card style="flex: 1; margin: 1%">
+                <mat-card class="spaced-card">
                     <mat-card-header>
                         <mat-card-title>Öffentliche Komponenten</mat-card-title>
                     </mat-card-header>
                     <mat-card-content>
-                        Gewähltes Gruppenelement: <strong>Y({{ client.keyPair.public_key.y.x }}, {{ client.keyPair.public_key.y.y }}
+                        Gewähltes Gruppenelement: <strong>Y({{ client.keyPair.public_key.y.x }}
+                        , {{ client.keyPair.public_key.y.y }}
                         )</strong>
                     </mat-card-content>
                 </mat-card>
@@ -140,7 +219,8 @@
 
         <mat-action-row>
             <button mat-flat-button color="primary" (click)="clearFields(client.name)">Löschen</button>
-            <button mat-flat-button color="primary" [disabled]="client.plaintext.length<1 || partnerHasNoKeyPairSet(client.name)"
+            <button mat-flat-button color="primary"
+                    [disabled]="client.plaintext.length<1 || partnerHasNoKeyPairSet(client.name)"
                     (click)="encrypt(client.name)">Verschlüsseln
             </button>
             <button mat-flat-button color="primary" [disabled]="client.ciphertext.encrypted_message.length<1"
