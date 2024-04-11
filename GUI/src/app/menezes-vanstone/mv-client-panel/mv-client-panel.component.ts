@@ -26,6 +26,7 @@ import {
 import {MvBackendRequestService} from "../../services/backend-api/mv-backend-request.service";
 import {MvConfiguration} from "../menezes-vanstone.component";
 import {EmptyIfUndefinedPipe} from "../../services/pipes/empty-if-undefined";
+import {DialogService} from "../../services/utility/dialogs.service";
 
 @Component({
     selector: "mv-client-panel",
@@ -75,7 +76,8 @@ export class MvClientPanelComponent {
 
     protected readonly JSON = JSON;
 
-    constructor(private backendRequestService: MvBackendRequestService,) {
+    constructor(private backendRequestService: MvBackendRequestService,
+                private dialogService: DialogService) {
     }
 
     /**
@@ -86,6 +88,7 @@ export class MvClientPanelComponent {
             return;
         }
 
+        let loadingDialog = this.dialogService.openLoadDialog();
         let request: MvEncryptRequest = {
             public_key: copyMvPublicKey(this.client.sendingTo.keyPair.public_key),
             message: this.client.plaintext,
@@ -96,6 +99,7 @@ export class MvClientPanelComponent {
             this.client.ciphertext = copyMvCipherText(ciphertext);
 
             if (!this.client.keyPair) {
+                loadingDialog.close();
                 return;
             }
 
@@ -106,6 +110,7 @@ export class MvClientPanelComponent {
             this.backendRequestService.sign(body).then(signature => {
                 this.client.signature = signature;
                 this.client.signature_valid = "ungeprüft";
+                loadingDialog.close();
             });
         });
 
@@ -119,6 +124,7 @@ export class MvClientPanelComponent {
             return;
         }
 
+        let loadingDialog = this.dialogService.openLoadDialog();
         let request: MvDecryptRequest = {
             private_key: copyMvKeyPair(this.client.keyPair).private_key,
             cipher_text: copyMvCipherText(this.client.ciphertext),
@@ -128,6 +134,7 @@ export class MvClientPanelComponent {
             this.client.plaintext = plaintext.message;
 
             if (!this.client.receivedFrom || !this.client.receivedFrom.keyPair) {
+                loadingDialog.close();
                 return;
             }
             let body: MvVerifyRequest = {
@@ -141,6 +148,7 @@ export class MvClientPanelComponent {
                 } else {
                     this.client.signature_valid = "ungültig";
                 }
+                loadingDialog.close();
             });
         });
     }
