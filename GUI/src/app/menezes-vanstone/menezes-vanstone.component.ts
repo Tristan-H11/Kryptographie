@@ -7,7 +7,7 @@ import {
     MatExpansionPanelHeader,
     MatExpansionPanelTitle
 } from "@angular/material/expansion";
-import {MatButton} from "@angular/material/button";
+import {MatButton, MatFabButton} from "@angular/material/button";
 import {MatFormField, MatHint, MatLabel, MatSuffix} from "@angular/material/form-field";
 import {MatInput} from "@angular/material/input";
 import {NgForOf} from "@angular/common";
@@ -21,6 +21,9 @@ import {MatCard, MatCardContent, MatCardHeader, MatCardTitle} from "@angular/mat
 import {MvBasicsPanelComponent} from "./mv-basics-panel/mv-basics-panel.component";
 import {MvClientPanelComponent} from "./mv-client-panel/mv-client-panel.component";
 import {MvConfigurationPanelComponent} from "./mv-configuration-panel/mv-configuration-panel.component";
+import {SimpleDialogComponent} from "../simple-dialog/simple-dialog.component";
+import {MatDialog, MatDialogRef} from "@angular/material/dialog";
+import {MatIcon} from "@angular/material/icon";
 
 // TODO Auslagern
 export interface MvConfiguration {
@@ -56,7 +59,9 @@ export interface MvConfiguration {
         MatCardContent,
         MvBasicsPanelComponent,
         MvClientPanelComponent,
-        MvConfigurationPanelComponent
+        MvConfigurationPanelComponent,
+        MatFabButton,
+        MatIcon
     ],
     templateUrl: "./menezes-vanstone.component.html",
     styleUrl: "./menezes-vanstone.component.scss"
@@ -77,8 +82,10 @@ export class MenezesVanstoneComponent {
         [
             createDefaultMvClientData("Alice"),
             createDefaultMvClientData("Bob"),
-            createDefaultMvClientData("Charlie")
         ];
+
+    constructor(public dialog: MatDialog) {
+    }
 
     /**
      * Löscht den übergebenen Client aus der Liste der Clients.
@@ -94,5 +101,18 @@ export class MenezesVanstoneComponent {
      */
     public getPossibleTargetClients(client: MvClientData): MvClientData[] {
         return this.clients.filter(c => c !== client);
+    }
+
+    public openNameInputDialog(): void {
+        const dialogRef = this.dialog.open(SimpleDialogComponent, {
+            data: {name: "", aborted: false},
+        });
+        dialogRef.afterClosed().subscribe(result => {
+            if (result.aborted) {
+                return;
+            }
+            const newClient = createDefaultMvClientData(result.name);
+            this.clients.push(newClient);
+        });
     }
 }
