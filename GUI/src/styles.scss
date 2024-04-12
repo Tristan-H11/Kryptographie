@@ -63,6 +63,12 @@ input.text-align-right {
 .spaced-card {
     margin: 1%;
     flex: 1;
+    transition: all 0.3s ease; // smooth transition effect
+}
+
+.spaced-card:hover {
+    background-color: #f5f5f5; // change background color on hover
+    box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2); // add box shadow on hover
 }
 
 p {
