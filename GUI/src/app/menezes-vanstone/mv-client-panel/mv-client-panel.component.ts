@@ -27,6 +27,8 @@ import {MvBackendRequestService} from "../../services/backend-api/mv-backend-req
 import {MvConfiguration} from "../menezes-vanstone.component";
 import {EmptyIfUndefinedPipe} from "../../services/pipes/empty-if-undefined";
 import {DialogService} from "../../services/utility/dialogs.service";
+import {MatAutocomplete, MatAutocompleteTrigger} from "@angular/material/autocomplete";
+import {MatChip, MatChipListbox, MatChipOption} from "@angular/material/chips";
 
 @Component({
     selector: "mv-client-panel",
@@ -50,6 +52,11 @@ import {DialogService} from "../../services/utility/dialogs.service";
         MatOption,
         MatButton,
         EmptyIfUndefinedPipe,
+        MatAutocompleteTrigger,
+        MatAutocomplete,
+        MatChipListbox,
+        MatChip,
+        MatChipOption,
     ],
     templateUrl: "./mv-client-panel.component.html",
     styleUrl: "./mv-client-panel.component.scss"
@@ -191,5 +198,9 @@ export class MvClientPanelComponent {
      */
     public delete(): void {
         this.deleteSelf.emit();
+    }
+
+    public changeTargetClientTo(client: MvClientData): void {
+        this.client.sendingTo = client;
     }
 }

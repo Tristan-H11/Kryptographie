@@ -71,6 +71,16 @@ input.text-align-right {
     box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2); // add box shadow on hover
 }
 
+.chip-list-container {
+    display: flex;
+    align-items: center;
+}
+
+.chip-list-label {
+    margin-right: 10px;
+    font-weight: bold;
+}
+
 p {
     text-align: justify;
 }
