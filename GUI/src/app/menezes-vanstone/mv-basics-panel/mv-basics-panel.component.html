@@ -134,14 +134,17 @@
                     <mat-card-title>Signieren</mat-card-title>
                 </mat-card-header>
                 <mat-card-content>
-                    <p>Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt
-                        ut labore et dolore m
-                        agna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum.
-                        Stet clita kasd guber
-                        sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam
-                        voluptua. At vero eos et accu
-                        sam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est
-                        Lorem ipsum dolor sit amet.</p>
+                    <p>Zur Bestimmung der Signatur (s, r) ∈ Z<sup>*</sup><sub>q</sub> x Z<sup>*</sup><sub>q</sub> mit q
+                        = ord(g) werden die folgenden Schritte ausgeführt:</p>
+                    <ol>
+                        <li>Es wird eine zufällige Zahl k ∈ Z<sup>*</sup><sub>q</sub> gewählt.</li>
+                        <li>Es wird r = u mod q berechnet, wobei (u, v) = k*g ∈ E(Z<sub>p</sub>).</li>
+                        <li>Es wird s = k<sup>-1</sup> * (h(m) + x*r) mod q berechnet, wobei h(m) der Hashwert der
+                            Nachricht ist.
+                        </li>
+                    </ol>
+                    <p>Ist s = 0 oder r = 0, so müssen die Schritte mit einem neuen k wiederholt werden.
+                        Andernfalls wurde die Signatur (r, s) erfolgreich bestimmt.</p>
                 </mat-card-content>
             </mat-card>
 
@@ -150,14 +153,13 @@
                     <mat-card-title>Verifizieren</mat-card-title>
                 </mat-card-header>
                 <mat-card-content>
-                    <p>Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt
-                        ut labore et dolore m
-                        agna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum.
-                        Stet clita kasd guber
-                        sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam
-                        voluptua. At vero eos et accu
-                        sam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est
-                        Lorem ipsum dolor sit amet.</p>
+                    <p>Zur Verifizierung einer Signatur (r, s) für eine Nachricht m müssen die folgenden Schritte
+                        durchgeführt werden:</p>
+                    <ol>
+                        <li>Es wird u = h(m) * s<sup>-1</sup> mod q und v = r * s<sup>-1</sup> mod q berechnet.</li>
+                        <li>Es wird (u', v') = u*g + v*y ∈ E(Z<sub>p</sub>) berechnet.</li>
+                        <li>Die Signatur ist gültig, wenn r ≡ u' mod q gilt.</li>
+                    </ol>
                 </mat-card-content>
             </mat-card>
         </div>
