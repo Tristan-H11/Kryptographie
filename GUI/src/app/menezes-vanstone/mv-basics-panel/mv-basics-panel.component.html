@@ -97,10 +97,13 @@
                     <mat-card-title>Schlüsselkomponenten</mat-card-title>
                 </mat-card-header>
                 <mat-card-content>
-                    <p>Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore m
-                        agna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd guber
-                        sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accu
-                        sam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.</p>
+                    <p>Der öffentliche Schlüssel setzt sich aus 4 Komponenten zusammen: (E, p, g, y).
+                        Dabei ist E die Elliptische Kurve E(Z<sub>p</sub>) und p der Modulus des endlichen Körpers.</p>
+                    <p>g ist ein Punkt auf der Kurve und Generator der zyklischen Untergruppe H, für dessen Ordnung q
+                        gilt:
+                        q ist eine Primzahl und q = |H| = |E(Z<sub>p</sub>)| / 8.</p>
+                    <p>Abschließend ist x ∈ Z<sub>|H|</sub> und y = g*x ∈ E(Z<sub>p</sub>). Damit ist der private
+                        Schlüssel der Wert x.</p>
                 </mat-card-content>
             </mat-card>
 
@@ -109,10 +112,18 @@
                     <mat-card-title>Verschlüsseln und Entschlüsseln</mat-card-title>
                 </mat-card-header>
                 <mat-card-content>
-                    <p>Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore m
-                        agna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd guber
-                        sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accu
-                        sam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.</p>
+                    <p>Zur Verschlüsselung wird die Nachricht von einer Zeichenkette in eine Menge von Zahlen
+                        umgewandelt und anschließend in Tupel (m1, m2) aufgeteilt. Die Schritte werden
+                        dann für jedes Tupel wiederholt.</p>
+                    <p>Es wird solange eine Zahl k ∈ Z<sup>*</sup><sub>|H|</sub> zufällig gewählt,
+                        bis in k*y = (c1, c2) ∈ E(Z<sub>p</sub>) sowohl c1, als auch c2 ungleich 0 sind.
+                        Der Geheimtext ist das Triple (a, b1, b2) mit a = k*g ∈ E(Z<sub>p</sub>), b1 = c1*m1 und b2 =
+                        c2*m2.</p>
+                    <p>Das Gesamt-Chiffrat besteht abschließend aus der Menge aller "a-Punkte" und der Übersetzung aller
+                        b1 und b2's in eine gemeinsame Zeichenkette.</p>
+                    <p>Zur Entschlüsselung wird mittels des privaten Schlüssels nun x*a = (c1, c2) ∈ E(Z<sub>p</sub>)
+                        bestimmt und der Klartext wird erhalten durch
+                        <br>(m1, m2) = (b1 * c1<sup>-1</sup> mod p, b2 * c2<sup>-1</sup> mod p)</p>
                 </mat-card-content>
             </mat-card>
         </div>
@@ -123,10 +134,14 @@
                     <mat-card-title>Signieren</mat-card-title>
                 </mat-card-header>
                 <mat-card-content>
-                    <p>Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore m
-                        agna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd guber
-                        sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accu
-                        sam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.</p>
+                    <p>Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt
+                        ut labore et dolore m
+                        agna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum.
+                        Stet clita kasd guber
+                        sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam
+                        voluptua. At vero eos et accu
+                        sam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est
+                        Lorem ipsum dolor sit amet.</p>
                 </mat-card-content>
             </mat-card>
 
@@ -135,10 +150,14 @@
                     <mat-card-title>Verifizieren</mat-card-title>
                 </mat-card-header>
                 <mat-card-content>
-                    <p>Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore m
-                        agna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd guber
-                        sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accu
-                        sam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.</p>
+                    <p>Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt
+                        ut labore et dolore m
+                        agna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum.
+                        Stet clita kasd guber
+                        sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam
+                        voluptua. At vero eos et accu
+                        sam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est
+                        Lorem ipsum dolor sit amet.</p>
                 </mat-card-content>
             </mat-card>
         </div>
