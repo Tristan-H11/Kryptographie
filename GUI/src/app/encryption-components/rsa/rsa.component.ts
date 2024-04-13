@@ -13,11 +13,10 @@ import {RsaClientData} from "../shared/ClientData";
 import {RsaConfigurationData} from "../shared/ConfigurationDataTypes";
 import {RsaClientPanelComponent} from "./rsa-client-panel/rsa-client-panel.component";
 import {AbstractAsymEncryptionComponent} from "../shared/AbstractAsymEncryptionComponent";
-import {SimpleDialogComponent} from "../../dialogs/simple-dialog/simple-dialog.component";
 
 @Component({
-  selector: 'rsa',
-  standalone: true,
+    selector: "rsa",
+    standalone: true,
     imports: [
         AddClientButtonComponent,
         MatAccordion,
@@ -29,29 +28,14 @@ import {SimpleDialogComponent} from "../../dialogs/simple-dialog/simple-dialog.c
         RsaConfigurationPanelComponent,
         RsaClientPanelComponent
     ],
-  templateUrl: './rsa.component.html',
-  styleUrl: './rsa.component.scss'
+    templateUrl: "./rsa.component.html",
+    styleUrl: "./rsa.component.scss"
 })
-export class RsaComponent extends AbstractAsymEncryptionComponent<RsaConfigurationData, RsaClientData>{
+export class RsaComponent extends AbstractAsymEncryptionComponent<RsaConfigurationData, RsaClientData> {
 
     public config: RsaConfigurationData = RsaConfigurationData.createDefault();
 
-
-    public clients: RsaClientData[] = [
-        RsaClientData.createDefaultWithName("Alice"),
-        RsaClientData.createDefaultWithName("Bob"),
-    ];
-
-    public openNameInputDialog(): void {
-        const dialogRef = this.dialog.open(SimpleDialogComponent, {
-            data: {name: "", aborted: false},
-        });
-        dialogRef.afterClosed().subscribe(result => {
-            if (result.aborted) {
-                return;
-            }
-            const newClient = RsaClientData.createDefaultWithName(result.name);
-            this.clients.push(newClient);
-        });
+    protected createDefaultClient(name: string): RsaClientData {
+        return RsaClientData.createDefaultWithName(name);
     }
 }

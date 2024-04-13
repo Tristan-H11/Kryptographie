@@ -21,7 +21,6 @@ import {MvClientData} from "../shared/ClientData";
 import {AddClientButtonComponent} from "../shared/add-client-button/add-client-button.component";
 import {MvConfigurationData} from "../shared/ConfigurationDataTypes";
 import {AbstractAsymEncryptionComponent} from "../shared/AbstractAsymEncryptionComponent";
-import {SimpleDialogComponent} from "../../dialogs/simple-dialog/simple-dialog.component";
 
 
 @Component({
@@ -60,26 +59,11 @@ import {SimpleDialogComponent} from "../../dialogs/simple-dialog/simple-dialog.c
 /**
  * Component for the Menezes Vanstone Encryption and Decryption.
  */
-export class MenezesVanstoneComponent extends AbstractAsymEncryptionComponent<MvConfigurationData, MvClientData>{
+export class MenezesVanstoneComponent extends AbstractAsymEncryptionComponent<MvConfigurationData, MvClientData> {
 
     public config: MvConfigurationData = MvConfigurationData.createDefault();
 
-    public clients: MvClientData[] =
-        [
-            MvClientData.createDefaultWithName("Alice"),
-            MvClientData.createDefaultWithName("Bob"),
-        ];
-
-    public openNameInputDialog(): void {
-        const dialogRef = this.dialog.open(SimpleDialogComponent, {
-            data: {name: "", aborted: false},
-        });
-        dialogRef.afterClosed().subscribe(result => {
-            if (result.aborted) {
-                return;
-            }
-            const newClient = MvClientData.createDefaultWithName(result.name);
-            this.clients.push(newClient);
-        });
+    protected createDefaultClient(name: string): MvClientData {
+        return MvClientData.createDefaultWithName(name);
     }
 }
