@@ -38,7 +38,7 @@
         <input class="text-align-right" matInput type="number" [(ngModel)]="config.randomSeed">
     </mat-form-field>
 
-    <mat-action-row class="action-row-content-left">
+    <mat-action-row>
         <button mat-flat-button *ngFor="let client of clients" color="primary" (click)="generateKeys(client.name)">
             Schlüsselpaar für {{ client.name }} erzeugen
         </button>
