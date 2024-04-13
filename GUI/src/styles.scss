@@ -1,4 +1,17 @@
-/* You can add global styles to this file, and also import other style files */
+$transition-effect: all 0.3s ease;
+$margin-size: 1%;
+$flex-1: 1;
+$hover-background-color: #f5f5f5;
+$box-shadow-hover: 0 4px 8px 0 rgba(0,0,0,0.2);
+
+@mixin flex-display {
+    display: flex;
+}
+
+@mixin justify-content($value) {
+    justify-content: $value;
+}
+
 
 html, body {
     height: 100%;
@@ -27,13 +40,13 @@ input.text-align-right {
 }
 
 .accordion-container {
-    width: 100%;
-    display: flex;
+    @include flex-display;
     flex-direction: column;
+    width: 100%;
 }
 
 .element-below-accordion-container {
-    display: flex;
+    @include flex-display;
     justify-content: right;
     width: auto;
     padding: 2vh 0;
@@ -41,7 +54,7 @@ input.text-align-right {
 }
 
 .below-accordion {
-    display: flex;
+    @include flex-display;
     flex-direction: row-reverse;
     column-gap: 1vw;
     align-items: center;
@@ -57,22 +70,23 @@ input.text-align-right {
 }
 
 .card-container {
-    display: flex;
-    justify-content: space-between;
-}
-.spaced-card {
-    margin: 1%;
-    flex: 1;
-    transition: all 0.3s ease; // smooth transition effect
-}
+    @include flex-display;
+    @include justify-content(space-between);
 
-.spaced-card:hover {
-    background-color: #f5f5f5; // change background color on hover
-    box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2); // add box shadow on hover
+    .spaced-card {
+        margin: $margin-size;
+        flex: $flex-1;
+        transition: $transition-effect; // smooth transition effect
+
+        &:hover {
+            background-color: $hover-background-color; // change background color on hover
+            box-shadow: $box-shadow-hover; // add box shadow on hover
+        }
+    }
 }
 
 .chip-list-container {
-    display: flex;
+    @include flex-display;
     align-items: center;
 }
 
