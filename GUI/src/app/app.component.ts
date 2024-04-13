@@ -32,29 +32,17 @@ import {NavbarComponent} from "./navbar/navbar.component";
     templateUrl: "./app.component.html",
     styleUrls: ["./app.component.scss"]
 })
-
-/**
- * Main Component of the application.
- * The component is responsible for the initialization of the application and the server connection.
- * The server connection is checked at the beginning of the application.
- * The server URL can be changed in the settings.
- * The server URL is saved in the local storage.
- * The routing to Navbar and Homepage is done in the html file of app.component.html
- */
 export class AppComponent implements OnInit {
 
     public isServerReachable: boolean = false;
 
-    constructor(private backendRequestService: RsaBackendRequestService,
-                private stateService: StateManagementService) {
+    constructor(private backendRequestService: RsaBackendRequestService) {
     }
 
     /**
      * Initialize the clients and check the server connection.
      */
     ngOnInit(): void {
-        this.stateService.createClient("Alice");
-        this.stateService.createClient("Bob");
         this.backendRequestService.checkHealth().then((result) => {
             this.isServerReachable = result;
         });
