@@ -16,7 +16,6 @@ import {ClientData} from "../ClientData";
         NgForOf
     ],
     templateUrl: "./client-action-row.component.html",
-    styleUrl: "./client-action-row.component.scss"
 })
 export class ClientActionRowComponent {
 

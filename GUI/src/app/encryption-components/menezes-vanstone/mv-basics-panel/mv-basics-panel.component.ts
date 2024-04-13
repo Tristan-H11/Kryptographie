@@ -21,7 +21,6 @@ import {
         MatExpansionPanelTitle
     ],
   templateUrl: './mv-basics-panel.component.html',
-  styleUrl: './mv-basics-panel.component.scss'
 })
 export class MvBasicsPanelComponent {
 

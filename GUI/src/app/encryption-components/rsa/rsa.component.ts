@@ -29,7 +29,6 @@ import {AbstractAsymEncryptionComponent} from "../shared/AbstractAsymEncryptionC
         RsaClientPanelComponent
     ],
     templateUrl: "./rsa.component.html",
-    styleUrl: "./rsa.component.scss"
 })
 export class RsaComponent extends AbstractAsymEncryptionComponent<RsaConfigurationData, RsaClientData> {
 

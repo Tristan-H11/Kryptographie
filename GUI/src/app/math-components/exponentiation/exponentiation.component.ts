@@ -16,7 +16,6 @@ import {MatDialog} from "@angular/material/dialog";
 	standalone: true,
 	imports: [CommonModule, MatExpansionModule, MatFormFieldModule, MatInputModule, ReactiveFormsModule, FormsModule, MatButtonModule],
 	templateUrl: "./exponentiation.component.html",
-	styleUrl: "./exponentiation.component.scss"
 })
 export class ExponentiationComponent {
 

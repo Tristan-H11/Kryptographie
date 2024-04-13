@@ -40,7 +40,6 @@ import {RsaVerifyRequest} from "../../../models/rsa-verify-request";
         FormsModule
     ],
     templateUrl: "./rsa-client-panel.component.html",
-    styleUrl: "./rsa-client-panel.component.scss"
 })
 export class RsaClientPanelComponent {
 

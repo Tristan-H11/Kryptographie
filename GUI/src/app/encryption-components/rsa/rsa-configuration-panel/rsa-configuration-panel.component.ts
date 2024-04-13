@@ -40,7 +40,6 @@ import {DialogService} from "../../../services/utility/dialogs.service";
         FormsModule
     ],
     templateUrl: "./rsa-configuration-panel.component.html",
-    styleUrl: "./rsa-configuration-panel.component.scss"
 })
 export class RsaConfigurationPanelComponent {
 

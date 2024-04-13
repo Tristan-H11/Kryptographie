@@ -16,7 +16,6 @@ import {MatDialog} from "@angular/material/dialog";
 	standalone: true,
 	imports: [CommonModule, MatButtonModule, MatExpansionModule, MatFormFieldModule, MatInputModule, ReactiveFormsModule, FormsModule],
 	templateUrl: "./extended-gcd.component.html",
-	styleUrl: "./extended-gcd.component.scss"
 })
 export class ExtendedGcdComponent {
 	public ggT: string = "";

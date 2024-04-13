@@ -62,7 +62,6 @@ import {MvConfigurationData} from "../../shared/ConfigurationDataTypes";
         ClientActionRowComponent,
     ],
     templateUrl: "./mv-client-panel.component.html",
-    styleUrl: "./mv-client-panel.component.scss"
 })
 export class MvClientPanelComponent {
 

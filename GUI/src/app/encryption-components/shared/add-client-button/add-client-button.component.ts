@@ -10,7 +10,6 @@ import {MatIcon} from "@angular/material/icon";
 		MatIcon
 	],
   templateUrl: './add-client-button.component.html',
-  styleUrl: './add-client-button.component.scss'
 })
 export class AddClientButtonComponent {
 

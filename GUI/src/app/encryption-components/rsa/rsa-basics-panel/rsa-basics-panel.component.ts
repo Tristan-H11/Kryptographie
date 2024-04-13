@@ -21,7 +21,6 @@ import {
 		MatExpansionPanelTitle
 	],
   templateUrl: './rsa-basics-panel.component.html',
-  styleUrl: './rsa-basics-panel.component.scss'
 })
 export class RsaBasicsPanelComponent {
 

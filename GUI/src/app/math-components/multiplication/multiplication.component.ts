@@ -20,7 +20,6 @@ import {ErrorDialogComponent} from "../../dialogs/error-dialog/error-dialog.comp
     standalone: true,
     imports: [CommonModule, MatButtonModule, MatExpansionModule, MatFormFieldModule, MatInputModule, ReactiveFormsModule, FormsModule],
     templateUrl: "./multiplication.component.html",
-    styleUrl: "./multiplication.component.scss"
 })
 export class MultiplicationComponent {
     public modulusWidth: number = 2048;

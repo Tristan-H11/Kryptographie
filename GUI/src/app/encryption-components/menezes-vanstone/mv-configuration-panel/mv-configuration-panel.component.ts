@@ -41,7 +41,6 @@ import {
         BasicConfigurationFieldsComponent
     ],
     templateUrl: "./mv-configuration-panel.component.html",
-    styleUrl: "./mv-configuration-panel.component.scss"
 })
 export class MvConfigurationPanelComponent {
 

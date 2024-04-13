@@ -16,7 +16,6 @@ import {ErrorDialogComponent} from "../../dialogs/error-dialog/error-dialog.comp
     standalone: true,
     imports: [CommonModule, FormsModule, MatButtonModule, MatExpansionModule, MatFormFieldModule, MatInputModule],
     templateUrl: "./shanks.component.html",
-    styleUrl: "./shanks.component.scss"
 })
 export class ShanksComponent {
 

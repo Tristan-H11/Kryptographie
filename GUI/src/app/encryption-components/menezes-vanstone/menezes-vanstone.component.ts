@@ -54,7 +54,6 @@ import {AbstractAsymEncryptionComponent} from "../shared/AbstractAsymEncryptionC
         AddClientButtonComponent
     ],
     templateUrl: "./menezes-vanstone.component.html",
-    styleUrl: "./menezes-vanstone.component.scss"
 })
 /**
  * Component for the Menezes Vanstone Encryption and Decryption.

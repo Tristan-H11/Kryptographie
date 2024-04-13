@@ -16,7 +16,6 @@ import {ConfigurationDataTypes} from "../ConfigurationDataTypes";
         MatSuffix
     ],
     templateUrl: "./basic-configuration-fields.component.html",
-    styleUrl: "./basic-configuration-fields.component.scss"
 })
 export class BasicConfigurationFieldsComponent {
 

@@ -16,7 +16,6 @@ import {ErrorDialogComponent} from "../../dialogs/error-dialog/error-dialog.comp
     standalone: true,
     imports: [CommonModule, FormsModule, MatButtonModule, MatExpansionModule, MatFormFieldModule, MatInputModule],
     templateUrl: "./modular-inverse.component.html",
-    styleUrl: "./modular-inverse.component.scss"
 })
 export class ModularInverseComponent {
 
