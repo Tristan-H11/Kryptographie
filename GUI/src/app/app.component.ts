@@ -40,7 +40,7 @@ export class AppComponent implements OnInit {
     }
 
     /**
-     * Initialize the clients and check the server connection.
+     * Initial soll überprüft werden, ob der Server erreichbar ist.
      */
     ngOnInit(): void {
         this.backendRequestService.checkHealth().then((result) => {
