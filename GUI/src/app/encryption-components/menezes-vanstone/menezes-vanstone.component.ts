@@ -16,16 +16,16 @@ import {MatCard, MatCardContent, MatCardHeader, MatCardTitle} from "@angular/mat
 import {MvBasicsPanelComponent} from "./mv-basics-panel/mv-basics-panel.component";
 import {MvClientPanelComponent} from "./mv-client-panel/mv-client-panel.component";
 import {MvConfigurationPanelComponent} from "./mv-configuration-panel/mv-configuration-panel.component";
-import {SimpleDialogComponent} from "../../dialogs/simple-dialog/simple-dialog.component";
-import {MatDialog} from "@angular/material/dialog";
 import {MatIcon} from "@angular/material/icon";
-import {createDefaultMvClientData, MvClientData} from "../shared/IClientData";
+import {MvClientData} from "../shared/ClientData";
 import {AddClientButtonComponent} from "../shared/add-client-button/add-client-button.component";
-import {MvConfigurationData} from "../shared/IConfigurationData";
+import {MvConfigurationData} from "../shared/ConfigurationDataTypes";
+import {AbstractAsymEncryptionComponent} from "../shared/AbstractAsymEncryptionComponent";
+import {SimpleDialogComponent} from "../../dialogs/simple-dialog/simple-dialog.component";
 
 
 @Component({
-    selector: "app-menezes-vanstone",
+    selector: "menezes-vanstone",
     standalone: true,
     imports: [
         MatAccordion,
@@ -60,39 +60,15 @@ import {MvConfigurationData} from "../shared/IConfigurationData";
 /**
  * Component for the Menezes Vanstone Encryption and Decryption.
  */
-export class MenezesVanstoneComponent {
-    public config: MvConfigurationData = {
-        modulusWidth: 32,
-        millerRabinRounds: 100,
-        coefA: 5,
-        randomSeed: 3,
-        numberSystem: 55296
-    }
+export class MenezesVanstoneComponent extends AbstractAsymEncryptionComponent<MvConfigurationData, MvClientData>{
+
+    public config: MvConfigurationData = MvConfigurationData.createDefault();
 
     public clients: MvClientData[] =
         [
-            createDefaultMvClientData("Alice"),
-            createDefaultMvClientData("Bob"),
+            MvClientData.createDefaultWithName("Alice"),
+            MvClientData.createDefaultWithName("Bob"),
         ];
-
-    constructor(public dialog: MatDialog) {
-    }
-
-    /**
-     * Löscht den übergebenen Client aus der Liste der Clients.
-     * @param client
-     */
-    public deleteClient(client: MvClientData) {
-        this.clients = this.clients.filter(c => c !== client);
-    }
-
-    /**
-     * Gibt eine shallow copy (!) der Clients zurück, die nicht der übergebene Client sind.
-     * Damit bleiben alle Referenzen erhalten, nur der Client selbst wird nicht zurückgegeben.
-     */
-    public getPossibleTargetClients(client: MvClientData): MvClientData[] {
-        return this.clients.filter(c => c !== client);
-    }
 
     public openNameInputDialog(): void {
         const dialogRef = this.dialog.open(SimpleDialogComponent, {
@@ -102,7 +78,7 @@ export class MenezesVanstoneComponent {
             if (result.aborted) {
                 return;
             }
-            const newClient = createDefaultMvClientData(result.name);
+            const newClient = MvClientData.createDefaultWithName(result.name);
             this.clients.push(newClient);
         });
     }

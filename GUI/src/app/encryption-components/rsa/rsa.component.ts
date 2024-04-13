@@ -9,14 +9,14 @@ import {
 import {NgForOf} from "@angular/common";
 import {RsaBasicsPanelComponent} from "./rsa-basics-panel/rsa-basics-panel.component";
 import {RsaConfigurationPanelComponent} from "./rsa-configuration-panel/rsa-configuration-panel.component";
-import {SimpleDialogComponent} from "../../dialogs/simple-dialog/simple-dialog.component";
-import {createDefaultRsaClientData, RsaClientData} from "../shared/IClientData";
-import {MatDialog} from "@angular/material/dialog";
-import {RsaConfigurationData} from "../shared/IConfigurationData";
+import {RsaClientData} from "../shared/ClientData";
+import {RsaConfigurationData} from "../shared/ConfigurationDataTypes";
 import {RsaClientPanelComponent} from "./rsa-client-panel/rsa-client-panel.component";
+import {AbstractAsymEncryptionComponent} from "../shared/AbstractAsymEncryptionComponent";
+import {SimpleDialogComponent} from "../../dialogs/simple-dialog/simple-dialog.component";
 
 @Component({
-  selector: 'app-rsa',
+  selector: 'rsa',
   standalone: true,
     imports: [
         AddClientButtonComponent,
@@ -32,39 +32,15 @@ import {RsaClientPanelComponent} from "./rsa-client-panel/rsa-client-panel.compo
   templateUrl: './rsa.component.html',
   styleUrl: './rsa.component.scss'
 })
-export class RsaComponent {
+export class RsaComponent extends AbstractAsymEncryptionComponent<RsaConfigurationData, RsaClientData>{
 
-    public config: RsaConfigurationData = {
-        modulusWidth: 1024,
-        millerRabinRounds: 40,
-        randomSeed: 3,
-        numberSystem: 55296
-    };
+    public config: RsaConfigurationData = RsaConfigurationData.createDefault();
 
 
     public clients: RsaClientData[] = [
-        createDefaultRsaClientData("Alice"),
-        createDefaultRsaClientData("Bob")
+        RsaClientData.createDefaultWithName("Alice"),
+        RsaClientData.createDefaultWithName("Bob"),
     ];
-
-    constructor(private dialog: MatDialog) {
-    }
-
-    /**
-     * Löscht den übergebenen Client aus der Liste der Clients.
-     * @param client
-     */
-    public deleteClient(client: RsaClientData) {
-        this.clients = this.clients.filter(c => c !== client);
-    }
-
-    /**
-     * Gibt eine shallow copy (!) der Clients zurück, die nicht der übergebene Client sind.
-     * Damit bleiben alle Referenzen erhalten, nur der Client selbst wird nicht zurückgegeben.
-     */
-    public getPossibleTargetClients(client: RsaClientData): RsaClientData[] {
-        return this.clients.filter(c => c !== client);
-    }
 
     public openNameInputDialog(): void {
         const dialogRef = this.dialog.open(SimpleDialogComponent, {
@@ -74,7 +50,7 @@ export class RsaComponent {
             if (result.aborted) {
                 return;
             }
-            const newClient = createDefaultRsaClientData(result.name);
+            const newClient = RsaClientData.createDefaultWithName(result.name);
             this.clients.push(newClient);
         });
     }
