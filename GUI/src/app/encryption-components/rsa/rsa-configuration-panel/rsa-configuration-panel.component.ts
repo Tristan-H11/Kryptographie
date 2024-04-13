@@ -21,7 +21,7 @@ import {RsaCreateKeyPairRequest} from "../../../models/rsa-create-key-pair-reque
 import {DialogService} from "../../../services/utility/dialogs.service";
 
 @Component({
-    selector: "app-rsa-configuration-panel",
+    selector: "rsa-configuration-panel",
     standalone: true,
     imports: [
         BasicConfigurationFieldsComponent,
