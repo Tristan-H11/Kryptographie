@@ -20,6 +20,7 @@ import {SimpleDialogComponent} from "../../simple-dialog/simple-dialog.component
 import {MatDialog} from "@angular/material/dialog";
 import {MatIcon} from "@angular/material/icon";
 import {createDefaultMvClientData, MvClientData} from "../shared/client";
+import {AddClientButtonComponent} from "../shared/add-client-button/add-client-button.component";
 
 // TODO Auslagern
 export interface MvConfiguration {
@@ -57,7 +58,8 @@ export interface MvConfiguration {
         MvClientPanelComponent,
         MvConfigurationPanelComponent,
         MatFabButton,
-        MatIcon
+        MatIcon,
+        AddClientButtonComponent
     ],
     templateUrl: "./menezes-vanstone.component.html",
     styleUrl: "./menezes-vanstone.component.scss"

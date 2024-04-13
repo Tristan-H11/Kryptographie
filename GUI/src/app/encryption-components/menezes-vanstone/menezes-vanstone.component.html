@@ -11,8 +11,4 @@
                      (deleteSelf)="deleteClient(client)"/>
 </mat-accordion>
 
-<div class="element-below-accordion-container">
-    <button mat-fab color="primary" (click)="openNameInputDialog()">
-        <mat-icon>person_add</mat-icon>
-    </button>
-</div>
+<add-client-button (addClient)="openNameInputDialog()"/>
