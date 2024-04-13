@@ -12,18 +12,14 @@ import {MatFormField, MatHint, MatLabel, MatSuffix} from "@angular/material/form
 import {MatInput} from "@angular/material/input";
 import {NgForOf} from "@angular/common";
 import {FormsModule, ReactiveFormsModule} from "@angular/forms";
-import {MvBackendRequestService} from "../services/backend-api/mv-backend-request.service";
-import {MvKeygenConfig} from "../models/mv-keygen-config";
-import {copyMvKeyPair,} from "../models/mv-beans";
-import {createDefaultMvClientData, MvClientData} from "../models/client";
-import {StateManagementService} from "../services/management/state-management.service";
 import {MatCard, MatCardContent, MatCardHeader, MatCardTitle} from "@angular/material/card";
 import {MvBasicsPanelComponent} from "./mv-basics-panel/mv-basics-panel.component";
 import {MvClientPanelComponent} from "./mv-client-panel/mv-client-panel.component";
 import {MvConfigurationPanelComponent} from "./mv-configuration-panel/mv-configuration-panel.component";
-import {SimpleDialogComponent} from "../simple-dialog/simple-dialog.component";
-import {MatDialog, MatDialogRef} from "@angular/material/dialog";
+import {SimpleDialogComponent} from "../../simple-dialog/simple-dialog.component";
+import {MatDialog} from "@angular/material/dialog";
 import {MatIcon} from "@angular/material/icon";
+import {createDefaultMvClientData, MvClientData} from "../shared/client";
 
 // TODO Auslagern
 export interface MvConfiguration {

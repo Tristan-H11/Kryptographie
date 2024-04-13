@@ -92,30 +92,12 @@
         </mat-expansion-panel>
     </div>
 
-    <mat-action-row style="display: flex; justify-content: space-between; flex-wrap: nowrap;">
-        <div>
-            <button mat-flat-button color="warn" (click)="delete()">{{ client.name }} löschen</button>
-        </div>
-        <div style="display: flex; gap: 10px;">
-            <div class="chip-list-container">
-                <span class="chip-list-label">Senden an:</span>
-                <mat-chip-listbox [multiple]="false">
-                    <mat-chip-option *ngFor="let client of possibleTargetClients"
-                                     (selectionChange)="changeTargetClientTo(client)">
-                        {{ client.name }}
-                    </mat-chip-option>
-                </mat-chip-listbox>
-            </div>
-            <button mat-flat-button color="primary" (click)="clearFields()">Felder leeren</button>
-            <button mat-flat-button color="primary"
-                    [disabled]="client.plaintext.length<1 || !client.sendingTo?.keyPair"
-                    (click)="encrypt()">Verschlüsseln
-            </button>
-            <button mat-flat-button color="primary" [disabled]="client.ciphertext.encrypted_message.length<1"
-                    (click)="decrypt()">Entschlüsseln
-            </button>
-            <button mat-flat-button color="primary" [disabled]="sendingToNotSet()" (click)="send()">Senden</button>
-        </div>
-    </mat-action-row>
+    <client-action-row [client]="client"
+                       [targetClients]="possibleTargetClients"
+                       (clearFieldsFromClient)="clearFields()"
+                       (decryptClient)="decrypt()"
+                       (deleteSelf)="delete()"
+                       (encryptClient)="encrypt()"
+                       (sendClient)="send()"/>
 
 </mat-expansion-panel>

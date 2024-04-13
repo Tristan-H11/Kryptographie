@@ -7,8 +7,8 @@ import {ShanksComponent} from "./shanks/shanks.component";
 import {ClientComponent} from "./client/client.component";
 import {ModularInverseComponent} from "./modular-inverse/modular-inverse.component";
 import {MultiplicationComponent} from "./multiplication/multiplication.component";
-import {MenezesVanstoneComponent} from "./menezes-vanstone/menezes-vanstone.component";
 import {RsaComponent} from "./rsa/rsa.component";
+import {MenezesVanstoneComponent} from "./encryption-components/menezes-vanstone/menezes-vanstone.component";
 
 /**
  * Defines the routes of the application.

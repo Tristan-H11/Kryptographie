@@ -10,7 +10,7 @@ import {StateManagementService} from "../services/management/state-management.se
 import {MatDialog, MatDialogRef} from "@angular/material/dialog";
 import {RsaBackendRequestService} from "../services/backend-api/rsa-backend-request.service";
 import {MatSnackBar} from "@angular/material/snack-bar";
-import {Client} from "../models/client";
+import {Client} from "../encryption-components/shared/client";
 import {RsaConfigurationData} from "../models/rsa-configuration-data";
 import {LoadingDialogComponent} from "../loading-dialog/loading-dialog.component";
 import {SimpleDialogComponent} from "../simple-dialog/simple-dialog.component";

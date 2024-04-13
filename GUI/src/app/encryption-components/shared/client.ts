@@ -1,4 +1,4 @@
-import {MvCipherText, MvKeyPair, MvSignature} from "./mv-beans";
+import {MvCipherText, MvKeyPair, MvSignature} from "../../models/mv-beans";
 
 /**
  * Darstellung der Clients.
@@ -13,7 +13,18 @@ export class Client {
 	}
 }
 
-export interface MvClientData {
+export interface IClientData {
+    name: string;
+    keyPair: any | undefined;
+    plaintext: string;
+    ciphertext: any | undefined;
+    signature: any | undefined;
+    signature_valid: string;
+    sendingTo: IClientData | undefined;
+    receivedFrom: IClientData | undefined;
+}
+
+export interface MvClientData extends IClientData{
 	name: string;
 	keyPair: MvKeyPair | undefined;
 	plaintext: string;

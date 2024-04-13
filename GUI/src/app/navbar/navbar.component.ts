@@ -5,7 +5,7 @@ import {MatIconModule} from "@angular/material/icon";
 import {MatDividerModule} from "@angular/material/divider";
 import {MatButtonModule} from "@angular/material/button";
 import {StateManagementService} from "../services/management/state-management.service";
-import {Client} from "../models/client";
+import {Client} from "../encryption-components/shared/client";
 import {NgForOf, NgIf} from "@angular/common";
 
 @Component({

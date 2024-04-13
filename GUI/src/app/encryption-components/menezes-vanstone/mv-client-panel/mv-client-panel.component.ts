@@ -9,7 +9,7 @@ import {
     MatExpansionPanelTitle
 } from "@angular/material/expansion";
 import {MatInput} from "@angular/material/input";
-import {createDefaultMvClientData, MvClientData} from "../../models/client";
+import {createDefaultMvClientData, MvClientData} from "../../shared/client";
 import {NgForOf} from "@angular/common";
 import {MatOption, MatSelect} from "@angular/material/select";
 import {MatButton} from "@angular/material/button";
@@ -22,13 +22,14 @@ import {
     MvEncryptRequest,
     MvSignRequest,
     MvVerifyRequest
-} from "../../models/mv-beans";
-import {MvBackendRequestService} from "../../services/backend-api/mv-backend-request.service";
+} from "../../../models/mv-beans";
+import {MvBackendRequestService} from "../../../services/backend-api/mv-backend-request.service";
 import {MvConfiguration} from "../menezes-vanstone.component";
-import {EmptyIfUndefinedPipe} from "../../services/pipes/empty-if-undefined";
-import {DialogService} from "../../services/utility/dialogs.service";
+import {EmptyIfUndefinedPipe} from "../../../services/pipes/empty-if-undefined";
+import {DialogService} from "../../../services/utility/dialogs.service";
 import {MatAutocomplete, MatAutocompleteTrigger} from "@angular/material/autocomplete";
 import {MatChip, MatChipListbox, MatChipOption} from "@angular/material/chips";
+import {ClientActionRowComponent} from "../../shared/client-action-row/client-action-row.component";
 
 @Component({
     selector: "mv-client-panel",
@@ -57,6 +58,7 @@ import {MatChip, MatChipListbox, MatChipOption} from "@angular/material/chips";
         MatChipListbox,
         MatChip,
         MatChipOption,
+        ClientActionRowComponent,
     ],
     templateUrl: "./mv-client-panel.component.html",
     styleUrl: "./mv-client-panel.component.scss"
@@ -169,7 +171,7 @@ export class MvClientPanelComponent {
         }
         this.client.sendingTo.ciphertext = copyMvCipherText(this.client.ciphertext);
         this.client.sendingTo.signature = copyMvSignature(this.client.signature);
-        this.client.receivedFrom = this.client
+        this.client.sendingTo.receivedFrom = this.client
 
         this.clearFields();
     }
