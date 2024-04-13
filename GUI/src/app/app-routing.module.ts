@@ -4,7 +4,6 @@ import {HomepageComponent} from "./homepage/homepage.component";
 import {ExponentiationComponent} from "./exponentiation/exponentiation.component";
 import {ExtendedGcdComponent} from "./extendedgcd/extended-gcd.component";
 import {ShanksComponent} from "./shanks/shanks.component";
-import {ClientComponent} from "./client/client.component";
 import {ModularInverseComponent} from "./modular-inverse/modular-inverse.component";
 import {MultiplicationComponent} from "./multiplication/multiplication.component";
 import {MenezesVanstoneComponent} from "./encryption-components/menezes-vanstone/menezes-vanstone.component";
@@ -16,7 +15,6 @@ import {RsaComponent} from "./encryption-components/rsa/rsa.component";
  */
 export const routes: Routes = [
     {path: "homepage", component: HomepageComponent},
-    {path: "client/:client", component: ClientComponent},
     {path: "menezesVanstone", component: MenezesVanstoneComponent},
     {path: "rsa", component: RsaComponent},
     {path: "exponentiation", component: ExponentiationComponent},
