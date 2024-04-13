@@ -1,0 +1,66 @@
+<mat-expansion-panel>
+    <mat-expansion-panel-header>
+        <mat-panel-title>
+            {{ client.name }}
+        </mat-panel-title>
+        <mat-panel-description>
+            Die Ansicht von {{ client.name }}
+        </mat-panel-description>
+    </mat-expansion-panel-header>
+
+    <mat-expansion-panel>
+        <mat-expansion-panel-header>
+            <mat-panel-title>
+                Schlüsselpaar
+            </mat-panel-title>
+        </mat-expansion-panel-header>
+        <div class="card-container">
+
+            <mat-card class="spaced-card">
+                <mat-card-header>
+                    <mat-card-title>Öffentliche Komponenten</mat-card-title>
+                </mat-card-header>
+                <mat-card-content>
+                    TODO: Öffentliche Komponenten (mit Blockgröße)
+                </mat-card-content>
+            </mat-card>
+
+            <mat-card style="flex: 1; margin: 1%">
+                <mat-card-header>
+                    <mat-card-title>Private Komponenten</mat-card-title>
+                </mat-card-header>
+                <mat-card-content>
+                    TODO: Private Komponenten (mit Blockgröße)
+                </mat-card-content>
+            </mat-card>
+        </div>
+    </mat-expansion-panel>
+    <br>
+    <mat-form-field appearance="outline" class="width-100">
+        <mat-label>Klartext</mat-label>
+        <textarea matInput placeholder="Das ist ein wunderbarer Tag..." [(ngModel)]="client.plaintext"></textarea>
+    </mat-form-field>
+    <br>
+    <mat-form-field appearance="outline" class="width-100">
+        <mat-label>Geheimtext</mat-label>
+        <textarea matInput placeholder="Qnf vfg rva jhaqreonere Gnt..."
+                  [(ngModel)]="client.ciphertext"></textarea>
+    </mat-form-field>
+    <br>
+    <mat-form-field class="width-100">
+        <mat-label>Signatur</mat-label>
+        <textarea matInput placeholder="Wird nach dem Berechnen automatisch angezeigt"
+                  [(ngModel)]="client.signature"></textarea>
+    </mat-form-field>
+    <br>
+    <p>Die soeben entschlüsselte Nachricht ist <strong>{{ client.signature_valid }}</strong></p>
+
+    <client-action-row [client]="client"
+                       [targetClients]="possibleTargetClients"
+                       (clearFieldsFromClient)="clearFields()"
+                       (decryptClient)="decrypt()"
+                       (deleteSelf)="delete()"
+                       (encryptClient)="encrypt()"
+                       (sendClient)="send()"/>
+
+</mat-expansion-panel>
