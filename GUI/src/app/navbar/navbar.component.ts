@@ -9,7 +9,7 @@ import {Client} from "../encryption-components/shared/IClientData";
 import {NgForOf, NgIf} from "@angular/common";
 
 @Component({
-    selector: 'app-navbar',
+    selector: 'navbar',
     standalone: true,
     imports: [
         RouterLink,
