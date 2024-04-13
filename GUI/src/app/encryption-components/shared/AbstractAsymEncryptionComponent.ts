@@ -1,6 +1,6 @@
 import {ConfigurationDataTypes} from "./ConfigurationDataTypes";
 import {ClientData} from "./ClientData";
-import {Component, Injectable, Input} from "@angular/core";
+import {Component, Input} from "@angular/core";
 import {MatDialog} from "@angular/material/dialog";
 
 /**
