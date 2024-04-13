@@ -122,7 +122,6 @@ export class MvClientPanelComponent {
                 this.dialogService.endTimedCalc(loadingCalcKey, "Nachricht verschlüsselt.");
             });
         });
-
     }
 
     /**
