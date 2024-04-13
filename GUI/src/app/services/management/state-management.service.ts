@@ -9,8 +9,6 @@ import {RsaCreateKeyPairRequest} from "../../models/rsa-create-key-pair-request"
 })
 export class StateManagementService {
 
-    private server_url = signal("https://krypto-server.tristan-hoermann.de");
-
     private configurationDataRSA = signal(RsaCreateKeyPairRequest.createDefaultConfigurationDataForRSA());
 
     private clientKeyMap = new Map<Client, WritableSignal<RsaKeyPair>>();
@@ -22,20 +20,6 @@ export class StateManagementService {
     private use_fast_math = signal(false);
 
     constructor() {
-    }
-
-    /**
-     * Gibt die URL des Servers zurück.
-     */
-    public getServerUrl(): WritableSignal<string> {
-        return this.server_url;
-    }
-
-    /**
-     * Setzt die URL des Servers.
-     */
-    public setServerUrl(url: string): void {
-        this.server_url.update(value => url);
     }
 
     /**

@@ -44,11 +44,9 @@ import {NavbarComponent} from "./navbar/navbar.component";
 export class AppComponent implements OnInit {
 
     public isServerReachable: boolean = false;
-    public serverURL: string = this.stateService.getServerUrl()();
 
     constructor(private backendRequestService: RsaBackendRequestService,
-                private stateService: StateManagementService,
-                private snackBar: MatSnackBar) {
+                private stateService: StateManagementService) {
     }
 
     /**
@@ -60,29 +58,5 @@ export class AppComponent implements OnInit {
         this.backendRequestService.checkHealth().then((result) => {
             this.isServerReachable = result;
         });
-    }
-
-    /**
-     * Check the server connection.
-     */
-    public checkServerConnection() {
-        this.backendRequestService.checkHealth().then((result) => {
-            if (result) {
-                this.snackBar.open("Server ist erreichbar!", "OK", {duration: 4000});
-            } else {
-                this.snackBar.open("Server ist nicht erreichbar!", "OK", {duration: 4000});
-            }
-        });
-    }
-
-    /**
-     * Save the server URL in the local storage.
-     */
-    public saveServerURL() {
-        this.stateService.setServerUrl(this.serverURL);
-        this.snackBar.open("Server URL gespeichert!", "OK", {duration: 4000});
-        setTimeout(() => {
-            this.checkServerConnection();
-        }, 4000);
     }
 }

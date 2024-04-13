@@ -9,13 +9,10 @@ import {StateManagementService} from "../management/state-management.service";
  */
 export class EndpointsService {
 
-    private domain: string = this.stateService.getServerUrl()();
+    private domain: string = "https://krypto-server.tristan-hoermann.de"
     private rsaEndpoint: string = "/rsa";
     private mvEndpoint: string = "/menezesVanstone";
     private mathEndpoint: string = "/math";
-
-    constructor(private stateService: StateManagementService) {
-    }
 
     /**
      * Gibt den Healthcheck-Endpoint zurück.
