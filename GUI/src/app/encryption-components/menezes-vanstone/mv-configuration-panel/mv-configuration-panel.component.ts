@@ -17,6 +17,9 @@ import {MvBackendRequestService} from "../../../services/backend-api/mv-backend-
 import {MvKeygenConfig} from "../../../models/mv-keygen-config";
 import {copyMvKeyPair} from "../../../models/mv-beans";
 import {MvConfigurationData} from "../../shared/IConfigurationData";
+import {
+    BasicConfigurationFieldsComponent
+} from "../../shared/basic-configuration-fields/basic-configuration-fields.component";
 
 @Component({
     selector: "mv-configuration-panel",
@@ -34,7 +37,8 @@ import {MvConfigurationData} from "../../shared/IConfigurationData";
         MatInput,
         MatLabel,
         MatSuffix,
-        NgForOf
+        NgForOf,
+        BasicConfigurationFieldsComponent
     ],
     templateUrl: "./mv-configuration-panel.component.html",
     styleUrl: "./mv-configuration-panel.component.scss"
@@ -80,19 +84,5 @@ export class MvConfigurationPanelComponent {
             }
             this.dialogService.endTimedCalc(loadingCalcKey, "Schlüsselpaar für " + name + " generiert.");
         });
-    }
-
-    /**
-     * Bestimmt die minimale Modulusbreite für eine gegebene Zahlensystemgröße.
-     */
-    public calcMinimumBitsize(): number {
-        return Math.ceil(Math.log2(this.config.numberSystem));
-    }
-
-    /**
-     * Bestimmt die maximale Zahlensystemgröße für eine gegebene Modulusbreite.
-     */
-    public calcMaxNumbersystem(): number {
-        return 2 ** this.config.modulusWidth;
     }
 }

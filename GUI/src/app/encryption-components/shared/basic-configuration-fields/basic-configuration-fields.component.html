@@ -1,0 +1,24 @@
+<mat-form-field appearance="outline" class="config-form-field">
+    <mat-label>Modulbreite</mat-label>
+    <input class="text-align-right" matInput type="number" [(ngModel)]="config.modulusWidth">
+    <span matTextSuffix>-Bit</span>
+    <mat-hint>Bei {{ config.numberSystem }} mindestens {{ calcMinimumBitsize() }} Bit</mat-hint>
+</mat-form-field>
+
+<mat-form-field appearance="outline" class="config-form-field">
+    <mat-label>Zahlensystem</mat-label>
+    <input class="text-align-right" matInput type="number" [(ngModel)]="config.numberSystem">
+    <mat-hint>Bei {{ config.modulusWidth }}-Bit maximal {{ calcMaxNumbersystem() }}</mat-hint>
+</mat-form-field>
+
+<mat-form-field appearance="outline" class="config-form-field">
+    <mat-label>Miller-Rabin Iterationen</mat-label>
+    <input class="text-align-right" matInput type="number" [(ngModel)]="config.millerRabinRounds">
+    <span matTextSuffix>-Runden</span>
+</mat-form-field>
+
+
+<mat-form-field appearance="outline" class="config-form-field">
+    <mat-label>Seed</mat-label>
+    <input class="text-align-right" matInput type="number" [(ngModel)]="config.randomSeed">
+</mat-form-field>
