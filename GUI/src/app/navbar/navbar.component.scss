@@ -1,57 +1,38 @@
 /* navbar.component.scss */
+$header-font-size: 1.8vw;
+$margin-size: 1vw;
+$button-width: 94%;
+
 .sidenav-header {
-  font-size: 1.8vw;
-  font-weight: bold;
-  margin-bottom: 1vw;
-  margin-top: 1vw;
-  text-align: center;
+    font-size: $header-font-size;
+    font-weight: bold;
+    margin-bottom: $margin-size;
+    margin-top: $margin-size;
+    text-align: center;
 }
 
-.sidenav-header > div {
-  line-height: 3vh;
+.sidenav-container {
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    row-gap: 1vh;
+
+    .sidenav-button, .turbo-toggle-button {
+        width: $button-width;
+        margin: 0 auto;
+        cursor: pointer;
+        font-size: calc(8px + 0.5vw); // Die Schriftgröße beträgt mind 8px und passt sich dann an die Bildschirmgröße an
+        padding: 1vh 2vw;
+        border-radius: 4px;
+    }
 }
 
 .sidenav-footer {
-  margin-top: auto;
-  width: 100%;
-  text-align: center;
-  font-size: 1.2vh;
-}
+    margin-top: auto;
+    width: 100%;
 
-.inner-sidenav-container {
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-  row-gap: 1vh;
-  overflow: hidden;
-  overflow-y: auto;
-}
-
-.sidenav-button, .turbo-toggle-button {
-  width: 94%;
-  margin: 0 auto;
-  cursor: pointer;
-  font-size: 1.8vh;
-  padding: 1vh 2vw;
-  border-radius: 4px;
-}
-
-.sidenav-client-button-container button {
-  width: 94%;
-  margin: 0 auto;
-  display: block;
-  font-size: 1.75vh;
-}
-
-.sidenav-client-button-container {
-  display: flex;
-  flex-direction: column;
-  row-gap: 1vh;
-  justify-content: flex-end;
-}
-
-.navbar-image {
-  width: 100%;
-  object-fit: contain;
-  margin-bottom: 1vh;
+    .navbar-image {
+        width: 100%;
+        object-fit: contain;
+    }
 }
