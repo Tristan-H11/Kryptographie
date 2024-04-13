@@ -3,7 +3,7 @@ import {MatButton} from "@angular/material/button";
 import {MatChipListbox, MatChipOption} from "@angular/material/chips";
 import {MatExpansionPanelActionRow} from "@angular/material/expansion";
 import {NgForOf} from "@angular/common";
-import {IClientData} from "../client";
+import {IClientData} from "../IClientData";
 
 @Component({
     selector: "client-action-row",

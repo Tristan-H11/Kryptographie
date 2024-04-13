@@ -11,7 +11,7 @@ import {
 import {MatFormField, MatHint, MatLabel, MatSuffix} from "@angular/material/form-field";
 import {MatInput} from "@angular/material/input";
 import {NgForOf} from "@angular/common";
-import {MvClientData} from "../../shared/client";
+import {MvClientData} from "../../shared/IClientData";
 import {DialogService} from "../../../services/utility/dialogs.service";
 import {MvBackendRequestService} from "../../../services/backend-api/mv-backend-request.service";
 import {MvKeygenConfig} from "../../../models/mv-keygen-config";

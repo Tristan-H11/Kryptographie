@@ -1,4 +1,5 @@
 import {MvCipherText, MvKeyPair, MvSignature} from "../../models/mv-beans";
+import {RsaKeyPair} from "../../models/rsa-key-pair";
 
 /**
  * Darstellung der Clients.
@@ -22,6 +23,29 @@ export interface IClientData {
     signature_valid: string;
     sendingTo: IClientData | undefined;
     receivedFrom: IClientData | undefined;
+}
+
+export interface RsaClientData extends IClientData {
+    name: string;
+    keyPair: RsaKeyPair | undefined;
+    plaintext: string;
+    ciphertext: any | undefined;
+    signature: any | undefined;
+    signature_valid: string;
+    sendingTo: RsaClientData | undefined;
+    receivedFrom: RsaClientData | undefined;
+}
+
+export function createDefaultRsaClientData(name: string): RsaClientData {
+    return {
+        receivedFrom: undefined, sendingTo: undefined,
+        name: name,
+        keyPair: RsaKeyPair.createEmptyKeyPair(),
+        plaintext: "",
+        ciphertext: undefined,
+        signature: undefined,
+        signature_valid: "ungeprüft"
+    }
 }
 
 export interface MvClientData extends IClientData{

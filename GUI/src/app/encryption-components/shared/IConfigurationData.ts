@@ -12,3 +12,6 @@ export interface MvConfigurationData extends IConfigurationData {
     numberSystem: number;
     coefA: number;
 }
+
+export interface RsaConfigurationData extends IConfigurationData {
+}

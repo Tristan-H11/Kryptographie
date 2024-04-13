@@ -9,7 +9,7 @@ import {
     MatExpansionPanelTitle
 } from "@angular/material/expansion";
 import {MatInput} from "@angular/material/input";
-import {createDefaultMvClientData, MvClientData} from "../../shared/client";
+import {createDefaultMvClientData, MvClientData} from "../../shared/IClientData";
 import {NgForOf} from "@angular/common";
 import {MatOption, MatSelect} from "@angular/material/select";
 import {MatButton} from "@angular/material/button";

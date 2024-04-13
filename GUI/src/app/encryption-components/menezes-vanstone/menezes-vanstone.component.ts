@@ -19,7 +19,7 @@ import {MvConfigurationPanelComponent} from "./mv-configuration-panel/mv-configu
 import {SimpleDialogComponent} from "../../simple-dialog/simple-dialog.component";
 import {MatDialog} from "@angular/material/dialog";
 import {MatIcon} from "@angular/material/icon";
-import {createDefaultMvClientData, MvClientData} from "../shared/client";
+import {createDefaultMvClientData, MvClientData} from "../shared/IClientData";
 import {AddClientButtonComponent} from "../shared/add-client-button/add-client-button.component";
 import {MvConfigurationData} from "../shared/IConfigurationData";
 

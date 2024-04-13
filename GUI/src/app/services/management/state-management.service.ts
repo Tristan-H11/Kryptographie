@@ -1,5 +1,5 @@
 import {Injectable, signal, WritableSignal} from "@angular/core";
-import {Client} from "../../encryption-components/shared/client";
+import {Client} from "../../encryption-components/shared/IClientData";
 import {RsaKeyPair} from "../../models/rsa-key-pair";
 import {MessageSignatureContainer} from "../../models/message-signature-container";
 import {RsaConfigurationData} from "../../models/rsa-configuration-data";
