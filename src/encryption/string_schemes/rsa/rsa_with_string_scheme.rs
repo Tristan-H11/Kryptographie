@@ -161,7 +161,7 @@ impl<'a> Verifier<RsaWithStringScheme> for RsaWithStringScheme {
     fn verify(
         key: &Self::Key,
         signature: &Self::Signature,
-        message: &Self::Signature,
+        message: &Self::Message,
         service: NumberTheoryService,
     ) -> Self::Output {
         let radix = key.radix;

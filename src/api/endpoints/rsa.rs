@@ -318,8 +318,8 @@ pub(crate) async fn verify(
 
         let plaintext = RsaWithStringScheme::verify(
             &rsa_with_string_key,
-            &plaintext,
             &signature,
+            &plaintext,
             number_theory_service,
         );
         let response = SingleStringResponse {
