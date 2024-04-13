@@ -35,7 +35,7 @@ import {DialogService} from "../services/utility/dialogs.service";
 /**
  * Component for the RSA Encryption and Decryption.
  */
-export class RsaComponent {
+export class RsaComponentOld {
     // Value for configuration Data which is provided by the global state management service
     private configurationData = this.stateService.getConfigurationData();
 
