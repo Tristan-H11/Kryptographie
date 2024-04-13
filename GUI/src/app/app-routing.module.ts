@@ -16,11 +16,11 @@ export const routes: Routes = [
     },
     {
         path: "exponentiation",
-        loadComponent: () => import("./exponentiation/exponentiation.component").then(m => m.ExponentiationComponent)
+        loadComponent: () => import("./math-components/exponentiation/exponentiation.component").then(m => m.ExponentiationComponent)
     },
     {
         path: "extendedGcd",
-        loadComponent: () => import("./extendedgcd/extended-gcd.component").then(m => m.ExtendedGcdComponent)
+        loadComponent: () => import("./math-components/extendedgcd/extended-gcd.component").then(m => m.ExtendedGcdComponent)
     },
     {
         path: "shanks",
@@ -28,11 +28,11 @@ export const routes: Routes = [
     },
     {
         path: "modularInverse",
-        loadComponent: () => import("./modular-inverse/modular-inverse.component").then(m => m.ModularInverseComponent)
+        loadComponent: () => import("./math-components/modular-inverse/modular-inverse.component").then(m => m.ModularInverseComponent)
     },
     {
         path: `multiplication`,
-        loadComponent: () => import("./multiplication/multiplication.component").then(m => m.MultiplicationComponent)
+        loadComponent: () => import("./math-components/multiplication/multiplication.component").then(m => m.MultiplicationComponent)
     },
     {
         path: "",

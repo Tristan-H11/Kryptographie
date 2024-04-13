@@ -5,15 +5,15 @@ import {MatExpansionModule} from "@angular/material/expansion";
 import {MatFormFieldModule} from "@angular/material/form-field";
 import {MatInputModule} from "@angular/material/input";
 import {FormsModule, ReactiveFormsModule} from "@angular/forms";
-import {RsaBackendRequestService} from "../services/backend-api/rsa-backend-request.service";
-import {RsaKeyPair} from "../models/rsa-key-pair";
-import {RsaCreateKeyPairRequest} from "../models/rsa-create-key-pair-request";
+import {RsaBackendRequestService} from "../../services/backend-api/rsa-backend-request.service";
+import {RsaKeyPair} from "../../models/rsa-key-pair";
+import {RsaCreateKeyPairRequest} from "../../models/rsa-create-key-pair-request";
 import {MatDialog, MatDialogRef} from "@angular/material/dialog";
-import {LoadingDialogComponent} from "../dialogs/loading-dialog/loading-dialog.component";
+import {LoadingDialogComponent} from "../../dialogs/loading-dialog/loading-dialog.component";
 import {MatSnackBar} from "@angular/material/snack-bar";
-import {MultiplicationRequest} from "../models/multiplication-request";
+import {MultiplicationRequest} from "../../models/multiplication-request";
 import {catchError, EMPTY} from "rxjs";
-import {ErrorDialogComponent} from "../dialogs/error-dialog/error-dialog.component";
+import {ErrorDialogComponent} from "../../dialogs/error-dialog/error-dialog.component";
 
 @Component({
     selector: "app-multiplication",

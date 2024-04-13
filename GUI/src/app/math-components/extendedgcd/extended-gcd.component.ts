@@ -5,10 +5,10 @@ import {MatExpansionModule} from "@angular/material/expansion";
 import {MatFormFieldModule} from "@angular/material/form-field";
 import {MatInputModule} from "@angular/material/input";
 import {FormsModule, ReactiveFormsModule} from "@angular/forms";
-import {RsaBackendRequestService} from "../services/backend-api/rsa-backend-request.service";
-import {ExtendedEuclidRequest} from "../models/extended-euclid-request";
+import {RsaBackendRequestService} from "../../services/backend-api/rsa-backend-request.service";
+import {ExtendedEuclidRequest} from "../../models/extended-euclid-request";
 import {catchError, EMPTY} from "rxjs";
-import {ErrorDialogComponent} from "../dialogs/error-dialog/error-dialog.component";
+import {ErrorDialogComponent} from "../../dialogs/error-dialog/error-dialog.component";
 import {MatDialog} from "@angular/material/dialog";
 
 @Component({
