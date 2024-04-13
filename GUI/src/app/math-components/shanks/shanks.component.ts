@@ -1,7 +1,7 @@
 import {Component} from "@angular/core";
 import {CommonModule} from "@angular/common";
-import {RsaBackendRequestService} from "../services/backend-api/rsa-backend-request.service";
-import {ShanksRequest} from "../models/shanks-request";
+import {RsaBackendRequestService} from "../../services/backend-api/rsa-backend-request.service";
+import {ShanksRequest} from "../../models/shanks-request";
 import {FormsModule} from "@angular/forms";
 import {MatButtonModule} from "@angular/material/button";
 import {MatExpansionModule} from "@angular/material/expansion";
@@ -9,7 +9,7 @@ import {MatFormFieldModule} from "@angular/material/form-field";
 import {MatInputModule} from "@angular/material/input";
 import {MatDialog} from "@angular/material/dialog";
 import {catchError, EMPTY} from "rxjs";
-import {ErrorDialogComponent} from "../dialogs/error-dialog/error-dialog.component";
+import {ErrorDialogComponent} from "../../dialogs/error-dialog/error-dialog.component";
 
 @Component({
     selector: "app-shanks",

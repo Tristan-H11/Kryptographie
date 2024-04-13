@@ -24,7 +24,7 @@ export const routes: Routes = [
     },
     {
         path: "shanks",
-        loadComponent: () => import("./shanks/shanks.component").then(m => m.ShanksComponent)
+        loadComponent: () => import("./math-components/shanks/shanks.component").then(m => m.ShanksComponent)
     },
     {
         path: "modularInverse",
