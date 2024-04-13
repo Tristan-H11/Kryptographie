@@ -21,15 +21,8 @@ import {MatDialog} from "@angular/material/dialog";
 import {MatIcon} from "@angular/material/icon";
 import {createDefaultMvClientData, MvClientData} from "../shared/client";
 import {AddClientButtonComponent} from "../shared/add-client-button/add-client-button.component";
+import {MvConfigurationData} from "../shared/IConfigurationData";
 
-// TODO Auslagern
-export interface MvConfiguration {
-    modulusWidth: number;
-    millerRabinRounds: number;
-    coefA: number;
-    randomSeed: number;
-    numberSystem: number;
-}
 
 @Component({
     selector: "app-menezes-vanstone",
@@ -68,7 +61,7 @@ export interface MvConfiguration {
  * Component for the Menezes Vanstone Encryption and Decryption.
  */
 export class MenezesVanstoneComponent {
-    public config: MvConfiguration = {
+    public config: MvConfigurationData = {
         modulusWidth: 32,
         millerRabinRounds: 100,
         coefA: 5,

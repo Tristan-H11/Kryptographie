@@ -24,12 +24,12 @@ import {
     MvVerifyRequest
 } from "../../../models/mv-beans";
 import {MvBackendRequestService} from "../../../services/backend-api/mv-backend-request.service";
-import {MvConfiguration} from "../menezes-vanstone.component";
 import {EmptyIfUndefinedPipe} from "../../../services/pipes/empty-if-undefined";
 import {DialogService} from "../../../services/utility/dialogs.service";
 import {MatAutocomplete, MatAutocompleteTrigger} from "@angular/material/autocomplete";
 import {MatChip, MatChipListbox, MatChipOption} from "@angular/material/chips";
 import {ClientActionRowComponent} from "../../shared/client-action-row/client-action-row.component";
+import {MvConfigurationData} from "../../shared/IConfigurationData";
 
 @Component({
     selector: "mv-client-panel",
@@ -72,7 +72,7 @@ export class MvClientPanelComponent {
     public possibleTargetClients: MvClientData[] = [];
 
     @Input()
-    public config: MvConfiguration = {
+    public config: MvConfigurationData = {
         modulusWidth: 0,
         millerRabinRounds: 0,
         coefA: 0,

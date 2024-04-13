@@ -11,12 +11,12 @@ import {
 import {MatFormField, MatHint, MatLabel, MatSuffix} from "@angular/material/form-field";
 import {MatInput} from "@angular/material/input";
 import {NgForOf} from "@angular/common";
-import {MvConfiguration} from "../menezes-vanstone.component";
 import {MvClientData} from "../../shared/client";
 import {DialogService} from "../../../services/utility/dialogs.service";
 import {MvBackendRequestService} from "../../../services/backend-api/mv-backend-request.service";
 import {MvKeygenConfig} from "../../../models/mv-keygen-config";
 import {copyMvKeyPair} from "../../../models/mv-beans";
+import {MvConfigurationData} from "../../shared/IConfigurationData";
 
 @Component({
     selector: "mv-configuration-panel",
@@ -42,7 +42,7 @@ import {copyMvKeyPair} from "../../../models/mv-beans";
 export class MvConfigurationPanelComponent {
 
     @Input()
-    public config: MvConfiguration = {
+    public config: MvConfigurationData = {
         modulusWidth: 32,
         millerRabinRounds: 20,
         coefA: 1,
