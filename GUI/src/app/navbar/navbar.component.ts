@@ -47,8 +47,4 @@ export class NavbarComponent {
     public toggleTurboMode() {
         this.stateService.getUseFastMath().update(value => !value);
     }
-
-    public getClients(): Set<Client> {
-        return this.stateService.getAllClients();
-    }
 }
