@@ -8,7 +8,7 @@ import {RsaBackendRequestService} from "../services/backend-api/rsa-backend-requ
 import {MatButtonModule} from "@angular/material/button";
 import {ExponentiationRequest} from "../models/exponentiation-request";
 import {catchError, EMPTY} from "rxjs";
-import {ErrorDialogComponent} from "../error-dialog/error-dialog.component";
+import {ErrorDialogComponent} from "../dialogs/error-dialog/error-dialog.component";
 import {MatDialog} from "@angular/material/dialog";
 
 @Component({

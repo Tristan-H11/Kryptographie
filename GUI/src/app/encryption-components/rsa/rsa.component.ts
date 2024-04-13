@@ -9,7 +9,7 @@ import {
 import {NgForOf} from "@angular/common";
 import {RsaBasicsPanelComponent} from "./rsa-basics-panel/rsa-basics-panel.component";
 import {RsaConfigurationPanelComponent} from "./rsa-configuration-panel/rsa-configuration-panel.component";
-import {SimpleDialogComponent} from "../../simple-dialog/simple-dialog.component";
+import {SimpleDialogComponent} from "../../dialogs/simple-dialog/simple-dialog.component";
 import {createDefaultRsaClientData, RsaClientData} from "../shared/IClientData";
 import {MatDialog} from "@angular/material/dialog";
 import {RsaConfigurationData} from "../shared/IConfigurationData";

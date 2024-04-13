@@ -9,7 +9,7 @@ import {RsaBackendRequestService} from "../services/backend-api/rsa-backend-requ
 import {ModularInversRequest} from "../models/modular-invers-request";
 import {MatDialog} from "@angular/material/dialog";
 import {catchError, EMPTY} from "rxjs";
-import {ErrorDialogComponent} from "../error-dialog/error-dialog.component";
+import {ErrorDialogComponent} from "../dialogs/error-dialog/error-dialog.component";
 
 @Component({
     selector: "app-modular-inverse",

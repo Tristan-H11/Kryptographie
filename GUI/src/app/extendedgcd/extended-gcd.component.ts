@@ -8,7 +8,7 @@ import {FormsModule, ReactiveFormsModule} from "@angular/forms";
 import {RsaBackendRequestService} from "../services/backend-api/rsa-backend-request.service";
 import {ExtendedEuclidRequest} from "../models/extended-euclid-request";
 import {catchError, EMPTY} from "rxjs";
-import {ErrorDialogComponent} from "../error-dialog/error-dialog.component";
+import {ErrorDialogComponent} from "../dialogs/error-dialog/error-dialog.component";
 import {MatDialog} from "@angular/material/dialog";
 
 @Component({

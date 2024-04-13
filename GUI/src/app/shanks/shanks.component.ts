@@ -9,7 +9,7 @@ import {MatFormFieldModule} from "@angular/material/form-field";
 import {MatInputModule} from "@angular/material/input";
 import {MatDialog} from "@angular/material/dialog";
 import {catchError, EMPTY} from "rxjs";
-import {ErrorDialogComponent} from "../error-dialog/error-dialog.component";
+import {ErrorDialogComponent} from "../dialogs/error-dialog/error-dialog.component";
 
 @Component({
     selector: "app-shanks",

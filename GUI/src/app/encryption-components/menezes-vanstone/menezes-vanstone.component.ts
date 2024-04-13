@@ -16,7 +16,7 @@ import {MatCard, MatCardContent, MatCardHeader, MatCardTitle} from "@angular/mat
 import {MvBasicsPanelComponent} from "./mv-basics-panel/mv-basics-panel.component";
 import {MvClientPanelComponent} from "./mv-client-panel/mv-client-panel.component";
 import {MvConfigurationPanelComponent} from "./mv-configuration-panel/mv-configuration-panel.component";
-import {SimpleDialogComponent} from "../../simple-dialog/simple-dialog.component";
+import {SimpleDialogComponent} from "../../dialogs/simple-dialog/simple-dialog.component";
 import {MatDialog} from "@angular/material/dialog";
 import {MatIcon} from "@angular/material/icon";
 import {createDefaultMvClientData, MvClientData} from "../shared/IClientData";
