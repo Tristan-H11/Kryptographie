@@ -16,13 +16,7 @@
         Aktiver Modus: Turbo
     </button>
 
-    <button mat-stroked-button routerLink="/startseite" class="sidenav-button">Startseite</button>
-    <mat-divider></mat-divider>
-    <div class="sidenav-client-button-container">
-        <button *ngFor="let client of getClients()" color="primary" mat-raised-button
-                routerLink="/client/{{client.name}}">{{ client.name }}
-        </button>
-    </div>
+    <button mat-raised-button color="primary" routerLink="/startseite" class="sidenav-button">Startseite</button>
     <button mat-stroked-button routerLink="/exponentiation" class="sidenav-button">Exponentiation</button>
     <button mat-stroked-button routerLink="/extendedGcd" class="sidenav-button">Extended GCD</button>
     <button mat-stroked-button routerLink="/shanks" class="sidenav-button">Shanks</button>
@@ -32,6 +26,6 @@
     <img src="assets/bgi_01.jpg" alt="Beschreibung des Bildes" class="navbar-image">
 
     <div class="sidenav-footer">
-<!--        Integrationsprojekt Kryptographie-->
+        <!-- Platz für einen Footer Text -->
     </div>
 </div>
