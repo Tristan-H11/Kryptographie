@@ -15,7 +15,7 @@ import {MatInput} from "@angular/material/input";
 import {NgForOf} from "@angular/common";
 import {FormsModule, ReactiveFormsModule} from "@angular/forms";
 import {RsaConfigurationData} from "../../shared/ConfigurationDataTypes";
-import {RsaClientData} from "../../shared/IClientData";
+import {RsaClientData} from "../../shared/ClientData";
 import {RsaBackendRequestService} from "../../../services/backend-api/rsa-backend-request.service";
 import {RsaCreateKeyPairRequest} from "../../../models/rsa-create-key-pair-request";
 import {DialogService} from "../../../services/utility/dialogs.service";

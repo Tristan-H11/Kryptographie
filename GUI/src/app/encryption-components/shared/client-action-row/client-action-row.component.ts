@@ -3,7 +3,7 @@ import {MatButton} from "@angular/material/button";
 import {MatChipListbox, MatChipOption} from "@angular/material/chips";
 import {MatExpansionPanelActionRow} from "@angular/material/expansion";
 import {NgForOf} from "@angular/common";
-import {IClientData} from "../IClientData";
+import {ClientData} from "../ClientData";
 
 @Component({
     selector: "client-action-row",
@@ -21,10 +21,10 @@ import {IClientData} from "../IClientData";
 export class ClientActionRowComponent {
 
     @Input()
-    public targetClients: IClientData[] = [];
+    public targetClients: ClientData[] = [];
 
     @Input()
-    public client: IClientData | undefined;
+    public client: ClientData | undefined;
 
     @Output()
     public deleteSelf: EventEmitter<void> = new EventEmitter<void>();
@@ -41,7 +41,7 @@ export class ClientActionRowComponent {
     @Output()
     public sendClient: EventEmitter<void> = new EventEmitter<void>();
 
-    public changeTargetClientTo(client: IClientData): void {
+    public changeTargetClientTo(client: ClientData): void {
         if (this.client) {
             this.client.sendingTo = client;
         }

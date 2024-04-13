@@ -1,5 +1,3 @@
-import {MvClientData} from "./IClientData";
-
 export abstract class ConfigurationDataTypes {
     public modulusWidth: number;
     public millerRabinRounds: number;

@@ -3,13 +3,14 @@ import {MatFormField, MatLabel} from "@angular/material/form-field";
 import {FormsModule} from "@angular/forms";
 import {MatCard, MatCardContent, MatCardHeader, MatCardTitle} from "@angular/material/card";
 import {
-    MatExpansionPanel, MatExpansionPanelActionRow,
+    MatExpansionPanel,
+    MatExpansionPanelActionRow,
     MatExpansionPanelDescription,
     MatExpansionPanelHeader,
     MatExpansionPanelTitle
 } from "@angular/material/expansion";
 import {MatInput} from "@angular/material/input";
-import {createDefaultMvClientData, MvClientData} from "../../shared/IClientData";
+import {MvClientData} from "../../shared/ClientData";
 import {NgForOf} from "@angular/common";
 import {MatOption, MatSelect} from "@angular/material/select";
 import {MatButton} from "@angular/material/button";
@@ -66,7 +67,7 @@ import {MvConfigurationData} from "../../shared/ConfigurationDataTypes";
 export class MvClientPanelComponent {
 
     @Input()
-    public client: MvClientData = createDefaultMvClientData("Empty");
+    public client: MvClientData = MvClientData.createDefaultWithName("Empty");
 
     @Input()
     public possibleTargetClients: MvClientData[] = [];
