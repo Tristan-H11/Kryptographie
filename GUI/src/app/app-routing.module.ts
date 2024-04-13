@@ -1,29 +1,48 @@
 import {NgModule} from "@angular/core";
 import {RouterModule, Routes} from "@angular/router";
-import {HomepageComponent} from "./homepage/homepage.component";
-import {ExponentiationComponent} from "./exponentiation/exponentiation.component";
-import {ExtendedGcdComponent} from "./extendedgcd/extended-gcd.component";
-import {ShanksComponent} from "./shanks/shanks.component";
-import {ModularInverseComponent} from "./modular-inverse/modular-inverse.component";
-import {MultiplicationComponent} from "./multiplication/multiplication.component";
-import {MenezesVanstoneComponent} from "./encryption-components/menezes-vanstone/menezes-vanstone.component";
-import {RsaComponent} from "./encryption-components/rsa/rsa.component";
 
-/**
- * Defines the routes of the application.
- * The routing takes place in navbar.component.html and homepage.html
- */
 export const routes: Routes = [
-    {path: "homepage", component: HomepageComponent},
-    {path: "menezesVanstone", component: MenezesVanstoneComponent},
-    {path: "rsa", component: RsaComponent},
-    {path: "exponentiation", component: ExponentiationComponent},
-    {path: "extendedGcd", component: ExtendedGcdComponent},
-    {path: "shanks", component: ShanksComponent},
-    {path: "modularInverse", component: ModularInverseComponent},
-    {path: `multiplication`, component: MultiplicationComponent},
-    {path: "", redirectTo: "/homepage", pathMatch: "full"},
-    {path: "**", component: HomepageComponent}
+    {
+        path: "homepage",
+        loadComponent: () => import("./homepage/homepage.component").then(m => m.HomepageComponent)
+    },
+    {
+        path: "menezesVanstone",
+        loadComponent: () => import("./encryption-components/menezes-vanstone/menezes-vanstone.component").then(m => m.MenezesVanstoneComponent)
+    },
+    {
+        path: "rsa",
+        loadComponent: () => import("./encryption-components/rsa/rsa.component").then(m => m.RsaComponent)
+    },
+    {
+        path: "exponentiation",
+        loadComponent: () => import("./exponentiation/exponentiation.component").then(m => m.ExponentiationComponent)
+    },
+    {
+        path: "extendedGcd",
+        loadComponent: () => import("./extendedgcd/extended-gcd.component").then(m => m.ExtendedGcdComponent)
+    },
+    {
+        path: "shanks",
+        loadComponent: () => import("./shanks/shanks.component").then(m => m.ShanksComponent)
+    },
+    {
+        path: "modularInverse",
+        loadComponent: () => import("./modular-inverse/modular-inverse.component").then(m => m.ModularInverseComponent)
+    },
+    {
+        path: `multiplication`,
+        loadComponent: () => import("./multiplication/multiplication.component").then(m => m.MultiplicationComponent)
+    },
+    {
+        path: "",
+        redirectTo: "/homepage",
+        pathMatch: "full"
+    },
+    {
+        path: "**",
+        redirectTo: "/homepage"
+    }
 ];
 
 @NgModule({
