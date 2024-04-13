@@ -29,7 +29,7 @@ import {DialogService} from "../../../services/utility/dialogs.service";
 import {MatAutocomplete, MatAutocompleteTrigger} from "@angular/material/autocomplete";
 import {MatChip, MatChipListbox, MatChipOption} from "@angular/material/chips";
 import {ClientActionRowComponent} from "../../shared/client-action-row/client-action-row.component";
-import {MvConfigurationData} from "../../shared/IConfigurationData";
+import {MvConfigurationData} from "../../shared/ConfigurationDataTypes";
 
 @Component({
     selector: "mv-client-panel",

@@ -14,7 +14,7 @@ import {MatFormField, MatHint, MatLabel} from "@angular/material/form-field";
 import {MatInput} from "@angular/material/input";
 import {NgForOf} from "@angular/common";
 import {FormsModule, ReactiveFormsModule} from "@angular/forms";
-import {RsaConfigurationData} from "../../shared/IConfigurationData";
+import {RsaConfigurationData} from "../../shared/ConfigurationDataTypes";
 import {RsaClientData} from "../../shared/IClientData";
 import {RsaBackendRequestService} from "../../../services/backend-api/rsa-backend-request.service";
 import {RsaCreateKeyPairRequest} from "../../../models/rsa-create-key-pair-request";

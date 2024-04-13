@@ -16,7 +16,7 @@ import {DialogService} from "../../../services/utility/dialogs.service";
 import {MvBackendRequestService} from "../../../services/backend-api/mv-backend-request.service";
 import {MvKeygenConfig} from "../../../models/mv-keygen-config";
 import {copyMvKeyPair} from "../../../models/mv-beans";
-import {MvConfigurationData} from "../../shared/IConfigurationData";
+import {MvConfigurationData} from "../../shared/ConfigurationDataTypes";
 import {
     BasicConfigurationFieldsComponent
 } from "../../shared/basic-configuration-fields/basic-configuration-fields.component";

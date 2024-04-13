@@ -2,7 +2,7 @@ import {Component, Input} from "@angular/core";
 import {FormsModule} from "@angular/forms";
 import {MatFormField, MatHint, MatLabel, MatSuffix} from "@angular/material/form-field";
 import {MatInput} from "@angular/material/input";
-import {IConfigurationData} from "../IConfigurationData";
+import {ConfigurationDataTypes} from "../ConfigurationDataTypes";
 
 @Component({
     selector: "basic-configuration-fields",
@@ -21,7 +21,7 @@ import {IConfigurationData} from "../IConfigurationData";
 export class BasicConfigurationFieldsComponent {
 
     @Input()
-    public config: IConfigurationData = {
+    public config: ConfigurationDataTypes = {
         modulusWidth: 64,
         millerRabinRounds: 40,
         randomSeed: 17,

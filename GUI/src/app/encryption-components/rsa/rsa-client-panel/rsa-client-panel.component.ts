@@ -12,7 +12,7 @@ import {MatFormField, MatLabel} from "@angular/material/form-field";
 import {MatInput} from "@angular/material/input";
 import {FormsModule, ReactiveFormsModule} from "@angular/forms";
 import {createDefaultRsaClientData, RsaClientData} from "../../shared/IClientData";
-import {RsaConfigurationData} from "../../shared/IConfigurationData";
+import {RsaConfigurationData} from "../../shared/ConfigurationDataTypes";
 import {DialogService} from "../../../services/utility/dialogs.service";
 import {RsaBackendRequestService} from "../../../services/backend-api/rsa-backend-request.service";
 import {RsaEncryptDecryptRequest} from "../../../models/rsa-encrypt-decrypt-request";
