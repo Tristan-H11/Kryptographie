@@ -7,7 +7,7 @@ import {MatInputModule} from "@angular/material/input";
 import {FormsModule, ReactiveFormsModule} from "@angular/forms";
 import {RsaBackendRequestService} from "../services/backend-api/rsa-backend-request.service";
 import {RsaKeyPair} from "../models/rsa-key-pair";
-import {RsaConfigurationData} from "../models/rsa-configuration-data";
+import {RsaCreateKeyPairRequest} from "../models/rsa-create-key-pair-request";
 import {MatDialog, MatDialogRef} from "@angular/material/dialog";
 import {LoadingDialogComponent} from "../loading-dialog/loading-dialog.component";
 import {MatSnackBar} from "@angular/material/snack-bar";
@@ -46,7 +46,7 @@ export class MultiplicationComponent {
      * Fragt die Schlüsselerzeugung an und gibt das Ergebnis zurück.
      */
     public generateKeys(): void {
-        let requestContent = new RsaConfigurationData(
+        let requestContent = new RsaCreateKeyPairRequest(
             this.modulusWidth,
             this.millerRabinIterations,
             this.randomSeed,

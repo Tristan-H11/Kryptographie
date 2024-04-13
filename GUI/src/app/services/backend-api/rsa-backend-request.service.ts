@@ -2,7 +2,7 @@ import {Injectable} from "@angular/core";
 import {HttpClient, HttpParams} from "@angular/common/http";
 import {EndpointsService} from "./endpoints.service";
 import {firstValueFrom, Observable} from "rxjs";
-import {RsaConfigurationData} from "../../models/rsa-configuration-data";
+import {RsaCreateKeyPairRequest} from "../../models/rsa-create-key-pair-request";
 import {RsaKeyPair} from "../../models/rsa-key-pair";
 import {RsaEncryptDecryptRequest} from "../../models/rsa-encrypt-decrypt-request";
 import {SingleMessageModel} from "../../models/SingleMessageModel";
@@ -49,7 +49,7 @@ export class RsaBackendRequestService {
     /**
      * Fragt den Post Endpunkt zum Erstellen eines neuen Schlüsselpaares ab.
      */
-    public async createKeyPair(body: RsaConfigurationData): Promise<RsaKeyPair> {
+    public async createKeyPair(body: RsaCreateKeyPairRequest): Promise<RsaKeyPair> {
         const params = this.getParams();
         const options = {params};
         return firstValueFrom(

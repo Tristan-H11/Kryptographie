@@ -1,7 +1,7 @@
 /**
- * RsaConfigurationData stellt die Datenstruktur für die Konfiguration der wichtigen RSA Eigenschaften bereit.
+ * RsaCreateKeyPairRequest stellt die Datenstruktur für die Konfiguration der wichtigen RSA Eigenschaften bereit.
  */
-export class RsaConfigurationData {
+export class RsaCreateKeyPairRequest {
 	modulus_width: number;
 	miller_rabin_rounds: number;
 	random_seed: number;
@@ -17,8 +17,8 @@ export class RsaConfigurationData {
 		this.number_system_base = number_system_base;
 	}
 
-	public static createDefaultConfigurationDataForRSA(): RsaConfigurationData {
-		return new RsaConfigurationData(1024, 10, 13, 55296);
+	public static createDefaultConfigurationDataForRSA(): RsaCreateKeyPairRequest {
+		return new RsaCreateKeyPairRequest(1024, 10, 13, 55296);
 	}
 }
 

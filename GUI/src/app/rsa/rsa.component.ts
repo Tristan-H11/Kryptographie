@@ -11,7 +11,7 @@ import {MatDialog, MatDialogRef} from "@angular/material/dialog";
 import {RsaBackendRequestService} from "../services/backend-api/rsa-backend-request.service";
 import {MatSnackBar} from "@angular/material/snack-bar";
 import {Client} from "../encryption-components/shared/IClientData";
-import {RsaConfigurationData} from "../models/rsa-configuration-data";
+import {RsaCreateKeyPairRequest} from "../models/rsa-create-key-pair-request";
 import {LoadingDialogComponent} from "../loading-dialog/loading-dialog.component";
 import {SimpleDialogComponent} from "../simple-dialog/simple-dialog.component";
 import {DialogService} from "../services/utility/dialogs.service";
@@ -121,7 +121,7 @@ export class RsaComponent {
      * Generates a new RSA key pair for the given client.
      */
     public generateKeys(client: Client) {
-        let requestContent = new RsaConfigurationData(
+        let requestContent = new RsaCreateKeyPairRequest(
             this.modulusWidth,
             this.millerRabinIterations,
             this.randomSeed,
@@ -221,7 +221,7 @@ export class RsaComponent {
     /**
      * Generates a new RSA key pair for the given client.
      */
-    private generateKeyPair(requestContent: RsaConfigurationData, client: Client): void {
+    private generateKeyPair(requestContent: RsaCreateKeyPairRequest, client: Client): void {
         let loadingCalcKey = this.dialogService.startTimedCalc();
         this.backendRequestService.createKeyPair(requestContent).then(
             (keyPair) => {

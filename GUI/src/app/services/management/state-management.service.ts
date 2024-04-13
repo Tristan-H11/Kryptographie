@@ -2,7 +2,7 @@ import {Injectable, signal, WritableSignal} from "@angular/core";
 import {Client} from "../../encryption-components/shared/IClientData";
 import {RsaKeyPair} from "../../models/rsa-key-pair";
 import {MessageSignatureContainer} from "../../models/message-signature-container";
-import {RsaConfigurationData} from "../../models/rsa-configuration-data";
+import {RsaCreateKeyPairRequest} from "../../models/rsa-create-key-pair-request";
 
 @Injectable({
     providedIn: "root"
@@ -11,7 +11,7 @@ export class StateManagementService {
 
     private server_url = signal("https://krypto-server.tristan-hoermann.de");
 
-    private configurationDataRSA = signal(RsaConfigurationData.createDefaultConfigurationDataForRSA());
+    private configurationDataRSA = signal(RsaCreateKeyPairRequest.createDefaultConfigurationDataForRSA());
 
     private clientKeyMap = new Map<Client, WritableSignal<RsaKeyPair>>();
 
