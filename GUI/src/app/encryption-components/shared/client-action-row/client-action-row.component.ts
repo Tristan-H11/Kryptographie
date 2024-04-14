@@ -71,10 +71,11 @@ export class ClientActionRowComponent {
      * Hat der Client kein eigenes Schlüsselpaar, so ist der Button deaktiviert. (Signatur nicht möglich)
      */
     public shouldDisableEncryptButton(): boolean {
-        if (!this.client || !this.client.keyPair || !this.client.sendingTo) {
-            return true;
-        }
-        return this.client.plaintext.length < 1 || !this.client.sendingTo.keyPair;
+        return !this.client
+            || !this.client.keyPair
+            || !this.client.sendingTo
+            || this.client.plaintext.length < 1
+            || !this.client.sendingTo.keyPair;
     }
 
     /**
@@ -82,11 +83,11 @@ export class ClientActionRowComponent {
      * Schlüsselpaar, so ist der Button deaktiviert.
      */
     public shouldDisableDecryptButton(): boolean {
-        if (!this.client || !this.client.keyPair || !this.client.receivedFrom) {
-            return true;
-        }
-
-        return this.client.ciphertext === undefined || !this.client.receivedFrom.keyPair;
+        return !this.client
+            || !this.client.keyPair
+            || !this.client.receivedFrom
+            || this.client.ciphertext === undefined
+            || !this.client.receivedFrom.keyPair;
     }
 
     /**
