@@ -35,6 +35,10 @@ export const routes: Routes = [
         loadComponent: () => import("./math-components/multiplication/multiplication.component").then(m => m.MultiplicationComponent)
     },
     {
+        path: 'display-curve',
+        loadComponent: () => import('./display-curve/display-curve.component').then(m => m.DisplayCurveComponent)
+    },
+    {
         path: "",
         redirectTo: "/homepage",
         pathMatch: "full"

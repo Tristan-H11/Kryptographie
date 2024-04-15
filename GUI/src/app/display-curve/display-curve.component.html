@@ -1,0 +1,49 @@
+<mat-accordion multi>
+    <mat-expansion-panel expanded>
+        <mat-expansion-panel-header>
+            <mat-panel-title>
+                Parameter für elliptische Kurven
+            </mat-panel-title>
+        </mat-expansion-panel-header>
+
+        <div class="coordinate-inputs">
+        <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Kurvenparameter A</mat-label>
+            <input matInput placeholder="Wert von A eingeben" type="number" [(ngModel)]="a">
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Kurvenparameter B</mat-label>
+            <input matInput placeholder="Wert von B eingeben" type="number" [(ngModel)]="b">
+        </mat-form-field>
+        </div>
+        <div class="coordinate-inputs">
+            <mat-form-field appearance="outline" class="full-width">
+                <mat-label>X-Koordinate von P</mat-label>
+                <input matInput placeholder="X-Wert von P" type="number" [(ngModel)]="P.x">
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="full-width">
+                <mat-label>Y-Koordinate von P</mat-label>
+                <input matInput placeholder="Y-Wert von P" type="number" [(ngModel)]="P.y">
+            </mat-form-field>
+        </div>
+        <div class="coordinate-inputs">
+            <mat-form-field appearance="outline" class="full-width">
+                <mat-label>X-Koordinate von Q</mat-label>
+                <input matInput placeholder="X-Wert von P" type="number" [(ngModel)]="Q.x">
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="full-width">
+                <mat-label>Y-Koordinate von Q</mat-label>
+                <input matInput placeholder="Y-Wert von P" type="number" [(ngModel)]="Q.y">
+            </mat-form-field>
+        </div>
+
+        <mat-action-row>
+            <button mat-raised-button color="primary" (click)="calculate()">Berechnen</button>
+        </mat-action-row>
+    </mat-expansion-panel>
+</mat-accordion>
+
+<div #plotContainer id="plot-container" class="plot-container"></div>
