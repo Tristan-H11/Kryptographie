@@ -1,4 +1,4 @@
-export class MvKeygenConfig {
+export class MvKeygenConfig { // TODO Mit MvCreateKeyPairRequest zusammenführen
     modulus_width: number;
     //todo Tristan, wieso wird hier nicht das Number System (Basis) mit angegeben?
     //in der menezesvanstone.component.ts wird in dem keygen jetzt nichtmehr das hier

@@ -1,3 +1,4 @@
+use crate::api::endpoints::mv::EcPointBean;
 use bigdecimal::num_bigint::BigInt;
 use bigdecimal::num_traits::Euclid;
 use bigdecimal::{One, Zero};
@@ -18,6 +19,17 @@ pub struct FiniteFieldEllipticCurvePoint {
     pub x: BigInt,
     pub y: BigInt,
     pub is_infinite: bool,
+}
+
+impl From<EcPointBean> for FiniteFieldEllipticCurvePoint {
+    /// Mapped die Bean in das Domain-Modell
+    fn from(point: EcPointBean) -> Self {
+        Self {
+            x: point.x.parse().unwrap(),
+            y: point.y.parse().unwrap(),
+            is_infinite: point.is_infinite,
+        }
+    }
 }
 
 impl FiniteFieldEllipticCurvePoint {
@@ -42,7 +54,10 @@ impl FiniteFieldEllipticCurvePoint {
     pub fn add(&self, other: &Self, curve: &SecureFiniteFieldEllipticCurve) -> Self {
         // Liegen die Punkte nicht auf der gleichen Kurve, ist das Ergebnis undefiniert.
         if !curve.has_point(self) || !curve.has_point(other) {
-            panic!("Points are not on the curve");
+            panic!(
+                "Points are not on the curve. P1: {:?}, P2: {:?}, Curve: {:?}",
+                self, other, curve
+            );
         }
 
         // Liegt einer der beiden Punkte im Unendlichen, so ist das Ergebnis der je andere Punkt.

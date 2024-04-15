@@ -1,28 +1,14 @@
-<!--
-If the server is reachable, the navbar and the main content are displayed.
--->
 <mat-sidenav-container *ngIf="isServerReachable" class="sidenav-container">
     <mat-sidenav mode="side" opened class="sidenav">
-        <app-navbar></app-navbar>
+        <navbar></navbar>
     </mat-sidenav>
     <mat-sidenav-content class="main-content">
         <router-outlet></router-outlet>
     </mat-sidenav-content>
 </mat-sidenav-container>
 
-<!--
-If the server is not reachable, a message is displayed to the user.
--->
 <div *ngIf="!isServerReachable" class="big-server-not-reachable-text">
     Der Server ist derzeit nicht erreichbar.
     <br><br>
     Bitte starte den Server und lade die Seite neu.
-    <br><br>
-    <!-- Mat Textfeld für die Eingabe der server IP -->
-    <mat-form-field>
-        <mat-label>Server Adresse mit Port</mat-label>
-        <input matInput [(ngModel)]="serverURL" placeholder="Server IP">
-    </mat-form-field>
-    <!-- Button zum Speichern der server IP -->
-    <button mat-raised-button (click)="saveServerURL()">Speichern</button>
 </div>

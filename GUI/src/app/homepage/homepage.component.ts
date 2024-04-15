@@ -9,7 +9,7 @@ import {MatIconModule} from "@angular/material/icon";
 import {MatSidenavContainer, MatSidenavContent} from "@angular/material/sidenav";
 import {NavbarComponent} from "../navbar/navbar.component";
 import {RouterLink, RouterLinkActive, RouterOutlet} from "@angular/router";
-import {SimpleDialogComponent} from "../simple-dialog/simple-dialog.component";
+import {SimpleDialogComponent} from "../dialogs/simple-dialog/simple-dialog.component";
 import {MatDialog} from "@angular/material/dialog";
 import {StateManagementService} from "../services/management/state-management.service";
 
@@ -49,20 +49,7 @@ export class HomepageComponent implements OnInit {
     ngOnInit(): void {
     }
 
-    /**
-     * Open a dialog to show a loading spinner.
-     */
-    public openNameInputDialog(): void {
-        const dialogRef = this.dialog.open(SimpleDialogComponent, {
-            data: {name: "", aborted: false},
-        });
-        dialogRef.afterClosed().subscribe(result => {
-            if (result.aborted) {
-                return;
-            }
-            this.stateService.createClient(result.name);
-        });
-    }
+
 
 }
 

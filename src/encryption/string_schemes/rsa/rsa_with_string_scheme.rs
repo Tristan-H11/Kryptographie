@@ -1,7 +1,3 @@
-use bigdecimal::num_bigint::{BigInt, Sign};
-use log::debug;
-use sha2::{Digest, Sha256};
-
 use crate::encryption::asymmetric_encryption_types::{
     AsymmetricDecryptor, AsymmetricEncryptionScheme, AsymmetricEncryptor, KeyGenWithPrimeConfig,
     KeyGenerator, Signer, Verifier,
@@ -18,6 +14,7 @@ use crate::encryption::string_schemes::rsa::keys::{
 use crate::encryption::symmetric_encryption_types::{SymmetricDecryptor, SymmetricEncryptor};
 use crate::math_core::number_theory::number_theory_service::NumberTheoryService;
 use crate::math_core::traits::logarithm::Logarithm;
+use crate::shared::hashing::sha256;
 
 pub struct RsaWithStringScheme {}
 
@@ -127,7 +124,7 @@ impl<'a> Signer<RsaWithStringScheme> for RsaWithStringScheme {
         let radix = key.radix;
         let rsa_key = &key.rsa_private_key;
         let block_size = rsa_key.n.log(&radix.into());
-        let hashed_message = RsaWithStringScheme::get_decimal_hash(message).to_str_radix(10);
+        let hashed_message = sha256(message).to_str_radix(10);
 
         let pre_key = DecimalUnicodeConversionSchemeKey { radix, block_size };
         let chunks = ToDecimalBlockScheme::encrypt(&hashed_message, &pre_key);
@@ -146,7 +143,8 @@ impl<'a> Signer<RsaWithStringScheme> for RsaWithStringScheme {
 }
 
 impl<'a> Verifier<RsaWithStringScheme> for RsaWithStringScheme {
-    type Input = str;
+    type Signature = str;
+    type Message = str;
     type Output = bool;
     type Key = RsaWithStringPublicKey;
 
@@ -162,8 +160,8 @@ impl<'a> Verifier<RsaWithStringScheme> for RsaWithStringScheme {
     /// * `bool` - Gibt an, ob die Verifizierung erfolgreich war.
     fn verify(
         key: &Self::Key,
-        signature: &Self::Input,
-        message: &Self::Input,
+        signature: &Self::Signature,
+        message: &Self::Message,
         service: NumberTheoryService,
     ) -> Self::Output {
         let radix = key.radix;
@@ -177,7 +175,7 @@ impl<'a> Verifier<RsaWithStringScheme> for RsaWithStringScheme {
             block_size: block_size + 1,
         };
 
-        let hashed_message = RsaWithStringScheme::get_decimal_hash(message).to_str_radix(10);
+        let hashed_message = sha256(message).to_str_radix(10);
         // Die g-adisch entwickelten Werte der gehashten Nachricht
         let message_chunks =
             ToDecimalBlockScheme::encrypt(&hashed_message, &message_unicode_conversion_key);
@@ -213,24 +211,6 @@ impl RsaWithStringScheme {
             public_key,
             private_key,
         }
-    }
-
-    /// Diese Methode berechnet den SHA256-Hash einer Nachricht.
-    ///
-    /// # Argumente
-    /// * `message` - Die Nachricht.
-    ///
-    /// # Rückgabe
-    /// * `BigInt` - Der Hash.
-    fn get_decimal_hash(message: &str) -> BigInt {
-        debug!("Hashen der Nachricht {} mit SHA256", message);
-        let mut hasher = Sha256::new();
-        hasher.update(message.as_bytes());
-        let hashed_message = hasher.finalize();
-
-        // Hash Nachricht in einen BigInt umwandeln
-        let message_big_int = BigInt::from_bytes_be(Sign::Plus, &hashed_message);
-        message_big_int
     }
 }
 

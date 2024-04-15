@@ -119,14 +119,15 @@ impl Signer<RsaScheme> for RsaScheme {
 }
 
 impl Verifier<RsaScheme> for RsaScheme {
-    type Input = BigInt;
+    type Signature = BigInt;
+    type Message = BigInt;
     type Output = bool;
     type Key = RsaPublicKey;
 
     fn verify(
         key: &Self::Key,
-        message: &Self::Input,
-        signature: &Self::Input,
+        message: &Self::Signature,
+        signature: &Self::Signature,
         service: NumberTheoryService,
     ) -> Self::Output {
         let decrypted_signature = service.fast_exponentiation(signature, &key.e, &key.n);

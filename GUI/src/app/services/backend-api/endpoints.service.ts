@@ -1,5 +1,6 @@
 import {Injectable} from "@angular/core";
 import {StateManagementService} from "../management/state-management.service";
+import {environment} from "../../../environments/environment";
 
 @Injectable({
     providedIn: "root"
@@ -9,13 +10,10 @@ import {StateManagementService} from "../management/state-management.service";
  */
 export class EndpointsService {
 
-    private domain: string = this.stateService.getServerUrl()();
+    private domain: string = environment.domain;
     private rsaEndpoint: string = "/rsa";
     private mvEndpoint: string = "/menezesVanstone";
     private mathEndpoint: string = "/math";
-
-    constructor(private stateService: StateManagementService) {
-    }
 
     /**
      * Gibt den Healthcheck-Endpoint zurück.
@@ -43,6 +41,20 @@ export class EndpointsService {
      */
     public getMvDecryptEndpoint(): string {
         return this.domain + this.mvEndpoint + "/decrypt";
+    }
+
+    /**
+     * Gibt den Endpoint zum MenezesVanstone Signieren einer Nachricht zurück.
+     */
+    public getMvSignEndpoint(): string {
+        return this.domain + this.mvEndpoint + "/sign";
+    }
+
+    /**
+     * Gibt den Endpoint zum MenezesVanstone Verifizieren einer Nachricht zurück.
+     */
+    public getMvVerifyEndpoint(): string {
+        return this.domain + this.mvEndpoint + "/verify";
     }
 
     /**

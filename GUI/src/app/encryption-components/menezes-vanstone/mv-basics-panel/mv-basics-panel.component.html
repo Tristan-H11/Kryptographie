@@ -1,0 +1,167 @@
+<mat-expansion-panel>
+    <mat-expansion-panel-header>
+        <mat-panel-title>
+            Menezes-Vanstone (ElGamal Derivat)
+        </mat-panel-title>
+        <mat-panel-description>
+            Beschreibung der theoretischen Grundlagen und Algorithmen
+        </mat-panel-description>
+    </mat-expansion-panel-header>
+
+    <mat-expansion-panel>
+        <mat-expansion-panel-header>
+            <mat-panel-title>
+                Theoretische Grundlagen
+            </mat-panel-title>
+        </mat-expansion-panel-header>
+
+        <div class="card-container">
+            <mat-card class="spaced-card">
+                <mat-card-header>
+                    <mat-card-title>ElGamal auf Elliptischen Kurven E(Z<sub>p</sub>)</mat-card-title>
+                </mat-card-header>
+                <mat-card-content>
+                    <p>Der klassische ElGamal wird auf einer Elliptischen Kurve über einem endlichen Körper definiert.
+                        Seine Sicherheit beruht auf dem Elliptischen Kurven Diskreten Logarithmus Problem (ECDLP) und
+                        ein
+                        Klartext für dieses Verfahren ist ein Punkt auf der Kurve.</p>
+                    <p>Dies ist denkbar unpraktisch, weil eine beliebige Nachricht somit vorher immer in einen Punkt
+                        umgewandelt werden muss. Dafür ist bisher keine effiziente Methode bekannt.</p>
+                </mat-card-content>
+            </mat-card>
+
+            <mat-card class="spaced-card">
+                <mat-card-header>
+                    <mat-card-title>Menezes-Vanstone Variante</mat-card-title>
+                </mat-card-header>
+                <mat-card-content>
+                    <p>Menezes und Vanstone haben für dieses Problem eine Variation des ElGamal-Schemas entwickelt.
+                        Diese erlaubt es, dass der Klartext und als beliebiges Element aus
+                        Z<sup>*</sup><sub>p</sub> x Z<sup>*</sup><sub>p</sub> gewählt werden kann.</p>
+                    <p>Der Geheimtext ist ein Triple aus einem Punkt auf der Kurve und zwei Körperelementen.</p>
+                </mat-card-content>
+            </mat-card>
+        </div>
+
+        <div class="card-container">
+            <mat-card class="spaced-card">
+                <mat-card-header>
+                    <mat-card-title>Erzeugung der Kurve</mat-card-title>
+                </mat-card-header>
+                <mat-card-content>
+                    <p>Die Generierung der Kurve y² = x³ + ax (mod p) erzeugt eine kryptographisch sichere Kurve. Dafür
+                        wird
+                        die Breite des zu
+                        verwendenden Moduls p gewählt, um den endlichen Körper unter der Kurve zu definieren. Des
+                        Weiteren
+                        wird
+                        eine natürliche Zahl n > 0 gewählt, welche als "-n²" den Koeffizienten a der Kurve
+                        definiert. </p>
+                    <p>Für die Generierung der zufälligen Primzahl wird ein Seed für die Zufallsverteilung und die
+                        Anzahl
+                        der
+                        gewünschten Miller-Rabin Runden angegeben.</p>
+                </mat-card-content>
+            </mat-card>
+
+            <mat-card class="spaced-card">
+                <mat-card-header>
+                    <mat-card-title>Wahl einer sicheren Kurve</mat-card-title>
+                </mat-card-header>
+                <mat-card-content>
+                    Die Parameter der Kurve müssen den folgenden Ansprüchen genügen, damit die Kurve als sicher gilt:
+                    <ul>
+                        <li>p muss eine Primzahl sein mit p ≡ 5 (mod 8), p > 3 und p darf nicht 2*n teilen.</li>
+                        <li>Die Ordnung der Kurve muss einen großen Primfaktor haben.</li>
+                        <li>Die gewählte zyklische Untergruppe muss die Ordnung q = (|E(Z<sub>p</sub>)| / 8) haben,
+                            wobei q
+                            eine Primzahl ist.
+                        </li>
+                        <li>In der gewählten Untergruppe darf das ECDLP praktisch nicht lösbar sein.</li>
+                    </ul>
+                </mat-card-content>
+            </mat-card>
+        </div>
+    </mat-expansion-panel>
+
+    <mat-expansion-panel>
+        <mat-expansion-panel-header>
+            <mat-panel-title>
+                Algorithmen
+            </mat-panel-title>
+        </mat-expansion-panel-header>
+
+        <div class="card-container">
+            <mat-card class="spaced-card">
+                <mat-card-header>
+                    <mat-card-title>Schlüsselkomponenten</mat-card-title>
+                </mat-card-header>
+                <mat-card-content>
+                    <p>Der öffentliche Schlüssel setzt sich aus 4 Komponenten zusammen: (E, p, g, y).
+                        Dabei ist E die Elliptische Kurve E(Z<sub>p</sub>) und p der Modulus des endlichen Körpers.</p>
+                    <p>g ist ein Punkt auf der Kurve und Generator der zyklischen Untergruppe H, für dessen Ordnung q
+                        gilt:
+                        q ist eine Primzahl und q = |H| = |E(Z<sub>p</sub>)| / 8.</p>
+                    <p>Abschließend ist x ∈ Z<sub>|H|</sub> und y = g*x ∈ E(Z<sub>p</sub>). Damit ist der private
+                        Schlüssel der Wert x.</p>
+                </mat-card-content>
+            </mat-card>
+
+            <mat-card class="spaced-card">
+                <mat-card-header>
+                    <mat-card-title>Verschlüsseln und Entschlüsseln</mat-card-title>
+                </mat-card-header>
+                <mat-card-content>
+                    <p>Zur Verschlüsselung wird die Nachricht von einer Zeichenkette in eine Menge von Zahlen
+                        umgewandelt und anschließend in Tupel (m1, m2) aufgeteilt. Die Schritte werden
+                        dann für jedes Tupel wiederholt.</p>
+                    <p>Es wird solange eine Zahl k ∈ Z<sup>*</sup><sub>|H|</sub> zufällig gewählt,
+                        bis in k*y = (c1, c2) ∈ E(Z<sub>p</sub>) sowohl c1, als auch c2 ungleich 0 sind.
+                        Der Geheimtext ist das Triple (a, b1, b2) mit a = k*g ∈ E(Z<sub>p</sub>), b1 = c1*m1 und b2 =
+                        c2*m2.</p>
+                    <p>Das Gesamt-Chiffrat besteht abschließend aus der Menge aller "a-Punkte" und der Übersetzung aller
+                        b1 und b2's in eine gemeinsame Zeichenkette.</p>
+                    <p>Zur Entschlüsselung wird mittels des privaten Schlüssels nun x*a = (c1, c2) ∈ E(Z<sub>p</sub>)
+                        bestimmt und der Klartext wird erhalten durch
+                        <br>(m1, m2) = (b1 * c1<sup>-1</sup> mod p, b2 * c2<sup>-1</sup> mod p)</p>
+                </mat-card-content>
+            </mat-card>
+        </div>
+
+        <div class="card-container">
+            <mat-card class="spaced-card">
+                <mat-card-header>
+                    <mat-card-title>Signieren</mat-card-title>
+                </mat-card-header>
+                <mat-card-content>
+                    <p>Zur Bestimmung der Signatur (s, r) ∈ Z<sup>*</sup><sub>q</sub> x Z<sup>*</sup><sub>q</sub> mit q
+                        = ord(g) werden die folgenden Schritte ausgeführt:</p>
+                    <ol>
+                        <li>Es wird eine zufällige Zahl k ∈ Z<sup>*</sup><sub>q</sub> gewählt.</li>
+                        <li>Es wird r = u mod q berechnet, wobei (u, v) = k*g ∈ E(Z<sub>p</sub>).</li>
+                        <li>Es wird s = k<sup>-1</sup> * (h(m) + x*r) mod q berechnet, wobei h(m) der Hashwert der
+                            Nachricht ist.
+                        </li>
+                    </ol>
+                    <p>Ist s = 0 oder r = 0, so müssen die Schritte mit einem neuen k wiederholt werden.
+                        Andernfalls wurde die Signatur (r, s) erfolgreich bestimmt.</p>
+                </mat-card-content>
+            </mat-card>
+
+            <mat-card class="spaced-card">
+                <mat-card-header>
+                    <mat-card-title>Verifizieren</mat-card-title>
+                </mat-card-header>
+                <mat-card-content>
+                    <p>Zur Verifizierung einer Signatur (r, s) für eine Nachricht m müssen die folgenden Schritte
+                        durchgeführt werden:</p>
+                    <ol>
+                        <li>Es wird u = h(m) * s<sup>-1</sup> mod q und v = r * s<sup>-1</sup> mod q berechnet.</li>
+                        <li>Es wird (u', v') = u*g + v*y ∈ E(Z<sub>p</sub>) berechnet.</li>
+                        <li>Die Signatur ist gültig, wenn r ≡ u' mod q gilt.</li>
+                    </ol>
+                </mat-card-content>
+            </mat-card>
+        </div>
+    </mat-expansion-panel>
+</mat-expansion-panel>

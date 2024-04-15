@@ -1,0 +1,14 @@
+<mat-accordion class="accordion-container" multi="true">
+
+    <mv-basics-panel/>
+
+    <mv-configuration-panel [config]="this.config" [clients]="clients"/>
+
+    <mv-client-panel *ngFor="let client of clients"
+                     [client]="client"
+                     [possibleTargetClients]="getPossibleTargetClients(client)"
+                     [config]="this.config"
+                     (deleteSelf)="deleteClient(client)"/>
+</mat-accordion>
+
+<add-client-button (addClient)="openNameInputDialog()"/>

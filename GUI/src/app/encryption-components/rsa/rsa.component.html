@@ -1,0 +1,14 @@
+<mat-accordion class="accordion-container" multi="true">
+
+    <rsa-basics-panel/>
+
+    <rsa-configuration-panel [config]="this.config" [clients]="clients"/>
+
+    <rsa-client-panel *ngFor="let client of clients"
+                     [client]="client"
+                     [possibleTargetClients]="getPossibleTargetClients(client)"
+                     [config]="this.config"
+                     (deleteSelf)="deleteClient(client)"/>
+</mat-accordion>
+
+<add-client-button (addClient)="openNameInputDialog()"/>

@@ -1,0 +1,25 @@
+<mat-action-row style="display: flex; justify-content: space-between; flex-wrap: nowrap;">
+    <div>
+        <button mat-flat-button color="warn" (click)="delete()">{{ client?.name }} löschen</button>
+    </div>
+    <div style="display: flex; gap: 10px;">
+        <div class="chip-list-container">
+            <span class="chip-list-label">Senden an:</span>
+            <mat-chip-listbox [multiple]="false">
+                <mat-chip-option *ngFor="let client of targetClients"
+                                 (selectionChange)="changeTargetClientTo(client)">
+                    {{ client.name }}
+                </mat-chip-option>
+            </mat-chip-listbox>
+        </div>
+        <button mat-flat-button color="primary" (click)="clearFields()">Felder leeren</button>
+        <button mat-flat-button color="primary"
+                [disabled]="shouldDisableEncryptButton()"
+                (click)="encrypt()">Verschlüsseln
+        </button>
+        <button mat-flat-button color="primary" [disabled]="shouldDisableDecryptButton()"
+                (click)="decrypt()">Entschlüsseln
+        </button>
+        <button mat-flat-button color="primary" [disabled]="shouldDisableSendButton()" (click)="send()">Senden</button>
+    </div>
+</mat-action-row>

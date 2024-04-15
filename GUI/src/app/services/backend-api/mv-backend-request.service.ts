@@ -5,8 +5,14 @@ import {HttpClient, HttpParams} from "@angular/common/http";
 import {firstValueFrom} from "rxjs";
 import {SingleMessageModel} from "../../models/SingleMessageModel";
 import {MvKeygenConfig} from "../../models/mv-keygen-config";
-import {MvCipherText, MvDecryptRequest, MvEncryptRequest, MvKeyPair} from "../../models/mv-beans";
-import {MvConfigurationData} from "../../models/mv-configuration-data";
+import {
+    MvCipherText,
+    MvDecryptRequest,
+    MvEncryptRequest,
+    MvKeyPair,
+    MvSignature,
+    MvSignRequest, MvVerifyRequest
+} from "../../models/mv-beans";
 
 @Injectable({
     providedIn: "root"
@@ -25,7 +31,7 @@ export class MvBackendRequestService {
     /**
      * Fragt den Post Endpunkt zum Erstellen eines neuen Schlüsselpaares ab.
      */
-    public async createKeyPair(body: MvConfigurationData): Promise<MvKeyPair> {
+    public async createKeyPair(body: MvKeygenConfig): Promise<MvKeyPair> {
         const params = this.getParams();
         const options = {params};
         return firstValueFrom(
@@ -52,6 +58,28 @@ export class MvBackendRequestService {
         const options = {params};
         return firstValueFrom(
             this.http.post<SingleMessageModel>(this.endpointsService.getMvDecryptEndpoint(), body, options)
+        );
+    }
+
+    /**
+     * Fragt den Post Endpunkt zum Signieren einer Nachricht ab.
+     */
+    public async sign(body: MvSignRequest): Promise<MvSignature> {
+        const params = this.getParams();
+        const options = {params};
+        return firstValueFrom(
+            this.http.post<MvSignature>(this.endpointsService.getMvSignEndpoint(), body, options)
+        );
+    }
+
+    /**
+     * Fragt den Post Endpunkt zum Verifizieren einer Nachricht ab.
+     */
+    public async verify(body: MvVerifyRequest): Promise<SingleMessageModel> {
+        const params = this.getParams();
+        const options = {params};
+        return firstValueFrom(
+            this.http.post<SingleMessageModel>(this.endpointsService.getMvVerifyEndpoint(), body, options)
         );
     }
 

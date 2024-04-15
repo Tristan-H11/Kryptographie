@@ -5,11 +5,10 @@ import {MatIconModule} from "@angular/material/icon";
 import {MatDividerModule} from "@angular/material/divider";
 import {MatButtonModule} from "@angular/material/button";
 import {StateManagementService} from "../services/management/state-management.service";
-import {Client} from "../models/client";
 import {NgForOf, NgIf} from "@angular/common";
 
 @Component({
-    selector: 'app-navbar',
+    selector: 'navbar',
     standalone: true,
     imports: [
         RouterLink,
@@ -46,9 +45,5 @@ export class NavbarComponent {
      */
     public toggleTurboMode() {
         this.stateService.getUseFastMath().update(value => !value);
-    }
-
-    public getClients(): Set<Client> {
-        return this.stateService.getAllClients();
     }
 }
