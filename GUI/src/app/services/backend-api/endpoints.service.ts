@@ -1,5 +1,6 @@
 import {Injectable} from "@angular/core";
 import {StateManagementService} from "../management/state-management.service";
+import {environment} from "../../../environments/environment";
 
 @Injectable({
     providedIn: "root"
@@ -9,7 +10,7 @@ import {StateManagementService} from "../management/state-management.service";
  */
 export class EndpointsService {
 
-    private domain: string = "https://krypto-server.tristan-hoermann.de"
+    private domain: string = environment.domain;
     private rsaEndpoint: string = "/rsa";
     private mvEndpoint: string = "/menezesVanstone";
     private mathEndpoint: string = "/math";
