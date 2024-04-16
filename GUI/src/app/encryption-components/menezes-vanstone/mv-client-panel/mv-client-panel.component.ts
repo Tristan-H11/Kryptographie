@@ -31,6 +31,7 @@ import {MatAutocomplete, MatAutocompleteTrigger} from "@angular/material/autocom
 import {MatChip, MatChipListbox, MatChipOption} from "@angular/material/chips";
 import {ClientActionRowComponent} from "../../shared/client-action-row/client-action-row.component";
 import {MvConfigurationData} from "../../shared/ConfigurationDataTypes";
+import {AbstractClientPanelComponent} from "../../shared/AbstractClientPanelComponent";
 
 @Component({
     selector: "mv-client-panel",
@@ -63,13 +64,7 @@ import {MvConfigurationData} from "../../shared/ConfigurationDataTypes";
     ],
     templateUrl: "./mv-client-panel.component.html",
 })
-export class MvClientPanelComponent {
-
-    @Input()
-    public client: MvClientData = MvClientData.createDefaultWithName("Empty");
-
-    @Input()
-    public possibleTargetClients: MvClientData[] = [];
+export class MvClientPanelComponent extends AbstractClientPanelComponent<MvClientData>{
 
     @Input()
     public config: MvConfigurationData = {
@@ -80,19 +75,17 @@ export class MvClientPanelComponent {
         numberSystem: 0
     };
 
-    @Output()
-    public deleteSelf: EventEmitter<void> = new EventEmitter<void>();
-
     protected readonly JSON = JSON;
 
     constructor(private backendRequestService: MvBackendRequestService,
                 private dialogService: DialogService) {
+        super();
     }
 
     /**
      * Verschlüsselt die Nachricht für das gewählte Ziel.
      */
-    public encrypt(): void {
+    public override encrypt(): void {
         if (!this.client.sendingTo || !this.client.sendingTo.keyPair) {
             return;
         }
@@ -127,7 +120,7 @@ export class MvClientPanelComponent {
     /**
      * Entschlüsselt den Ciphertext und prüft die Signatur, falls vorhanden.
      */
-    public decrypt(): void {
+    public override decrypt(): void {
         if (!this.client.keyPair) {
             return;
         }
@@ -161,47 +154,7 @@ export class MvClientPanelComponent {
         });
     }
 
-    /**
-     * Sendet den Ciphertext an den anderen Partner und setzt die Felder zurück.
-     */
-    public send(): void {
-        if (!this.client.sendingTo) {
-            return;
-        }
-        this.client.sendingTo.ciphertext = copyMvCipherText(this.client.ciphertext);
-        this.client.sendingTo.signature = copyMvSignature(this.client.signature);
-        this.client.sendingTo.receivedFrom = this.client
-
-        this.clearFields();
-    }
-
-    /**
-     * Setzt alle Felder des Clients zurück.
-     */
-    public clearFields(): void {
-        this.client.plaintext = "";
-        this.client.ciphertext.encrypted_message = "";
-        this.client.ciphertext.points = [];
-        this.client.signature.r = "Empty";
-        this.client.signature.s = "Empty";
-        this.client.signature_valid = "ungeprüft";
-    }
-
-    /**
-     * Gibt an, ob bereits gesetzt wurde, an wen der Client senden soll.
-     */
-    public sendingToNotSet(): boolean {
-        return this.client.sendingTo === undefined;
-    }
-
-    /**
-     * Löscht sich selber aus der Liste der Clients.
-     */
-    public delete(): void {
-        this.deleteSelf.emit();
-    }
-
-    public changeTargetClientTo(client: MvClientData): void {
-        this.client.sendingTo = client;
+    protected createDefaultClient(name: string): MvClientData {
+        return MvClientData.createDefaultWithName(name);
     }
 }

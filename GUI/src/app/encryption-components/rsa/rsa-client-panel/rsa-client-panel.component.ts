@@ -1,4 +1,4 @@
-import {Component, EventEmitter, Input, Output} from "@angular/core";
+import {Component, Input} from "@angular/core";
 import {ClientActionRowComponent} from "../../shared/client-action-row/client-action-row.component";
 import {EmptyIfUndefinedPipe} from "../../../services/pipes/empty-if-undefined";
 import {MatCard, MatCardContent, MatCardHeader, MatCardTitle} from "@angular/material/card";
@@ -18,6 +18,7 @@ import {RsaBackendRequestService} from "../../../services/backend-api/rsa-backen
 import {RsaEncryptDecryptRequest} from "../../../models/rsa-encrypt-decrypt-request";
 import {RsaSignRequest} from "../../../models/rsa-sign-request";
 import {RsaVerifyRequest} from "../../../models/rsa-verify-request";
+import {AbstractClientPanelComponent} from "../../shared/AbstractClientPanelComponent";
 
 @Component({
     selector: "rsa-client-panel",
@@ -41,13 +42,10 @@ import {RsaVerifyRequest} from "../../../models/rsa-verify-request";
     ],
     templateUrl: "./rsa-client-panel.component.html",
 })
-export class RsaClientPanelComponent {
-
-    @Input()
-    public client: RsaClientData = RsaClientData.createDefaultWithName("Empty");
-
-    @Input()
-    public possibleTargetClients: RsaClientData[] = [];
+export class RsaClientPanelComponent extends AbstractClientPanelComponent<RsaClientData> {
+    protected override createDefaultClient(name: string): RsaClientData {
+        return RsaClientData.createDefaultWithName(name);
+    }
 
     @Input()
     public config: RsaConfigurationData = {
@@ -57,25 +55,9 @@ export class RsaClientPanelComponent {
         numberSystem: 0
     };
 
-    @Output()
-    public deleteSelf: EventEmitter<void> = new EventEmitter<void>();
-
     constructor(private backendRequestService: RsaBackendRequestService,
                 private dialogService: DialogService) {
-    }
-
-    /**
-     * Gibt an, ob bereits gesetzt wurde, an wen der Client senden soll.
-     */
-    public sendingToNotSet(): boolean {
-        return this.client.sendingTo === undefined;
-    }
-
-    /**
-     * Löscht sich selber aus der Liste der Clients.
-     */
-    public delete(): void {
-        this.deleteSelf.emit();
+        super();
     }
 
     /**
@@ -152,30 +134,5 @@ export class RsaClientPanelComponent {
                 this.dialogService.endTimedCalc(loadingCalcKey, "Nachricht entschlüsselt und verifiziert.");
             });
         });
-    }
-
-    /**
-     * Sendet den Ciphertext an den anderen Partner und setzt die Felder zurück.
-     */
-    public send(): void {
-        if (!this.client.sendingTo) {
-            return;
-        }
-        this.client.sendingTo.ciphertext = this.client.ciphertext;
-        this.client.sendingTo.signature = this.client.signature;
-        this.client.sendingTo.receivedFrom = this.client;
-
-        this.clearFields();
-    }
-
-    public changeTargetClientTo(client: RsaClientData): void {
-        this.client.sendingTo = client;
-    }
-
-    public clearFields(): void {
-        this.client.plaintext = "";
-        this.client.ciphertext = "";
-        this.client.signature = "";
-        this.client.signature_valid = "ungeprüft";
     }
 }
