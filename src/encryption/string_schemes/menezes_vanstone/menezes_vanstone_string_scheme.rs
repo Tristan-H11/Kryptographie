@@ -1,6 +1,6 @@
 use crate::api::endpoints::mv::MvCipherTextBean;
 use bigdecimal::num_bigint::BigInt;
-use bigdecimal::{One, Zero};
+use bigdecimal::Zero;
 
 use crate::encryption::asymmetric_encryption_types::{
     AsymmetricDecryptor, AsymmetricEncryptionScheme, AsymmetricEncryptor,

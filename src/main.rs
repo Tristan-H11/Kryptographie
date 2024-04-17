@@ -1,12 +1,7 @@
-mod api;
-mod encryption;
-mod math_core;
-mod shared;
-
-use crate::api::basic::config_app;
 use actix_cors::Cors;
 use actix_web::middleware::Logger;
 use actix_web::{App, HttpServer};
+use encryption_tool::api::basic::config_app;
 use log::LevelFilter;
 use simple_logger::SimpleLogger;
 
