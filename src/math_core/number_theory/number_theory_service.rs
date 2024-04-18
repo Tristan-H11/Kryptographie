@@ -1,6 +1,6 @@
 use crate::math_core::number_theory::extended_euclid_result::ExtendedEuclidResult;
-use num::BigInt;
 use anyhow::Result;
+use num::BigInt;
 
 use crate::math_core::number_theory::fast_number_theory_service::FastNumberTheoryService;
 use crate::math_core::number_theory::slow_number_theory_service::SlowNumberTheoryService;

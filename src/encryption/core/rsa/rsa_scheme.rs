@@ -9,7 +9,7 @@ use crate::math_core::number_theory::number_theory_service::{
 };
 use crate::math_core::pseudo_random_number_generator::PseudoRandomNumberGenerator;
 use crate::math_core::traits::increment::Increment;
-use crate::shared::errors::ArithmeticError;
+use anyhow::Result;
 use atomic_counter::RelaxedCounter;
 use bigdecimal::num_bigint::BigInt;
 use bigdecimal::One;
@@ -178,11 +178,7 @@ impl RsaScheme {
     ///
     /// # Fehler
     /// * `ArithmeticError::NoInverseError` - Falls kein multiplikatives Inverses gefunden werden konnte.
-    fn generate_d(
-        e: &BigInt,
-        phi: &BigInt,
-        service: NumberTheoryService,
-    ) -> Result<BigInt, ArithmeticError> {
+    fn generate_d(e: &BigInt, phi: &BigInt, service: NumberTheoryService) -> Result<BigInt> {
         trace!("Generiere d mit e {} und phi {}", e, phi);
         let d = service.modulo_inverse(e, phi)?;
         debug!("d ist {}", d);

@@ -1,5 +1,5 @@
-use anyhow::{bail, Result};
 use crate::math_core::number_theory::extended_euclid_result::ExtendedEuclidResult;
+use anyhow::{bail, Result};
 use bigdecimal::num_bigint::BigInt;
 use bigdecimal::num_traits::Euclid;
 use bigdecimal::One;
