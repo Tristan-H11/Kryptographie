@@ -25,3 +25,12 @@ pub enum RsaError {
     #[error("RSA Key generation error")]
     KeyGenerationError,
 }
+
+#[derive(Debug, Error, Clone)]
+pub enum MenezesVanstoneError {
+    #[error("n must not be 0, but it is {0}")]
+    InvalidNValueError(i32),
+
+    #[error("Modulus width must be greater than 3, but it is {0}")]
+    InvalidModulusWidthError(u32),
+}

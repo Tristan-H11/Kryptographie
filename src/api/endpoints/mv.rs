@@ -205,9 +205,13 @@ pub(crate) async fn create_key_pair(
         req_body.random_seed,
     );
 
-    let response = MvKeyPairBean::from(key_pair);
-
-    HttpResponse::Ok().json(response)
+    match key_pair {
+        Ok(key_pair) => {
+            let response = MvKeyPairBean::from(key_pair);
+            HttpResponse::Ok().json(response)
+        }
+        Err(e) => HttpResponse::InternalServerError().body(e.to_string()),
+    }
 }
 
 /// Verschlüsselt eine Nachricht mit dem MenezesVanstone-Schema.

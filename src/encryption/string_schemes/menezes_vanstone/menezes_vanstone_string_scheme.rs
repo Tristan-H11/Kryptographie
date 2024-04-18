@@ -66,7 +66,8 @@ impl MenezesVanstoneStringScheme {
             modul_width,
             miller_rabin_iterations,
             random_seed,
-        );
+        )
+        .unwrap(); // TODO Error handling
 
         let public_key = key_pair.public_key;
         let private_key = key_pair.private_key;

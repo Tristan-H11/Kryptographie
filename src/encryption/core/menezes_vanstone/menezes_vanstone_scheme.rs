@@ -1,3 +1,5 @@
+use anyhow::bail;
+use anyhow::Result;
 use std::time::SystemTime;
 
 use crate::api::endpoints::mv::MvSignatureBean;
@@ -21,6 +23,7 @@ use crate::math_core::number_theory::number_theory_service::{
 };
 use crate::math_core::pseudo_random_number_generator::PseudoRandomNumberGenerator;
 use crate::math_core::traits::increment::Increment;
+use crate::shared::errors::MenezesVanstoneError;
 use crate::shared::hashing::sha256;
 
 #[derive(Clone, Debug, PartialEq)]
@@ -64,13 +67,13 @@ impl MenezesVanstoneScheme {
         modul_width: u32,
         miller_rabin_iterations: u32,
         random_seed: u32,
-    ) -> MenezesVanstoneKeyPair {
-        assert_ne!(n, 0, "n darf nicht 0 sein, ist aber {}", n); // TODO error Handling
-        assert!(
-            modul_width > 3,
-            "Die Modulbreite muss mindestens 4 Bit betragen, ist aber {}",
-            modul_width
-        ); // TODO error Handling
+    ) -> Result<MenezesVanstoneKeyPair> {
+        if n == 0 {
+            bail!(MenezesVanstoneError::InvalidNValueError(n));
+        }
+        if modul_width <= 3 {
+            bail!(MenezesVanstoneError::InvalidModulusWidthError(modul_width));
+        }
 
         let curve =
             SecureFiniteFieldEllipticCurve::new(n.into(), modul_width, miller_rabin_iterations);
@@ -94,10 +97,10 @@ impl MenezesVanstoneScheme {
 
         let private_key = MenezesVanstonePrivateKey { curve, x };
 
-        MenezesVanstoneKeyPair {
+        Ok(MenezesVanstoneKeyPair {
             public_key,
             private_key,
-        }
+        })
     }
 }
 
