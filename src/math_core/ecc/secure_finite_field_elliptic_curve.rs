@@ -1,6 +1,7 @@
 use std::ops::{AddAssign, Div, Neg};
 
 use crate::api::endpoints::mv::EllipticCurveBean;
+use anyhow::{Context, Result};
 use atomic_counter::RelaxedCounter;
 use bigdecimal::num_bigint::BigInt;
 use bigdecimal::num_traits::Euclid;
@@ -63,7 +64,7 @@ impl SecureFiniteFieldEllipticCurve {
     /// - Eine zyklische Untergruppe der Ordnung q muss existieren, wobei für q gilt:
     /// -- q = N / 8, wobei N = |E(Z_p)| (Ordnung der Kurve) und
     /// -- q muss eine Primzahl sein
-    pub fn new(n: i32, modul_width: u32, miller_rabin_iterations: u32) -> Self {
+    pub fn new(n: i32, modul_width: u32, miller_rabin_iterations: u32) -> Result<Self> {
         if n.is_zero() {
             panic!("Der Koeffizient a darf nicht 0 sein!"); // TODO Error Handling
         }
@@ -109,7 +110,8 @@ impl SecureFiniteFieldEllipticCurve {
                 &order_of_subgroup,
                 &curve,
                 &counter,
-            );
+            )
+            .context("Error while calculating signature generator")?;
 
             let curve = Self {
                 a,
@@ -119,7 +121,7 @@ impl SecureFiniteFieldEllipticCurve {
             };
 
             if curve.has_point(&curve.generator) {
-                return curve;
+                return Ok(curve);
             }
             warn!(
                 "Berechneter Generator ist kein Punkt der Kurve! \
@@ -287,7 +289,7 @@ impl SecureFiniteFieldEllipticCurve {
         q: &BigInt,
         curve: &SecureFiniteFieldEllipticCurve,
         counter: &RelaxedCounter,
-    ) -> FiniteFieldEllipticCurvePoint {
+    ) -> Result<FiniteFieldEllipticCurvePoint> {
         let mut generator: FiniteFieldEllipticCurvePoint;
         let service = NumberTheoryService::new(Fast); // TODO übergeben lassen
 
@@ -331,11 +333,11 @@ impl SecureFiniteFieldEllipticCurve {
 
             // Der Generator selber darf nicht im Unendlichen liegen und auch die Ordnung
             // des Punktes muss gleich q sein, also muss Generator*q im Unendlichen liegen.
-            if !generator.is_infinite && generator.multiply(q, curve).is_infinite {
+            if !generator.is_infinite && generator.multiply(q, curve)?.is_infinite {
                 break;
             }
         }
-        generator
+        Ok(generator)
     }
 
     ///
@@ -391,7 +393,7 @@ mod tests {
 
     #[test]
     fn test_has_point_not() {
-        let curve = SecureFiniteFieldEllipticCurve::new(7, 17, 20);
+        let curve = SecureFiniteFieldEllipticCurve::new(7, 17, 20).unwrap();
         let point = FiniteFieldEllipticCurvePoint::new(5.into(), 7.into());
         // (5, 7) liegt nicht auf y^2 = x^3 + 7 (mod 17)
         assert!(!curve.has_point(&point));
@@ -403,8 +405,8 @@ mod tests {
 
     #[test]
     fn test_has_point() {
-        let curve = SecureFiniteFieldEllipticCurve::new(5, 16, 40);
-        let point = curve.generator.multiply(&3.into(), &curve);
+        let curve = SecureFiniteFieldEllipticCurve::new(5, 16, 40).unwrap();
+        let point = curve.generator.multiply(&3.into(), &curve).unwrap();
         // (5, 8) liegt auf y^2 = x^3 + 7 (mod 17)
         assert!(curve.has_point(&point));
 

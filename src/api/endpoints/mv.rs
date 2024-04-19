@@ -245,9 +245,13 @@ pub(crate) async fn encrypt(
 
         let ciphertext = MenezesVanstoneStringScheme::encrypt(&public_key, &message, service);
 
-        let response = MvCipherTextBean::from(ciphertext);
-
-        Ok(HttpResponse::Ok().json(response))
+        match ciphertext {
+            Ok(ciphertext) => {
+                let response = MvCipherTextBean::from(ciphertext);
+                Ok(HttpResponse::Ok().json(response))
+            }
+            Err(e) => Ok(HttpResponse::InternalServerError().body(e.to_string())),
+        }
     })
 }
 
@@ -310,9 +314,13 @@ pub(crate) async fn sign(
 
         let signature = MenezesVanstoneScheme::sign(&private_key, message, service);
 
-        let response = MvSignatureBean::from(signature);
-
-        Ok(HttpResponse::Ok().json(response))
+        match signature {
+            Ok(signature) => {
+                let response = MvSignatureBean::from(signature);
+                Ok(HttpResponse::Ok().json(response))
+            }
+            Err(e) => Ok(HttpResponse::InternalServerError().body(e.to_string())),
+        }
     })
 }
 
@@ -335,10 +343,14 @@ pub(crate) async fn verify(
 
         let verified = MenezesVanstoneScheme::verify(&public_key, signature, message, service);
 
-        let response = SingleStringResponse {
-            message: verified.to_string(),
-        };
-
-        Ok(HttpResponse::Ok().json(response))
+        match verified {
+            Ok(verified) => {
+                let response = SingleStringResponse {
+                    message: verified.to_string(),
+                };
+                Ok(HttpResponse::Ok().json(response))
+            }
+            Err(e) => Ok(HttpResponse::InternalServerError().body(e.to_string())),
+        }
     })
 }
