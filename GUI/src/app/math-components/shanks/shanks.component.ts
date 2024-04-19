@@ -34,16 +34,7 @@ export class ShanksComponent {
      */
     public calculate() {
         let body = new ShanksRequest(this.base, this.element, this.modul);
-        this.backendRequestService.shanks(body).pipe(
-            catchError(
-                (error) => {
-                    this.dialog.open(ErrorDialogComponent, {
-                        data: {message: error.error.message}
-                    });
-                    return EMPTY;
-                }
-            )
-        ).subscribe(result => {
+        this.backendRequestService.shanks(body).subscribe(result => {
             this.result = result.message;
         });
     }

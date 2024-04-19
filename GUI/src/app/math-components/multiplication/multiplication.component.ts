@@ -56,7 +56,7 @@ export class MultiplicationComponent {
 
         const startTime = Date.now();
 
-        this.backendRequestService.createKeyPair(requestContent).then(
+        this.backendRequestService.createKeyPair(requestContent).subscribe(
             (receivedKeyPair) => {
                 const duration = Date.now() - startTime;
                 this.keyPair = receivedKeyPair;
