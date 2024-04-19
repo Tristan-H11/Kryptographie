@@ -70,7 +70,8 @@ export class RsaConfigurationPanelComponent {
         );
 
         let loadingCalcKey = this.dialogService.startTimedCalc();
-        this.rsaBackendService.createKeyPair(requestContent).then(
+        this.rsaBackendService.createKeyPair(requestContent)
+            .subscribe(
             (keyPair) => {
                 const client = this.clients.find(c => c === forClient);
                 if (client) {

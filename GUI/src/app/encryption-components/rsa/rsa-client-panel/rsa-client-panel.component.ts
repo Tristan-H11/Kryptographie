@@ -19,6 +19,7 @@ import {RsaEncryptDecryptRequest} from "../../../models/rsa-encrypt-decrypt-requ
 import {RsaSignRequest} from "../../../models/rsa-sign-request";
 import {RsaVerifyRequest} from "../../../models/rsa-verify-request";
 import {AbstractClientPanelComponent} from "../../shared/AbstractClientPanelComponent";
+import {concatMap, EMPTY} from "rxjs";
 
 @Component({
     selector: "rsa-client-panel",
@@ -75,24 +76,26 @@ export class RsaClientPanelComponent extends AbstractClientPanelComponent<RsaCli
 
         let loadingCalcKey = this.dialogService.startTimedCalc();
 
-        this.backendRequestService.encrypt(requestBody).then(response => {
-            this.client.ciphertext = response.message;
+        this.backendRequestService.encrypt(requestBody).pipe(
+            concatMap(response => {
+                this.client.ciphertext = response.message;
 
-            if (!this.client.keyPair) {
-                this.dialogService.endTimedCalc(loadingCalcKey, "Nachricht verschlüsselt.");
-                return;
-            }
+                if (!this.client.keyPair) {
+                    this.dialogService.endTimedCalc(loadingCalcKey, "Nachricht verschlüsselt.");
+                    return EMPTY;
+                }
 
-            const signRequest = new RsaSignRequest(
-                this.client.plaintext,
-                this.client.keyPair,
-                this.config.numberSystem
-            );
-            this.backendRequestService.sign(signRequest).then(response => {
-                this.client.signature = response.message;
-                this.client.signature_valid = "ungeprüft";
-                this.dialogService.endTimedCalc(loadingCalcKey, "Nachricht verschlüsselt und signiert.");
-            });
+                const signRequest = new RsaSignRequest(
+                    this.client.plaintext,
+                    this.client.keyPair,
+                    this.config.numberSystem
+                );
+                return this.backendRequestService.sign(signRequest);
+            })
+        ).subscribe(response => {
+            this.client.signature = response.message;
+            this.client.signature_valid = "ungeprüft";
+            this.dialogService.endTimedCalc(loadingCalcKey, "Nachricht verschlüsselt und signiert.");
         });
     }
 
@@ -111,28 +114,30 @@ export class RsaClientPanelComponent extends AbstractClientPanelComponent<RsaCli
 
         let loadingCalcKey = this.dialogService.startTimedCalc();
 
-        this.backendRequestService.decrypt(requestBody).then(response => {
-            this.client.plaintext = response.message;
+        this.backendRequestService.decrypt(requestBody).pipe(
+            concatMap(response => {
+                this.client.plaintext = response.message;
 
-            if (!this.client.receivedFrom || !this.client.receivedFrom.keyPair) {
-                this.dialogService.endTimedCalc(loadingCalcKey, "Nachricht entschlüsselt.");
-                return;
-            }
-
-            const verifyRequest = new RsaVerifyRequest(
-                this.client.plaintext,
-                this.client.signature,
-                this.client.receivedFrom.keyPair,
-                this.config.numberSystem
-            );
-            this.backendRequestService.verify(verifyRequest).then(response => {
-                if (response.message === "true") {
-                    this.client.signature_valid = "gültig";
-                } else {
-                    this.client.signature_valid = "ungültig";
+                if (!this.client.receivedFrom || !this.client.receivedFrom.keyPair) {
+                    this.dialogService.endTimedCalc(loadingCalcKey, "Nachricht entschlüsselt.");
+                    return EMPTY;
                 }
-                this.dialogService.endTimedCalc(loadingCalcKey, "Nachricht entschlüsselt und verifiziert.");
-            });
+
+                const verifyRequest = new RsaVerifyRequest(
+                    this.client.plaintext,
+                    this.client.signature,
+                    this.client.receivedFrom.keyPair,
+                    this.config.numberSystem
+                );
+                return this.backendRequestService.verify(verifyRequest);
+            })
+        ).subscribe(response => {
+            if (response.message === "true") {
+                this.client.signature_valid = "gültig";
+            } else {
+                this.client.signature_valid = "ungültig";
+            }
+            this.dialogService.endTimedCalc(loadingCalcKey, "Nachricht entschlüsselt und verifiziert.");
         });
     }
 }
