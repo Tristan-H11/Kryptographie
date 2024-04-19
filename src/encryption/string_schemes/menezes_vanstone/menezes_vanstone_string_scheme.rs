@@ -1,7 +1,7 @@
 use crate::api::endpoints::mv::MvCipherTextBean;
 use bigdecimal::num_bigint::BigInt;
 use bigdecimal::Zero;
-
+use anyhow::{Context, Result};
 use crate::encryption::asymmetric_encryption_types::{
     AsymmetricDecryptor, AsymmetricEncryptionScheme, AsymmetricEncryptor,
 };
@@ -178,7 +178,7 @@ impl AsymmetricEncryptor<MenezesVanstoneStringScheme> for MenezesVanstoneStringS
 
 impl<'a> Decryptor<MenezesVanstoneStringScheme> for MenezesVanstoneStringScheme {
     type Input = MvStringCiphertext;
-    type Output = String;
+    type Output = Result<String>;
     type Key = MenezesVanstoneStringPrivateKey;
 }
 
@@ -224,7 +224,8 @@ impl AsymmetricDecryptor<MenezesVanstoneStringScheme> for MenezesVanstoneStringS
         // Jeden einzelnen Ciphertext für sich entschlüsseln
         let mut plaintext_list: Vec<MenezesVanstonePlaintext> = Vec::new();
         for ciphertext in ciphertext_list {
-            let plaintext = MenezesVanstoneScheme::decrypt(&key.mv_key, &ciphertext, service);
+            let plaintext = MenezesVanstoneScheme::decrypt(&key.mv_key, &ciphertext, service)
+                .context("Entschlüsselung im MenezesVanstone-Kern fehlgeschlagen. Fehler: {:#?}")?;
             plaintext_list.push(plaintext);
         }
 
@@ -234,7 +235,7 @@ impl AsymmetricDecryptor<MenezesVanstoneStringScheme> for MenezesVanstoneStringS
             big_int_vec.push(plaintext.first.clone());
             big_int_vec.push(plaintext.second.clone());
         }
-        ToDecimalBlockScheme::decrypt(&big_int_vec, &decimal_unicode_key)
+        Ok(ToDecimalBlockScheme::decrypt(&big_int_vec, &decimal_unicode_key))
     }
 }
 

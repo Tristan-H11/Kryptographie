@@ -1,4 +1,4 @@
-use anyhow::bail;
+use anyhow::{bail, Context};
 use anyhow::Result;
 use std::time::SystemTime;
 
@@ -160,7 +160,7 @@ impl AsymmetricEncryptor<MenezesVanstoneScheme> for MenezesVanstoneScheme {
 
 impl Decryptor<MenezesVanstoneScheme> for MenezesVanstoneScheme {
     type Input = MenezesVanstoneCiphertext;
-    type Output = MenezesVanstonePlaintext;
+    type Output = Result<MenezesVanstonePlaintext>;
     type Key = MenezesVanstonePrivateKey;
 }
 
@@ -177,13 +177,18 @@ impl AsymmetricDecryptor<MenezesVanstoneScheme> for MenezesVanstoneScheme {
 
         let point = a.multiply(&key.x, &key.curve);
         let (c1, c2) = (point.x, point.y);
-        let m1 = (b1 * service.modulo_inverse(&c1, prime).unwrap()) % prime; //TODO Unwrap
-        let m2 = (b2 * service.modulo_inverse(&c2, prime).unwrap()) % prime; //TODO Unwrap
+        let c1_inverse = service.modulo_inverse(&c1, prime)
+            .context("Failed to find modulo inverse for c1 during decryption")?;
+        let c2_inverse = service.modulo_inverse(&c2, prime)
+            .context("Failed to find modulo inverse for c2 during decryption")?;
 
-        MenezesVanstonePlaintext {
+        let m1 = (b1 * c1_inverse) % prime;
+        let m2 = (b2 * c2_inverse) % prime;
+
+        Ok(MenezesVanstonePlaintext {
             first: m1,
             second: m2,
-        }
+        })
     }
 }
 

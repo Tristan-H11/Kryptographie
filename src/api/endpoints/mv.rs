@@ -282,9 +282,13 @@ pub(crate) async fn decrypt(
 
         let plaintext = MenezesVanstoneStringScheme::decrypt(&private_key, &ciphertext, service);
 
-        let response = SingleStringResponse { message: plaintext };
-
-        Ok(HttpResponse::Ok().json(response))
+        match plaintext {
+            Ok(plaintext) => {
+                let response = SingleStringResponse { message: plaintext };
+                Ok(HttpResponse::Ok().json(response))
+            }
+            Err(e) => Ok(HttpResponse::InternalServerError().body(e.to_string())),
+        }
     })
 }
 
