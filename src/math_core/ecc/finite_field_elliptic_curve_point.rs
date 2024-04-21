@@ -1,4 +1,5 @@
 use crate::api::endpoints::mv::EcPointBean;
+use anyhow::{bail, Context, Result};
 use bigdecimal::num_bigint::BigInt;
 use bigdecimal::num_traits::Euclid;
 use bigdecimal::{One, Zero};
@@ -51,31 +52,33 @@ impl FiniteFieldEllipticCurvePoint {
 
     /// Addiert zwei Punkte auf einer elliptischen Kurve.
     /// Die Punkte müssen auf der gleichen elliptischen Kurve liegen.
-    pub fn add(&self, other: &Self, curve: &SecureFiniteFieldEllipticCurve) -> Self {
+    pub fn add(&self, other: &Self, curve: &SecureFiniteFieldEllipticCurve) -> Result<Self> {
         // Liegen die Punkte nicht auf der gleichen Kurve, ist das Ergebnis undefiniert.
         if !curve.has_point(self) || !curve.has_point(other) {
-            panic!(
-                "Points are not on the curve. P1: {:?}, P2: {:?}, Curve: {:?}",
-                self, other, curve
-            );
+            bail!(
+                "Points are not on the curve. P1: {:#?}, P2: {:#?}, Curve: {:#?}",
+                self,
+                other,
+                curve
+            )
         }
 
         // Liegt einer der beiden Punkte im Unendlichen, so ist das Ergebnis der je andere Punkt.
         if self.is_infinite {
-            return other.clone();
+            return Ok(other.clone());
         }
         if other.is_infinite {
-            return self.clone();
+            return Ok(self.clone());
         }
 
         // Negieren sich zwei Punkte, so erhält man ebenfalls den Punkt im Unendlichen.
         if self.x == other.x && (&self.y).add(&other.y).rem_euclid(&curve.prime).is_zero() {
-            return FiniteFieldEllipticCurvePoint::infinite();
+            return Ok(FiniteFieldEllipticCurvePoint::infinite());
         }
 
         // Handelt es sich um identische Punkte, so wird der Punkt verdoppelt.
         if self == other {
-            return self.double(curve);
+            return Ok(self.double(curve));
         }
 
         let prime = &curve.prime;
@@ -96,7 +99,7 @@ impl FiniteFieldEllipticCurvePoint {
         let x_sum = &slope * &slope - &self.x - &other.x;
         let y_sum = &slope * (&self.x - &x_sum) - &self.y;
 
-        FiniteFieldEllipticCurvePoint::new(x_sum, y_sum).normalize(prime)
+        Ok(FiniteFieldEllipticCurvePoint::new(x_sum, y_sum).normalize(prime))
     }
 
     /// Verdoppelt einen Punkt auf einer elliptischen Kurve.
@@ -129,19 +132,23 @@ impl FiniteFieldEllipticCurvePoint {
     /// Dabei wird die optimierte Berechnung in Form des Double-and-add Algorithmus verwendet.
     /// Bei Multiplikation mit 0 wird der Punkt im Ursprung mit Bezug auf die ursprüngliche Kurve
     /// zurückgegeben.
-    pub fn multiply(&self, scalar: &BigInt, curve: &SecureFiniteFieldEllipticCurve) -> Self {
+    pub fn multiply(
+        &self,
+        scalar: &BigInt,
+        curve: &SecureFiniteFieldEllipticCurve,
+    ) -> Result<Self> {
         // Bei einer 1 passiert nichts
         if scalar.is_one() {
-            return self.clone();
+            return Ok(self.clone());
         }
         // Bei einer 2 wird verdoppelt
         if scalar == &BigInt::from(2) {
-            return self.double(curve);
+            return Ok(self.double(curve));
         }
         // Ist der Punkt der Generator und der Skalar die Ordnung des Generators, wird der Punkt
         // im Unendlichen zurückgegeben.
         if self == &curve.generator && scalar == &curve.order_of_subgroup {
-            return FiniteFieldEllipticCurvePoint::infinite();
+            return Ok(FiniteFieldEllipticCurvePoint::infinite());
         }
 
         let mut result = FiniteFieldEllipticCurvePoint::infinite();
@@ -149,12 +156,14 @@ impl FiniteFieldEllipticCurvePoint {
         let mut n = scalar.clone();
         while n > BigInt::zero() {
             if n.is_odd() {
-                result = result.add(&addend, &curve);
+                result = result
+                    .add(&addend, &curve)
+                    .context("Error while adding point in multiply operation")?;
             }
             addend = addend.double(curve);
             n = n >> 1;
         }
-        result
+        Ok(result)
     }
 
     ///
@@ -190,7 +199,7 @@ mod tests {
     use super::*;
 
     fn get_curve() -> SecureFiniteFieldEllipticCurve {
-        SecureFiniteFieldEllipticCurve::new(5, 16, 40)
+        SecureFiniteFieldEllipticCurve::new(5, 16, 40).unwrap()
     }
 
     #[test]
@@ -198,9 +207,9 @@ mod tests {
         let curve = get_curve();
         assert!(curve.order_of_subgroup > 8.into());
         let p1 = curve.generator.clone();
-        let p2 = curve.generator.multiply(&4.into(), &curve);
-        let p3 = p1.add(&p2, &curve);
-        let expected = p1.multiply(&5.into(), &curve);
+        let p2 = curve.generator.multiply(&4.into(), &curve).unwrap();
+        let p3 = p1.add(&p2, &curve).unwrap();
+        let expected = p1.multiply(&5.into(), &curve).unwrap();
         assert_eq!(p3, expected);
         let has_point = curve.has_point(&p3);
         assert!(has_point, "{:?}, {:?}", p3, curve);
@@ -210,7 +219,7 @@ mod tests {
     fn test_add_identical_points_doubles() {
         let curve = get_curve();
         let p1 = curve.generator.clone();
-        let result = p1.add(&p1, &curve);
+        let result = p1.add(&p1, &curve).unwrap();
         assert_eq!(result, p1.double(&curve));
     }
 
@@ -218,15 +227,15 @@ mod tests {
     fn test_multiply_trivial() {
         let curve = get_curve();
         let p1 = curve.generator.clone();
-        let identical = p1.multiply(&1.into(), &curve);
+        let identical = p1.multiply(&1.into(), &curve).unwrap();
         assert_eq!(p1, identical);
 
-        let doubled = p1.multiply(&2.into(), &curve);
+        let doubled = p1.multiply(&2.into(), &curve).unwrap();
         let expected = curve.generator.double(&curve);
         assert_eq!(doubled, expected);
 
-        let p2 = doubled.multiply(&8.into(), &curve);
-        let expected = curve.generator.multiply(&16.into(), &curve);
+        let p2 = doubled.multiply(&8.into(), &curve).unwrap();
+        let expected = curve.generator.multiply(&16.into(), &curve).unwrap();
         assert_eq!(p2, expected);
     }
 
@@ -234,7 +243,7 @@ mod tests {
     fn test_multiply_by_order_gives_infinity() {
         let curve = get_curve();
         let p1 = curve.generator.clone();
-        let p2 = p1.multiply(&curve.order_of_subgroup, &curve);
+        let p2 = p1.multiply(&curve.order_of_subgroup, &curve).unwrap();
         let expected = FiniteFieldEllipticCurvePoint::infinite();
         assert_eq!(p2, expected);
     }
@@ -242,7 +251,7 @@ mod tests {
     #[test]
     fn test_multiply_with_zero() {
         let curve = get_curve();
-        let p2 = curve.generator.multiply(&0.into(), &curve);
+        let p2 = curve.generator.multiply(&0.into(), &curve).unwrap();
         let expected = FiniteFieldEllipticCurvePoint::infinite();
         assert_eq!(p2, expected);
     }
@@ -254,11 +263,11 @@ mod tests {
         let infinity = FiniteFieldEllipticCurvePoint::infinite();
 
         // Point + 0 = Point
-        let p2 = generator.add(&infinity, &curve);
+        let p2 = generator.add(&infinity, &curve).unwrap();
         assert_eq!(p2, generator);
 
         // 0 + Point = Point
-        let p3 = infinity.add(&generator, &curve);
+        let p3 = infinity.add(&generator, &curve).unwrap();
         assert_eq!(p3, generator);
     }
 }

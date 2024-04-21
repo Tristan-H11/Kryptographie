@@ -1,12 +1,13 @@
-use std::fmt;
+use thiserror::Error;
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Error, Clone)]
 pub enum ArithmeticError {
     /// Wird geworfen, wenn eine Zahl kein Inverses hat.
     ///
     /// # Argumente
     /// * `number` - Die Zahl, die kein Inverses hat.
     /// * `modulus` - Das Modulus, zu dem die Zahl kein Inverses hat.
+    #[error("No inverse error: number {0} with modulus {1}")]
     NoInverseError(String, String),
 
     /// Wird geworfen, wenn eine Zahl keinen diskreten Logarithmus hat.
@@ -14,39 +15,22 @@ pub enum ArithmeticError {
     /// # Argumente
     /// * `base` - Die Basis, zu der der diskrete Logarithmus nicht existiert.
     /// * `element` - Das Element, zu dem der diskrete Logarithmus nicht existiert.
+    #[error("No discrete logarithm error: base {0} with element {1}")]
     NoDiscreteLogarithmError(String, String),
 }
 
-impl fmt::Display for ArithmeticError {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        match self {
-            ArithmeticError::NoInverseError(number, modulus) => write!(
-                f,
-                "No inverse error: number {} with modulus {}",
-                number, modulus
-            ),
-            ArithmeticError::NoDiscreteLogarithmError(base, element) => write!(
-                f,
-                "No discrete logarithm error: base {} with element {}",
-                base, element
-            ),
-        }
-    }
-}
-
-impl std::error::Error for ArithmeticError {}
-
-#[derive(Debug, Clone)]
+#[derive(Debug, Error, Clone)]
 pub enum RsaError {
     /// Wird geworfen, wenn die Schlüsselerzeugung fehlschlägt.
-    #[allow(dead_code)] // TODO: Wieder einbauen
+    #[error("RSA Key generation error")]
     KeyGenerationError,
 }
 
-impl fmt::Display for RsaError {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        match self {
-            RsaError::KeyGenerationError => write!(f, "RSA Key generation error"),
-        }
-    }
+#[derive(Debug, Error, Clone)]
+pub enum MenezesVanstoneError {
+    #[error("n must not be 0, but it is {0}")]
+    InvalidNValueError(i32),
+
+    #[error("Modulus width must be greater than 3, but it is {0}")]
+    InvalidModulusWidthError(u32),
 }

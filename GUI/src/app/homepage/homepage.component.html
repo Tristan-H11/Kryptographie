@@ -1,15 +1,43 @@
 <mat-accordion multi>
-    <div class="encryption-container">
+    <div class="container">
         <mat-expansion-panel expanded [hideToggle]="true">
             <mat-expansion-panel-header>
                 <mat-panel-title>
-                    Wählen Sie eine Art der Verschlüsselung aus
+                    Asymmetrische Verschlüsselungen
                 </mat-panel-title>
             </mat-expansion-panel-header>
 
             <div class="button-container">
                 <button mat-raised-button routerLink="/menezesVanstone" color="primary">Menezes-Vanstone</button>
                 <button mat-raised-button routerLink="/rsa" color="primary">RSA</button>
+            </div>
+        </mat-expansion-panel>
+    </div>
+
+    <div class="container">
+        <mat-expansion-panel expanded [hideToggle]="true">
+            <mat-expansion-panel-header>
+                <mat-panel-title>
+                    Modulare Arithmetik
+                </mat-panel-title>
+            </mat-expansion-panel-header>
+
+            <div class="button-container">
+                <button mat-raised-button color="primary" class="sidenav-button" routerLink="/modPow">
+                    Mod Pow
+                </button>
+                <button mat-raised-button color="primary" class="sidenav-button" routerLink="/extendedGcd">
+                    Extended GCD
+                </button>
+                <button mat-raised-button color="primary" class="sidenav-button" routerLink="/shanks">
+                    Shanks
+                </button>
+                <button mat-raised-button color="primary" class="sidenav-button" routerLink="/modularInverse">
+                    Modular Inverse
+                </button>
+                <button mat-raised-button color="primary" class="sidenav-button" routerLink="/multiplication">
+                    RSA Multiplikation
+                </button>
             </div>
         </mat-expansion-panel>
     </div>

@@ -1,7 +1,4 @@
 use crate::api::endpoints::mv::MvCipherTextBean;
-use bigdecimal::num_bigint::BigInt;
-use bigdecimal::{One, Zero};
-
 use crate::encryption::asymmetric_encryption_types::{
     AsymmetricDecryptor, AsymmetricEncryptionScheme, AsymmetricEncryptor,
 };
@@ -19,6 +16,9 @@ use crate::encryption::symmetric_encryption_types::{SymmetricDecryptor, Symmetri
 use crate::math_core::ecc::finite_field_elliptic_curve_point::FiniteFieldEllipticCurvePoint;
 use crate::math_core::number_theory::number_theory_service::NumberTheoryService;
 use crate::math_core::traits::logarithm::Logarithm;
+use anyhow::{bail, Context, Result};
+use bigdecimal::num_bigint::BigInt;
+use bigdecimal::Zero;
 
 pub struct MenezesVanstoneStringScheme {}
 
@@ -48,25 +48,30 @@ impl MenezesVanstoneStringScheme {
         miller_rabin_iterations: u32,
         random_seed: u32,
         radix: u32,
-    ) -> MenezesVanstoneStringKeyPair {
-        assert_ne!(n, 0, "n darf nicht 0 sein, ist aber {}.", n);
-        assert!(
-            modul_width > 3,
-            "Die Modulbreite muss mindestens 4 Bit betragen, ist aber {}.",
-            modul_width
-        );
-        assert_ne!(
-            radix, 0,
-            "Die Basis des Zeichensatzes muss größer als 0 sein, ist aber {}.",
-            radix
-        );
+    ) -> Result<MenezesVanstoneStringKeyPair> {
+        if n < 1 {
+            bail!("n darf nicht kleiner 1 sein, ist aber {}.", n);
+        }
+        if modul_width <= 3 {
+            bail!(
+                "Die Modulbreite muss mindestens 4 Bit betragen, ist aber {}.",
+                modul_width
+            );
+        }
+        if radix == 0 {
+            bail!(
+                "Die Basis des Zeichensatzes muss größer als 0 sein, ist aber {}.",
+                radix
+            );
+        }
 
         let key_pair = MenezesVanstoneScheme::generate_keypair(
             n,
             modul_width,
             miller_rabin_iterations,
             random_seed,
-        );
+        )
+        .context("Error while creating keypair for MenezesVanstone-Core. Error: {:#?}")?;
 
         let public_key = key_pair.public_key;
         let private_key = key_pair.private_key;
@@ -81,16 +86,16 @@ impl MenezesVanstoneStringScheme {
             radix,
         };
 
-        MenezesVanstoneStringKeyPair {
+        Ok(MenezesVanstoneStringKeyPair {
             public_key,
             private_key,
-        }
+        })
     }
 }
 
 impl<'a> Encryptor<MenezesVanstoneStringScheme> for MenezesVanstoneStringScheme {
     type Input = str;
-    type Output = MvStringCiphertext;
+    type Output = Result<MvStringCiphertext>;
     type Key = MenezesVanstoneStringPublicKey;
 }
 
@@ -103,7 +108,10 @@ impl AsymmetricEncryptor<MenezesVanstoneStringScheme> for MenezesVanstoneStringS
         let radix = key.radix;
         let block_size = key.mv_key.curve.prime.log(&radix.into());
         if block_size < 1 {
-            panic!("Verhältnis von Basis und Modul ist zu klein.")
+            bail!(
+                "Die Blockgröße muss mindestens 1 sein, ist aber {}.",
+                block_size
+            )
         }
         let decimal_unicode_key = DecimalUnicodeConversionSchemeKey { radix, block_size };
 
@@ -145,7 +153,8 @@ impl AsymmetricEncryptor<MenezesVanstoneStringScheme> for MenezesVanstoneStringS
         // Jeden einzelnen Plaintext für sich verschlüsseln
         let mut ciphertext_list: Vec<MenezesVanstoneCiphertext> = Vec::new();
         for plaintext in plaintext_list {
-            let ciphertext = MenezesVanstoneScheme::encrypt(&key.mv_key, &plaintext, service);
+            let ciphertext = MenezesVanstoneScheme::encrypt(&key.mv_key, &plaintext, service)
+                .context("Verschlüsselung im MenezesVanstone-Kern fehlgeschlagen. Fehler: {:#?}")?;
             ciphertext_list.push(ciphertext);
         }
 
@@ -168,16 +177,16 @@ impl AsymmetricEncryptor<MenezesVanstoneStringScheme> for MenezesVanstoneStringS
             .flat_map(|c| vec![c.point.clone()])
             .collect();
 
-        MvStringCiphertext {
+        Ok(MvStringCiphertext {
             ciphertext: ciphertext_string,
             points,
-        }
+        })
     }
 }
 
 impl<'a> Decryptor<MenezesVanstoneStringScheme> for MenezesVanstoneStringScheme {
     type Input = MvStringCiphertext;
-    type Output = String;
+    type Output = Result<String>;
     type Key = MenezesVanstoneStringPrivateKey;
 }
 
@@ -223,7 +232,8 @@ impl AsymmetricDecryptor<MenezesVanstoneStringScheme> for MenezesVanstoneStringS
         // Jeden einzelnen Ciphertext für sich entschlüsseln
         let mut plaintext_list: Vec<MenezesVanstonePlaintext> = Vec::new();
         for ciphertext in ciphertext_list {
-            let plaintext = MenezesVanstoneScheme::decrypt(&key.mv_key, &ciphertext, service);
+            let plaintext = MenezesVanstoneScheme::decrypt(&key.mv_key, &ciphertext, service)
+                .context("Entschlüsselung im MenezesVanstone-Kern fehlgeschlagen. Fehler: {:#?}")?;
             plaintext_list.push(plaintext);
         }
 
@@ -233,7 +243,10 @@ impl AsymmetricDecryptor<MenezesVanstoneStringScheme> for MenezesVanstoneStringS
             big_int_vec.push(plaintext.first.clone());
             big_int_vec.push(plaintext.second.clone());
         }
-        ToDecimalBlockScheme::decrypt(&big_int_vec, &decimal_unicode_key)
+        Ok(ToDecimalBlockScheme::decrypt(
+            &big_int_vec,
+            &decimal_unicode_key,
+        ))
     }
 }
 
@@ -256,7 +269,8 @@ mod tests {
         let modul_width = rand::thread_rng().gen_range(4..256);
         let random_seed = rand::thread_rng().gen_range(1..1000);
         let key_pair =
-            MenezesVanstoneStringScheme::generate_keypair(n, modul_width, 40, random_seed, radix);
+            MenezesVanstoneStringScheme::generate_keypair(n, modul_width, 40, random_seed, radix)
+                .unwrap();
 
         let public_key = key_pair.public_key;
         let private_key = key_pair.private_key;
@@ -270,9 +284,10 @@ mod tests {
             .collect();
 
         let service = NumberTheoryService::new(Fast);
-        let ciphertext = MenezesVanstoneStringScheme::encrypt(&public_key, &plaintext, service);
+        let ciphertext =
+            MenezesVanstoneStringScheme::encrypt(&public_key, &plaintext, service).unwrap();
         let decrypted_plaintext =
-            MenezesVanstoneStringScheme::decrypt(&private_key, &ciphertext, service);
+            MenezesVanstoneStringScheme::decrypt(&private_key, &ciphertext, service).unwrap();
         assert_eq!(plaintext, decrypted_plaintext);
     }
 }

@@ -7,46 +7,35 @@ import {MatInputModule} from "@angular/material/input";
 import {FormsModule, ReactiveFormsModule} from "@angular/forms";
 import {RsaBackendRequestService} from "../../services/backend-api/rsa-backend-request.service";
 import {ExtendedEuclidRequest} from "../../models/extended-euclid-request";
-import {catchError, EMPTY} from "rxjs";
-import {ErrorDialogComponent} from "../../dialogs/error-dialog/error-dialog.component";
 import {MatDialog} from "@angular/material/dialog";
 
 @Component({
-	selector: "app-extended-gcd",
-	standalone: true,
-	imports: [CommonModule, MatButtonModule, MatExpansionModule, MatFormFieldModule, MatInputModule, ReactiveFormsModule, FormsModule],
-	templateUrl: "./extended-gcd.component.html",
+    selector: "app-extended-gcd",
+    standalone: true,
+    imports: [CommonModule, MatButtonModule, MatExpansionModule, MatFormFieldModule, MatInputModule, ReactiveFormsModule, FormsModule],
+    templateUrl: "./extended-gcd.component.html",
 })
 export class ExtendedGcdComponent {
-	public ggT: string = "";
-	public parameterA: string = "";
-	public parameterB: string = "";
-	public coefficientX: string = "";
-	public coefficientY: string = "";
+    public ggT: string = "";
+    public parameterA: string = "";
+    public parameterB: string = "";
+    public coefficientX: string = "";
+    public coefficientY: string = "";
 
-	constructor(private backendRequestService: RsaBackendRequestService, private dialog: MatDialog) {
-	}
+    constructor(private backendRequestService: RsaBackendRequestService, private dialog: MatDialog) {
+    }
 
-	/**
-	 * Berechnet den ggT.
-	 */
-	public calculate() {
+    /**
+     * Berechnet den ggT.
+     */
+    public calculate() {
 
-		const body = new ExtendedEuclidRequest(this.parameterA, this.parameterB);
+        const body = new ExtendedEuclidRequest(this.parameterA, this.parameterB);
 
-		this.backendRequestService.extendedGcd(body).pipe(
-            catchError(
-                (error) => {
-                    this.dialog.open(ErrorDialogComponent, {
-                        data: {message: error.error.message}
-                    });
-                    return EMPTY;
-                }
-            )
-        ).subscribe(result => {
-			this.ggT = result.ggt;
-			this.coefficientX = result.x;
-			this.coefficientY = result.y;
-		});
-	}
+        this.backendRequestService.extendedGcd(body).subscribe(result => {
+            this.ggT = result.ggt;
+            this.coefficientX = result.x;
+            this.coefficientY = result.y;
+        });
+    }
 }

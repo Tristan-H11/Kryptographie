@@ -32,16 +32,7 @@ export class ModularInverseComponent {
 
     public calculate() {
         let body = new ModularInversRequest(this.n, this.modul);
-        this.backendRequestService.modularInverse(body).pipe(
-            catchError(
-                (error) => {
-                    this.dialog.open(ErrorDialogComponent, {
-                        data: {message: error.error.message}
-                    });
-                    return EMPTY;
-                }
-            )
-        ).subscribe(result => {
+        this.backendRequestService.modularInverse(body).subscribe(result => {
             this.result = result.message;
         });
     }

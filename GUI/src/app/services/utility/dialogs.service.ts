@@ -2,6 +2,7 @@ import {Injectable} from "@angular/core";
 import {MatSnackBar} from "@angular/material/snack-bar";
 import {MatDialog, MatDialogRef} from "@angular/material/dialog";
 import {LoadingDialogComponent} from "../../dialogs/loading-dialog/loading-dialog.component";
+import {ErrorDialogComponent} from "../../dialogs/error-dialog/error-dialog.component";
 
 @Injectable({
     providedIn: "root"
@@ -13,6 +14,17 @@ export class DialogService {
     }>();
 
     constructor(private snackBar: MatSnackBar, private dialog: MatDialog) {
+    }
+
+    /**
+     * Zeigt einen Fehler aus der HTTP-Response in einem Dialog an.
+     */
+    public showErrorDialog(message: string): void {
+        this.dialog.open(ErrorDialogComponent, {
+            data: {
+                message
+            }
+        });
     }
 
     /**

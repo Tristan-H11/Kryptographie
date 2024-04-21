@@ -1,4 +1,4 @@
-import {Component, EventEmitter, Input, Output} from "@angular/core";
+import {Component, Input} from "@angular/core";
 import {MatFormField, MatLabel} from "@angular/material/form-field";
 import {FormsModule} from "@angular/forms";
 import {MatCard, MatCardContent, MatCardHeader, MatCardTitle} from "@angular/material/card";
@@ -31,6 +31,8 @@ import {MatAutocomplete, MatAutocompleteTrigger} from "@angular/material/autocom
 import {MatChip, MatChipListbox, MatChipOption} from "@angular/material/chips";
 import {ClientActionRowComponent} from "../../shared/client-action-row/client-action-row.component";
 import {MvConfigurationData} from "../../shared/ConfigurationDataTypes";
+import {AbstractClientPanelComponent} from "../../shared/AbstractClientPanelComponent";
+import {concatMap, EMPTY} from "rxjs";
 
 @Component({
     selector: "mv-client-panel",
@@ -63,13 +65,7 @@ import {MvConfigurationData} from "../../shared/ConfigurationDataTypes";
     ],
     templateUrl: "./mv-client-panel.component.html",
 })
-export class MvClientPanelComponent {
-
-    @Input()
-    public client: MvClientData = MvClientData.createDefaultWithName("Empty");
-
-    @Input()
-    public possibleTargetClients: MvClientData[] = [];
+export class MvClientPanelComponent extends AbstractClientPanelComponent<MvClientData>{
 
     @Input()
     public config: MvConfigurationData = {
@@ -80,19 +76,17 @@ export class MvClientPanelComponent {
         numberSystem: 0
     };
 
-    @Output()
-    public deleteSelf: EventEmitter<void> = new EventEmitter<void>();
-
     protected readonly JSON = JSON;
 
     constructor(private backendRequestService: MvBackendRequestService,
                 private dialogService: DialogService) {
+        super();
     }
 
     /**
      * Verschlüsselt die Nachricht für das gewählte Ziel.
      */
-    public encrypt(): void {
+    public override encrypt(): void {
         if (!this.client.sendingTo || !this.client.sendingTo.keyPair) {
             return;
         }
@@ -103,31 +97,33 @@ export class MvClientPanelComponent {
             message: this.client.plaintext,
             radix: this.config.numberSystem
         };
-        // TODO Refactor! Verschachtelte Request sind ein NO-GO!
-        this.backendRequestService.encrypt(request).then(ciphertext => {
-            this.client.ciphertext = copyMvCipherText(ciphertext);
 
-            if (!this.client.keyPair) {
-                this.dialogService.endTimedCalc(loadingCalcKey, "Nachricht verschlüsselt.");
-                return;
-            }
+        this.backendRequestService.encrypt(request).pipe(
+            concatMap(ciphertext => {
+                this.client.ciphertext = copyMvCipherText(ciphertext);
 
-            let body: MvSignRequest = {
-                private_key: this.client.keyPair.private_key,
-                message: this.client.plaintext
-            };
-            this.backendRequestService.sign(body).then(signature => {
-                this.client.signature = signature;
-                this.client.signature_valid = "ungeprüft";
-                this.dialogService.endTimedCalc(loadingCalcKey, "Nachricht verschlüsselt.");
-            });
+                if (!this.client.keyPair) {
+                    this.dialogService.endTimedCalc(loadingCalcKey, "Nachricht verschlüsselt.");
+                    return EMPTY;
+                }
+
+                let body: MvSignRequest = {
+                    private_key: this.client.keyPair.private_key,
+                    message: this.client.plaintext
+                };
+                return this.backendRequestService.sign(body);
+            })
+        ).subscribe(signature => {
+            this.client.signature = copyMvSignature(signature)
+            this.client.signature_valid = "ungeprüft";
+            this.dialogService.endTimedCalc(loadingCalcKey, "Nachricht verschlüsselt und signiert.");
         });
     }
 
     /**
      * Entschlüsselt den Ciphertext und prüft die Signatur, falls vorhanden.
      */
-    public decrypt(): void {
+    public override decrypt(): void {
         if (!this.client.keyPair) {
             return;
         }
@@ -138,70 +134,33 @@ export class MvClientPanelComponent {
             cipher_text: copyMvCipherText(this.client.ciphertext),
             radix: this.config.numberSystem
         };
-        this.backendRequestService.decrypt(request).then(plaintext => {
-            this.client.plaintext = plaintext.message;
+        this.backendRequestService.decrypt(request).pipe(
+            concatMap(plaintext => {
+                this.client.plaintext = plaintext.message;
 
-            if (!this.client.receivedFrom || !this.client.receivedFrom.keyPair) {
-                this.dialogService.endTimedCalc(loadingCalcKey, "Nachricht entschlüsselt.");
-                return;
-            }
-            let body: MvVerifyRequest = {
-                public_key: this.client.receivedFrom.keyPair.public_key,
-                message: this.client.plaintext,
-                signature: this.client.signature
-            };
-            this.backendRequestService.verify(body).then(result => {
-                if (result.message === "true") {
-                    this.client.signature_valid = "gültig";
-                } else {
-                    this.client.signature_valid = "ungültig";
+                if (!this.client.receivedFrom || !this.client.receivedFrom.keyPair) {
+                    this.dialogService.endTimedCalc(loadingCalcKey, "Nachricht entschlüsselt.");
+                    return EMPTY;
                 }
-                this.dialogService.endTimedCalc(loadingCalcKey, "Nachricht entschlüsselt.");
-            });
+
+                let body: MvVerifyRequest = {
+                    public_key: this.client.receivedFrom.keyPair.public_key,
+                    message: this.client.plaintext,
+                    signature: this.client.signature
+                };
+                return this.backendRequestService.verify(body);
+            })
+        ).subscribe(result => {
+            if (result.message === "true") {
+                this.client.signature_valid = "gültig";
+            } else {
+                this.client.signature_valid = "ungültig";
+            }
+            this.dialogService.endTimedCalc(loadingCalcKey, "Nachricht entschlüsselt und verifiziert.");
         });
     }
 
-    /**
-     * Sendet den Ciphertext an den anderen Partner und setzt die Felder zurück.
-     */
-    public send(): void {
-        if (!this.client.sendingTo) {
-            return;
-        }
-        this.client.sendingTo.ciphertext = copyMvCipherText(this.client.ciphertext);
-        this.client.sendingTo.signature = copyMvSignature(this.client.signature);
-        this.client.sendingTo.receivedFrom = this.client
-
-        this.clearFields();
-    }
-
-    /**
-     * Setzt alle Felder des Clients zurück.
-     */
-    public clearFields(): void {
-        this.client.plaintext = "";
-        this.client.ciphertext.encrypted_message = "";
-        this.client.ciphertext.points = [];
-        this.client.signature.r = "Empty";
-        this.client.signature.s = "Empty";
-        this.client.signature_valid = "ungeprüft";
-    }
-
-    /**
-     * Gibt an, ob bereits gesetzt wurde, an wen der Client senden soll.
-     */
-    public sendingToNotSet(): boolean {
-        return this.client.sendingTo === undefined;
-    }
-
-    /**
-     * Löscht sich selber aus der Liste der Clients.
-     */
-    public delete(): void {
-        this.deleteSelf.emit();
-    }
-
-    public changeTargetClientTo(client: MvClientData): void {
-        this.client.sendingTo = client;
+    protected createDefaultClient(name: string): MvClientData {
+        return MvClientData.createDefaultWithName(name);
     }
 }

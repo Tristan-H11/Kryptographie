@@ -1,10 +1,10 @@
 use crate::math_core::number_theory::extended_euclid_result::ExtendedEuclidResult;
+use anyhow::Result;
 use num::BigInt;
 
 use crate::math_core::number_theory::fast_number_theory_service::FastNumberTheoryService;
 use crate::math_core::number_theory::slow_number_theory_service::SlowNumberTheoryService;
 use crate::math_core::pseudo_random_number_generator::PseudoRandomNumberGenerator;
-use crate::shared::errors::ArithmeticError;
 
 /// Gibt an, ob die schnelle oder die langsame Implementierung des `NumberTheoryService` verwendet werden soll.
 pub enum NumberTheoryServiceSpeed {
@@ -52,7 +52,7 @@ impl NumberTheoryServiceTrait for NumberTheoryService {
         }
     }
 
-    fn modulo_inverse(&self, n: &BigInt, modul: &BigInt) -> Result<BigInt, ArithmeticError> {
+    fn modulo_inverse(&self, n: &BigInt, modul: &BigInt) -> Result<BigInt> {
         match self {
             NumberTheoryService::FastService(service) => service.modulo_inverse(n, modul),
             NumberTheoryService::SlowService(service) => service.modulo_inverse(n, modul),
@@ -151,7 +151,7 @@ pub trait NumberTheoryServiceTrait {
     ///
     /// assert_eq!(result, Ok(BigInt::from(3)));
     /// ```
-    fn modulo_inverse(&self, n: &BigInt, modul: &BigInt) -> Result<BigInt, ArithmeticError>;
+    fn modulo_inverse(&self, n: &BigInt, modul: &BigInt) -> Result<BigInt>;
 
     /// Diese Methode führt einen probabilistischen Primzahltest für den angegebenen Integer durch.
     ///

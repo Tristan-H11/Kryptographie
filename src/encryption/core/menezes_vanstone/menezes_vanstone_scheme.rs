@@ -1,3 +1,5 @@
+use anyhow::Result;
+use anyhow::{bail, Context};
 use std::time::SystemTime;
 
 use crate::api::endpoints::mv::MvSignatureBean;
@@ -21,6 +23,7 @@ use crate::math_core::number_theory::number_theory_service::{
 };
 use crate::math_core::pseudo_random_number_generator::PseudoRandomNumberGenerator;
 use crate::math_core::traits::increment::Increment;
+use crate::shared::errors::MenezesVanstoneError;
 use crate::shared::hashing::sha256;
 
 #[derive(Clone, Debug, PartialEq)]
@@ -64,16 +67,17 @@ impl MenezesVanstoneScheme {
         modul_width: u32,
         miller_rabin_iterations: u32,
         random_seed: u32,
-    ) -> MenezesVanstoneKeyPair {
-        assert_ne!(n, 0, "n darf nicht 0 sein, ist aber {}", n); // TODO error Handling
-        assert!(
-            modul_width > 3,
-            "Die Modulbreite muss mindestens 4 Bit betragen, ist aber {}",
-            modul_width
-        ); // TODO error Handling
+    ) -> Result<MenezesVanstoneKeyPair> {
+        if n == 0 {
+            bail!(MenezesVanstoneError::InvalidNValueError(n));
+        }
+        if modul_width <= 3 {
+            bail!(MenezesVanstoneError::InvalidModulusWidthError(modul_width));
+        }
 
         let curve =
-            SecureFiniteFieldEllipticCurve::new(n.into(), modul_width, miller_rabin_iterations);
+            SecureFiniteFieldEllipticCurve::new(n.into(), modul_width, miller_rabin_iterations)
+                .context("Failed to create secure elliptic curve")?;
 
         let prng = PseudoRandomNumberGenerator::new(random_seed, NumberTheoryService::new(Fast)); // TODO übergeben
         let counter = RelaxedCounter::new(1);
@@ -81,7 +85,10 @@ impl MenezesVanstoneScheme {
         let (mut x, mut y);
         loop {
             x = prng.take(&1.into(), &order_of_subgroup.decrement(), &counter);
-            y = curve.generator.multiply(&x, &curve);
+            y = curve
+                .generator
+                .multiply(&x, &curve)
+                .context("Failed to calculate key-component y")?;
             if !y.x.is_zero() && !y.y.is_zero() {
                 break;
             }
@@ -94,16 +101,16 @@ impl MenezesVanstoneScheme {
 
         let private_key = MenezesVanstonePrivateKey { curve, x };
 
-        MenezesVanstoneKeyPair {
+        Ok(MenezesVanstoneKeyPair {
             public_key,
             private_key,
-        }
+        })
     }
 }
 
 impl Encryptor<MenezesVanstoneScheme> for MenezesVanstoneScheme {
     type Input = MenezesVanstonePlaintext;
-    type Output = MenezesVanstoneCiphertext;
+    type Output = Result<MenezesVanstoneCiphertext>;
     type Key = MenezesVanstonePublicKey;
 }
 
@@ -133,9 +140,15 @@ impl AsymmetricEncryptor<MenezesVanstoneScheme> for MenezesVanstoneScheme {
             // Dadurch, dass ein Wert < |H| gewählt wird, ist garantiert, dass der Punkt k*g niemals
             // im Unendlichen liegen wird.
             k = random_generator.take(&1.into(), &curve.order_of_subgroup.decrement(), &counter);
-            let point = key.y.multiply(&k, curve);
+            let point = key
+                .y
+                .multiply(&k, curve)
+                .context("Failed to calculate Point (c1, c2)")?;
             if point.is_infinite {
-                panic!("Point is infinite")
+                bail!(
+                    "Calculated point is infinite, but cannot be since k < |H|. With k = {}",
+                    k
+                )
             }
             (c1, c2) = (point.x, point.y);
             // Sind beide Werte ungleich 0, so ist das Paar (c1, c2) gültig
@@ -143,21 +156,25 @@ impl AsymmetricEncryptor<MenezesVanstoneScheme> for MenezesVanstoneScheme {
                 break;
             }
         }
-        let a = key.curve.generator.multiply(&k, curve);
+        let a = key
+            .curve
+            .generator
+            .multiply(&k, curve)
+            .context("Failed to calculate Point a")?;
         let b1 = (c1 * m1) % prime;
         let b2 = (c2 * m2) % prime;
 
-        MenezesVanstoneCiphertext {
+        Ok(MenezesVanstoneCiphertext {
             point: a,
             first: b1,
             second: b2,
-        }
+        })
     }
 }
 
 impl Decryptor<MenezesVanstoneScheme> for MenezesVanstoneScheme {
     type Input = MenezesVanstoneCiphertext;
-    type Output = MenezesVanstonePlaintext;
+    type Output = Result<MenezesVanstonePlaintext>;
     type Key = MenezesVanstonePrivateKey;
 }
 
@@ -172,21 +189,30 @@ impl AsymmetricDecryptor<MenezesVanstoneScheme> for MenezesVanstoneScheme {
         let b2 = &ciphertext.second;
         let prime = &key.curve.prime;
 
-        let point = a.multiply(&key.x, &key.curve);
+        let point = a
+            .multiply(&key.x, &key.curve)
+            .context("Failed to calculate Point (c1, c2)")?;
         let (c1, c2) = (point.x, point.y);
-        let m1 = (b1 * service.modulo_inverse(&c1, prime).unwrap()) % prime; //TODO Unwrap
-        let m2 = (b2 * service.modulo_inverse(&c2, prime).unwrap()) % prime; //TODO Unwrap
+        let c1_inverse = service
+            .modulo_inverse(&c1, prime)
+            .context("Failed to find modulo inverse for c1 during decryption")?;
+        let c2_inverse = service
+            .modulo_inverse(&c2, prime)
+            .context("Failed to find modulo inverse for c2 during decryption")?;
 
-        MenezesVanstonePlaintext {
+        let m1 = (b1 * c1_inverse) % prime;
+        let m2 = (b2 * c2_inverse) % prime;
+
+        Ok(MenezesVanstonePlaintext {
             first: m1,
             second: m2,
-        }
+        })
     }
 }
 
 impl<'a> Signer<MenezesVanstoneScheme> for MenezesVanstoneScheme {
     type Input = str;
-    type Output = MenezesVanstoneSignature;
+    type Output = Result<MenezesVanstoneSignature>;
     type Key = MenezesVanstonePrivateKey;
 
     fn sign(key: &Self::Key, message: &Self::Input, service: NumberTheoryService) -> Self::Output {
@@ -200,9 +226,15 @@ impl<'a> Signer<MenezesVanstoneScheme> for MenezesVanstoneScheme {
         // Schleife, bis r und s jeweils ungleich 0 sind.
         loop {
             let k = &prng.take(&1.into(), &q.decrement(), &counter);
-            let point = curve.generator.multiply(k, curve);
+            let point = curve
+                .generator
+                .multiply(k, curve)
+                .context("Failed to calculate Point (c1, c2)")?;
             if point.is_infinite {
-                panic!("Point is infinite")
+                bail!(
+                    "Calculated point is infinite, but cannot be since k < |H|. With k = {}",
+                    k
+                )
             }
             let r = point.x.rem_euclid(q);
             if r.is_zero() {
@@ -213,7 +245,7 @@ impl<'a> Signer<MenezesVanstoneScheme> for MenezesVanstoneScheme {
             if s.is_zero() {
                 continue;
             }
-            return MenezesVanstoneSignature { r, s };
+            return Ok(MenezesVanstoneSignature { r, s });
         }
     }
 }
@@ -221,7 +253,7 @@ impl<'a> Signer<MenezesVanstoneScheme> for MenezesVanstoneScheme {
 impl<'a> Verifier<MenezesVanstoneScheme> for MenezesVanstoneScheme {
     type Signature = MenezesVanstoneSignature;
     type Message = str;
-    type Output = bool;
+    type Output = Result<bool>;
     type Key = MenezesVanstonePublicKey;
 
     fn verify(
@@ -240,12 +272,20 @@ impl<'a> Verifier<MenezesVanstoneScheme> for MenezesVanstoneScheme {
         let u1 = (hashed_message * w).rem_euclid(q);
         let u2 = (r * w).rem_euclid(q);
 
-        let first_point = curve.generator.multiply(&u1, curve);
-        let second_point = key.y.multiply(&u2, curve);
-        let point = first_point.add(&second_point, curve);
+        let first_point = curve
+            .generator
+            .multiply(&u1, curve)
+            .context("Failed to calculate first point")?;
+        let second_point = key
+            .y
+            .multiply(&u2, curve)
+            .context("Failed to calculate second point")?;
+        let point = first_point
+            .add(&second_point, curve)
+            .context("Failed to calculate verification point")?;
 
         let v = point.x.rem_euclid(q);
-        v == *r
+        Ok(v == *r)
     }
 }
 
@@ -264,7 +304,8 @@ mod tests {
         let n = 7; //rand::thread_rng().gen_range(1..30);
         let modul_width = 128; //rand::thread_rng().gen_range(4..256);
         let random_seed = 300; //rand::thread_rng().gen_range(1..1000);
-        let key_pair = MenezesVanstoneScheme::generate_keypair(n, modul_width, 40, random_seed);
+        let key_pair =
+            MenezesVanstoneScheme::generate_keypair(n, modul_width, 40, random_seed).unwrap();
 
         let public_key = key_pair.public_key;
         let private_key = key_pair.private_key;
@@ -276,9 +317,9 @@ mod tests {
         };
 
         let service = NumberTheoryService::new(Fast);
-        let ciphertext = MenezesVanstoneScheme::encrypt(&public_key, &plaintext, service);
+        let ciphertext = MenezesVanstoneScheme::encrypt(&public_key, &plaintext, service).unwrap();
         let decrypted_plaintext =
-            MenezesVanstoneScheme::decrypt(&private_key, &ciphertext, service);
+            MenezesVanstoneScheme::decrypt(&private_key, &ciphertext, service).unwrap();
         assert_eq!(plaintext, decrypted_plaintext);
     }
 
@@ -289,7 +330,8 @@ mod tests {
         let n = rand::thread_rng().gen_range(1..30);
         let modul_width = rand::thread_rng().gen_range(4..256);
         let random_seed = rand::thread_rng().gen_range(1..1000);
-        let key_pair = MenezesVanstoneScheme::generate_keypair(n, modul_width, 40, random_seed);
+        let key_pair =
+            MenezesVanstoneScheme::generate_keypair(n, modul_width, 40, random_seed).unwrap();
 
         let public_key = key_pair.public_key;
         let private_key = key_pair.private_key;
@@ -301,9 +343,9 @@ mod tests {
         };
 
         let service = NumberTheoryService::new(Fast);
-        let ciphertext = MenezesVanstoneScheme::encrypt(&public_key, &plaintext, service);
+        let ciphertext = MenezesVanstoneScheme::encrypt(&public_key, &plaintext, service).unwrap();
         let decrypted_plaintext =
-            MenezesVanstoneScheme::decrypt(&private_key, &ciphertext, service);
+            MenezesVanstoneScheme::decrypt(&private_key, &ciphertext, service).unwrap();
         assert_ne!(plaintext, decrypted_plaintext);
     }
 
@@ -314,7 +356,8 @@ mod tests {
         let n = 5; //rand::thread_rng().gen_range(1..30);
         let modul_width = 16; //rand::thread_rng().gen_range(4..16);
         let random_seed = 73; //rand::thread_rng().gen_range(1..1000);
-        let key_pair = MenezesVanstoneScheme::generate_keypair(n, modul_width, 40, random_seed);
+        let key_pair =
+            MenezesVanstoneScheme::generate_keypair(n, modul_width, 40, random_seed).unwrap();
 
         let public_key = key_pair.public_key;
         let private_key = key_pair.private_key;
@@ -323,13 +366,15 @@ mod tests {
 
         let message = "Hello World!";
         let signature =
-            MenezesVanstoneScheme::sign(&private_key, message, NumberTheoryService::new(Fast));
+            MenezesVanstoneScheme::sign(&private_key, message, NumberTheoryService::new(Fast))
+                .unwrap();
         let is_verified = MenezesVanstoneScheme::verify(
             &public_key,
             &signature,
             message,
             NumberTheoryService::new(Fast),
-        );
+        )
+        .unwrap();
         assert!(is_verified);
     }
 }

@@ -1,4 +1,5 @@
 use crate::math_core::number_theory::extended_euclid_result::ExtendedEuclidResult;
+use anyhow::{bail, Result};
 use bigdecimal::num_bigint::BigInt;
 use bigdecimal::num_traits::Euclid;
 use bigdecimal::One;
@@ -31,17 +32,16 @@ impl NumberTheoryServiceTrait for FastNumberTheoryService {
         base.modpow(exponent, modul)
     }
 
-    fn modulo_inverse(&self, n: &BigInt, modul: &BigInt) -> Result<BigInt, ArithmeticError> {
+    fn modulo_inverse(&self, n: &BigInt, modul: &BigInt) -> Result<BigInt> {
         let number_theory_service = FastNumberTheoryService::new();
         let extended_euclid_result = number_theory_service.extended_euclid(modul, n);
         if !extended_euclid_result.ggt.is_one() {
-            return Err(ArithmeticError::NoInverseError(
+            bail!(ArithmeticError::NoInverseError(
                 n.to_string(),
                 modul.to_string(),
             ));
         }
-        // Berechnet aus den letzten Faktoren das Inverse.
-        return Ok((modul + extended_euclid_result.y).rem_euclid(modul));
+        Ok((modul + extended_euclid_result.y).rem_euclid(modul))
     }
 
     fn is_probably_prime(

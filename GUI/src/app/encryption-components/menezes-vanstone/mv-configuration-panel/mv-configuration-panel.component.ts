@@ -71,7 +71,7 @@ export class MvConfigurationPanelComponent {
             coef_a: this.config.coefA,
             random_seed: this.config.randomSeed
         };
-        this.backendRequestService.createKeyPair(config).then(key => {
+        this.backendRequestService.createKeyPair(config).subscribe(key => {
             const client = this.clients.find(client => client.name === name);
             if (client) {
                 client.keyPair = copyMvKeyPair(key);

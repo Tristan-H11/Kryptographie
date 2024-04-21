@@ -1,7 +1,8 @@
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="Run RSA-Implementation" type="CargoCommandRunConfiguration" factoryName="Cargo Command">
-    <option name="command" value="run --package RSA-Implementation --bin RSA-Implementation --release" />
+  <configuration default="false" name="Run encryption_tool" type="CargoCommandRunConfiguration" factoryName="Cargo Command">
+    <option name="command" value="run --package encryption_tool --bin encryption_tool --release" />
     <option name="workingDirectory" value="file://$PROJECT_DIR$" />
+    <envs />
     <option name="emulateTerminal" value="true" />
     <option name="channel" value="DEFAULT" />
     <option name="requiredFeatures" value="true" />
@@ -9,7 +10,6 @@
     <option name="withSudo" value="false" />
     <option name="buildTarget" value="REMOTE" />
     <option name="backtrace" value="SHORT" />
-    <envs />
     <option name="isRedirectInput" value="false" />
     <option name="redirectInputPath" value="" />
     <method v="2">

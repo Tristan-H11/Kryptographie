@@ -1,4 +1,4 @@
-import {Component, EventEmitter, Input, Output} from "@angular/core";
+import {Component, Input} from "@angular/core";
 import {ClientActionRowComponent} from "../../shared/client-action-row/client-action-row.component";
 import {EmptyIfUndefinedPipe} from "../../../services/pipes/empty-if-undefined";
 import {MatCard, MatCardContent, MatCardHeader, MatCardTitle} from "@angular/material/card";
@@ -18,6 +18,8 @@ import {RsaBackendRequestService} from "../../../services/backend-api/rsa-backen
 import {RsaEncryptDecryptRequest} from "../../../models/rsa-encrypt-decrypt-request";
 import {RsaSignRequest} from "../../../models/rsa-sign-request";
 import {RsaVerifyRequest} from "../../../models/rsa-verify-request";
+import {AbstractClientPanelComponent} from "../../shared/AbstractClientPanelComponent";
+import {concatMap, EMPTY} from "rxjs";
 
 @Component({
     selector: "rsa-client-panel",
@@ -41,13 +43,10 @@ import {RsaVerifyRequest} from "../../../models/rsa-verify-request";
     ],
     templateUrl: "./rsa-client-panel.component.html",
 })
-export class RsaClientPanelComponent {
-
-    @Input()
-    public client: RsaClientData = RsaClientData.createDefaultWithName("Empty");
-
-    @Input()
-    public possibleTargetClients: RsaClientData[] = [];
+export class RsaClientPanelComponent extends AbstractClientPanelComponent<RsaClientData> {
+    protected override createDefaultClient(name: string): RsaClientData {
+        return RsaClientData.createDefaultWithName(name);
+    }
 
     @Input()
     public config: RsaConfigurationData = {
@@ -57,25 +56,9 @@ export class RsaClientPanelComponent {
         numberSystem: 0
     };
 
-    @Output()
-    public deleteSelf: EventEmitter<void> = new EventEmitter<void>();
-
     constructor(private backendRequestService: RsaBackendRequestService,
                 private dialogService: DialogService) {
-    }
-
-    /**
-     * Gibt an, ob bereits gesetzt wurde, an wen der Client senden soll.
-     */
-    public sendingToNotSet(): boolean {
-        return this.client.sendingTo === undefined;
-    }
-
-    /**
-     * Löscht sich selber aus der Liste der Clients.
-     */
-    public delete(): void {
-        this.deleteSelf.emit();
+        super();
     }
 
     /**
@@ -93,24 +76,26 @@ export class RsaClientPanelComponent {
 
         let loadingCalcKey = this.dialogService.startTimedCalc();
 
-        this.backendRequestService.encrypt(requestBody).then(response => {
-            this.client.ciphertext = response.message;
+        this.backendRequestService.encrypt(requestBody).pipe(
+            concatMap(response => {
+                this.client.ciphertext = response.message;
 
-            if (!this.client.keyPair) {
-                this.dialogService.endTimedCalc(loadingCalcKey, "Nachricht verschlüsselt.");
-                return;
-            }
+                if (!this.client.keyPair) {
+                    this.dialogService.endTimedCalc(loadingCalcKey, "Nachricht verschlüsselt.");
+                    return EMPTY;
+                }
 
-            const signRequest = new RsaSignRequest(
-                this.client.plaintext,
-                this.client.keyPair,
-                this.config.numberSystem
-            );
-            this.backendRequestService.sign(signRequest).then(response => {
-                this.client.signature = response.message;
-                this.client.signature_valid = "ungeprüft";
-                this.dialogService.endTimedCalc(loadingCalcKey, "Nachricht verschlüsselt und signiert.");
-            });
+                const signRequest = new RsaSignRequest(
+                    this.client.plaintext,
+                    this.client.keyPair,
+                    this.config.numberSystem
+                );
+                return this.backendRequestService.sign(signRequest);
+            })
+        ).subscribe(response => {
+            this.client.signature = response.message;
+            this.client.signature_valid = "ungeprüft";
+            this.dialogService.endTimedCalc(loadingCalcKey, "Nachricht verschlüsselt und signiert.");
         });
     }
 
@@ -129,53 +114,30 @@ export class RsaClientPanelComponent {
 
         let loadingCalcKey = this.dialogService.startTimedCalc();
 
-        this.backendRequestService.decrypt(requestBody).then(response => {
-            this.client.plaintext = response.message;
+        this.backendRequestService.decrypt(requestBody).pipe(
+            concatMap(response => {
+                this.client.plaintext = response.message;
 
-            if (!this.client.receivedFrom || !this.client.receivedFrom.keyPair) {
-                this.dialogService.endTimedCalc(loadingCalcKey, "Nachricht entschlüsselt.");
-                return;
-            }
-
-            const verifyRequest = new RsaVerifyRequest(
-                this.client.plaintext,
-                this.client.signature,
-                this.client.receivedFrom.keyPair,
-                this.config.numberSystem
-            );
-            this.backendRequestService.verify(verifyRequest).then(response => {
-                if (response.message === "true") {
-                    this.client.signature_valid = "gültig";
-                } else {
-                    this.client.signature_valid = "ungültig";
+                if (!this.client.receivedFrom || !this.client.receivedFrom.keyPair) {
+                    this.dialogService.endTimedCalc(loadingCalcKey, "Nachricht entschlüsselt.");
+                    return EMPTY;
                 }
-                this.dialogService.endTimedCalc(loadingCalcKey, "Nachricht entschlüsselt und verifiziert.");
-            });
+
+                const verifyRequest = new RsaVerifyRequest(
+                    this.client.plaintext,
+                    this.client.signature,
+                    this.client.receivedFrom.keyPair,
+                    this.config.numberSystem
+                );
+                return this.backendRequestService.verify(verifyRequest);
+            })
+        ).subscribe(response => {
+            if (response.message === "true") {
+                this.client.signature_valid = "gültig";
+            } else {
+                this.client.signature_valid = "ungültig";
+            }
+            this.dialogService.endTimedCalc(loadingCalcKey, "Nachricht entschlüsselt und verifiziert.");
         });
-    }
-
-    /**
-     * Sendet den Ciphertext an den anderen Partner und setzt die Felder zurück.
-     */
-    public send(): void {
-        if (!this.client.sendingTo) {
-            return;
-        }
-        this.client.sendingTo.ciphertext = this.client.ciphertext;
-        this.client.sendingTo.signature = this.client.signature;
-        this.client.sendingTo.receivedFrom = this.client;
-
-        this.clearFields();
-    }
-
-    public changeTargetClientTo(client: RsaClientData): void {
-        this.client.sendingTo = client;
-    }
-
-    public clearFields(): void {
-        this.client.plaintext = "";
-        this.client.ciphertext = "";
-        this.client.signature = "";
-        this.client.signature_valid = "ungeprüft";
     }
 }
