@@ -1,15 +1,15 @@
 import { AfterViewInit, Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import functionPlot from 'function-plot';
+import { FormsModule } from "@angular/forms";
 import {
     MatAccordion,
     MatExpansionPanel,
     MatExpansionPanelActionRow,
-    MatExpansionPanelDescription, MatExpansionPanelHeader, MatExpansionPanelTitle,
+    MatExpansionPanelDescription, MatExpansionPanelHeader, MatExpansionPanelTitle
 } from "@angular/material/expansion";
 import {MatButton} from "@angular/material/button";
 import {MatFormField, MatLabel} from "@angular/material/form-field";
 import {MatInput} from "@angular/material/input";
-import {FormsModule} from "@angular/forms";
 
 @Component({
     selector: 'app-display-curve',
@@ -28,31 +28,111 @@ import {FormsModule} from "@angular/forms";
         MatLabel
     ],
     templateUrl: './display-curve.component.html',
-    styleUrl: './display-curve.component.scss'
+    styleUrls: ['./display-curve.component.scss']
 })
-export class DisplayCurveComponent implements OnInit, AfterViewInit {
+export class DisplayCurveComponent implements OnInit {
 
-    @ViewChild('plotContainer') plotContainer!: ElementRef;
+    @ViewChild('plotContainerAdd') plotContainerAdd!: ElementRef;
+    @ViewChild('plotContainerMul') plotContainerMul!: ElementRef;
 
+    // Curve for Addition
     public a = -7;
     public b = 10;
+    // Point on Curve
     public P = { x: 1, y: 2 };
     public Q = { x: 3, y: 4 };
-    public R = { x: 0, y:  0};
+    // Result from point addition
+    public R = { x: 0, y: 0 };
 
-    constructor() {
+    // Curve for Multiplication
+    public a2 = -7;
+    public b2 = 10;
+    public n2 = 2;
+    public P2 = { x: 1, y: 2 };
+    // Result point from Multiplication
+    public Q2 = { x: -1, y: -4 };
+
+    constructor() { }
+
+    ngOnInit(): void { }
+
+    private checkIfPointIsOnCurve(x: number, y: number): boolean {
+        // y^2 = x^3 + ax + b
+        if (x == 0 && y == 0) {
+            return true; // point at infinity
+        }
+        return Math.pow(y, 2) === Math.pow(x, 3) + this.a * x + this.b;
     }
 
-    ngOnInit(): void {
+    private calculateYCoordinate(x: number): number {
+        return Math.sqrt(Math.pow(x, 3) + this.a * x + this.b);
     }
 
-    // needed for mouse movements on the graph
-    ngAfterViewInit(): void {
+    private calculateAdditionPointR(p: { x: number, y: number }, q: { x: number, y: number }): { x: number, y: number } {
+        let slope: number;
+        let x3: number;
+        let y3: number;
+
+        // Check if P or Q is the point at infinity
+        if ((p.x == 0 && p.y == 0) || (q.x == 0 && q.y == 0)) {
+            return (p.x == 0 && p.y == 0) ? q : p;
+        }
+
+        // Check if the tangent at P is vertical
+        if (p.x == q.x && p.y == q.y) {
+            if (p.y == 0) {
+                return { x: 0, y: 0 };
+            }
+        }
+
+        // Check if p.x != q.x and p.y + q.y != 0
+        if (p.x != q.x && p.y + q.y != 0) {
+            if (p.x != q.x) {
+                slope = (q.y - p.y) / (q.x - p.x);
+                x3 = Math.pow(slope, 2) - p.x - q.x;
+                y3 = -slope * (x3 - p.x) - p.y;
+                return { x: x3, y: y3 };
+            }
+            if (p.x == q.x && p.y == q.y && q.y != 0) {
+                slope = (3 * Math.pow(p.x, 2) + this.a) / (2 * p.y);
+                x3 = Math.pow(slope, 2) - 2 * p.x;
+                y3 = -slope * (x3 - p.x) - p.y;
+                return { x: x3, y: y3 };
+            }
+        }
+        return { x: 0, y: 0 };
+    }
+
+    private calculateMultiplicationPointR(p: { x: number, y: number }, n: number): { x: number, y: number } {
+        // let q = p;
+        //
+        // for (let i = 1; i <= n; i++) {
+        //     q = this.calculateAdditionPointR(p, q);
+        // }
+        // return q;
+
+        return { x: 0, y: 0 };
+    }
+
+    public add_calculation() {
+        if (!this.checkIfPointIsOnCurve(this.P.x, this.P.y)) {
+            this.P.y = this.calculateYCoordinate(this.P.x);
+        }
+        if (!this.checkIfPointIsOnCurve(this.Q.x, this.Q.y)) {
+            this.Q.y = this.calculateYCoordinate(this.Q.x);
+        }
+        this.R = this.calculateAdditionPointR(this.P, this.Q);
+        this.pointAdditionPlotCurve();
+    }
+
+    public mul_calculation() {
+        // this.Q2 = this.calculateMultiplicationPointR(this.P2, this.n2);
+        // this.pointMultiplicationPlotCurve();
     }
 
     private pointAdditionPlotCurve() {
         functionPlot({
-            target: this.plotContainer.nativeElement,
+            target: this.plotContainerAdd.nativeElement,
             width: 800,
             height: 600,
             yAxis: { domain: [-20, 20] },
@@ -66,7 +146,7 @@ export class DisplayCurveComponent implements OnInit, AfterViewInit {
                     closed: false,
                 },
                 {
-                    fn: `(${(this.Q.y - this.P.y) / (this.Q.x - this.P.x)}) * x + (${this.P.y - (this.Q.y - this.P.y) / 
+                    fn: `(${(this.Q.y - this.P.y) / (this.Q.x - this.P.x)}) * x + (${this.P.y - (this.Q.y - this.P.y) /
                     (this.Q.x - this.P.x) * this.P.x})`,
                     fnType: 'linear',
                     graphType: 'polyline',
@@ -86,65 +166,31 @@ export class DisplayCurveComponent implements OnInit, AfterViewInit {
                     color: 'black'
                 },
             ],
-            annotations: [
-                {
-                    x: this.P.x,
-                    y: this.P.y,
-                    text: `P (${this.P.x.toFixed(0)}, ${this.P.y.toFixed(0)})`
-                },
-                {
-                    x: this.Q.x,
-                    y: this.Q.y,
-                    text: `Q (${this.Q.x.toFixed(0)}, ${this.Q.y.toFixed(0)})`
-                },
-                {
-                    x: this.R.x,
-                    y: this.R.y,
-                    text: `R (${this.R.x.toFixed(0)}, ${this.R.y.toFixed(0)})`
-                }
-            ]
         });
     }
-    private calculatePointR(p: {x: number, y: number} , q: {x: number, y: number}): void {
-        let slope: number;
-        let x3: number;
-        let y3: number;
 
-        // Check if P or Q is the point at infinity
-        if ((p.x == 0 && p.y == 0) || (q.x == 0 && q.y == 0)) {
-            this.R = (p.x == 0 && p.y == 0) ? q : p;
-            return;
-        }
-
-        // Check if the tangent at P is vertical
-        if (p.x == q.x && p.y == q.y) {
-            if (p.y == 0) {
-                this.R = {x: 0, y: 0};  // infinity
-                return;
-            }
-        }
-
-        // Check if p.x != q.x and p.y + q.y != 0
-        if (p.x != q.x && p.y + q.y != 0) {
-            if (p.x != q.x) {
-                slope = (q.y - p.y) / (q.x - p.x);
-                x3 = Math.pow(slope, 2) - p.x - q.x;
-                y3 = -slope * (x3 - p.x) - p.y;
-                this.R = {x: x3, y: y3};
-                return;
-            }
-            if (p.x == q.x && p.y == q.y && q.y != 0){
-                slope = (3 * Math.pow(p.x, 2) + this.a) / (2 * p.y);
-                x3 = Math.pow(slope, 2) - 2 * p.x;
-                y3 = -slope * (x3 - p.x) - p.y;
-                this.R = {x: x3, y: y3};
-                return;
-            }
-        }
-    }
-
-    public calculate() {
-        this.calculatePointR(this.P, this.Q);
-        this.pointAdditionPlotCurve();
+    private pointMultiplicationPlotCurve() {
+        functionPlot({
+            target: this.plotContainerMul.nativeElement,
+            width: 800,
+            height: 600,
+            yAxis: { domain: [-20, 20] },
+            xAxis: { domain: [-20, 20] },
+            grid: true,
+            data: [
+                {
+                    fn: `y^2 - (x^3 + (${this.a2}) * x + ${this.b2})`,
+                    fnType: 'implicit',
+                    color: 'blue',
+                    closed: false,
+                },
+                {
+                    points: [[this.P2.x, this.P2.y], [this.Q2.x, this.Q2.y]],
+                    fnType: 'points',
+                    graphType: 'scatter',
+                    color: 'yellow',
+                },
+            ],
+        });
     }
 }
