@@ -30,7 +30,7 @@ use crate::math_core::traits::increment::Increment;
 #[derive(Clone, PartialEq, Debug)]
 pub struct SecureFiniteFieldEllipticCurve {
     /// Der Koeffizient a der elliptischen Kurve
-    pub a: i32,
+    pub a: i64,
     /// Der Modulus p der elliptischen Kurve, um sie über einem endlichen Körper zu definieren
     pub prime: BigInt,
     /// Die Ordnung der zyklischen Untergruppe / des Generators, in welcher das Problem des
@@ -64,7 +64,7 @@ impl SecureFiniteFieldEllipticCurve {
     /// - Eine zyklische Untergruppe der Ordnung q muss existieren, wobei für q gilt:
     /// -- q = N / 8, wobei N = |E(Z_p)| (Ordnung der Kurve) und
     /// -- q muss eine Primzahl sein
-    pub fn new(n: i32, modul_width: u32, miller_rabin_iterations: u32) -> Result<Self> {
+    pub fn new(n: i64, modul_width: u32, miller_rabin_iterations: u32) -> Result<Self> {
         if n.is_zero() {
             panic!("Der Koeffizient a darf nicht 0 sein!"); // TODO Error Handling
         }
@@ -132,7 +132,7 @@ impl SecureFiniteFieldEllipticCurve {
 
     pub fn calculate_p_and_q(
         prime: &BigInt,
-        n: i32,
+        n: i64,
         miller_rabin_iterations: u32,
     ) -> (BigInt, BigInt) {
         let double_n = BigInt::from(n).double();
@@ -174,7 +174,7 @@ impl SecureFiniteFieldEllipticCurve {
         }
     }
 
-    fn calculate_big_n(prime: &BigInt, n: i32) -> BigInt {
+    fn calculate_big_n(prime: &BigInt, n: i64) -> BigInt {
         let first_complex_number = ComplexNumber::new(prime.clone(), BigInt::zero());
         let second_complex_number =
             ComplexNumber::new(Self::calculate_w(&prime, 2.into()), BigInt::one());
@@ -212,7 +212,7 @@ impl SecureFiniteFieldEllipticCurve {
         w
     }
 
-    pub fn calculate_real_part(alpha: ComplexNumber, prime: &BigInt, n: i32) -> BigInt {
+    pub fn calculate_real_part(alpha: ComplexNumber, prime: &BigInt,    n: i64) -> BigInt {
         let mut count = 4;
         let mut alpha = alpha.clone();
         // Schleife, die alle möglichen Konjugationen von alpha durchgeht
@@ -285,7 +285,7 @@ impl SecureFiniteFieldEllipticCurve {
 
     pub fn calculate_signature_generator(
         prime: &BigInt,
-        a: i32,
+        a: i64,
         q: &BigInt,
         curve: &SecureFiniteFieldEllipticCurve,
         counter: &RelaxedCounter,
