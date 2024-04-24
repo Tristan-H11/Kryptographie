@@ -9,45 +9,45 @@
         <div class="coordinate-inputs">
         <mat-form-field appearance="outline" class="full-width">
             <mat-label>Kurvenparameter A</mat-label>
-            <input matInput placeholder="Wert von A eingeben" type="number" [(ngModel)]="a">
+            <input matInput placeholder="Wert von A eingeben" type="number" [(ngModel)]="a_add">
         </mat-form-field>
 
         <mat-form-field appearance="outline" class="full-width">
             <mat-label>Kurvenparameter B</mat-label>
-            <input matInput placeholder="Wert von B eingeben" type="number" [(ngModel)]="b">
+            <input matInput placeholder="Wert von B eingeben" type="number" [(ngModel)]="b_add">
         </mat-form-field>
         </div>
         <div class="coordinate-inputs">
             <mat-form-field appearance="outline" class="full-width">
                 <mat-label>X-Koordinate von P</mat-label>
-                <input matInput placeholder="X-Wert von P" type="number" [(ngModel)]="P.x">
+                <input matInput placeholder="X-Wert von P" type="number" [(ngModel)]="P_add.x">
             </mat-form-field>
 
             <mat-form-field appearance="outline" class="full-width">
                 <mat-label>Y-Koordinate von P</mat-label>
-                <input matInput placeholder="Y-Wert von P" type="number" [(ngModel)]="P.y">
+                <input matInput placeholder="Y-Wert von P" type="number" [(ngModel)]="P_add.y">
             </mat-form-field>
         </div>
         <div class="coordinate-inputs">
             <mat-form-field appearance="outline" class="full-width">
                 <mat-label>X-Koordinate von Q</mat-label>
-                <input matInput placeholder="X-Wert von P" type="number" [(ngModel)]="Q.x">
+                <input matInput placeholder="X-Wert von P" type="number" [(ngModel)]="Q_add.x">
             </mat-form-field>
 
             <mat-form-field appearance="outline" class="full-width">
                 <mat-label>Y-Koordinate von Q</mat-label>
-                <input matInput placeholder="Y-Wert von P" type="number" [(ngModel)]="Q.y">
+                <input matInput placeholder="Y-Wert von P" type="number" [(ngModel)]="Q_add.y">
             </mat-form-field>
         </div>
         <div class="coordinate-inputs">
             <mat-form-field appearance="outline" class="full-width">
                 <mat-label>X-Koordinate von R</mat-label>
-                <input matInput type="number" placeholder="X-Wert von R" [(ngModel)]="R.x" disabled>
+                <input matInput placeholder="X-Wert von R" [(ngModel)]="R_add.x" readonly>
             </mat-form-field>
 
             <mat-form-field appearance="outline" class="full-width">
                 <mat-label>Y-Koordinate von R</mat-label>
-                <input matInput type="number" placeholder="Y-Wert von R" [(ngModel)]="R.y" disabled>
+                <input matInput placeholder="Y-Wert von R" [(ngModel)]="R_add.y" readonly>
             </mat-form-field>
         </div>
         <mat-action-row>
@@ -61,46 +61,46 @@
     <mat-expansion-panel expanded>
         <mat-expansion-panel-header>
             <mat-panel-title>
-                Multiplikation auf eliptischen Kurven
+                Skalarmultiplikation von Punkten auf elliptischen Kurven
             </mat-panel-title>
         </mat-expansion-panel-header>
 
         <div class="coordinate-inputs">
             <mat-form-field appearance="outline" class="full-width">
                 <mat-label>Kurvenparameter A</mat-label>
-                <input matInput placeholder="Wert von A eingeben" type="number" [(ngModel)]="a2">
+                <input matInput placeholder="Wert von A eingeben" type="number" [(ngModel)]="a_mul">
             </mat-form-field>
 
             <mat-form-field appearance="outline" class="full-width">
                 <mat-label>Kurvenparameter B</mat-label>
-                <input matInput placeholder="Wert von B eingeben" type="number" [(ngModel)]="b2">
+                <input matInput placeholder="Wert von B eingeben" type="number" [(ngModel)]="b_mul">
             </mat-form-field>
 
             <mat-form-field appearance="outline" class="full-width">
-                <mat-label>Parameter N</mat-label>
-                <input matInput placeholder="Wert von B eingeben" type="number" [(ngModel)]="n2">
+                <mat-label>Parameter N (multiplikator)</mat-label>
+                <input matInput placeholder="Wert von B eingeben" type="number" [(ngModel)]="n_mul">
             </mat-form-field>
         </div>
         <div class="coordinate-inputs">
             <mat-form-field appearance="outline" class="full-width">
                 <mat-label>X-Koordinate von P</mat-label>
-                <input matInput placeholder="X-Wert von P" type="number" [(ngModel)]="P2.x">
+                <input matInput placeholder="X-Wert von P" type="number" [(ngModel)]="P_mul.x">
             </mat-form-field>
 
             <mat-form-field appearance="outline" class="full-width">
                 <mat-label>Y-Koordinate von P</mat-label>
-                <input matInput placeholder="Y-Wert von P" type="number" [(ngModel)]="P2.y">
+                <input matInput placeholder="Y-Wert von P" type="number" [(ngModel)]="P_mul.y">
             </mat-form-field>
         </div>
         <div class="coordinate-inputs">
             <mat-form-field appearance="outline" class="full-width">
                 <mat-label>X-Koordinate von Q</mat-label>
-                <input matInput placeholder="X-Wert von P" type="number" [(ngModel)]="Q2.x" disabled>
+                <input matInput placeholder="X-Wert von P" [(ngModel)]="Q_mul.x" readonly>
             </mat-form-field>
 
             <mat-form-field appearance="outline" class="full-width">
                 <mat-label>Y-Koordinate von Q</mat-label>
-                <input matInput placeholder="Y-Wert von P" type="number" [(ngModel)]="Q2.y" disabled>
+                <input matInput placeholder="Y-Wert von P" [(ngModel)]="Q_mul.y" readonly>
             </mat-form-field>
         </div>
         <mat-action-row>
