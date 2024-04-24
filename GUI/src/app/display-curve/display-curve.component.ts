@@ -11,6 +11,10 @@ import {MatButton} from "@angular/material/button";
 import {MatFormField, MatLabel} from "@angular/material/form-field";
 import {MatInput} from "@angular/material/input";
 
+class Point {
+    constructor(public x: number, public y: number) {}
+}
+
 @Component({
     selector: 'app-display-curve',
     standalone: true,
@@ -36,52 +40,54 @@ export class DisplayCurveComponent implements OnInit {
     @ViewChild('plotContainerMul') plotContainerMul!: ElementRef;
 
     // Curve for Addition
-    public a = -7;
-    public b = 10;
+    public a_add = -7;
+    public b_add = 10;
     // Point on Curve
-    public P = { x: 1, y: 2 };
-    public Q = { x: 3, y: 4 };
+    public P_add = new Point(1, 2);
+    public Q_add = new Point(3, 4);
     // Result from point addition
-    public R = { x: 0, y: 0 };
+    public R_add = new Point(0, 0);
 
     // Curve for Multiplication
-    public a2 = -7;
-    public b2 = 10;
-    public n2 = 2;
-    public P2 = { x: 1, y: 2 };
+    public a_mul = -7;
+    public b_mul = 10;
+    public n_mul = 2;
+    public P_mul = new Point(1, 2);
     // Result point from Multiplication
-    public Q2 = { x: -1, y: -4 };
+    public Q_mul = new Point(-1, -4);
 
     constructor() { }
 
     ngOnInit(): void { }
 
-    private checkIfPointIsOnCurve(x: number, y: number): boolean {
+    private checkIfPointIsOnCurve(p: Point): boolean {
         // y^2 = x^3 + ax + b
-        if (x == 0 && y == 0) {
+        if (p.x == 0 && p.y == 0) {
             return true; // point at infinity
         }
-        return Math.pow(y, 2) === Math.pow(x, 3) + this.a * x + this.b;
+        return Math.pow(p.y, 2) === Math.pow(p.x, 3) + this.a_add * p.x + this.b_add;
     }
 
     private calculateYCoordinate(x: number): number {
-        return Math.sqrt(Math.pow(x, 3) + this.a * x + this.b);
+        return Math.sqrt(Math.pow(x, 3) + this.a_add * x + this.b_add);
     }
 
-    private calculateAdditionPointR(p: { x: number, y: number }, q: { x: number, y: number }): { x: number, y: number } {
+    private calculateAdditionPointR(p: Point, q: Point): Point {
         let slope: number;
         let x3: number;
         let y3: number;
 
         // Check if P or Q is the point at infinity
-        if ((p.x == 0 && p.y == 0) || (q.x == 0 && q.y == 0)) {
-            return (p.x == 0 && p.y == 0) ? q : p;
+        if (p.x == 0 && p.y == 0)
+            return q;
+        if (q.x == 0 && q.y == 0) {
+            return p;
         }
 
         // Check if the tangent at P is vertical
         if (p.x == q.x && p.y == q.y) {
             if (p.y == 0) {
-                return { x: 0, y: 0 };
+                return new Point(0, 0);
             }
         }
 
@@ -91,19 +97,20 @@ export class DisplayCurveComponent implements OnInit {
                 slope = (q.y - p.y) / (q.x - p.x);
                 x3 = Math.pow(slope, 2) - p.x - q.x;
                 y3 = -slope * (x3 - p.x) - p.y;
-                return { x: x3, y: y3 };
+                return new Point(x3, y3);
             }
             if (p.x == q.x && p.y == q.y && q.y != 0) {
-                slope = (3 * Math.pow(p.x, 2) + this.a) / (2 * p.y);
+                slope = (3 * Math.pow(p.x, 2) + this.a_add) / (2 * p.y);
                 x3 = Math.pow(slope, 2) - 2 * p.x;
                 y3 = -slope * (x3 - p.x) - p.y;
-                return { x: x3, y: y3 };
+                return new Point(x3, y3);
             }
         }
-        return { x: 0, y: 0 };
+        return new Point(0, 0);
     }
 
-    private calculateMultiplicationPointR(p: { x: number, y: number }, n: number): { x: number, y: number } {
+
+    private calculateMultiplicationPointR(p: Point, n: number): Point {
         // let q = p;
         //
         // for (let i = 1; i <= n; i++) {
@@ -111,17 +118,17 @@ export class DisplayCurveComponent implements OnInit {
         // }
         // return q;
 
-        return { x: 0, y: 0 };
+        return new Point(0, 0);
     }
 
     public add_calculation() {
-        if (!this.checkIfPointIsOnCurve(this.P.x, this.P.y)) {
-            this.P.y = this.calculateYCoordinate(this.P.x);
+        if (!this.checkIfPointIsOnCurve(this.P_add)) {
+            this.P_add.y = this.calculateYCoordinate(this.P_add.x);
         }
-        if (!this.checkIfPointIsOnCurve(this.Q.x, this.Q.y)) {
-            this.Q.y = this.calculateYCoordinate(this.Q.x);
+        if (!this.checkIfPointIsOnCurve(this.Q_add)) {
+            this.Q_add.y = this.calculateYCoordinate(this.Q_add.x);
         }
-        this.R = this.calculateAdditionPointR(this.P, this.Q);
+        this.R_add = this.calculateAdditionPointR(this.P_add, this.Q_add);
         this.pointAdditionPlotCurve();
     }
 
@@ -140,27 +147,27 @@ export class DisplayCurveComponent implements OnInit {
             grid: true,
             data: [
                 {
-                    fn: `y^2 - (x^3 + (${this.a}) * x + ${this.b})`,
+                    fn: `y^2 - (x^3 + (${this.a_add}) * x + ${this.b_add})`,
                     fnType: 'implicit',
                     color: 'blue',
                     closed: false,
                 },
                 {
-                    fn: `(${(this.Q.y - this.P.y) / (this.Q.x - this.P.x)}) * x + (${this.P.y - (this.Q.y - this.P.y) /
-                    (this.Q.x - this.P.x) * this.P.x})`,
+                    fn: `(${(this.Q_add.y - this.P_add.y) / (this.Q_add.x - this.P_add.x)}) * x + (${this.P_add.y - (this.Q_add.y - this.P_add.y) /
+                    (this.Q_add.x - this.P_add.x) * this.P_add.x})`,
                     fnType: 'linear',
                     graphType: 'polyline',
                     color: 'red'
                 },
                 {
-                    points: [[this.P.x, this.P.y], [this.Q.x, this.Q.y], [this.R.x, this.R.y]],
+                    points: [[this.P_add.x, this.P_add.y], [this.Q_add.x, this.Q_add.y], [this.R_add.x, this.R_add.y]],
                     fnType: 'points',
                     graphType: 'scatter',
                     color: 'yellow',
                 },
                 {
-                    vector: [0, 2 * this.R.y],
-                    offset: [this.R.x, -this.R.y],
+                    vector: [0, 2 * this.R_add.y],
+                    offset: [this.R_add.x, -this.R_add.y],
                     fnType: 'vector',
                     graphType: 'polyline',
                     color: 'black'
@@ -179,13 +186,13 @@ export class DisplayCurveComponent implements OnInit {
             grid: true,
             data: [
                 {
-                    fn: `y^2 - (x^3 + (${this.a2}) * x + ${this.b2})`,
+                    fn: `y^2 - (x^3 + (${this.a_mul}) * x + ${this.b_mul})`,
                     fnType: 'implicit',
                     color: 'blue',
                     closed: false,
                 },
                 {
-                    points: [[this.P2.x, this.P2.y], [this.Q2.x, this.Q2.y]],
+                    points: [[this.P_mul.x, this.P_mul.y], [this.Q_mul.x, this.Q_mul.y]],
                     fnType: 'points',
                     graphType: 'scatter',
                     color: 'yellow',
