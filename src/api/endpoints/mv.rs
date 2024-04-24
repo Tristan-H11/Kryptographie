@@ -37,7 +37,7 @@ pub struct MvCreateKeyPairRequestBean {
 
 #[derive(Serialize, Deserialize, Clone)]
 pub struct EllipticCurveBean {
-    pub a: i32,
+    pub a: i64,
     pub prime: String,
     pub order_of_subgroup: String,
     pub generator: EcPointBean,
