@@ -1,0 +1,112 @@
+<mat-accordion multi>
+    <mat-expansion-panel expanded>
+        <mat-expansion-panel-header>
+            <mat-panel-title>
+                Addition auf eliptischen Kurven
+            </mat-panel-title>
+        </mat-expansion-panel-header>
+
+        <div class="coordinate-inputs">
+        <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Kurvenparameter A</mat-label>
+            <input matInput placeholder="Wert von A eingeben" type="number" [(ngModel)]="a_add">
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Kurvenparameter B</mat-label>
+            <input matInput placeholder="Wert von B eingeben" type="number" [(ngModel)]="b_add">
+        </mat-form-field>
+        </div>
+        <div class="coordinate-inputs">
+            <mat-form-field appearance="outline" class="full-width">
+                <mat-label>X-Koordinate von P</mat-label>
+                <input matInput placeholder="X-Wert von P" type="number" [(ngModel)]="P_add.x">
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="full-width">
+                <mat-label>Y-Koordinate von P</mat-label>
+                <input matInput placeholder="Y-Wert von P" type="number" [(ngModel)]="P_add.y">
+            </mat-form-field>
+        </div>
+        <div class="coordinate-inputs">
+            <mat-form-field appearance="outline" class="full-width">
+                <mat-label>X-Koordinate von Q</mat-label>
+                <input matInput placeholder="X-Wert von P" type="number" [(ngModel)]="Q_add.x">
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="full-width">
+                <mat-label>Y-Koordinate von Q</mat-label>
+                <input matInput placeholder="Y-Wert von P" type="number" [(ngModel)]="Q_add.y">
+            </mat-form-field>
+        </div>
+        <div class="coordinate-inputs">
+            <mat-form-field appearance="outline" class="full-width">
+                <mat-label>X-Koordinate von R</mat-label>
+                <input matInput placeholder="X-Wert von R" [(ngModel)]="R_add.x" readonly>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="full-width">
+                <mat-label>Y-Koordinate von R</mat-label>
+                <input matInput placeholder="Y-Wert von R" [(ngModel)]="R_add.y" readonly>
+            </mat-form-field>
+        </div>
+        <mat-action-row>
+            <button mat-raised-button color="primary" (click)="add_calculation()">Berechnen</button>
+        </mat-action-row>
+    </mat-expansion-panel>
+</mat-accordion>
+<div #plotContainerAdd id="plot-container-add" class="plot-container"></div>
+
+<mat-accordion multi>
+    <mat-expansion-panel expanded>
+        <mat-expansion-panel-header>
+            <mat-panel-title>
+                Skalarmultiplikation von Punkten auf elliptischen Kurven
+            </mat-panel-title>
+        </mat-expansion-panel-header>
+
+        <div class="coordinate-inputs">
+            <mat-form-field appearance="outline" class="full-width">
+                <mat-label>Kurvenparameter A</mat-label>
+                <input matInput placeholder="Wert von A eingeben" type="number" [(ngModel)]="a_mul">
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="full-width">
+                <mat-label>Kurvenparameter B</mat-label>
+                <input matInput placeholder="Wert von B eingeben" type="number" [(ngModel)]="b_mul">
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="full-width">
+                <mat-label>Parameter N (multiplikator)</mat-label>
+                <input matInput placeholder="Wert von B eingeben" type="number" [(ngModel)]="n_mul">
+            </mat-form-field>
+        </div>
+        <div class="coordinate-inputs">
+            <mat-form-field appearance="outline" class="full-width">
+                <mat-label>X-Koordinate von P</mat-label>
+                <input matInput placeholder="X-Wert von P" type="number" [(ngModel)]="P_mul.x">
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="full-width">
+                <mat-label>Y-Koordinate von P</mat-label>
+                <input matInput placeholder="Y-Wert von P" type="number" [(ngModel)]="P_mul.y">
+            </mat-form-field>
+        </div>
+        <div class="coordinate-inputs">
+            <mat-form-field appearance="outline" class="full-width">
+                <mat-label>X-Koordinate von Q</mat-label>
+                <input matInput placeholder="X-Wert von P" [(ngModel)]="Q_mul.x" readonly>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="full-width">
+                <mat-label>Y-Koordinate von Q</mat-label>
+                <input matInput placeholder="Y-Wert von P" [(ngModel)]="Q_mul.y" readonly>
+            </mat-form-field>
+        </div>
+        <mat-action-row>
+            <button mat-raised-button color="primary" (click)="mul_calculation()">Berechnen</button>
+        </mat-action-row>
+    </mat-expansion-panel>
+</mat-accordion>
+
+<div #plotContainerMul id="plot-container-mul" class="plot-container"></div>
