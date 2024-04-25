@@ -78,7 +78,7 @@ export class DisplayCurveComponent implements OnInit {
         return Math.sqrt(Math.pow(x, 3) + this.a_add * x + this.b_add);
     }
 
-    private calculateAdditionPointR(p: Point, q: Point): Point {
+    private calculatePointAddition(p: Point, q: Point): Point {
         let slope: number;
         let x3: number;
         let y3: number;
@@ -107,11 +107,6 @@ export class DisplayCurveComponent implements OnInit {
         return new Point(0, 0);
     }
 
-    private calculateMultiplicationPointR(p: Point, n: number): Point {
-        //todo
-        return new Point(0, 0);
-    }
-
     public add_calculation() {
         if (!this.checkIfPointIsOnCurve(this.P_add, this.a_add, this.b_add)) {
             if (!this.checkNeutralElement(this.P_add, this.Q_add)) {
@@ -129,11 +124,26 @@ export class DisplayCurveComponent implements OnInit {
                 return;
             }
         }
-        this.R_add = this.calculateAdditionPointR(this.P_add, this.Q_add);
+        this.R_add = this.calculatePointAddition(this.P_add, this.Q_add);
         this.pointAdditionPlotCurve();
     }
 
     public mul_calculation() {
+        if (!this.checkIfPointIsOnCurve(this.P_mul, this.a_mul, this.b_mul)) {
+            this.P_mul.y = this.calculateYCoordinate(this.P_mul.x);
+        }
+        this.Q_mul = this.P_mul;
+        for (let i = 1; i < this.n_mul; i++) {
+            this.mul_calculation_step();
+        }
+        this.pointMultiplicationPlotCurve();
+    }
+
+    public mul_calculation_step() {
+        if (!this.checkIfPointIsOnCurve(this.Q_mul, this.a_mul, this.b_mul)) {
+            this.Q_mul.y = this.calculateYCoordinate(this.Q_mul.x);
+        }
+        this.Q_mul = this.calculatePointAddition(this.P_mul, this.Q_mul);
     }
 
     private pointAdditionPlotCurve() {
