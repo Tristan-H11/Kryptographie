@@ -1,5 +1,6 @@
 import {NgModule} from "@angular/core";
 import {RouterModule, Routes} from "@angular/router";
+import {DisplayCurveComponent} from "./display-curve/display-curve.component";
 
 export const routes: Routes = [
     {
@@ -33,6 +34,10 @@ export const routes: Routes = [
     {
         path: `multiplication`,
         loadComponent: () => import("./math-components/multiplication/multiplication.component").then(m => m.MultiplicationComponent)
+    },
+    {
+        path: "display-curve",
+        loadComponent: () => import("./display-curve/display-curve.component").then(m => m.DisplayCurveComponent)
     },
     {
         path: "",
