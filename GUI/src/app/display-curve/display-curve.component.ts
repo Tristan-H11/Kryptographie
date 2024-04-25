@@ -117,7 +117,7 @@ export class DisplayCurveComponent implements OnInit {
             if (!this.checkNeutralElement(this.P_add, this.Q_add)) {
                 this.P_add.y = this.calculateYCoordinate(this.P_add.x);
             } else {
-                this.dialogService.showErrorDialog("Nullpounkt, kein Diagramm möglich, ändern Sie die Punktwerte.");
+                this.dialogService.showErrorDialog("Nullpunkt, kein Diagramm möglich, ändern Sie die Punktwerte.");
                 return;
             }
         }
@@ -125,7 +125,7 @@ export class DisplayCurveComponent implements OnInit {
             if (!this.checkNeutralElement(this.P_add, this.Q_add)) {
                 this.Q_add.y = this.calculateYCoordinate(this.Q_add.x);
             } else {
-                this.dialogService.showErrorDialog("Nullpounkt, kein Diagramm möglich, ändern Sie die Punktwerte.");
+                this.dialogService.showErrorDialog("Nullpunkt, kein Diagramm möglich, ändern Sie die Punktwerte.");
                 return;
             }
         }
