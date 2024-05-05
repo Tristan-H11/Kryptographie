@@ -26,8 +26,8 @@ impl From<EcPointBean> for FiniteFieldEllipticCurvePoint {
     /// Mapped die Bean in das Domain-Modell
     fn from(point: EcPointBean) -> Self {
         Self {
-            x: point.x.parse().unwrap(),
-            y: point.y.parse().unwrap(),
+            x: point.x.parse().unwrap(), // TODO .unwrap() durch turbofish ersetzen ? --> .parse()::<BigFloat>()
+            y: point.y.parse().unwrap(), // TODO .unwrap() durch turbofish ersetzen ? --> .parse()::<BigFloat>()
             is_infinite: point.is_infinite,
         }
     }
