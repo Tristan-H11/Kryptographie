@@ -161,7 +161,7 @@ impl SecureFiniteFieldEllipticCurve {
                 {
                     break;
                 }
-                // Treffen diese Bedingungen nicht zu, wird kongruenzerhaltend eine neue getestet.
+                // Treffen diese Bedingungen nicht zu, wird kongruenz erhaltend eine neue getestet.
                 prime.add_assign(BigInt::from(8));
             }
 
