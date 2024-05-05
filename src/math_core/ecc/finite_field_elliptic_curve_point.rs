@@ -302,4 +302,12 @@ mod tests {
         assert_eq!(result, expected);
     }
 
+    #[test]
+    fn test_add_point_to_infinity() {
+        let curve = get_curve();
+        let generator = curve.generator.clone();
+        let infinity = FiniteFieldEllipticCurvePoint::infinite();
+        let result = generator.add(&infinity, &curve).unwrap();
+        assert_eq!(result, generator);
+    }
 }
