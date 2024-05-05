@@ -468,4 +468,17 @@ mod tests {
         assert!(curve.has_point(&point));
     }
 
+    #[test]
+    fn test_calculate_legendre_symbol() {
+        let prime = BigInt::from(13);
+        // Test mit quadratischem Rest
+        let legendre_symbol_1 = SecureFiniteFieldEllipticCurve::calculate_legendre_symbol(&12.into(), &prime); // Satz 1.18
+        assert_eq!(legendre_symbol_1, BigInt::one());
+        // Test mit quadratischem Nichtrest
+        let legendre_symbol_2 = SecureFiniteFieldEllipticCurve::calculate_legendre_symbol(&2.into(), &prime); // Satz 1.19
+        assert_eq!(legendre_symbol_2, BigInt::from(-1));
+        // Test mit a = 0 (Punkt liegt auf der y-Achse)
+        let legendre_symbol_3 = SecureFiniteFieldEllipticCurve::calculate_legendre_symbol(&BigInt::zero(), &prime); // Definition 1.27 Punkt 2
+        assert_eq!(legendre_symbol_3, BigInt::zero());
+    }
 }
