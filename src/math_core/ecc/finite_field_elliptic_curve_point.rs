@@ -290,4 +290,16 @@ mod tests {
         let expected = FiniteFieldEllipticCurvePoint::infinite();
         assert_eq!(result, expected);
     }
+
+    #[test]
+    fn test_multiply_by_large_scalar() { // 1000 is 1111101000 in binary
+        let curve = get_curve();
+        let generator = curve.generator.clone();
+        let large_scalar = BigInt::from(1000);
+        // Multiplying the generator by a large scalar
+        let result = generator.multiply(&large_scalar, &curve).unwrap();
+        let expected = generator.multiply(&BigInt::from(1000), &curve).unwrap();
+        assert_eq!(result, expected);
+    }
+
 }
