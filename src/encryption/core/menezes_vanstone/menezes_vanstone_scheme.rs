@@ -399,4 +399,13 @@ mod tests {
         let result = MenezesVanstoneScheme::generate_keypair(0, 128, 40, 123);
         assert!(result.is_err());
     }
+
+    #[test]
+    fn test_invalid_modulus_width_error() {
+        // Testet, ob ein Fehler zurückgegeben wird, wenn die Breite des Moduls <= 3 ist
+        let result = MenezesVanstoneScheme::generate_keypair(5, 3, 40, 123);
+        assert!(result.is_err());
+    }
+
+
 }
