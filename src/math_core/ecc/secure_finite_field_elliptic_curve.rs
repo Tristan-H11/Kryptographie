@@ -451,4 +451,17 @@ mod tests {
         let point_at_infinity = FiniteFieldEllipticCurvePoint::new(BigInt::zero(), BigInt::zero());
         assert!(curve.has_point(&point_at_infinity));
     }
+
+    #[test]
+    fn test_has_point_on_curve_with_negative_a() {
+        let curve = SecureFiniteFieldEllipticCurve::new(-3, 17, 40).unwrap();
+        let point = curve.generator.multiply(&3.into(), &curve).unwrap();
+        // (5, 8) liegt auf y^2 = x^3 + 7 (mod 17)
+        assert!(curve.has_point(&point));
+
+        let point = FiniteFieldEllipticCurvePoint::new(0.into(), 0.into());
+        // (5, 8) liegt auf y^2 = x^3 + 7 (mod 17)
+        assert!(curve.has_point(&point));
+    }
+
 }
