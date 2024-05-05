@@ -355,9 +355,8 @@ impl SecureFiniteFieldEllipticCurve {
         Ok(generator)
     }
 
-    ///
+
     /// Überprüft, ob ein Punkt auf der elliptischen Kurve liegt.
-    ///
     pub fn has_point(&self, point: &FiniteFieldEllipticCurvePoint) -> bool {
         let x_squared = &point.x.pow(2);
         let x_cubed = &point.x * x_squared;
