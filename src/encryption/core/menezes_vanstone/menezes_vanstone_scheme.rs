@@ -392,4 +392,11 @@ mod tests {
         .unwrap();
         assert!(is_verified);
     }
+
+    #[test]
+    fn test_invalid_n_value_error() {
+        // Testet, ob ein Fehler zurückgegeben wird, wenn n = 0 ist
+        let result = MenezesVanstoneScheme::generate_keypair(0, 128, 40, 123);
+        assert!(result.is_err());
+    }
 }
