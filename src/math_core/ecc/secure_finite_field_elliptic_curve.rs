@@ -59,7 +59,7 @@ impl SecureFiniteFieldEllipticCurve {
     /// erfüllen:
     /// - Es muss gelten n > 0,
     /// - Es muss für den Modulus p gelten, dass
-    /// -- p mod 8 = 5 und
+    /// -- p ≡ 5 mod 8 und
     /// -- p nicht 2*n teilt (2n mod p != 0)
     /// - Eine zyklische Untergruppe der Ordnung q muss existieren, wobei für q gilt:
     /// -- q = N / 8, wobei N = |E(Z_p)| (Ordnung der Kurve) und
