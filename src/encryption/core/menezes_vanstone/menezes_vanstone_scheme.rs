@@ -141,13 +141,6 @@ impl AsymmetricEncryptor<MenezesVanstoneScheme> for MenezesVanstoneScheme {
         let m2 = &plaintext.second;
         let prime = &key.curve.prime;
 
-        // TODO Der Seed für die Generierung der Zufallszahl für das Verschlüsseln der Nachricht
-        // wird vorerst aus der aktuellen Systemzeit generiert und auf 2^16 begrenzt.
-        // let random_seed = SystemTime::now()
-        //     .duration_since(SystemTime::UNIX_EPOCH)
-        //     .unwrap()
-        //     .as_secs() as u16;
-
         // Random Seed from safe crypto source rand crate
         let mut rng = rand::thread_rng();
         let random_seed:u16 = rng.next_u32() as u16;
