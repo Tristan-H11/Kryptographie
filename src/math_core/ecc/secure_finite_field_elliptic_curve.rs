@@ -151,7 +151,7 @@ impl SecureFiniteFieldEllipticCurve {
             loop {
                 // Wenn die Primzahl folgende Bedingungen erfüllt, so genügt sie dem Verfahren:
                 // 1. Sie ist eine Primzahl
-                // 2. Sie ist ein quadratischer Rest zu p, also n^((p-1)/2) = 1 (mod p)
+                // 2. Sie ist ein quadratischer Rest zu p, also n^((p-1)/2) = 1 (mod p) -- Skript Satz 1.15
                 // 3. Sie ist kein Vielfaches von 2n
                 if service.is_probably_prime(&prime, miller_rabin_iterations, &prng)
                     && service
@@ -249,6 +249,7 @@ impl SecureFiniteFieldEllipticCurve {
     }
 
     //TODO Doku: Nach Satz 1.15 und Definition 1.27 (Kryptographie 2)
+    /// Für jede p Element P > 2 & p Teilerfremd c gilt: (c / p) Kongruent c^((p-1)/2) (mod p)
     //TODO Auch aufnehmen, dass b eine Primzahl > 3 sein muss
     pub fn calculate_legendre_symbol(a: &BigInt, prime: &BigInt) -> BigInt {
         let service = NumberTheoryService::new(Fast); // TODO übergeben lassen
