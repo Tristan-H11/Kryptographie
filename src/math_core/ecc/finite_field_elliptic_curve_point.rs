@@ -176,19 +176,8 @@ impl FiniteFieldEllipticCurvePoint {
             return self.clone();
         }
 
-        let mut x = self.x.clone();
-        let mut y = self.y.clone();
-
-        // Ggf muss hier mal ein while statt einem if hin, um "vielfach zu tiefe" Zahlen abzufangen? -- NEIN, wenn while, dann endloser loop
-        if x < BigInt::zero() {
-          x += prime;
-        }
-        if y < BigInt::zero() {
-          y += prime;
-        }
-
-        let normalized_x = x.rem_euclid(prime);
-        let normalized_y = y.rem_euclid(prime);
+        let normalized_x = self.x.clone().rem_euclid(prime);
+        let normalized_y = self.y.clone().rem_euclid(prime);
         FiniteFieldEllipticCurvePoint::new(normalized_x, normalized_y)
     }
 }
