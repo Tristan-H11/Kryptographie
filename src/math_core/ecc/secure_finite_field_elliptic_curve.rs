@@ -1,7 +1,7 @@
 use std::ops::{AddAssign, Div, Neg};
 
 use crate::api::endpoints::mv::EllipticCurveBean;
-use anyhow::{Context, Result};
+use anyhow::{Context, ensure, Result};
 use atomic_counter::RelaxedCounter;
 use bigdecimal::num_bigint::BigInt;
 use bigdecimal::num_traits::Euclid;
@@ -65,12 +65,16 @@ impl SecureFiniteFieldEllipticCurve {
     /// -- q = N / 8, wobei N = |E(Z_p)| (Ordnung der Kurve) und
     /// -- q muss eine Primzahl sein
     pub fn new(n: i64, modul_width: u32, miller_rabin_iterations: u32) -> Result<Self> {
-        if n.is_zero() {
-            panic!("Der Koeffizient a darf nicht 0 sein!"); // TODO Error Handling
-        }
-        if modul_width < 4u32 {
-            panic!("Der Modulus p muss mindestens 4 Bit breit sein!"); // TODO Error Handling
-        }
+        // if n.is_zero() {
+        //     panic!("Der Koeffizient a darf nicht 0 sein!"); // TODO Error Handling
+        // }
+        // if modul_width < 4u32 {
+        //     panic!("Der Modulus p muss mindestens 4 Bit breit sein!"); // TODO Error Handling
+        // }
+
+        ensure!(n != 0, "Der Koeffizient a darf nicht 0 sein!"); // Returns an error if the condition is not satisfied
+        ensure!(modul_width >= 4, "Der Modulus p muss mindestens 4 Bit breit sein!");
+
         let a = n.pow(2).neg();
 
         // Wird für einen späteren Vergleich benötigt
