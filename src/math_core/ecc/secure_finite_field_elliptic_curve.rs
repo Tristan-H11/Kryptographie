@@ -289,7 +289,8 @@ impl SecureFiniteFieldEllipticCurve {
         }
 
         // legendre_symbol = a ^ ((b - 1) / 2) (mod b)
-        let legendre_symbol = service.fast_exponentiation(&a, &prime.decrement().half(), &prime);
+        let exponent = prime.decrement().half();
+        let legendre_symbol = service.fast_exponentiation(&a, &exponent, &prime);
 
         if legendre_symbol.is_one() {
             BigInt::one()
