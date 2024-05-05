@@ -7,6 +7,7 @@ use atomic_counter::RelaxedCounter;
 use bigdecimal::num_bigint::BigInt;
 use bigdecimal::num_traits::Euclid;
 use bigdecimal::Zero;
+use rand::RngCore;
 
 use crate::encryption::asymmetric_encryption_types::{
     AsymmetricDecryptor, AsymmetricEncryptionScheme, AsymmetricEncryptor, Signer, Verifier,
@@ -142,10 +143,15 @@ impl AsymmetricEncryptor<MenezesVanstoneScheme> for MenezesVanstoneScheme {
 
         // TODO Der Seed für die Generierung der Zufallszahl für das Verschlüsseln der Nachricht
         // wird vorerst aus der aktuellen Systemzeit generiert und auf 2^16 begrenzt.
-        let random_seed = SystemTime::now()
-            .duration_since(SystemTime::UNIX_EPOCH)
-            .unwrap()
-            .as_secs() as u16;
+        // let random_seed = SystemTime::now()
+        //     .duration_since(SystemTime::UNIX_EPOCH)
+        //     .unwrap()
+        //     .as_secs() as u16;
+
+        // Random Seed from safe crypto source rand crate
+        let mut rng = rand::thread_rng();
+        let random_seed:u16 = rng.next_u32() as u16;
+
         let random_generator = PseudoRandomNumberGenerator::new(random_seed as u32, service);
         let counter = RelaxedCounter::new(1);
         let curve = &key.curve;
