@@ -116,7 +116,7 @@ impl FiniteFieldEllipticCurvePoint {
         let service = NumberTheoryService::new(Fast); // TODO X: Später korrigieren
         let p = &curve.prime;
         // Zähler der Steigung berechnen
-        let slope_numer = 3 * &self.x * &self.x + &curve.a;
+        let slope_numer = 3 * (&self.x).pow(2) + &curve.a;
         // Nenner der Steigung berechnen
         let slope_denom = 2 * &self.y;
         let slope_denom = service.modulo_inverse(&slope_denom, p).unwrap();
