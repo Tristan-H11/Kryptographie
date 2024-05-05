@@ -261,21 +261,24 @@ impl SecureFiniteFieldEllipticCurve {
         let service = NumberTheoryService::new(Fast); // TODO übergeben lassen
         let negative_one = BigInt::from(-1);
 
-        // TODO: Fall von b teilt a = 0 zurückgeben
-        // Danach kann das Kriterium auf Rückgabe von fastExp(a, prime/2 -1, prime) reduziert werden, weil
-        // nur noch 1 und -1 als Ergebnis herauskommen können.
         if a.is_multiple_of(prime) { // Definition 1.27 Punkt 2, Falls p|a, dann (a/p) := 0
             return BigInt::zero();
         }
 
-        if a == &prime.decrement() {
-            // Satz 1.18
-            let exponent: BigInt = prime.decrement().div(2);
-            return if exponent.is_even() {
-                BigInt::one()
-            } else {
-                negative_one
-            };
+        // if a == &prime.decrement() { -- Funktioniert zwar, kann aber verkürzt werden (siehe unten)
+        //     // Satz 1.18
+        //     let exponent: BigInt = prime.decrement().half();
+        //     return if exponent.is_even() {
+        //         BigInt::one()
+        //     } else {
+        //         negative_one
+        //     };
+        // }
+
+        if a == &prime.decrement() && !prime.is_even(){
+            return BigInt::one();
+        } else if a == &prime.decrement() && prime.is_even() {
+            return negative_one;
         }
 
         if a == &BigInt::from(2) {
