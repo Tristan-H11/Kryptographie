@@ -443,4 +443,12 @@ mod tests {
         assert!(result.is_err());
         let result = SecureFiniteFieldEllipticCurve::new(5, 0, 40);
     }
+
+    #[test]
+    fn test_has_point_at_infinity() {
+        // Test, ob der Punkt im Unendlichen auf der Kurve liegt
+        let curve = SecureFiniteFieldEllipticCurve::new(5, 16, 40).unwrap();
+        let point_at_infinity = FiniteFieldEllipticCurvePoint::new(BigInt::zero(), BigInt::zero());
+        assert!(curve.has_point(&point_at_infinity));
+    }
 }
