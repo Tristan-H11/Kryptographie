@@ -250,6 +250,12 @@ impl SecureFiniteFieldEllipticCurve {
 
     //TODO Doku: Nach Satz 1.15 und Definition 1.27 (Kryptographie 2)
     /// Für jede p Element P > 2 & p Teilerfremd c gilt: (c / p) Kongruent c^((p-1)/2) (mod p)
+    /// Bsp: 7 ist ein quadratischer Nichtrest modulo 13
+    /// (7/13) Kongruent 7^(13-1)/2 = 7^6 = 117649 Kongruent -1 (mod 13)
+    /// p Element P & a Element Z, a heißt quadratischer Rest mod p, wenn x Element Z existiert, sodass x^2 Kongruent a (mod p)
+    /// p Element P & a Element Z, a heißt quadratischer Nichtrest mod p, wenn x Element Z, sodass x^2 Kongruent a (mod p) nicht existiert
+    /// Sei p eine ungerade Primzahl und a Element Z, dann gilt:
+    /// (a/p) := (+1 falls a quadratischer Rest mod p, -1 falls a quadratischer Nichtrest mod p, 0 falls a = 0)
     //TODO Auch aufnehmen, dass b eine Primzahl > 3 sein muss
     pub fn calculate_legendre_symbol(a: &BigInt, prime: &BigInt) -> BigInt {
         let service = NumberTheoryService::new(Fast); // TODO übergeben lassen
