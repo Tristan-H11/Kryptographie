@@ -391,5 +391,32 @@ mod tests {
         assert!(result.is_err());
     }
 
+    #[test]
+    fn test_sign_verify_invalid_signature() {
+        // Testet, ob Signaturprüfung fehlschlägt, wenn die Signatur ungültig ist
+        let n = 5;
+        let modul_width = 16;
+        let random_seed = 73;
+        let key_pair =
+            MenezesVanstoneScheme::generate_keypair(n, modul_width, 40, random_seed).unwrap();
+        let public_key = key_pair.public_key;
+        let private_key = key_pair.private_key;
+        let message = "Hello My Friend!";
+        let signature =
+            MenezesVanstoneScheme::sign(&private_key, message, NumberTheoryService::new(Fast))
+                .unwrap();
+        // Manipulation der Signatur
+        let invalid_signature = MenezesVanstoneSignature {
+            r: BigInt::from(12345),
+            s: BigInt::from(67890),
+        };
+        let is_verified = MenezesVanstoneScheme::verify(
+            &public_key,
+            &invalid_signature,
+            message,
+            NumberTheoryService::new(Fast),
+        ).unwrap();
+        assert!(!is_verified);
+    }
 
 }
