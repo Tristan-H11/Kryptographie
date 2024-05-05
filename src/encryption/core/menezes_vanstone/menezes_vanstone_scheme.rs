@@ -419,4 +419,32 @@ mod tests {
         assert!(!is_verified);
     }
 
+    #[test]
+    fn test_verify_invalid_message() {
+        // Testet, ob Signaturprüfung fehlschlägt, wenn die Nachricht nicht übereinstimmt
+        let n = 5;
+        let modul_width = 16;
+        let random_seed = 73;
+        let key_pair =
+            MenezesVanstoneScheme::generate_keypair(n, modul_width, 40, random_seed).unwrap();
+
+        let public_key = key_pair.public_key;
+        let private_key = key_pair.private_key;
+
+        let message = "Hello my Friend!";
+        let signature =
+            MenezesVanstoneScheme::sign(&private_key, message, NumberTheoryService::new(Fast))
+                .unwrap();
+
+        let another_message = "I hate you the most!";
+
+        let is_verified = MenezesVanstoneScheme::verify(
+            &public_key,
+            &signature,
+            another_message,
+            NumberTheoryService::new(Fast),
+        )
+            .unwrap();
+        assert!(!is_verified);
+    }
 }
