@@ -481,4 +481,16 @@ mod tests {
         let legendre_symbol_3 = SecureFiniteFieldEllipticCurve::calculate_legendre_symbol(&BigInt::zero(), &prime); // Definition 1.27 Punkt 2
         assert_eq!(legendre_symbol_3, BigInt::zero());
     }
+
+    #[test]
+    fn test_calculate_w() {
+        // Testet das Berechnen von w(p, z)
+        let prime_1 = BigInt::from(13);
+        let w_1 = SecureFiniteFieldEllipticCurve::calculate_w(&prime_1, BigInt::from(2));
+        assert_eq!(w_1, BigInt::from(8));
+
+        let prime_2 = BigInt::from(17);
+        let w_2 = SecureFiniteFieldEllipticCurve::calculate_w(&prime_2, BigInt::from(3));
+        assert_eq!(w_2, BigInt::from(13));
+    }
 }
