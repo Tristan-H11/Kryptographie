@@ -238,6 +238,17 @@ mod tests {
     }
 
     #[test]
+    fn test_add_point_to_itself_multiple_times() {
+        let curve = get_curve();
+        let generator = curve.generator.clone();
+        let result = generator
+            .add(&generator, &curve).unwrap()
+            .add(&generator, &curve).unwrap();
+        let expected = generator.multiply(&3.into(), &curve).unwrap();
+        assert_eq!(result, expected);
+    }
+
+    #[test]
     fn test_multiply_by_order_gives_infinity() {
         let curve = get_curve();
         let p1 = curve.generator.clone();
@@ -268,4 +279,6 @@ mod tests {
         let p3 = infinity.add(&generator, &curve).unwrap();
         assert_eq!(p3, generator);
     }
+
+
 }
