@@ -96,7 +96,8 @@ impl FiniteFieldEllipticCurvePoint {
         // Steigung der Geraden durch die beiden Punkte berechnen
         let slope = slope_numer * slope_denom;
 
-        let x_sum = &slope * &slope - &self.x - &other.x;
+        let x_sum = &slope.pow(2) - &self.x - &other.x;
+        // Version aus Skript S. 57 ohne Verteilen des Negativzeichens: let y_sum = - (&slope * (&x_sum - &self.x)) - &self.y;
         let y_sum = &slope * (&self.x - &x_sum) - &self.y;
 
         Ok(FiniteFieldEllipticCurvePoint::new(x_sum, y_sum).normalize(prime))
