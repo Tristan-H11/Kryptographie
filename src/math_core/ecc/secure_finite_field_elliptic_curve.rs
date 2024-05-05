@@ -428,4 +428,13 @@ mod tests {
         // (5, 8) liegt auf y^2 = x^3 + 7 (mod 17)
         assert!(curve.has_point(&point));
     }
+
+    #[test]
+    fn test_with_invalid_n() {
+        // Test mit einem ungültigen Wert für n (0)
+        let result = SecureFiniteFieldEllipticCurve::new(0, 16, 40);
+        assert!(result.is_err());
+    }
+
+
 }
