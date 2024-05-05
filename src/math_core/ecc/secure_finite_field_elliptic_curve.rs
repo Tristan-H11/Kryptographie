@@ -259,12 +259,15 @@ impl SecureFiniteFieldEllipticCurve {
     //TODO Auch aufnehmen, dass b eine Primzahl > 3 sein muss
     pub fn calculate_legendre_symbol(a: &BigInt, prime: &BigInt) -> BigInt {
         let service = NumberTheoryService::new(Fast); // TODO übergeben lassen
+        let negative_one = BigInt::from(-1);
 
         // TODO: Fall von b teilt a = 0 zurückgeben
         // Danach kann das Kriterium auf Rückgabe von fastExp(a, prime/2 -1, prime) reduziert werden, weil
         // nur noch 1 und -1 als Ergebnis herauskommen können.
+        if a.is_multiple_of(prime) { // Definition 1.27 Punkt 2, Falls p|a, dann (a/p) := 0
+            return BigInt::zero();
+        }
 
-        let negative_one = BigInt::from(-1);
         if a == &prime.decrement() {
             // Satz 1.18
             let exponent: BigInt = prime.decrement().div(2);
@@ -287,6 +290,7 @@ impl SecureFiniteFieldEllipticCurve {
 
         // legendre_symbol = a ^ ((b - 1) / 2) (mod b)
         let legendre_symbol = service.fast_exponentiation(&a, &prime.decrement().half(), &prime);
+
         if legendre_symbol.is_one() {
             BigInt::one()
         } else {
