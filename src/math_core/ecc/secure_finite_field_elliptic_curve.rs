@@ -66,10 +66,10 @@ impl SecureFiniteFieldEllipticCurve {
     /// -- q muss eine Primzahl sein
     pub fn new(n: i64, modul_width: u32, miller_rabin_iterations: u32) -> Result<Self> {
         // if n.is_zero() {
-        //     panic!("Der Koeffizient a darf nicht 0 sein!"); // TODO Error Handling
+        //     panic!("Der Koeffizient a darf nicht 0 sein!");
         // }
         // if modul_width < 4u32 {
-        //     panic!("Der Modulus p muss mindestens 4 Bit breit sein!"); // TODO Error Handling
+        //     panic!("Der Modulus p muss mindestens 4 Bit breit sein!");
         // }
 
         ensure!(n != 0, "Der Koeffizient a darf nicht 0 sein!"); // Returns an error if the condition is not satisfied
