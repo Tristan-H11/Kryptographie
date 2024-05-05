@@ -280,5 +280,14 @@ mod tests {
         assert_eq!(p3, generator);
     }
 
-
+    #[test]
+    fn test_add_point_to_its_negation() {
+        let curve = get_curve();
+        let generator = curve.generator.clone();
+        let negated_generator = FiniteFieldEllipticCurvePoint::new(generator.x.clone(), -generator.y.clone());
+        // Addiere negativen Generator --> Infinity
+        let result = generator.add(&negated_generator, &curve).unwrap();
+        let expected = FiniteFieldEllipticCurvePoint::infinite();
+        assert_eq!(result, expected);
+    }
 }
