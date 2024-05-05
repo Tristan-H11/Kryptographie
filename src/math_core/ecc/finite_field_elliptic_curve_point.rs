@@ -213,6 +213,15 @@ mod tests {
     }
 
     #[test]
+    fn test_add_two_points_at_infinity() {
+        let curve = get_curve();
+        let infinity = FiniteFieldEllipticCurvePoint::infinite();
+        let result = infinity.add(&infinity, &curve).unwrap();
+        let expected = FiniteFieldEllipticCurvePoint::infinite();
+        assert_eq!(result, expected);
+    }
+
+    #[test]
     fn test_multiply_trivial() {
         let curve = get_curve();
         let p1 = curve.generator.clone();
