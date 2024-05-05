@@ -436,5 +436,11 @@ mod tests {
         assert!(result.is_err());
     }
 
-
+    #[test]
+    fn test_with_invalid_modulus_width() {
+        // Test mit einem ungültigen Wert für die Breite des Modulus p (weniger als 4)
+        let result = SecureFiniteFieldEllipticCurve::new(5, 3, 40);
+        assert!(result.is_err());
+        let result = SecureFiniteFieldEllipticCurve::new(5, 0, 40);
+    }
 }
