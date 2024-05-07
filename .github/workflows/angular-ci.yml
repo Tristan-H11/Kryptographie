@@ -18,6 +18,14 @@ jobs:
         with:
           node-version: '21'
 
+      - name: Cache dependencies
+        uses: actions/cache@v2
+        with:
+          path: |
+            ~/.npm
+            ./GUI/node_modules
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+
       - name: Install Angular project dependencies
         run: npm install
         working-directory: ./GUI
@@ -27,5 +35,5 @@ jobs:
         working-directory: ./GUI
 
       - name: Run Angular Tests
-        run: npm run test
+        run: ./node_modules/.bin/ng test
         working-directory: ./GUI
