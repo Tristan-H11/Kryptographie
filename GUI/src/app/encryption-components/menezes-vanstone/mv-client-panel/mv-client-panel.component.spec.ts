@@ -113,7 +113,7 @@ describe('MvClientPanelComponent', () => {
         component.client = source_client;
         component.client.sendingTo = source_client;
         component.encrypt();
-        tick(); // Simuliert asynchrone Operationen
+        tick();
 
         expect(backendRequestServiceSpy.encrypt).toHaveBeenCalledOnceWith({
             public_key: source_client.keyPair.public_key,
