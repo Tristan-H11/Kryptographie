@@ -246,9 +246,4 @@ describe('MvClientPanelComponent', () => {
         expect(component.client.signature_valid).toEqual('gültig');
         expect(dialogServiceSpy.endTimedCalc).toHaveBeenCalledWith('loadingCalcKey', 'Nachricht entschlüsselt und verifiziert.');
     }));
-
-    it('should create default client with given name', () => {
-        // Method createDefaultClient is protected, that's why we can not test it directly
-        // We can test it by calling the method from the component
-    });
 });
