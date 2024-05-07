@@ -11,6 +11,10 @@ export const routes: Routes = [
         loadComponent: () => import("./encryption-components/menezes-vanstone/menezes-vanstone.component").then(m => m.MenezesVanstoneComponent)
     },
     {
+        path: "menezesVanstoneSingle",
+        loadComponent: () => import("./encryption-components/menezes-vanstone-single/menezes-vanstone-single.component").then(m => m.MenezesVanstoneSingleComponent)
+    },
+    {
         path: "rsa",
         loadComponent: () => import("./encryption-components/rsa/rsa.component").then(m => m.RsaComponent)
     },
