@@ -212,7 +212,7 @@ impl SecureFiniteFieldEllipticCurve {
         w
     }
 
-    pub fn calculate_real_part(alpha: ComplexNumber, prime: &BigInt,    n: i64) -> BigInt {
+    pub fn calculate_real_part(alpha: ComplexNumber, prime: &BigInt, n: i64) -> BigInt {
         let mut count = 4;
         let mut alpha = alpha.clone();
         // Schleife, die alle möglichen Konjugationen von alpha durchgeht
