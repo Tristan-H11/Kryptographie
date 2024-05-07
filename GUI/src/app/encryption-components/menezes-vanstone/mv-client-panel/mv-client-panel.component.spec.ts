@@ -118,7 +118,7 @@ describe('MvClientPanelComponent', () => {
         expect(backendRequestServiceSpy.encrypt).toHaveBeenCalledOnceWith({
             public_key: source_client.keyPair.public_key,
             message: source_client.plaintext,
-            radix: 0 // Setzen Sie den Radix auf den erwarteten Wert
+            radix: 0
         } as MvEncryptRequest);
         expect(component.client.ciphertext).toEqual(expectedCipherText);
         expect(component.client.signature).toEqual(expectedSignature);
