@@ -1,23 +1,254 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
-
-import { MvClientPanelComponent } from './mv-client-panel.component';
+import {ComponentFixture, fakeAsync, TestBed, tick, waitForAsync} from '@angular/core/testing';
+import {FormsModule} from '@angular/forms';
+import {MatCardModule} from '@angular/material/card';
+import {MatFormFieldModule} from '@angular/material/form-field';
+import {MatInputModule} from '@angular/material/input';
+import {MvClientPanelComponent} from './mv-client-panel.component';
+import {HttpClient} from "@angular/common/http";
+import {HttpClientTestingModule} from "@angular/common/http/testing";
+import {BrowserAnimationsModule} from "@angular/platform-browser/animations";
+import {MvCipherText, MvDecryptRequest, MvEncryptRequest, MvSignature, MvVerifyRequest} from "../../../models/mv-beans";
+import {MvBackendRequestService} from "../../../services/backend-api/mv-backend-request.service";
+import {DialogService} from "../../../services/utility/dialogs.service";
+import {of} from "rxjs";
 
 describe('MvClientPanelComponent', () => {
-  let component: MvClientPanelComponent;
-  let fixture: ComponentFixture<MvClientPanelComponent>;
+    let component: MvClientPanelComponent;
+    let fixture: ComponentFixture<MvClientPanelComponent>;
+    let backendRequestServiceSpy: jasmine.SpyObj<MvBackendRequestService>;
+    let dialogServiceSpy: jasmine.SpyObj<DialogService>;
 
-  beforeEach(async () => {
-    await TestBed.configureTestingModule({
-      imports: [MvClientPanelComponent]
-    })
-    .compileComponents();
-    
-    fixture = TestBed.createComponent(MvClientPanelComponent);
-    component = fixture.componentInstance;
-    fixture.detectChanges();
-  });
+    beforeEach(waitForAsync(() => {
+        const backendSpy = jasmine.createSpyObj('MvBackendRequestService', ['encrypt', 'sign', 'decrypt', 'verify']);
+        const dialogSpy = jasmine.createSpyObj('DialogService', ['startTimedCalc', 'endTimedCalc']);
 
-  it('should create', () => {
-    expect(component).toBeTruthy();
-  });
+        TestBed.configureTestingModule({
+            imports: [
+                FormsModule,
+                MatCardModule,
+                MatFormFieldModule,
+                MatInputModule,
+                HttpClientTestingModule,
+                BrowserAnimationsModule
+            ],
+            providers: [
+                {provide: MvBackendRequestService, useValue: backendSpy},
+                {provide: DialogService, useValue: dialogSpy}
+            ]
+        })
+            .compileComponents();
+        backendRequestServiceSpy = TestBed.inject(MvBackendRequestService) as jasmine.SpyObj<MvBackendRequestService>;
+        dialogServiceSpy = TestBed.inject(DialogService) as jasmine.SpyObj<DialogService>;
+    }));
+
+    beforeEach(() => {
+        fixture = TestBed.createComponent(MvClientPanelComponent);
+        component = fixture.componentInstance;
+        fixture.detectChanges();
+    });
+
+    it('should create', () => {
+        expect(component).toBeTruthy();
+    });
+
+    it('should encrypt message when send is called', fakeAsync(() => {
+        const source_client = {
+            name: 'source_client',
+            keyPair: {
+                public_key: {
+                    curve: {
+                        a: 0,
+                        prime: '13',
+                        order_of_subgroup: '7',
+                        generator: {
+                            x: '3',
+                            y: '8',
+                            is_infinite: false
+                        }
+                    },
+                    y: {
+                        x: '3',
+                        y: '8',
+                        is_infinite: false
+                    }
+                },
+                private_key: {
+                    curve: {
+                        a: 0,
+                        prime: '19',
+                        order_of_subgroup: '13',
+                        generator: {
+                            x: '2',
+                            y: '7',
+                            is_infinite: false
+                        }
+                    },
+                    x: '3'
+                }
+            },
+            ciphertext: {
+                encrypted_message: 'encrypted_text',
+                points: [{x: '3', y: '8', is_infinite: false}]
+            },
+            plaintext: 'Test Message 12 ! B',
+            signature: {
+                r: '123',
+                s: '456'
+            },
+            sendingTo: undefined,
+            receivedFrom: undefined,
+            signature_valid: 'ungeprüft'
+        };
+
+        const expectedCipherText: MvCipherText = {
+            encrypted_message: 'encrypted_text',
+            points: [{x: '3', y: '8', is_infinite: false}]
+        };
+        const expectedSignature: MvSignature = {r: '123', s: '456'};
+
+        backendRequestServiceSpy.encrypt.and.returnValue(of(expectedCipherText));
+        backendRequestServiceSpy.sign.and.returnValue(of(expectedSignature));
+        dialogServiceSpy.startTimedCalc.and.returnValue('loadingKey');
+
+        component.client = source_client;
+        component.client.sendingTo = source_client;
+        component.encrypt();
+        tick();
+
+        expect(backendRequestServiceSpy.encrypt).toHaveBeenCalledOnceWith({
+            public_key: source_client.keyPair.public_key,
+            message: source_client.plaintext,
+            radix: 0
+        } as MvEncryptRequest);
+        expect(component.client.ciphertext).toEqual(expectedCipherText);
+        expect(component.client.signature).toEqual(expectedSignature);
+        expect(dialogServiceSpy.endTimedCalc).toHaveBeenCalledWith('loadingKey', 'Nachricht verschlüsselt und signiert.');
+    }));
+
+    it('should decrypt message', fakeAsync(() => {
+        const source_client = {
+            name: 'source_client',
+            keyPair: {
+                public_key: {
+                    curve: {
+                        a: 0,
+                        prime: '13',
+                        order_of_subgroup: '7',
+                        generator: {
+                            x: '3',
+                            y: '8',
+                            is_infinite: false
+                        }
+                    },
+                    y: {
+                        x: '3',
+                        y: '8',
+                        is_infinite: false
+                    }
+                },
+                private_key: {
+                    curve: {
+                        a: 0,
+                        prime: '19',
+                        order_of_subgroup: '13',
+                        generator: {
+                            x: '2',
+                            y: '7',
+                            is_infinite: false
+                        }
+                    },
+                    x: '3'
+                }
+            },
+            ciphertext: {
+                encrypted_message: 'encrypted_text',
+                points: [{x: '3', y: '8', is_infinite: false}]
+            },
+            plaintext: 'Test Message 12 ! B',
+            signature: {
+                r: '123',
+                s: '456'
+            },
+            sendingTo: undefined,
+            receivedFrom: undefined,
+            signature_valid: 'ungeprüft'
+        };
+        const target_client = {
+            name: 'target_client',
+            keyPair: {
+                public_key: {
+                    curve: {
+                        a: 0,
+                        prime: '13',
+                        order_of_subgroup: '7',
+                        generator: {
+                            x: '3',
+                            y: '8',
+                            is_infinite: false
+                        }
+                    },
+                    y: {
+                        x: '3',
+                        y: '8',
+                        is_infinite: false
+                    }
+                },
+                private_key: {
+                    curve: {
+                        a: 0,
+                        prime: '19',
+                        order_of_subgroup: '13',
+                        generator: {
+                            x: '2',
+                            y: '7',
+                            is_infinite: false
+                        }
+                    },
+                    x: '3'
+                }
+            },
+            ciphertext: {
+                encrypted_message: 'encrypted_text',
+                points: [{x: '3', y: '8', is_infinite: false}]
+            },
+            plaintext: 'Test Message 12 ! B',
+            signature: {
+                r: '123',
+                s: '456'
+            },
+            sendingTo: undefined,
+            receivedFrom: source_client,
+            signature_valid: 'ungeprüft'
+        };
+
+        const expectedPlaintext = 'Test Message 12 ! B';
+        const expectedVerifyResponse = {message: 'true'};
+
+        backendRequestServiceSpy.decrypt.and.returnValue(of({message: expectedPlaintext}));
+        backendRequestServiceSpy.verify.and.returnValue(of(expectedVerifyResponse));
+        dialogServiceSpy.startTimedCalc.and.returnValue('loadingCalcKey');
+
+        component.client = target_client;
+        component.decrypt();
+        tick();
+
+        expect(backendRequestServiceSpy.decrypt).toHaveBeenCalledOnceWith({
+            private_key: target_client.keyPair.private_key,
+            cipher_text: target_client.ciphertext,
+            radix: 0
+        } as MvDecryptRequest);
+        expect(component.client.plaintext).toEqual(expectedPlaintext);
+        expect(backendRequestServiceSpy.verify).toHaveBeenCalledOnceWith({
+            public_key: source_client.keyPair.public_key,
+            message: expectedPlaintext,
+            signature: target_client.signature
+        } as MvVerifyRequest);
+        expect(component.client.signature_valid).toEqual('gültig');
+        expect(dialogServiceSpy.endTimedCalc).toHaveBeenCalledWith('loadingCalcKey', 'Nachricht entschlüsselt und verifiziert.');
+    }));
+
+    it('should create default client with given name', () => {
+        // Method createDefaultClient is protected, that's why we can not test it directly
+        // We can test it by calling the method from the component
+    });
 });
