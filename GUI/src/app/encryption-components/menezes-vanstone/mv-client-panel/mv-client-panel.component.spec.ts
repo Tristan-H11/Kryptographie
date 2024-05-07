@@ -232,7 +232,6 @@ describe('MvClientPanelComponent', () => {
         component.decrypt();
         tick();
 
-        // Assert
         expect(backendRequestServiceSpy.decrypt).toHaveBeenCalledOnceWith({
             private_key: target_client.keyPair.private_key,
             cipher_text: target_client.ciphertext,
