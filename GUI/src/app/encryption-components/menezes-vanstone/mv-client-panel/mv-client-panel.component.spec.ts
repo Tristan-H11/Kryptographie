@@ -4,13 +4,13 @@ import {MatCardModule} from '@angular/material/card';
 import {MatFormFieldModule} from '@angular/material/form-field';
 import {MatInputModule} from '@angular/material/input';
 import {MvClientPanelComponent} from './mv-client-panel.component';
-import {HttpClient} from "@angular/common/http";
 import {HttpClientTestingModule} from "@angular/common/http/testing";
 import {BrowserAnimationsModule} from "@angular/platform-browser/animations";
 import {MvCipherText, MvDecryptRequest, MvEncryptRequest, MvSignature, MvVerifyRequest} from "../../../models/mv-beans";
 import {MvBackendRequestService} from "../../../services/backend-api/mv-backend-request.service";
 import {DialogService} from "../../../services/utility/dialogs.service";
 import {of} from "rxjs";
+import {MvClientData} from "../../shared/ClientData";
 
 describe('MvClientPanelComponent', () => {
     let component: MvClientPanelComponent;
@@ -52,7 +52,7 @@ describe('MvClientPanelComponent', () => {
     });
 
     it('should encrypt message when send is called', fakeAsync(() => {
-        const source_client = {
+        const source_client: MvClientData = {
             name: 'source_client',
             keyPair: {
                 public_key: {
@@ -93,7 +93,8 @@ describe('MvClientPanelComponent', () => {
             plaintext: 'Test Message 12 ! B',
             signature: {
                 r: '123',
-                s: '456'
+                s: '456',
+                string_representation: '24jiafrj5eagp'
             },
             sendingTo: undefined,
             receivedFrom: undefined,
@@ -104,7 +105,10 @@ describe('MvClientPanelComponent', () => {
             encrypted_message: 'encrypted_text',
             points: [{x: '3', y: '8', is_infinite: false}]
         };
-        const expectedSignature: MvSignature = {r: '123', s: '456'};
+        const expectedSignature: MvSignature = {
+            r: '123', s: '456',
+            string_representation: '24jiafrj5eagp'
+        };
 
         backendRequestServiceSpy.encrypt.and.returnValue(of(expectedCipherText));
         backendRequestServiceSpy.sign.and.returnValue(of(expectedSignature));
@@ -116,7 +120,7 @@ describe('MvClientPanelComponent', () => {
         tick();
 
         expect(backendRequestServiceSpy.encrypt).toHaveBeenCalledOnceWith({
-            public_key: source_client.keyPair.public_key,
+            public_key: source_client.keyPair!.public_key,
             message: source_client.plaintext,
             radix: 0
         } as MvEncryptRequest);
@@ -126,7 +130,7 @@ describe('MvClientPanelComponent', () => {
     }));
 
     it('should decrypt message', fakeAsync(() => {
-        const source_client = {
+        const source_client: MvClientData = {
             name: 'source_client',
             keyPair: {
                 public_key: {
@@ -167,13 +171,14 @@ describe('MvClientPanelComponent', () => {
             plaintext: 'Test Message 12 ! B',
             signature: {
                 r: '123',
-                s: '456'
+                s: '456',
+                string_representation: 'q94cu9v5epsäng'
             },
             sendingTo: undefined,
             receivedFrom: undefined,
             signature_valid: 'ungeprüft'
         };
-        const target_client = {
+        const target_client: MvClientData = {
             name: 'target_client',
             keyPair: {
                 public_key: {
@@ -214,7 +219,8 @@ describe('MvClientPanelComponent', () => {
             plaintext: 'Test Message 12 ! B',
             signature: {
                 r: '123',
-                s: '456'
+                s: '456',
+                string_representation: '23rjoislfaökg'
             },
             sendingTo: undefined,
             receivedFrom: source_client,
@@ -233,13 +239,13 @@ describe('MvClientPanelComponent', () => {
         tick();
 
         expect(backendRequestServiceSpy.decrypt).toHaveBeenCalledOnceWith({
-            private_key: target_client.keyPair.private_key,
+            private_key: target_client.keyPair!.private_key,
             cipher_text: target_client.ciphertext,
             radix: 0
         } as MvDecryptRequest);
         expect(component.client.plaintext).toEqual(expectedPlaintext);
         expect(backendRequestServiceSpy.verify).toHaveBeenCalledOnceWith({
-            public_key: source_client.keyPair.public_key,
+            public_key: source_client.keyPair!.public_key,
             message: expectedPlaintext,
             signature: target_client.signature
         } as MvVerifyRequest);
