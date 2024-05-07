@@ -57,7 +57,8 @@ export interface MvSignRequest {
 
 export interface MvSignature {
     r: string,
-    s: string
+    s: string,
+    string_representation: string;
 }
 
 export interface MvVerifyRequest {
@@ -108,14 +109,15 @@ export function copyMvCipherText(cipherText: MvCipherText): MvCipherText {
 export function copyMvSignRequest(signRequest: MvSignRequest): MvSignRequest {
     return {
         private_key: copyMvPrivateKey(signRequest.private_key),
-        message: signRequest.message
+        message: signRequest.message,
     };
 }
 
 export function copyMvSignature(signature: MvSignature): MvSignature {
     return {
         r: signature.r,
-        s: signature.s
+        s: signature.s,
+        string_representation: signature.string_representation
     };
 }
 
