@@ -195,11 +195,12 @@ impl FiniteFieldEllipticCurvePoint {
 
 #[cfg(test)]
 mod tests {
-
+    use crate::shared::statistics_logger::VoidLogger;
     use super::*;
 
     fn get_curve() -> SecureFiniteFieldEllipticCurve {
-        SecureFiniteFieldEllipticCurve::new(5, 16, 40).unwrap()
+        let logger = &mut VoidLogger {};
+        SecureFiniteFieldEllipticCurve::new(5, 16, 40, logger).unwrap()
     }
 
     #[test]
