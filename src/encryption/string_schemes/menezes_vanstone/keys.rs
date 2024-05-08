@@ -1,7 +1,4 @@
-use crate::encryption::asymmetric_encryption_types::{
-    AsymmetricDecryptionKey, AsymmetricEncryptionKey, AsymmetricKey, AsymmetricKeyPair, PrivateKey,
-    PublicKey,
-};
+use crate::encryption::asymmetric_encryption_types::{AsymmetricDecryptionKey, AsymmetricEncryptionKey, AsymmetricKey, AsymmetricKeyPair, PrivateKey, PublicKey, SignatureKey, VerificationKey};
 use crate::encryption::core::menezes_vanstone::keys::{
     MenezesVanstonePrivateKey, MenezesVanstonePublicKey,
 };
@@ -19,6 +16,8 @@ impl AsymmetricKey<MenezesVanstoneStringScheme> for MenezesVanstoneStringPublicK
 impl PublicKey<MenezesVanstoneStringScheme> for MenezesVanstoneStringPublicKey {}
 impl AsymmetricEncryptionKey<MenezesVanstoneStringScheme> for MenezesVanstoneStringPublicKey {}
 
+impl VerificationKey<MenezesVanstoneStringScheme> for MenezesVanstoneStringPublicKey {}
+
 #[derive(Clone, Debug)]
 pub struct MenezesVanstoneStringPrivateKey {
     pub mv_key: MenezesVanstonePrivateKey,
@@ -32,6 +31,8 @@ impl AsymmetricKey<MenezesVanstoneStringScheme> for MenezesVanstoneStringPrivate
 impl PrivateKey<MenezesVanstoneStringScheme> for MenezesVanstoneStringPrivateKey {}
 
 impl AsymmetricDecryptionKey<MenezesVanstoneStringScheme> for MenezesVanstoneStringPrivateKey {}
+
+impl SignatureKey<MenezesVanstoneStringScheme> for MenezesVanstoneStringPrivateKey {}
 
 #[derive(Clone, Debug)]
 pub struct MenezesVanstoneStringKeyPair {
