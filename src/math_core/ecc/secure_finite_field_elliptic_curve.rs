@@ -87,7 +87,7 @@ impl SecureFiniteFieldEllipticCurve {
             prime = prng.generate_prime(modul_width, miller_rabin_iterations, &counter);
             // Die Primzahl muss mod 8 kongruent 5 genügen und darf 2n nicht teilen
             if prime.rem_euclid(&8.into()) == 5.into() && !double_n.is_multiple_of(&prime) {
-                logger.log_statistic("Primzahlversuche (5mod8)", loop_counter);
+                logger.log_statistic("Initiale Primzahlversuche (5mod8)", loop_counter);
                 break;
             }
         }
@@ -97,6 +97,7 @@ impl SecureFiniteFieldEllipticCurve {
         // Manchmal wird ein Generator bestimmt, der nicht auf der Kurve liegt. In dem Fall soll
         // die Berechnung wiederholt werden, bis ein gültiger Generator gefunden wurde.
         loop {
+            logger.enrich_context("Große Iterationen");
             let (prime, order_of_subgroup) =
                 Self::calculate_p_and_q(&prime, n, miller_rabin_iterations, logger);
 
@@ -126,6 +127,8 @@ impl SecureFiniteFieldEllipticCurve {
             };
 
             if curve.has_point(&curve.generator) {
+                logger.remove_context();
+                logger.remove_context();
                 return Ok(curve);
             }
             warn!(
@@ -370,8 +373,25 @@ impl SecureFiniteFieldEllipticCurve {
 
 #[cfg(test)]
 mod tests {
-    use crate::shared::statistics_logger::VoidLogger;
+    use std::collections::HashMap;
+    use crate::shared::statistics_logger::{StatisticsLoggerImpl, VoidLogger};
     use super::*;
+
+    #[test]
+    fn test_curve_generation() {
+
+        let mut result = HashMap::new();
+
+        for bitsize in [16, 32, 64, 128, 256] {
+        let logger = &mut StatisticsLoggerImpl::new();
+            for _ in 0..200 {
+                let curve = SecureFiniteFieldEllipticCurve::new(5, bitsize, 40, logger).unwrap();
+            }
+            result.insert(format!("{} Bit", bitsize), logger.get_all_with_metrics());
+        }
+
+        println!("{:#?}", result);
+    }
 
     #[test]
     fn test_calculate_big_n() {
