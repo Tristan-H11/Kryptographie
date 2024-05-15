@@ -201,10 +201,24 @@ export class DisplayCurveComponent implements OnInit {
                     closed: false,
                 },
                 {
+                    fn: `(${(this.Q_mul.y - this.P_mul.y) / (this.Q_mul.x - this.P_mul.x)}) * x + (${this.P_mul.y - (this.Q_mul.y - this.P_mul.y) /
+                    (this.Q_mul.x - this.P_mul.x) * this.P_mul.x})`,
+                    fnType: 'linear',
+                    graphType: 'polyline',
+                    color: 'red'
+                },
+                {
                     points: [[this.P_mul.x, this.P_mul.y], [this.Q_mul.x, this.Q_mul.y]],
                     fnType: 'points',
                     graphType: 'scatter',
                     color: 'yellow',
+                },
+                {
+                    vector: [0, 2 * this.Q_mul.y],
+                    offset: [this.Q_mul.x, -this.Q_mul.y],
+                    fnType: 'vector',
+                    graphType: 'polyline',
+                    color: 'black'
                 },
             ],
         });
