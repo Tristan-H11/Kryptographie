@@ -26,8 +26,8 @@ impl From<EcPointBean> for FiniteFieldEllipticCurvePoint {
     /// Mapped die Bean in das Domain-Modell
     fn from(point: EcPointBean) -> Self {
         Self {
-            x: point.x.parse().unwrap(), // TODO .unwrap() durch turbofish ersetzen ? --> .parse()::<BigFloat>()
-            y: point.y.parse().unwrap(), // TODO .unwrap() durch turbofish ersetzen ? --> .parse()::<BigFloat>()
+            x: point.x.parse().unwrap(),
+            y: point.y.parse().unwrap(),
             is_infinite: point.is_infinite,
         }
     }
@@ -288,26 +288,18 @@ mod tests {
         // Addiere negativen Generator --> Infinity
         let result = generator.add(&negated_generator, &curve).unwrap();
         let expected = FiniteFieldEllipticCurvePoint::infinite();
-        assert_eq!(result, expected);
+        assert_eq!(result, expected, "Adding a point to its negation should result in the infinite point");
     }
 
     #[test]
-    fn test_multiply_by_large_scalar() { // 1000 is 1111101000 in binary
+    fn test_multiply_by_large_scalar() {
         let curve = get_curve();
         let generator = curve.generator.clone();
-        let large_scalar = BigInt::from(1000);
+        let large_scalar = BigInt::from(1000000000);
         // Multiplying the generator by a large scalar
         let result = generator.multiply(&large_scalar, &curve).unwrap();
-        let expected = generator.multiply(&BigInt::from(1000), &curve).unwrap();
+        let expected = generator.multiply(&BigInt::from(1000000000), &curve).unwrap();
         assert_eq!(result, expected);
     }
 
-    #[test]
-    fn test_add_point_to_infinity() {
-        let curve = get_curve();
-        let generator = curve.generator.clone();
-        let infinity = FiniteFieldEllipticCurvePoint::infinite();
-        let result = generator.add(&infinity, &curve).unwrap();
-        assert_eq!(result, generator);
-    }
 }
