@@ -41,7 +41,7 @@ impl From<MvPrivateKeyBean> for MenezesVanstonePrivateKey {
     /// Mapped die Bean in das Domain-Modell
     fn from(mv_private_key: MvPrivateKeyBean) -> Self {
         let curve = SecureFiniteFieldEllipticCurve::from(mv_private_key.curve);
-        let x = mv_private_key.x.parse().unwrap(); // TODO: Anstatt .unwrap() ggf. turbofish verwenden ? --> z.B. .parse()::<BigInt>()
+        let x = mv_private_key.x.parse().unwrap();
         MenezesVanstonePrivateKey { curve, x }
     }
 }
