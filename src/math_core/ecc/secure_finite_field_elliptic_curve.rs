@@ -374,6 +374,7 @@ impl SecureFiniteFieldEllipticCurve {
 #[cfg(test)]
 mod tests {
     use std::collections::HashMap;
+    use std::fs;
     use crate::shared::statistics_logger::{StatisticsLoggerImpl, VoidLogger};
     use super::*;
 
@@ -381,15 +382,49 @@ mod tests {
     fn test_curve_generation() {
 
         let mut result = HashMap::new();
+        let mut raw_values = HashMap::new();
 
         for bitsize in [16, 32, 64, 128, 256] {
         let logger = &mut StatisticsLoggerImpl::new();
             for _ in 0..200 {
                 let curve = SecureFiniteFieldEllipticCurve::new(5, bitsize, 40, logger).unwrap();
             }
-            result.insert(format!("{} Bit", bitsize), logger.get_all_with_metrics());
+            result.insert(format!("{}-Bit", bitsize), logger.get_all_with_metrics());
+            raw_values.insert(format!("{}-Bit", bitsize), logger.get_all());
         }
 
+        for entry in raw_values {
+            let mut csv_content = String::new();
+
+            let headers: Vec<String> = entry.1
+                .iter()
+                .map(|(name, _)| name.split("::")
+                    .last()
+                    .unwrap()
+                    .trim()
+                    .to_string()
+                ).collect();
+            csv_content.push_str(&headers.join(","));
+            csv_content.push('\n');
+
+            let max_len = entry.1.iter().map(|(_, values)| values.len()).max().unwrap();
+            for i in 0..max_len {
+                let row: Vec<String> = entry.1.iter().map(|(_, values)| {
+                    if i < values.len() {
+                        values[i].to_string()
+                    } else {
+                        String::new()
+                    }
+                }).collect();
+                csv_content.push_str(&row.join(","));
+                csv_content.push('\n');
+            }
+
+            fs::write(
+                format!("{}.csv", entry.0),
+                csv_content,
+            ).unwrap();
+        }
         println!("{:#?}", result);
     }
 
