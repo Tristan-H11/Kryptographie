@@ -17,6 +17,7 @@ use crate::math_core::traits::logarithm::Logarithm;
 use anyhow::{bail, Context, ensure, Result};
 use bigdecimal::num_bigint::BigInt;
 use bigdecimal::Zero;
+use crate::shared::statistics_logger::VoidLogger;
 
 pub struct MenezesVanstoneStringScheme {}
 
@@ -63,11 +64,14 @@ impl MenezesVanstoneStringScheme {
             );
         }
 
+        let logger = &mut VoidLogger {};
+
         let key_pair = MenezesVanstoneScheme::generate_keypair(
             n,
             modul_width,
             miller_rabin_iterations,
             random_seed,
+            logger, // TODO übergeben lassen
         )
         .context("Error while creating keypair for MenezesVanstone-Core. Error: {:#?}")?;
 

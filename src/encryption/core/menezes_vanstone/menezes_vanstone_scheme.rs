@@ -28,6 +28,7 @@ use crate::math_core::pseudo_random_number_generator::PseudoRandomNumberGenerato
 use crate::math_core::traits::increment::Increment;
 use crate::shared::errors::MenezesVanstoneError;
 use crate::shared::hashing::sha256;
+use crate::shared::statistics_logger::StatisticsLogger;
 
 #[derive(Clone, Debug, PartialEq)]
 pub struct MenezesVanstonePlaintext {
@@ -78,12 +79,15 @@ impl EncryptionScheme for MenezesVanstoneScheme {}
 impl AsymmetricEncryptionScheme for MenezesVanstoneScheme {}
 
 impl MenezesVanstoneScheme {
-    pub fn generate_keypair(
+    pub fn generate_keypair<LOGGER: StatisticsLogger>(
         n: i32,
         modul_width: u32,
         miller_rabin_iterations: u32,
         random_seed: u32,
+        logger: &mut LOGGER,
     ) -> Result<MenezesVanstoneKeyPair> {
+        logger.enrich_context("Menezes-Vanstone Schlüsselpaar-Erstellung");
+
         if n == 0 {
             bail!(MenezesVanstoneError::InvalidNValueError(n));
         }
@@ -92,20 +96,24 @@ impl MenezesVanstoneScheme {
         }
 
         let curve =
-            SecureFiniteFieldEllipticCurve::new(n.into(), modul_width, miller_rabin_iterations)
+            SecureFiniteFieldEllipticCurve::new(n.into(), modul_width, miller_rabin_iterations, logger)
                 .context("Failed to create secure elliptic curve")?;
 
         let prng = PseudoRandomNumberGenerator::new(random_seed, NumberTheoryService::new(Fast)); // TODO übergeben
         let counter = RelaxedCounter::new(1);
         let order_of_subgroup = &curve.order_of_subgroup;
         let (mut x, mut y);
+        let mut loop_counter = 0;
         loop {
+            loop_counter += 1;
             x = prng.take(&1.into(), &order_of_subgroup.decrement(), &counter);
             y = curve
                 .generator
                 .multiply(&x, &curve)
                 .context("Failed to calculate key-component y")?;
             if !y.x.is_zero() && !y.y.is_zero() {
+                logger.log_statistic("Y-Berechnung", loop_counter);
+                logger.remove_context();
                 break;
             }
         }
@@ -310,18 +318,20 @@ mod tests {
     use rand::Rng;
 
     use crate::math_core::number_theory::number_theory_service::NumberTheoryServiceSpeed::Fast;
+    use crate::shared::statistics_logger::{StatisticsLoggerImpl, VoidLogger};
 
     use super::*;
 
     #[test]
     fn test_menezes_vanstone_encryption_decryption() {
+        let logger = &mut StatisticsLoggerImpl::new();
         // Die Parameter sollen hier für jeden Testlauf zufällig gewählt werden, damit flakiness
         // eher auffällt.
         let n = 7; //rand::thread_rng().gen_range(1..30);
         let modul_width = 128; //rand::thread_rng().gen_range(4..256);
         let random_seed = 300; //rand::thread_rng().gen_range(1..1000);
         let key_pair =
-            MenezesVanstoneScheme::generate_keypair(n, modul_width, 40, random_seed).unwrap();
+            MenezesVanstoneScheme::generate_keypair(n, modul_width, 40, random_seed, logger).unwrap();
 
         let public_key = key_pair.public_key;
         let private_key = key_pair.private_key;
@@ -337,17 +347,20 @@ mod tests {
         let decrypted_plaintext =
             MenezesVanstoneScheme::decrypt(&private_key, &ciphertext, service).unwrap();
         assert_eq!(plaintext, decrypted_plaintext);
+
+        println!("{:#?}", logger.get_all());
     }
 
     #[test]
     fn test_encryption_decryption_fails_when_message_greater_prime() {
+        let logger = &mut VoidLogger {};
         // Die Parameter sollen hier für jeden Testlauf zufällig gewählt werden, damit flakiness
         // eher auffällt.
         let n = rand::thread_rng().gen_range(1..30);
         let modul_width = rand::thread_rng().gen_range(4..256);
         let random_seed = rand::thread_rng().gen_range(1..1000);
         let key_pair =
-            MenezesVanstoneScheme::generate_keypair(n, modul_width, 40, random_seed).unwrap();
+            MenezesVanstoneScheme::generate_keypair(n, modul_width, 40, random_seed, logger).unwrap();
 
         let public_key = key_pair.public_key;
         let private_key = key_pair.private_key;
@@ -367,13 +380,14 @@ mod tests {
 
     #[test]
     fn test_sign_verify_happyflow() {
+        let logger = &mut VoidLogger {};
         // Die Parameter sollen hier für jeden Testlauf zufällig gewählt werden, damit flakiness
         // eher auffällt.
         let n = 5; //rand::thread_rng().gen_range(1..30);
         let modul_width = 16; //rand::thread_rng().gen_range(4..16);
         let random_seed = 73; //rand::thread_rng().gen_range(1..1000);
         let key_pair =
-            MenezesVanstoneScheme::generate_keypair(n, modul_width, 40, random_seed).unwrap();
+            MenezesVanstoneScheme::generate_keypair(n, modul_width, 40, random_seed, logger).unwrap();
 
         let public_key = key_pair.public_key;
         let private_key = key_pair.private_key;

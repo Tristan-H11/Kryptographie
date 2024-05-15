@@ -29,6 +29,7 @@ use crate::math_core::number_theory::number_theory_service::NumberTheoryService;
 use crate::math_core::number_theory::number_theory_service::NumberTheoryServiceSpeed::{
     Fast, Slow,
 };
+use crate::shared::statistics_logger::VoidLogger;
 
 #[derive(Deserialize, Clone)]
 pub struct MvCreateKeyPairRequestBean {
@@ -211,11 +212,14 @@ pub(crate) async fn create_key_pair(
         false => NumberTheoryService::new(Slow),
     };
 
+    let logger = &mut VoidLogger {}; // TODO An QueryParam anpassen
+
     let key_pair = MenezesVanstoneScheme::generate_keypair(
         req_body.coef_a,
         req_body.modulus_width,
         req_body.miller_rabin_rounds,
         req_body.random_seed,
+        logger,
     );
 
     match key_pair {

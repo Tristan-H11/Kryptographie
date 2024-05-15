@@ -18,6 +18,7 @@ use crate::math_core::number_theory::number_theory_service::{
 use crate::math_core::pseudo_random_number_generator::PseudoRandomNumberGenerator;
 use crate::math_core::traits::divisible::Divisible;
 use crate::math_core::traits::increment::Increment;
+use crate::shared::statistics_logger::StatisticsLogger;
 
 ///
 /// Repräsentiert eine elliptische Kurve mit einer zyklischen Untergruppe, in der das
@@ -64,7 +65,8 @@ impl SecureFiniteFieldEllipticCurve {
     /// - Eine zyklische Untergruppe der Ordnung q muss existieren, wobei für q gilt:
     /// -- q = N / 8, wobei N = |E(Z_p)| (Ordnung der Kurve) und
     /// -- q muss eine Primzahl sein
-    pub fn new(n: i64, modul_width: u32, miller_rabin_iterations: u32) -> Result<Self> {
+    pub fn new<LOGGER: StatisticsLogger>(n: i64, modul_width: u32, miller_rabin_iterations: u32, logger: &mut LOGGER) -> Result<Self> {
+        logger.enrich_context("Kurvenerstellung");
         if n.is_zero() {
             panic!("Der Koeffizient a darf nicht 0 sein!"); // TODO Error Handling
         }
@@ -79,10 +81,13 @@ impl SecureFiniteFieldEllipticCurve {
         let prng = PseudoRandomNumberGenerator::new_seeded();
         let counter = RelaxedCounter::new(1);
         let mut prime: BigInt;
+        let mut loop_counter = 0;
         loop {
+            loop_counter += 1;
             prime = prng.generate_prime(modul_width, miller_rabin_iterations, &counter);
             // Die Primzahl muss mod 8 kongruent 5 genügen und darf 2n nicht teilen
             if prime.rem_euclid(&8.into()) == 5.into() && !double_n.is_multiple_of(&prime) {
+                logger.log_statistic("Initiale Primzahlversuche (5mod8)", loop_counter);
                 break;
             }
         }
@@ -92,8 +97,9 @@ impl SecureFiniteFieldEllipticCurve {
         // Manchmal wird ein Generator bestimmt, der nicht auf der Kurve liegt. In dem Fall soll
         // die Berechnung wiederholt werden, bis ein gültiger Generator gefunden wurde.
         loop {
+            logger.enrich_context("Große Iterationen");
             let (prime, order_of_subgroup) =
-                Self::calculate_p_and_q(&prime, n, miller_rabin_iterations);
+                Self::calculate_p_and_q(&prime, n, miller_rabin_iterations, logger);
 
             let curve = Self {
                 a,
@@ -121,6 +127,8 @@ impl SecureFiniteFieldEllipticCurve {
             };
 
             if curve.has_point(&curve.generator) {
+                logger.remove_context();
+                logger.remove_context();
                 return Ok(curve);
             }
             warn!(
@@ -130,21 +138,27 @@ impl SecureFiniteFieldEllipticCurve {
         }
     }
 
-    pub fn calculate_p_and_q(
+    pub fn calculate_p_and_q<LOGGER: StatisticsLogger>(
         prime: &BigInt,
         n: i64,
         miller_rabin_iterations: u32,
+        logger: &mut LOGGER,
     ) -> (BigInt, BigInt) {
+        logger.enrich_context("Berechnung von p und q");
         let double_n = BigInt::from(n).double();
         let mut prime = prime.clone();
         let mut q: BigInt;
         let service = NumberTheoryService::new(Fast); // TODO übergeben lassen
         let prng = PseudoRandomNumberGenerator::new_seeded(); // TODO übergeben lassen
 
+        let mut loop_counter = 0;
         // Die Schleife, die läuft, bis 'q = N / 8' eine Primzahl ergibt.
         loop {
+            loop_counter += 1;
+            let mut loop_counter_quad_rest = 0;
             // Die Schleife, die eine passende Primzahl bestimmt.
             loop {
+                loop_counter_quad_rest += 1;
                 // Wenn die Primzahl folgende Bedingungen erfüllt, so genügt sie dem Verfahren:
                 // 1. Sie ist eine Primzahl
                 // 2. Sie ist ein quadratischer Rest zu p, also n^((p-1)/2) = 1 (mod p)
@@ -155,6 +169,7 @@ impl SecureFiniteFieldEllipticCurve {
                         .is_one()
                     && !double_n.is_multiple_of(&prime)
                 {
+                    logger.log_statistic("Primzahlversuche quadratischer Rest", loop_counter_quad_rest);
                     break;
                 }
                 // Treffen diese Bedingungen nicht zu, wird kongruenzerhaltend eine neue getestet.
@@ -166,6 +181,8 @@ impl SecureFiniteFieldEllipticCurve {
             q = big_n.div(8);
             // Ist q = N / 8 eine Primzahl, so wird die Schleife verlassen und das q ist gültig.
             if service.is_probably_prime(&q, miller_rabin_iterations, &prng) {
+                logger.log_statistic("Suche nach q", loop_counter);
+                logger.remove_context();
                 return (prime, q);
             }
             // Ist q keine Primzahl, wird prime um 8 erhöht und ein neuer Versuch gestartet.
@@ -356,7 +373,60 @@ impl SecureFiniteFieldEllipticCurve {
 
 #[cfg(test)]
 mod tests {
+    use std::collections::HashMap;
+    use std::fs;
+    use crate::shared::statistics_logger::{StatisticsLoggerImpl, VoidLogger};
     use super::*;
+
+    #[test]
+    fn test_curve_generation() {
+
+        let mut result = HashMap::new();
+        let mut raw_values = HashMap::new();
+
+        for bitsize in [16, 32, 64, 128, 256] {
+        let logger = &mut StatisticsLoggerImpl::new();
+            for _ in 0..200 {
+                let curve = SecureFiniteFieldEllipticCurve::new(5, bitsize, 40, logger).unwrap();
+            }
+            result.insert(format!("{}-Bit", bitsize), logger.get_all_with_metrics());
+            raw_values.insert(format!("{}-Bit", bitsize), logger.get_all());
+        }
+
+        for entry in raw_values {
+            let mut csv_content = String::new();
+
+            let headers: Vec<String> = entry.1
+                .iter()
+                .map(|(name, _)| name.split("::")
+                    .last()
+                    .unwrap()
+                    .trim()
+                    .to_string()
+                ).collect();
+            csv_content.push_str(&headers.join(","));
+            csv_content.push('\n');
+
+            let max_len = entry.1.iter().map(|(_, values)| values.len()).max().unwrap();
+            for i in 0..max_len {
+                let row: Vec<String> = entry.1.iter().map(|(_, values)| {
+                    if i < values.len() {
+                        values[i].to_string()
+                    } else {
+                        String::new()
+                    }
+                }).collect();
+                csv_content.push_str(&row.join(","));
+                csv_content.push('\n');
+            }
+
+            fs::write(
+                format!("{}.csv", entry.0),
+                csv_content,
+            ).unwrap();
+        }
+        println!("{:#?}", result);
+    }
 
     #[test]
     fn test_calculate_big_n() {
@@ -393,7 +463,8 @@ mod tests {
 
     #[test]
     fn test_has_point_not() {
-        let curve = SecureFiniteFieldEllipticCurve::new(7, 17, 20).unwrap();
+        let logger = &mut VoidLogger {};
+        let curve = SecureFiniteFieldEllipticCurve::new(7, 17, 20, logger).unwrap();
         let point = FiniteFieldEllipticCurvePoint::new(5.into(), 7.into());
         // (5, 7) liegt nicht auf y^2 = x^3 + 7 (mod 17)
         assert!(!curve.has_point(&point));
@@ -405,7 +476,8 @@ mod tests {
 
     #[test]
     fn test_has_point() {
-        let curve = SecureFiniteFieldEllipticCurve::new(5, 16, 40).unwrap();
+        let logger = &mut VoidLogger {};
+        let curve = SecureFiniteFieldEllipticCurve::new(5, 16, 40, logger).unwrap();
         let point = curve.generator.multiply(&3.into(), &curve).unwrap();
         // (5, 8) liegt auf y^2 = x^3 + 7 (mod 17)
         assert!(curve.has_point(&point));
