@@ -65,14 +65,8 @@ impl SecureFiniteFieldEllipticCurve {
     /// -- q = N / 8, wobei N = |E(Z_p)| (Ordnung der Kurve) und
     /// -- q muss eine Primzahl sein
     pub fn new(n: i64, modul_width: u32, miller_rabin_iterations: u32) -> Result<Self> {
-        // if n.is_zero() {
-        //     panic!("Der Koeffizient a darf nicht 0 sein!");
-        // }
-        // if modul_width < 4u32 {
-        //     panic!("Der Modulus p muss mindestens 4 Bit breit sein!");
-        // }
 
-        ensure!(n != 0, "Der Koeffizient a darf nicht 0 sein!"); // Returns an error if the condition is not satisfied
+        ensure!(n != 0, "Der Koeffizient a darf nicht 0 sein!");
         ensure!(modul_width >= 4, "Der Modulus p muss mindestens 4 Bit breit sein!");
 
         let a = n.pow(2).neg();
@@ -161,7 +155,7 @@ impl SecureFiniteFieldEllipticCurve {
                 {
                     break;
                 }
-                // Treffen diese Bedingungen nicht zu, wird kongruenz erhaltend eine neue getestet.
+                // Treffen diese Bedingungen nicht zu, wird kongruenzerhaltend eine neue getestet.
                 prime.add_assign(BigInt::from(8));
             }
 
@@ -248,7 +242,6 @@ impl SecureFiniteFieldEllipticCurve {
         }
     }
 
-    //TODO Doku: Nach Satz 1.15 und Definition 1.27 (Kryptographie 2)
     /// Für jede p Element P > 2 & p Teilerfremd c gilt: (c / p) Kongruent c^((p-1)/2) (mod p)
     /// Bsp: 7 ist ein quadratischer Nichtrest modulo 13
     /// (7/13) Kongruent 7^(13-1)/2 = 7^6 = 117649 Kongruent -1 (mod 13)
@@ -265,20 +258,14 @@ impl SecureFiniteFieldEllipticCurve {
             return BigInt::zero();
         }
 
-        // if a == &prime.decrement() { -- Funktioniert zwar, kann aber verkürzt werden (siehe unten)
-        //     // Satz 1.18
-        //     let exponent: BigInt = prime.decrement().half();
-        //     return if exponent.is_even() {
-        //         BigInt::one()
-        //     } else {
-        //         negative_one
-        //     };
-        // }
-
-        if a == &prime.decrement() && !prime.is_even(){
-            return BigInt::one();
-        } else if a == &prime.decrement() && prime.is_even() {
-            return negative_one;
+        if a == &prime.decrement() {
+            // Satz 1.18
+            let exponent: BigInt = prime.decrement().half();
+            return if exponent.is_even() {
+                BigInt::one()
+            } else {
+                negative_one
+            };
         }
 
         if a == &BigInt::from(2) {
@@ -425,11 +412,9 @@ mod tests {
     fn test_has_point() {
         let curve = SecureFiniteFieldEllipticCurve::new(5, 16, 40).unwrap();
         let point = curve.generator.multiply(&3.into(), &curve).unwrap();
-        // (5, 8) liegt auf y^2 = x^3 + 7 (mod 16)
         assert!(curve.has_point(&point));
 
         let point = FiniteFieldEllipticCurvePoint::new(0.into(), 0.into());
-        // (5, 8) liegt auf y^2 = x^3 + 7 (mod 16)
         assert!(curve.has_point(&point));
     }
 
@@ -437,34 +422,41 @@ mod tests {
     fn test_with_invalid_n() {
         // Test mit einem ungültigen Wert für n (0)
         let result = SecureFiniteFieldEllipticCurve::new(0, 16, 40);
-        assert!(result.is_err());
+        match result {
+            Err(err) => {
+                assert_eq!(err.to_string(), "Der Koeffizient a darf nicht 0 sein!");
+            }
+            _ => panic!("Erwarteter Fehler wurde nicht zurückgegeben"),
+        }
     }
 
     #[test]
     fn test_with_invalid_modulus_width() {
-        // Test mit einem ungültigen Wert für die Breite des Modulus p (weniger als 4)
         let result = SecureFiniteFieldEllipticCurve::new(5, 3, 40);
-        assert!(result.is_err());
+        match result {
+            Err(err) => {
+                assert_eq!(err.to_string(), "Der Modulus p muss mindestens 4 Bit breit sein!");
+            }
+            _ => panic!("Erwarteter Fehler wurde nicht zurückgegeben"),
+        }
+
+        // Test mit einem ungültigen Wert für die Breite des Modulus p (0)
         let result = SecureFiniteFieldEllipticCurve::new(5, 0, 40);
+        match result {
+            Err(err) => {
+                assert_eq!(err.to_string(), "Der Modulus p muss mindestens 4 Bit breit sein!");
+            }
+            _ => panic!("Erwarteter Fehler wurde nicht zurückgegeben"),
+        }
     }
 
     #[test]
-    fn test_has_point_at_infinity() {
-        // Test, ob der Punkt im Unendlichen auf der Kurve liegt
-        let curve = SecureFiniteFieldEllipticCurve::new(5, 16, 40).unwrap();
-        let point_at_infinity = FiniteFieldEllipticCurvePoint::new(BigInt::zero(), BigInt::zero());
-        assert!(curve.has_point(&point_at_infinity));
-    }
-
-    #[test]
-    fn test_has_point_on_curve_with_negative_a() {
+    fn test_has_point_on_curve_with_negative_n() {
         let curve = SecureFiniteFieldEllipticCurve::new(-3, 17, 40).unwrap();
         let point = curve.generator.multiply(&3.into(), &curve).unwrap();
-        // (5, 8) liegt auf y^2 = x^3 + 7 (mod 17)
         assert!(curve.has_point(&point));
 
         let point = FiniteFieldEllipticCurvePoint::new(0.into(), 0.into());
-        // (5, 8) liegt auf y^2 = x^3 + 7 (mod 17)
         assert!(curve.has_point(&point));
     }
 
