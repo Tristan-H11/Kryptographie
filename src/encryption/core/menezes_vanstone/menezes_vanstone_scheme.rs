@@ -125,7 +125,6 @@ impl AsymmetricEncryptor<MenezesVanstoneScheme> for MenezesVanstoneScheme {
         let m2 = &plaintext.second;
         let prime = &key.curve.prime;
 
-        // Random Seed from safe crypto source rand crate
         let mut rng = rand::thread_rng();
         let random_seed:u16 = rng.next_u32() as u16;
 
@@ -381,14 +380,30 @@ mod tests {
     fn test_invalid_n_value_error() {
         // Testet, ob ein Fehler zurückgegeben wird, wenn n = 0 ist
         let result = MenezesVanstoneScheme::generate_keypair(0, 128, 40, 123);
-        assert!(result.is_err());
+        match result {
+            Err(err) => {
+                match err.downcast_ref::<MenezesVanstoneError>() {
+                    Some(&MenezesVanstoneError::InvalidNValueError(_)) => assert!(true),
+                    _ => assert!(false, "Expected InvalidNValueError"),
+                }
+            },
+            _ => assert!(false, "Expected an error"),
+        }
     }
 
     #[test]
     fn test_invalid_modulus_width_error() {
         // Testet, ob ein Fehler zurückgegeben wird, wenn die Breite des Moduls <= 3 ist
         let result = MenezesVanstoneScheme::generate_keypair(5, 3, 40, 123);
-        assert!(result.is_err());
+        match result {
+            Err(err) => {
+                match err.downcast_ref::<MenezesVanstoneError>() {
+                    Some(&MenezesVanstoneError::InvalidModulusWidthError(_)) => assert!(true),
+                    _ => assert!(false, "Expected InvalidModulusWidthError"),
+                }
+            },
+            _ => assert!(false, "Expected an error"),
+        }
     }
 
     #[test]
