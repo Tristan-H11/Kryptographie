@@ -1,5 +1,4 @@
 use std::collections::HashMap;
-use std::fmt::format;
 
 pub trait StatisticsLogger {
     /// Fügt eine Kontextschicht hinzu.
@@ -110,10 +109,17 @@ impl StatisticsLogger for StatisticsLoggerImpl {
     fn get_all_with_metrics(&self) -> HashMap<String, Vec<(String, f64)>> {
         let mut result = HashMap::new();
         for (key, values) in &self.data {
-            let avg = self.mean(values).unwrap_or(0.0) as f64;
-            let stddev = self.std_deviation(values).unwrap_or(0.0) as f64;
-            let first_and_third = self.first_and_third_quartile(values).unwrap_or((0, 0));
-            let min_and_max = self.min_and_max(values).unwrap_or((0, 0));
+
+            // Abschneiden der oberen und unteren 10%
+            let mut values = values.clone();
+            values.sort();
+            let ten_percent = (values.len() as f64 * 0.1) as usize;
+            values = values[ten_percent..values.len() - ten_percent].to_vec();
+
+            let avg = self.mean(&values).unwrap_or(0.0) as f64;
+            let stddev = self.std_deviation(&values).unwrap_or(0.0) as f64;
+            let first_and_third = self.first_and_third_quartile(&values).unwrap_or((0, 0));
+            let min_and_max = self.min_and_max(&values).unwrap_or((0, 0));
 
             let vec = vec![
                 ("Average: ".into(), avg),
@@ -139,11 +145,11 @@ impl StatisticsLogger for StatisticsLoggerImpl {
 pub struct VoidLogger {}
 
 impl StatisticsLogger for VoidLogger {
-    fn enrich_context(&mut self, context: &str) {}
+    fn enrich_context(&mut self, _context: &str) {}
 
     fn remove_context(&mut self) {}
 
-    fn log_statistic(&mut self, key: &str, count: i32) {}
+    fn log_statistic(&mut self, _key: &str, _count: i32) {}
 
     fn get_all(&self) -> HashMap<String, Vec<i32>> { HashMap::new() }
 
