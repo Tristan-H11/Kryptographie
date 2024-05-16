@@ -1,3 +1,4 @@
+use std::fmt::Display;
 use std::ops::{AddAssign, Div, Neg};
 
 use crate::api::endpoints::mv::EllipticCurveBean;
@@ -38,6 +39,16 @@ pub struct SecureFiniteFieldEllipticCurve {
     pub order_of_subgroup: BigInt,
     /// Der Generator der zyklischen Untergruppe
     pub generator: FiniteFieldEllipticCurvePoint,
+}
+
+impl Display for SecureFiniteFieldEllipticCurve {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "y^2 = {} * x^3 (mod {}),\nGenerator: {}",
+            self.a, self.prime, self.generator
+        )
+    }
 }
 
 impl From<EllipticCurveBean> for SecureFiniteFieldEllipticCurve {

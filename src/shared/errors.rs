@@ -1,3 +1,5 @@
+use crate::math_core::ecc::finite_field_elliptic_curve_point::FiniteFieldEllipticCurvePoint;
+use crate::math_core::ecc::secure_finite_field_elliptic_curve::SecureFiniteFieldEllipticCurve;
 use thiserror::Error;
 
 #[derive(Debug, Error, Clone)]
@@ -33,4 +35,16 @@ pub enum MenezesVanstoneError {
 
     #[error("Modulus width must be greater than 3, but it is {0}")]
     InvalidModulusWidthError(u32),
+
+    #[error("Number system base must be greater than 0, but it is {0}")]
+    InvalidNumberSystemBaseError(u32),
+}
+
+#[derive(Debug, Error, Clone)]
+pub enum EllipticCurveError {
+    #[error("Point {0} is not on curve {1}")]
+    PointNotOnCurveError(
+        FiniteFieldEllipticCurvePoint,
+        SecureFiniteFieldEllipticCurve,
+    ),
 }

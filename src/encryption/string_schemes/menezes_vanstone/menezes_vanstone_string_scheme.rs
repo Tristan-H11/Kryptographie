@@ -16,7 +16,8 @@ use crate::encryption::symmetric_encryption_types::{SymmetricDecryptor, Symmetri
 use crate::math_core::ecc::finite_field_elliptic_curve_point::FiniteFieldEllipticCurvePoint;
 use crate::math_core::number_theory::number_theory_service::NumberTheoryService;
 use crate::math_core::traits::logarithm::Logarithm;
-use anyhow::{bail, ensure, Context, Result};
+use crate::shared::errors::MenezesVanstoneError;
+use anyhow::{ensure, Context, Result};
 use bigdecimal::num_bigint::BigInt;
 use bigdecimal::Zero;
 
@@ -49,21 +50,15 @@ impl MenezesVanstoneStringScheme {
         random_seed: u32,
         radix: u32,
     ) -> Result<MenezesVanstoneStringKeyPair> {
-        if n < 1 {
-            bail!("n darf nicht kleiner 1 sein, ist aber {}.", n);
-        }
-        if modul_width <= 3 {
-            bail!(
-                "Die Modulbreite muss mindestens 4 Bit betragen, ist aber {}.",
-                modul_width
-            );
-        }
-        if radix == 0 {
-            bail!(
-                "Die Basis des Zeichensatzes muss größer als 0 sein, ist aber {}.",
-                radix
-            );
-        }
+        ensure!(n != 0, MenezesVanstoneError::InvalidNValueError(n));
+        ensure!(
+            modul_width > 3,
+            MenezesVanstoneError::InvalidModulusWidthError(modul_width)
+        );
+        ensure!(
+            radix != 0,
+            MenezesVanstoneError::InvalidNumberSystemBaseError(radix)
+        );
 
         let key_pair = MenezesVanstoneScheme::generate_keypair(
             n,
@@ -107,12 +102,12 @@ impl AsymmetricEncryptor<MenezesVanstoneStringScheme> for MenezesVanstoneStringS
     ) -> Self::Output {
         let radix = key.radix;
         let block_size = key.mv_key.curve.prime.log(&radix.into());
-        if block_size < 1 {
-            bail!(
-                "Die Blockgröße muss mindestens 1 sein, ist aber {}.",
-                block_size
-            )
-        }
+
+        ensure!(
+            block_size > 0,
+            "Die Blockgröße muss mindestens 1 sein, ist aber {}.",
+            block_size
+        );
         let decimal_unicode_key = DecimalUnicodeConversionSchemeKey { radix, block_size };
 
         // Blockchiffre anwenden
@@ -248,7 +243,11 @@ impl<'a> Signer<MenezesVanstoneStringScheme> for MenezesVanstoneStringScheme {
     type Output = String;
     type Key = MenezesVanstoneStringPrivateKey;
 
-    fn sign(_key: &Self::Key, _message: &Self::Input, _service: NumberTheoryService) -> Self::Output {
+    fn sign(
+        _key: &Self::Key,
+        _message: &Self::Input,
+        _service: NumberTheoryService,
+    ) -> Self::Output {
         todo!()
     }
 }

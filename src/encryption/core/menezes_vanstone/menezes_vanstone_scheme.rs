@@ -1,6 +1,5 @@
-use anyhow::Result;
-use anyhow::{bail, Context};
-
+use anyhow::{Context};
+use anyhow::{ensure, Result};
 
 use crate::api::endpoints::mv::MvSignatureBean;
 use atomic_counter::RelaxedCounter;
@@ -85,12 +84,11 @@ impl MenezesVanstoneScheme {
         miller_rabin_iterations: u32,
         random_seed: u32,
     ) -> Result<MenezesVanstoneKeyPair> {
-        if n == 0 {
-            bail!(MenezesVanstoneError::InvalidNValueError(n));
-        }
-        if modul_width <= 3 {
-            bail!(MenezesVanstoneError::InvalidModulusWidthError(modul_width));
-        }
+        ensure!(n != 0, MenezesVanstoneError::InvalidNValueError(n));
+        ensure!(
+            modul_width > 3,
+            MenezesVanstoneError::InvalidModulusWidthError(modul_width)
+        );
 
         let curve =
             SecureFiniteFieldEllipticCurve::new(n.into(), modul_width, miller_rabin_iterations)
@@ -158,12 +156,13 @@ impl AsymmetricEncryptor<MenezesVanstoneScheme> for MenezesVanstoneScheme {
                 .y
                 .multiply(&k, curve)
                 .context("Failed to calculate Point (c1, c2)")?;
-            if point.is_infinite {
-                bail!(
-                    "Calculated point is infinite, but cannot be since k < |H|. With k = {}",
-                    k
-                )
-            }
+
+            ensure!(
+                !point.is_infinite,
+                "Calculated point is infinite, but cannot be since k < |H|. With k = {}",
+                k
+            );
+
             (c1, c2) = (point.x, point.y);
             // Sind beide Werte ungleich 0, so ist das Paar (c1, c2) gültig
             if !c1.is_zero() && !c2.is_zero() {
@@ -244,12 +243,13 @@ impl<'a> Signer<MenezesVanstoneScheme> for MenezesVanstoneScheme {
                 .generator
                 .multiply(k, curve)
                 .context("Failed to calculate Point (c1, c2)")?;
-            if point.is_infinite {
-                bail!(
-                    "Calculated point is infinite, but cannot be since k < |H|. With k = {}",
-                    k
-                )
-            }
+
+            ensure!(
+                !point.is_infinite,
+                "Calculated point is infinite, but cannot be since k < |H|. With k = {}",
+                k
+            );
+
             let r = point.x.rem_euclid(q);
             if r.is_zero() {
                 continue;

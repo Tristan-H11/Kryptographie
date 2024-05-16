@@ -1,5 +1,6 @@
+use std::fmt::Display;
 use crate::api::endpoints::mv::EcPointBean;
-use anyhow::{bail, Context, Result};
+use anyhow::{ensure, Context, Result};
 use bigdecimal::num_bigint::BigInt;
 use bigdecimal::num_traits::Euclid;
 use bigdecimal::{One, Zero};
@@ -11,6 +12,7 @@ use crate::math_core::number_theory::number_theory_service::{
     NumberTheoryService, NumberTheoryServiceTrait,
 };
 use crate::math_core::traits::parity::Parity;
+use crate::shared::errors::EllipticCurveError::PointNotOnCurveError;
 
 /// Repräsentiert einen Punkt auf einer elliptischen Kurve.
 /// Die Koordinaten des Punktes sind Elemente eines endlichen Körpers.
@@ -20,6 +22,16 @@ pub struct FiniteFieldEllipticCurvePoint {
     pub x: BigInt,
     pub y: BigInt,
     pub is_infinite: bool,
+}
+
+impl Display for FiniteFieldEllipticCurvePoint {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        if self.is_infinite {
+            write!(f, "Infinite Point")
+        } else {
+            write!(f, "({}, {})", self.x, self.y)
+        }
+    }
 }
 
 impl From<EcPointBean> for FiniteFieldEllipticCurvePoint {
@@ -54,14 +66,14 @@ impl FiniteFieldEllipticCurvePoint {
     /// Die Punkte müssen auf der gleichen elliptischen Kurve liegen.
     pub fn add(&self, other: &Self, curve: &SecureFiniteFieldEllipticCurve) -> Result<Self> {
         // Liegen die Punkte nicht auf der gleichen Kurve, ist das Ergebnis undefiniert.
-        if !curve.has_point(self) || !curve.has_point(other) {
-            bail!(
-                "Points are not on the curve. P1: {:#?}, P2: {:#?}, Curve: {:#?}",
-                self,
-                other,
-                curve
-            )
-        }
+        ensure!(
+            curve.has_point(self),
+            PointNotOnCurveError(other.clone(), curve.clone())
+        );
+        ensure!(
+            curve.has_point(other),
+            PointNotOnCurveError(other.clone(), curve.clone())
+        );
 
         // Liegt einer der beiden Punkte im Unendlichen, so ist das Ergebnis der je andere Punkt.
         if self.is_infinite {
