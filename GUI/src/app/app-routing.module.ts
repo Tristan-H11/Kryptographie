@@ -1,6 +1,6 @@
 import {NgModule} from "@angular/core";
 import {RouterModule, Routes} from "@angular/router";
-import {DisplayCurveComponent} from "./display-curve/display-curve.component";
+import {CoordinateInputComponent} from "./display-curve/coordinate-input/coordinate-input.component";
 
 export const routes: Routes = [
     {
