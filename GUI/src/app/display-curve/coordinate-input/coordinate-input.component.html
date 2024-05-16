@@ -1,0 +1,25 @@
+<div class="coordinate-inputs">
+    <div *ngIf="_val_a !== undefined && _val_b !== undefined">
+        <mat-form-field appearance="outline" class="full-width">
+            <mat-label>{{ labelX }}</mat-label>
+            <input matInput placeholder="{{ placeholderX }}" type="number" [(ngModel)]="_val_a" [readonly]="readOnly" (ngModelChange)="onValAChange($event)">
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="full-width">
+            <mat-label>{{ labelY }}</mat-label>
+            <input matInput placeholder="{{ placeholderY }}" type="number" [(ngModel)]="_val_b" [readonly]="readOnly" (ngModelChange)="onValBChange($event)">
+        </mat-form-field>
+    </div>
+
+    <div *ngIf="_point_x !== '' && _point_y !== ''">
+        <mat-form-field appearance="outline" class="full-width">
+            <mat-label>X-Koordinate</mat-label>
+            <input matInput placeholder="X-Wert" type="number" [(ngModel)]="_point_x" [readonly]="readOnly" (ngModelChange)="onPointXChange($event)">
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Y-Koordinate</mat-label>
+            <input matInput placeholder="Y-Wert" type="number" [(ngModel)]="_point_y" [readonly]="readOnly" (ngModelChange)="onPointYChange($event)">
+        </mat-form-field>
+    </div>
+</div>
