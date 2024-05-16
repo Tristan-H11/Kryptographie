@@ -2,7 +2,7 @@ use crate::math_core::ecc::finite_field_elliptic_curve_point::FiniteFieldEllipti
 use crate::math_core::ecc::secure_finite_field_elliptic_curve::SecureFiniteFieldEllipticCurve;
 use thiserror::Error;
 
-#[derive(Debug, Error, Clone)]
+#[derive(Debug, Error)]
 pub enum ArithmeticError {
     /// Wird geworfen, wenn eine Zahl kein Inverses hat.
     ///
@@ -21,7 +21,7 @@ pub enum ArithmeticError {
     NoDiscreteLogarithmError(String, String),
 }
 
-#[derive(Debug, Error, Clone)]
+#[derive(Debug, Error)]
 pub enum MenezesVanstoneError {
     #[error("n must not be 0, but it is {0}")]
     InvalidNValueError(i32),
@@ -33,7 +33,7 @@ pub enum MenezesVanstoneError {
     InvalidNumberSystemBaseError(u32),
 }
 
-#[derive(Debug, Error, Clone)]
+#[derive(Error, Debug)]
 pub enum EllipticCurveError {
     #[error("Point {0} is not on curve {1}")]
     PointNotOnCurveError(
