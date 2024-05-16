@@ -11,9 +11,29 @@ import {MatButton} from "@angular/material/button";
 import {MatFormField, MatLabel} from "@angular/material/form-field";
 import {MatInput} from "@angular/material/input";
 import {DialogService} from "../services/utility/dialogs.service";
+import {CoordinateInputComponent} from "./coordinate-input/coordinate-input.component";
 
-class Point {
-    constructor(public x: number, public y: number) {
+abstract class AbstractPoint {
+    public x: number | string;
+    public y: number | string;
+
+    protected constructor(x: number | string, y: number | string) {
+        this.x = x;
+        this.y = y;
+    }
+}
+
+// Konkrete Implementierung der Klasse Point, die von AbstractPoint erbt
+class Point extends AbstractPoint {
+    constructor(x: number, y: number) {
+        super(x, y);  // Aufruf des Konstruktors der abstrakten Klasse
+    }
+}
+
+// Konkrete Implementierung der Klasse InfinityPoint, die von AbstractPoint erbt
+class InfinityPoint extends AbstractPoint {
+    constructor() {
+        super("Infinity", "Infinity");  // Aufruf des Konstruktors der abstrakten Klasse
     }
 }
 
@@ -31,7 +51,8 @@ class Point {
         MatExpansionPanelTitle,
         MatFormField,
         MatInput,
-        MatLabel
+        MatLabel,
+        CoordinateInputComponent
     ],
     templateUrl: './display-curve.component.html',
     styleUrls: ['./display-curve.component.scss']
@@ -42,21 +63,21 @@ export class DisplayCurveComponent implements OnInit {
     @ViewChild('plotContainerMul') plotContainerMul!: ElementRef;
 
     // Curve for Addition
-    public a_add = -7;
-    public b_add = 10;
+    public a_add: number = -7;
+    public b_add: number = 10;
     // Point on Curve
-    public P_add = new Point(1, 2);
-    public Q_add = new Point(3, 4);
+    public P_add: AbstractPoint = new Point(1, 2);
+    public Q_add: AbstractPoint = new Point(3, 4);
     // Result from point addition
-    public R_add = new Point(0, 0);
+    public R_add: AbstractPoint = new Point(0, 0);
 
     // Curve for Multiplication
-    public a_mul = -7;
-    public b_mul = 10;
-    public n_mul = 2;
-    public P_mul = new Point(1, 2);
+    public a_mul: number = -7;
+    public b_mul: number = 10;
+    public n_mul: number = 2;
+    public P_mul: AbstractPoint = new Point(1, 2);
     // Result point from Multiplication
-    public Q_mul = new Point(-1, -4);
+    public Q_mul: AbstractPoint = new Point(-1, -4);
 
     constructor(private dialogService: DialogService) {
     }
@@ -64,73 +85,107 @@ export class DisplayCurveComponent implements OnInit {
     ngOnInit(): void {
     }
 
-    private checkIfPointIsOnCurve(p: Point, a: number, b: number): boolean {
+    private checkIfPointIsOnCurve(p: AbstractPoint, a: number, b: number): boolean {
         // y^2 = x^3 + ax + b
-        return Math.pow(p.y, 2) === Math.pow(p.x, 3) + a * p.x + b;
+        if (p instanceof Point) {
+            const x = Number(p.x);
+            const y = Number(p.y);
+            return Math.pow(y, 2) === Math.pow(x, 3) + a * x + b;
+        }
+        return true; // Point at infinity is always on the curve
     }
 
-    private checkNeutralElement(p: Point, q: Point): boolean {
+    private checkInfinityPoint(x: AbstractPoint, y: AbstractPoint): boolean {
         // If one of the points is the point at infinity, the result is the other point
-        return (p.x == 0 && p.y == 0) || (q.x == 0 && q.y == 0);
+        if (x instanceof InfinityPoint && y instanceof Point) {
+            return false;
+        } else if (x instanceof Point && y instanceof Point) {
+            return false;
+        }
+        return true; // InfinityPoint
     }
 
-    private calculateYCoordinate(x: number): number {
-        return Math.sqrt(Math.pow(x, 3) + this.a_add * x + this.b_add);
+    private calculateYCoordinate(p: AbstractPoint): AbstractPoint {
+        if (p instanceof Point) {
+            const x = Number(p.x);
+            p.y = Math.sqrt(Math.pow(x, 3) + this.a_add * x + this.b_add);
+            return p;
+        }
+        return new InfinityPoint();
     }
 
-    private calculatePointAddition(p: Point, q: Point): Point {
+    private calculatePointAddition(p: AbstractPoint, q: AbstractPoint): AbstractPoint {
         let slope: number;
         let x3: number;
         let y3: number;
-        // Check condition 1: Page 57 P+O := O+P := P --> see function checkNeutralElement
+
+        console.log("Point in Addition function -- P: ", p)
+        console.log("Point in Addition function --  Q: ", q)
+
+        // Check condition 1: Page 57 P+O := O+P := P --> see function checkInfinityPoint
+        if (this.checkInfinityPoint(p, q)) {
+            console.log("Point P is the point at infinity. The result is point Q.", q);
+            return q;
+        }
+        if (this.checkInfinityPoint(q, p)) {
+            console.log("Point Q is the point at infinity. The result is point P.", p);
+            return p;
+        }
+
+        console.log("No Point is the point at infinity. Continue with calculation.")
+
         // Check condition 2: Page 57 P1, P2 ∈ E(IF) mit P1 = (x1, y1), P2 = (x2, y2), x1 = x2 und y1 + y2 = 0 gilt
         // P1 + P2 := O
-        if (p.x == q.x && p.y + q.y == 0) {
-            return new Point(0, 0);
+        const p_x = Number(p.x);
+        const p_y = Number(p.y);
+        const q_x = Number(q.x);
+        const q_y = Number(q.y);
+
+        if (p_x == q_x && p_y + q_y == 0) {
+            console.log("Point P and Q are the same but have different signs. The result is the point at infinity.");
+            return new InfinityPoint();
         }
         // Check condition 3: Page 57 SehnenTangentenVerfahren
-        if ((p.x != q.x) || (p.y + q.y != 0)) {
-            if (p.x != q.x) {
-                slope = (q.y - p.y) / (q.x - p.x);
-                x3 = Math.pow(slope, 2) - p.x - q.x;
-                y3 = -slope * (x3 - p.x) - p.y;
+        if ((p_x != q_x) || (p_y + q_y != 0)) {
+            if (p_x != q_x) {
+                slope = (q_y - p_y) / (q_x - p_x);
+                x3 = Math.pow(slope, 2) - p_x - q_x;
+                y3 = -slope * (x3 - p_x) - p_y;
+                console.log("Point P and Q are different. Calculate point R." + x3 + " " + y3);
                 return new Point(x3, y3);
             }
-            if (p.x == q.x && p.y == q.y && q.y != 0) {
-                slope = (3 * Math.pow(p.x, 2) + this.a_add) / (2 * p.y);
-                x3 = Math.pow(slope, 2) - 2 * p.x;
-                y3 = -slope * (x3 - p.x) - p.y;
+            if (p_x == q_x && p_y == q_y && q_y != 0) {
+                slope = (3 * Math.pow(p_x, 2) + this.a_add) / (2 * p_y);
+                x3 = Math.pow(slope, 2) - 2 * p_x;
+                y3 = -slope * (x3 - p_x) - p_y;
+                console.log("Point P and Q are the same. Calculate point R." + x3 + " " + y3);
                 return new Point(x3, y3);
             }
         }
         //Default
-        return new Point(0, 0);
+        console.log("Default case. Return point at infinity.");
+        return new InfinityPoint();
     }
 
     public add_calculation() {
-        if (!this.checkIfPointIsOnCurve(this.P_add, this.a_add, this.b_add)) {
-            if (!this.checkNeutralElement(this.P_add, this.Q_add)) {
-                this.P_add.y = this.calculateYCoordinate(this.P_add.x);
-            } else {
-                this.dialogService.showErrorDialog("Nullpunkt, kein Diagramm möglich, ändern Sie die Punktwerte.");
-                return;
+        console.log(this.P_add);
+        if (!this.checkIfPointIsOnCurve(this.P_add, this.a_add, this.b_add)) { // checks y^2 = x^3 + ax + b is true
+                this.P_add = this.calculateYCoordinate(this.P_add);
             }
-        }
         if (!this.checkIfPointIsOnCurve(this.Q_add, this.a_add, this.b_add)) {
-            if (!this.checkNeutralElement(this.P_add, this.Q_add)) {
-                this.Q_add.y = this.calculateYCoordinate(this.Q_add.x);
-            } else {
-                this.dialogService.showErrorDialog("Nullpunkt, kein Diagramm möglich, ändern Sie die Punktwerte.");
-                return;
-            }
+            this.Q_add = this.calculateYCoordinate(this.Q_add);
         }
+
+        console.log("Point P: ", this.P_add)
+        console.log("Point Q: ", this.Q_add)
+
         this.R_add = this.calculatePointAddition(this.P_add, this.Q_add);
         this.pointAdditionPlotCurve();
     }
 
     public mul_calculation() {
         if (!this.checkIfPointIsOnCurve(this.P_mul, this.a_mul, this.b_mul)) {
-            this.P_mul.y = this.calculateYCoordinate(this.P_mul.x);
+            this.P_mul = this.calculateYCoordinate(this.P_mul);
         }
         this.Q_mul = this.P_mul;
         for (let i = 1; i < this.n_mul; i++) {
@@ -141,12 +196,42 @@ export class DisplayCurveComponent implements OnInit {
 
     public mul_calculation_step() {
         if (!this.checkIfPointIsOnCurve(this.Q_mul, this.a_mul, this.b_mul)) {
-            this.Q_mul.y = this.calculateYCoordinate(this.Q_mul.x);
+            this.Q_mul = this.calculateYCoordinate(this.Q_mul);
         }
         this.Q_mul = this.calculatePointAddition(this.P_mul, this.Q_mul);
     }
 
     private pointAdditionPlotCurve() {
+        let P_add_x: number;
+        let P_add_y: number;
+        let Q_add_x: number;
+        let Q_add_y: number;
+        let R_add_x: number;
+        let R_add_y: number;
+
+        if (this.P_add instanceof InfinityPoint) {
+            P_add_x = NaN;
+            P_add_y = NaN;
+        } else {
+            P_add_x = Number(this.P_add.x);
+            P_add_y = Number(this.P_add.y);
+        }
+
+        if (this.Q_add instanceof InfinityPoint) {
+            Q_add_x = NaN;
+            Q_add_y = NaN;
+        } else {
+            Q_add_x = Number(this.Q_add.x);
+            Q_add_y = Number(this.Q_add.y);
+        }
+
+        if (this.R_add instanceof InfinityPoint) {
+            R_add_x = NaN;
+            R_add_y = NaN;
+        } else {
+            R_add_x = Number(this.R_add.x);
+            R_add_y = Number(this.R_add.y);
+        }
         functionPlot({
             target: this.plotContainerAdd.nativeElement,
             width: 800,
@@ -162,21 +247,21 @@ export class DisplayCurveComponent implements OnInit {
                     closed: false,
                 },
                 {
-                    fn: `(${(this.Q_add.y - this.P_add.y) / (this.Q_add.x - this.P_add.x)}) * x + (${this.P_add.y - (this.Q_add.y - this.P_add.y) /
-                    (this.Q_add.x - this.P_add.x) * this.P_add.x})`,
+                    fn: `(${(Q_add_y - P_add_y) / (Q_add_x - P_add_x)}) * x + (${P_add_y - (Q_add_y - P_add_y) /
+                    (Q_add_x - P_add_x) * P_add_x})`,
                     fnType: 'linear',
                     graphType: 'polyline',
                     color: 'red'
                 },
                 {
-                    points: [[this.P_add.x, this.P_add.y], [this.Q_add.x, this.Q_add.y], [this.R_add.x, this.R_add.y]],
+                    points: [[P_add_x, P_add_y], [Q_add_x, Q_add_y], [R_add_x, R_add_y]],
                     fnType: 'points',
                     graphType: 'scatter',
                     color: 'yellow',
                 },
                 {
-                    vector: [0, 2 * this.R_add.y],
-                    offset: [this.R_add.x, -this.R_add.y],
+                    vector: [0, 2 * R_add_y],
+                    offset: [R_add_x, -R_add_y],
                     fnType: 'vector',
                     graphType: 'polyline',
                     color: 'black'
@@ -186,6 +271,26 @@ export class DisplayCurveComponent implements OnInit {
     }
 
     private pointMultiplicationPlotCurve() {
+        let P_mul_x: number;
+        let P_mul_y: number;
+        let Q_mul_x: number;
+        let Q_mul_y: number;
+
+        if (this.P_mul instanceof InfinityPoint) {
+            P_mul_x = NaN;
+            P_mul_y = NaN;
+        } else {
+            P_mul_x = Number(this.P_mul.x);
+            P_mul_y = Number(this.P_mul.y);
+        }
+
+        if (this.Q_mul instanceof InfinityPoint) {
+            Q_mul_x = NaN;
+            Q_mul_y = NaN;
+        } else {
+            Q_mul_x = Number(this.Q_mul.x);
+            Q_mul_y = Number(this.Q_mul.y);
+        }
         functionPlot({
             target: this.plotContainerMul.nativeElement,
             width: 800,
@@ -201,21 +306,21 @@ export class DisplayCurveComponent implements OnInit {
                     closed: false,
                 },
                 {
-                    fn: `(${(this.Q_mul.y - this.P_mul.y) / (this.Q_mul.x - this.P_mul.x)}) * x + (${this.P_mul.y - (this.Q_mul.y - this.P_mul.y) /
-                    (this.Q_mul.x - this.P_mul.x) * this.P_mul.x})`,
+                    fn: `(${(Q_mul_y - P_mul_y) / (Q_mul_x - P_mul_x)}) * x + (${P_mul_y - (Q_mul_y - P_mul_y) /
+                    (Q_mul_x - P_mul_x) * P_mul_x})`,
                     fnType: 'linear',
                     graphType: 'polyline',
                     color: 'red'
                 },
                 {
-                    points: [[this.P_mul.x, this.P_mul.y], [this.Q_mul.x, this.Q_mul.y]],
+                    points: [[P_mul_x, P_mul_y], [Q_mul_x, Q_mul_y]],
                     fnType: 'points',
                     graphType: 'scatter',
                     color: 'yellow',
                 },
                 {
-                    vector: [0, 2 * this.Q_mul.y],
-                    offset: [this.Q_mul.x, -this.Q_mul.y],
+                    vector: [0, 2 * Q_mul_y],
+                    offset: [Q_mul_x, -Q_mul_y],
                     fnType: 'vector',
                     graphType: 'polyline',
                     color: 'black'
