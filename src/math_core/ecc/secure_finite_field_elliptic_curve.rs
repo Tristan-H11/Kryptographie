@@ -45,7 +45,7 @@ impl Display for SecureFiniteFieldEllipticCurve {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(
             f,
-            "y^2 = {} * x^3 (mod {}),\nGenerator: {}",
+            "y^2 = x^3 + {} * x (mod {}),\nGenerator: {}",
             self.a, self.prime, self.generator
         )
     }
