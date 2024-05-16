@@ -22,13 +22,6 @@ pub enum ArithmeticError {
 }
 
 #[derive(Debug, Error, Clone)]
-pub enum RsaError {
-    /// Wird geworfen, wenn die Schlüsselerzeugung fehlschlägt.
-    #[error("RSA Key generation error")]
-    KeyGenerationError,
-}
-
-#[derive(Debug, Error, Clone)]
 pub enum MenezesVanstoneError {
     #[error("n must not be 0, but it is {0}")]
     InvalidNValueError(i32),
