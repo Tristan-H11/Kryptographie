@@ -1,5 +1,5 @@
 import {ClientData, MvClientData, RsaClientData} from "./ClientData";
-import {Component, EventEmitter, Input} from "@angular/core";
+import {Component, EventEmitter, Input, Output} from "@angular/core";
 
 /**
  * Abstrakte Komponente für Client-Panel.
@@ -16,7 +16,7 @@ export abstract class AbstractClientPanelComponent<CLIENT extends ClientData> {
     @Input()
     public possibleTargetClients: CLIENT[] = [];
 
-    @Input()
+    @Output()
     public deleteSelf: EventEmitter<void> = new EventEmitter<void>();
 
     /**

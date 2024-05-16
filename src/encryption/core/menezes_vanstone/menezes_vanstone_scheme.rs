@@ -16,6 +16,9 @@ use crate::encryption::core::menezes_vanstone::keys::{
     MenezesVanstoneKeyPair, MenezesVanstonePrivateKey, MenezesVanstonePublicKey,
 };
 use crate::encryption::encryption_types::{Decryptor, EncryptionScheme, Encryptor};
+use crate::encryption::string_schemes::decimal_unicode_schemes::from_decimal_block_scheme::FromDecimalBlockScheme;
+use crate::encryption::string_schemes::decimal_unicode_schemes::keys::DecimalUnicodeConversionSchemeKey;
+use crate::encryption::symmetric_encryption_types::SymmetricDecryptor;
 use crate::math_core::ecc::finite_field_elliptic_curve_point::FiniteFieldEllipticCurvePoint;
 use crate::math_core::ecc::secure_finite_field_elliptic_curve::SecureFiniteFieldEllipticCurve;
 use crate::math_core::number_theory::number_theory_service::NumberTheoryServiceSpeed::Fast;
@@ -49,10 +52,23 @@ pub struct MenezesVanstoneSignature {
 impl From<MvSignatureBean> for MenezesVanstoneSignature {
     /// Mapped die Bean in das Domain-Modell
     fn from(signature: MvSignatureBean) -> Self {
-        MenezesVanstoneSignature {
-            r: signature.r.parse().unwrap(),
-            s: signature.s.parse().unwrap(),
-        }
+        // TODO: Sauber ausarbeiten!
+        let key = DecimalUnicodeConversionSchemeKey {
+            block_size: 4,
+            radix: 55296,
+        };
+        let blocks = FromDecimalBlockScheme::decrypt(&signature.string_representation, &key);
+        assert_eq!(blocks.len(), 2);
+        let r_from_string = blocks[0].clone();
+        let s_from_string = blocks[1].clone();
+
+        let r = signature.r.parse().unwrap();
+        let s = signature.s.parse().unwrap();
+
+        assert_eq!(r_from_string, r);
+        assert_eq!(s_from_string, s);
+
+        MenezesVanstoneSignature { r, s }
     }
 }
 

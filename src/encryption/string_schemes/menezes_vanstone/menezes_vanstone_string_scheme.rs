@@ -1,7 +1,5 @@
 use crate::api::endpoints::mv::MvCipherTextBean;
-use crate::encryption::asymmetric_encryption_types::{
-    AsymmetricDecryptor, AsymmetricEncryptionScheme, AsymmetricEncryptor,
-};
+use crate::encryption::asymmetric_encryption_types::{AsymmetricDecryptor, AsymmetricEncryptionScheme, AsymmetricEncryptor, Signer, Verifier};
 use crate::encryption::core::menezes_vanstone::menezes_vanstone_scheme::{
     MenezesVanstoneCiphertext, MenezesVanstonePlaintext, MenezesVanstoneScheme,
 };
@@ -16,7 +14,7 @@ use crate::encryption::symmetric_encryption_types::{SymmetricDecryptor, Symmetri
 use crate::math_core::ecc::finite_field_elliptic_curve_point::FiniteFieldEllipticCurvePoint;
 use crate::math_core::number_theory::number_theory_service::NumberTheoryService;
 use crate::math_core::traits::logarithm::Logarithm;
-use anyhow::{bail, Context, Result};
+use anyhow::{bail, Context, ensure, Result};
 use bigdecimal::num_bigint::BigInt;
 use bigdecimal::Zero;
 
@@ -115,19 +113,6 @@ impl AsymmetricEncryptor<MenezesVanstoneStringScheme> for MenezesVanstoneStringS
         }
         let decimal_unicode_key = DecimalUnicodeConversionSchemeKey { radix, block_size };
 
-        // TODO Löschen? Erstmal abhängen lassen. Deadline: 20.04.2024
-        // TODO Hier ist das Padding. Das muss aber noch irgendwie wieder rausgerechnet werden.
-        // TODO Funktioniert aber auch THEORETISCH(!) einwandfrei ohne. Überwiegend ungetestet!
-        // TODO Wenn die Nachricht genau uneven-blocks lang ist, wird ein letzter Block
-        // TODO mit Wert 0 eingefügt.
-        // Den Plaintext auffüllen, bis er eine gerade Anzahl von Blöcken erzeugen wird
-        // let diff = block_size * 2 - (plaintext.len() % (block_size * 2));
-        // let supplement = "\u{0000}".repeat(diff);
-        // let mut padded_plaintext = String::from(plaintext);
-        // if (plaintext.len() / block_size * 2) == 0 {
-        //     padded_plaintext.push_str(&supplement);
-        // }
-
         // Blockchiffre anwenden
         let message = ToDecimalBlockScheme::encrypt(&plaintext, &decimal_unicode_key);
 
@@ -135,10 +120,13 @@ impl AsymmetricEncryptor<MenezesVanstoneStringScheme> for MenezesVanstoneStringS
         let mut plaintext_list: Vec<MenezesVanstonePlaintext> = Vec::new();
         for chunk in message.chunks(2) {
             // Falls es den zweiten Block nicht gibt, soll eine 0 eingefügt werden.
+            // Dadurch kann die Nachricht "\u{0]" nicht mehr eindeutig entschlüsselt werden, weil
+            // diese im BlockChiffre keine eindeutige Repräsentation hat.
+            // Dieser Tradeoff ist aber in Ordnung und wird in der Praxis nicht relevant sein.
             if chunk.len() < 2 {
                 let plaintext_chunk = MenezesVanstonePlaintext {
                     first: chunk[0].clone(),
-                    second: BigInt::zero(), // TODO: Warum geht das? Eigentlich darf das nicht gewählt werden! Siehe Algorithmus 3.3, Auswahl von (m1, m2)
+                    second: BigInt::zero(),
                 };
                 plaintext_list.push(plaintext_chunk);
             } else {
@@ -206,9 +194,9 @@ impl AsymmetricDecryptor<MenezesVanstoneStringScheme> for MenezesVanstoneStringS
         let big_int_vec = FromDecimalBlockScheme::decrypt(&ciphertext_string, &decimal_unicode_key);
 
         // Wenn wir hier keine zusammenpassende Anzahl von Punkten und Tupeln haben,
-        // dann ist die Nachricht nicht korrekt verschlüsselt worden.
+        // dann ist die Nachricht nicht korrekt verschlüsselt oder grob manipuliert worden.
         // Durch '*2' wird ebenfalls sichergestellt, dass es eine gerade Anzahl von Tupeln gibt.
-        assert_eq!(points.len() * 2, big_int_vec.len(), "Ungültiger Ciphertext");
+        ensure!(points.len() * 2 == big_int_vec.len(), "Die Anzahl der Punkte und Tupel stimmen nicht überein.");
 
         // Die Zahlen in eine Liste von MenezesVanstoneCiphertext mappen
         let mut ciphertext_list: Vec<MenezesVanstoneCiphertext> = Vec::new();
@@ -233,7 +221,7 @@ impl AsymmetricDecryptor<MenezesVanstoneStringScheme> for MenezesVanstoneStringS
         let mut plaintext_list: Vec<MenezesVanstonePlaintext> = Vec::new();
         for ciphertext in ciphertext_list {
             let plaintext = MenezesVanstoneScheme::decrypt(&key.mv_key, &ciphertext, service)
-                .context("Entschlüsselung im MenezesVanstone-Kern fehlgeschlagen. Fehler: {:#?}")?;
+                .context("Entschlüsselung im MenezesVanstone-Kern fehlgeschlagen.")?;
             plaintext_list.push(plaintext);
         }
 
@@ -247,6 +235,27 @@ impl AsymmetricDecryptor<MenezesVanstoneStringScheme> for MenezesVanstoneStringS
             &big_int_vec,
             &decimal_unicode_key,
         ))
+    }
+}
+
+impl<'a> Signer<MenezesVanstoneStringScheme> for MenezesVanstoneStringScheme {
+    type Input = str;
+    type Output = String;
+    type Key = MenezesVanstoneStringPrivateKey;
+
+    fn sign(key: &Self::Key, message: &Self::Input, service: NumberTheoryService) -> Self::Output {
+        todo!()
+    }
+}
+
+impl<'a> Verifier<MenezesVanstoneStringScheme> for MenezesVanstoneStringScheme {
+    type Signature = str;
+    type Message = str;
+    type Output = bool;
+    type Key = MenezesVanstoneStringPublicKey;
+
+    fn verify(key: &Self::Key, signature: &Self::Signature, message: &Self::Message, service: NumberTheoryService) -> Self::Output {
+        todo!()
     }
 }
 

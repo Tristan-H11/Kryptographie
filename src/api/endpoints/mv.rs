@@ -14,12 +14,15 @@ use crate::encryption::core::menezes_vanstone::keys::{
 use crate::encryption::core::menezes_vanstone::menezes_vanstone_scheme::{
     MenezesVanstoneScheme, MenezesVanstoneSignature,
 };
+use crate::encryption::string_schemes::decimal_unicode_schemes::from_decimal_block_scheme::FromDecimalBlockScheme;
+use crate::encryption::string_schemes::decimal_unicode_schemes::keys::DecimalUnicodeConversionSchemeKey;
 use crate::encryption::string_schemes::menezes_vanstone::keys::{
     MenezesVanstoneStringPrivateKey, MenezesVanstoneStringPublicKey,
 };
 use crate::encryption::string_schemes::menezes_vanstone::menezes_vanstone_string_scheme::{
     MenezesVanstoneStringScheme, MvStringCiphertext,
 };
+use crate::encryption::symmetric_encryption_types::SymmetricEncryptor;
 use crate::math_core::ecc::finite_field_elliptic_curve_point::FiniteFieldEllipticCurvePoint;
 use crate::math_core::ecc::secure_finite_field_elliptic_curve::SecureFiniteFieldEllipticCurve;
 use crate::math_core::number_theory::number_theory_service::NumberTheoryService;
@@ -151,13 +154,23 @@ pub struct MvDecryptRequestBean {
 pub struct MvSignatureBean {
     pub r: String,
     pub s: String,
+    pub string_representation: String,
 }
 
 impl From<MenezesVanstoneSignature> for MvSignatureBean {
     fn from(signature: MenezesVanstoneSignature) -> Self {
+        //TODO Sauber ausarbeiten!
+        let blocks = vec![signature.r.clone(), signature.s.clone()];
+        let key = DecimalUnicodeConversionSchemeKey {
+            radix: 55296,
+            block_size: 4,
+        };
+        let string_representation = FromDecimalBlockScheme::encrypt(&blocks, &key);
+
         MvSignatureBean {
             r: signature.r.to_string(),
             s: signature.s.to_string(),
+            string_representation,
         }
     }
 }
