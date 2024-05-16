@@ -1,9 +1,9 @@
-use std::fmt::Display;
 use crate::api::endpoints::mv::EcPointBean;
 use anyhow::{ensure, Context, Result};
 use bigdecimal::num_bigint::BigInt;
 use bigdecimal::num_traits::Euclid;
 use bigdecimal::{One, Zero};
+use std::fmt::Display;
 use std::ops::Add;
 
 use crate::math_core::ecc::secure_finite_field_elliptic_curve::SecureFiniteFieldEllipticCurve;
