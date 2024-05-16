@@ -1,0 +1,95 @@
+<mat-accordion multi>
+    <mat-expansion-panel expanded>
+        <mat-expansion-panel-header>
+            <mat-panel-title>
+                Addition auf eliptischen Kurven
+            </mat-panel-title>
+        </mat-expansion-panel-header>
+
+        <app-coordinate-input
+                [labelX]="'Kurvenparameter A'"
+                [labelY]="'Kurvenparameter B'"
+                [placeholderX]="'Wert von A eingeben'"
+                [placeholderY]="'Wert von B eingeben'"
+                [(val_a)]="a_add"
+                [(val_b)]="b_add">
+        </app-coordinate-input>
+
+        <app-coordinate-input
+                [labelX]="'X-Koordinate von P'"
+                [labelY]="'Y-Koordinate von P'"
+                [placeholderX]="'X-Wert von P'"
+                [placeholderY]="'Y-Wert von P'"
+                [(point_x)]="P_add.x"
+                [(point_y)]="P_add.y">
+        </app-coordinate-input>
+
+        <app-coordinate-input
+                [labelX]="'X-Koordinate von Q'"
+                [labelY]="'Y-Koordinate von Q'"
+                [placeholderX]="'X-Wert von Q'"
+                [placeholderY]="'Y-Wert von Q'"
+                [(point_x)]="Q_add.x"
+                [(point_y)]="Q_add.y">
+        </app-coordinate-input>
+
+        <app-coordinate-input
+                [labelX]="'X-Koordinate von R'"
+                [labelY]="'Y-Koordinate von R'"
+                [placeholderX]="'X-Wert von R'"
+                [placeholderY]="'Y-Wert von R'"
+                [(point_x)]="R_add.x"
+                [(point_y)]="R_add.y"
+                [readOnly]="true">
+        </app-coordinate-input>
+
+        <mat-action-row>
+            <button mat-raised-button color="primary" (click)="add_calculation()">Berechnen</button>
+        </mat-action-row>
+    </mat-expansion-panel>
+</mat-accordion>
+<div #plotContainerAdd id="plot-container-add" class="plot-container"></div>
+
+<mat-accordion multi>
+    <mat-expansion-panel expanded>
+        <mat-expansion-panel-header>
+            <mat-panel-title>
+                Skalarmultiplikation von Punkten auf elliptischen Kurven
+            </mat-panel-title>
+        </mat-expansion-panel-header>
+
+        <app-coordinate-input
+                [labelX]="'Kurvenparameter A'"
+                [labelY]="'Kurvenparameter B'"
+                [placeholderX]="'Wert von A eingeben'"
+                [placeholderY]="'Wert von B eingeben'"
+                [(val_a)]="a_mul"
+                [(val_b)]="b_mul">
+        </app-coordinate-input>
+
+        <app-coordinate-input
+                [labelX]="'X-Koordinate von P'"
+                [labelY]="'Y-Koordinate von P'"
+                [placeholderX]="'X-Wert von P'"
+                [placeholderY]="'Y-Wert von P'"
+                [(point_x)]="P_mul.x"
+                [(point_y)]="P_mul.y">
+        </app-coordinate-input>
+
+        <app-coordinate-input
+                [labelX]="'X-Koordinate von Q'"
+                [labelY]="'Y-Koordinate von Q'"
+                [placeholderX]="'X-Wert von Q'"
+                [placeholderY]="'Y-Wert von Q'"
+                [(point_x)]="Q_mul.x"
+                [(point_y)]="Q_mul.y"
+                [readOnly]="true">
+        </app-coordinate-input>
+
+        <mat-action-row>
+            <button mat-raised-button color="primary" (click)="mul_calculation()">Berechnen</button>
+        </mat-action-row>
+    </mat-expansion-panel>
+</mat-accordion>
+
+<div #plotContainerMul id="plot-container-mul" class="plot-container"></div>

@@ -1,0 +1,17 @@
+.full-width {
+  width: calc(50% - 10px);
+}
+
+.coordinate-inputs {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}
+
+.plot-container {
+  width: 80%;
+  margin: 0 auto;
+  background-color: #f0f0f0;
+  padding: 20px;
+  border-radius: 10px;
+}
