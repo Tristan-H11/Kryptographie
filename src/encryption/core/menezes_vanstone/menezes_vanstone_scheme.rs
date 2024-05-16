@@ -1,6 +1,6 @@
 use anyhow::Result;
 use anyhow::{bail, Context};
-use std::time::SystemTime;
+
 
 use crate::api::endpoints::mv::MvSignatureBean;
 use atomic_counter::RelaxedCounter;
@@ -142,7 +142,7 @@ impl AsymmetricEncryptor<MenezesVanstoneScheme> for MenezesVanstoneScheme {
         let prime = &key.curve.prime;
 
         let mut rng = rand::thread_rng();
-        let random_seed:u16 = rng.next_u32() as u16;
+        let random_seed: u16 = rng.next_u32() as u16;
 
         let random_generator = PseudoRandomNumberGenerator::new(random_seed as u32, service);
         let counter = RelaxedCounter::new(1);
@@ -397,11 +397,9 @@ mod tests {
         // Testet, ob ein Fehler zurückgegeben wird, wenn n = 0 ist
         let result = MenezesVanstoneScheme::generate_keypair(0, 128, 40, 123);
         match result {
-            Err(err) => {
-                match err.downcast_ref::<MenezesVanstoneError>() {
-                    Some(&MenezesVanstoneError::InvalidNValueError(_)) => assert!(true),
-                    _ => assert!(false, "Expected InvalidNValueError"),
-                }
+            Err(err) => match err.downcast_ref::<MenezesVanstoneError>() {
+                Some(&MenezesVanstoneError::InvalidNValueError(_)) => assert!(true),
+                _ => assert!(false, "Expected InvalidNValueError"),
             },
             _ => assert!(false, "Expected an error"),
         }
@@ -412,11 +410,9 @@ mod tests {
         // Testet, ob ein Fehler zurückgegeben wird, wenn die Breite des Moduls <= 3 ist
         let result = MenezesVanstoneScheme::generate_keypair(5, 3, 40, 123);
         match result {
-            Err(err) => {
-                match err.downcast_ref::<MenezesVanstoneError>() {
-                    Some(&MenezesVanstoneError::InvalidModulusWidthError(_)) => assert!(true),
-                    _ => assert!(false, "Expected InvalidModulusWidthError"),
-                }
+            Err(err) => match err.downcast_ref::<MenezesVanstoneError>() {
+                Some(&MenezesVanstoneError::InvalidModulusWidthError(_)) => assert!(true),
+                _ => assert!(false, "Expected InvalidModulusWidthError"),
             },
             _ => assert!(false, "Expected an error"),
         }
@@ -433,7 +429,7 @@ mod tests {
         let public_key = key_pair.public_key;
         let private_key = key_pair.private_key;
         let message = "Hello My Friend!";
-        let signature =
+        let _signature =
             MenezesVanstoneScheme::sign(&private_key, message, NumberTheoryService::new(Fast))
                 .unwrap();
         // Manipulation der Signatur
@@ -446,7 +442,8 @@ mod tests {
             &invalid_signature,
             message,
             NumberTheoryService::new(Fast),
-        ).unwrap();
+        )
+        .unwrap();
         assert!(!is_verified);
     }
 
@@ -475,7 +472,7 @@ mod tests {
             another_message,
             NumberTheoryService::new(Fast),
         )
-            .unwrap();
+        .unwrap();
         assert!(!is_verified);
     }
 }

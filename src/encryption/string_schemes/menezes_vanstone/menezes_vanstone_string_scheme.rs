@@ -1,5 +1,7 @@
 use crate::api::endpoints::mv::MvCipherTextBean;
-use crate::encryption::asymmetric_encryption_types::{AsymmetricDecryptor, AsymmetricEncryptionScheme, AsymmetricEncryptor, Signer, Verifier};
+use crate::encryption::asymmetric_encryption_types::{
+    AsymmetricDecryptor, AsymmetricEncryptionScheme, AsymmetricEncryptor, Signer, Verifier,
+};
 use crate::encryption::core::menezes_vanstone::menezes_vanstone_scheme::{
     MenezesVanstoneCiphertext, MenezesVanstonePlaintext, MenezesVanstoneScheme,
 };
@@ -14,7 +16,7 @@ use crate::encryption::symmetric_encryption_types::{SymmetricDecryptor, Symmetri
 use crate::math_core::ecc::finite_field_elliptic_curve_point::FiniteFieldEllipticCurvePoint;
 use crate::math_core::number_theory::number_theory_service::NumberTheoryService;
 use crate::math_core::traits::logarithm::Logarithm;
-use anyhow::{bail, Context, ensure, Result};
+use anyhow::{bail, ensure, Context, Result};
 use bigdecimal::num_bigint::BigInt;
 use bigdecimal::Zero;
 
@@ -196,7 +198,10 @@ impl AsymmetricDecryptor<MenezesVanstoneStringScheme> for MenezesVanstoneStringS
         // Wenn wir hier keine zusammenpassende Anzahl von Punkten und Tupeln haben,
         // dann ist die Nachricht nicht korrekt verschlüsselt oder grob manipuliert worden.
         // Durch '*2' wird ebenfalls sichergestellt, dass es eine gerade Anzahl von Tupeln gibt.
-        ensure!(points.len() * 2 == big_int_vec.len(), "Die Anzahl der Punkte und Tupel stimmen nicht überein.");
+        ensure!(
+            points.len() * 2 == big_int_vec.len(),
+            "Die Anzahl der Punkte und Tupel stimmen nicht überein."
+        );
 
         // Die Zahlen in eine Liste von MenezesVanstoneCiphertext mappen
         let mut ciphertext_list: Vec<MenezesVanstoneCiphertext> = Vec::new();
@@ -243,7 +248,7 @@ impl<'a> Signer<MenezesVanstoneStringScheme> for MenezesVanstoneStringScheme {
     type Output = String;
     type Key = MenezesVanstoneStringPrivateKey;
 
-    fn sign(key: &Self::Key, message: &Self::Input, service: NumberTheoryService) -> Self::Output {
+    fn sign(_key: &Self::Key, _message: &Self::Input, _service: NumberTheoryService) -> Self::Output {
         todo!()
     }
 }
@@ -254,7 +259,12 @@ impl<'a> Verifier<MenezesVanstoneStringScheme> for MenezesVanstoneStringScheme {
     type Output = bool;
     type Key = MenezesVanstoneStringPublicKey;
 
-    fn verify(key: &Self::Key, signature: &Self::Signature, message: &Self::Message, service: NumberTheoryService) -> Self::Output {
+    fn verify(
+        _key: &Self::Key,
+        _signature: &Self::Signature,
+        _message: &Self::Message,
+        _service: NumberTheoryService,
+    ) -> Self::Output {
         todo!()
     }
 }

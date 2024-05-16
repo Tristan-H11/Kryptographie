@@ -1,7 +1,7 @@
 use std::ops::{AddAssign, Div, Neg};
 
 use crate::api::endpoints::mv::EllipticCurveBean;
-use anyhow::{Context, ensure, Result};
+use anyhow::{ensure, Context, Result};
 use atomic_counter::RelaxedCounter;
 use bigdecimal::num_bigint::BigInt;
 use bigdecimal::num_traits::Euclid;
@@ -65,9 +65,11 @@ impl SecureFiniteFieldEllipticCurve {
     /// -- q = N / 8, wobei N = |E(Z_p)| (Ordnung der Kurve) und
     /// -- q muss eine Primzahl sein
     pub fn new(n: i64, modul_width: u32, miller_rabin_iterations: u32) -> Result<Self> {
-
         ensure!(n != 0, "Der Koeffizient a darf nicht 0 sein!");
-        ensure!(modul_width >= 4, "Der Modulus p muss mindestens 4 Bit breit sein!");
+        ensure!(
+            modul_width >= 4,
+            "Der Modulus p muss mindestens 4 Bit breit sein!"
+        );
 
         let a = n.pow(2).neg();
 
@@ -254,7 +256,8 @@ impl SecureFiniteFieldEllipticCurve {
         let service = NumberTheoryService::new(Fast); // TODO übergeben lassen
         let negative_one = BigInt::from(-1);
 
-        if a.is_multiple_of(prime) { // Definition 1.27 Punkt 2, Falls p|a, dann (a/p) := 0
+        if a.is_multiple_of(prime) {
+            // Definition 1.27 Punkt 2, Falls p|a, dann (a/p) := 0
             return BigInt::zero();
         }
 
@@ -346,7 +349,6 @@ impl SecureFiniteFieldEllipticCurve {
         Ok(generator)
     }
 
-
     /// Überprüft, ob ein Punkt auf der elliptischen Kurve liegt.
     pub fn has_point(&self, point: &FiniteFieldEllipticCurvePoint) -> bool {
         let x_squared = &point.x.pow(2);
@@ -435,7 +437,10 @@ mod tests {
         let result = SecureFiniteFieldEllipticCurve::new(5, 3, 40);
         match result {
             Err(err) => {
-                assert_eq!(err.to_string(), "Der Modulus p muss mindestens 4 Bit breit sein!");
+                assert_eq!(
+                    err.to_string(),
+                    "Der Modulus p muss mindestens 4 Bit breit sein!"
+                );
             }
             _ => panic!("Erwarteter Fehler wurde nicht zurückgegeben"),
         }
@@ -444,7 +449,10 @@ mod tests {
         let result = SecureFiniteFieldEllipticCurve::new(5, 0, 40);
         match result {
             Err(err) => {
-                assert_eq!(err.to_string(), "Der Modulus p muss mindestens 4 Bit breit sein!");
+                assert_eq!(
+                    err.to_string(),
+                    "Der Modulus p muss mindestens 4 Bit breit sein!"
+                );
             }
             _ => panic!("Erwarteter Fehler wurde nicht zurückgegeben"),
         }
@@ -464,13 +472,16 @@ mod tests {
     fn test_calculate_legendre_symbol() {
         let prime = BigInt::from(13);
         // Test mit quadratischem Rest
-        let legendre_symbol_1 = SecureFiniteFieldEllipticCurve::calculate_legendre_symbol(&12.into(), &prime); // Satz 1.18
+        let legendre_symbol_1 =
+            SecureFiniteFieldEllipticCurve::calculate_legendre_symbol(&12.into(), &prime); // Satz 1.18
         assert_eq!(legendre_symbol_1, BigInt::one());
         // Test mit quadratischem Nichtrest
-        let legendre_symbol_2 = SecureFiniteFieldEllipticCurve::calculate_legendre_symbol(&2.into(), &prime); // Satz 1.19
+        let legendre_symbol_2 =
+            SecureFiniteFieldEllipticCurve::calculate_legendre_symbol(&2.into(), &prime); // Satz 1.19
         assert_eq!(legendre_symbol_2, BigInt::from(-1));
         // Test mit a = 0 (Punkt liegt auf der y-Achse)
-        let legendre_symbol_3 = SecureFiniteFieldEllipticCurve::calculate_legendre_symbol(&BigInt::zero(), &prime); // Definition 1.27 Punkt 2
+        let legendre_symbol_3 =
+            SecureFiniteFieldEllipticCurve::calculate_legendre_symbol(&BigInt::zero(), &prime); // Definition 1.27 Punkt 2
         assert_eq!(legendre_symbol_3, BigInt::zero());
     }
 

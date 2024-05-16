@@ -242,8 +242,10 @@ mod tests {
         let curve = get_curve();
         let generator = curve.generator.clone();
         let result = generator
-            .add(&generator, &curve).unwrap()
-            .add(&generator, &curve).unwrap();
+            .add(&generator, &curve)
+            .unwrap()
+            .add(&generator, &curve)
+            .unwrap();
         let expected = generator.multiply(&3.into(), &curve).unwrap();
         assert_eq!(result, expected);
     }
@@ -284,11 +286,15 @@ mod tests {
     fn test_add_point_to_its_negation() {
         let curve = get_curve();
         let generator = curve.generator.clone();
-        let negated_generator = FiniteFieldEllipticCurvePoint::new(generator.x.clone(), -generator.y.clone());
+        let negated_generator =
+            FiniteFieldEllipticCurvePoint::new(generator.x.clone(), -generator.y.clone());
         // Addiere negativen Generator --> Infinity
         let result = generator.add(&negated_generator, &curve).unwrap();
         let expected = FiniteFieldEllipticCurvePoint::infinite();
-        assert_eq!(result, expected, "Adding a point to its negation should result in the infinite point");
+        assert_eq!(
+            result, expected,
+            "Adding a point to its negation should result in the infinite point"
+        );
     }
 
     #[test]
@@ -298,8 +304,9 @@ mod tests {
         let large_scalar = BigInt::from(1000000000);
         // Multiplying the generator by a large scalar
         let result = generator.multiply(&large_scalar, &curve).unwrap();
-        let expected = generator.multiply(&BigInt::from(1000000000), &curve).unwrap();
+        let expected = generator
+            .multiply(&BigInt::from(1000000000), &curve)
+            .unwrap();
         assert_eq!(result, expected);
     }
-
 }
