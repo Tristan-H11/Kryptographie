@@ -199,4 +199,14 @@ describe('MvClientPanelComponent', () => {
         expect(dialogServiceSpy.endTimedCalc).toHaveBeenCalledWith('loadingCalcKey', 'Nachricht entschlüsselt und verifiziert.');
     }));
 
+    it('should not encrypt message when sendingTo is not set', fakeAsync(() => {
+        component.client = source_client;
+        component.client.sendingTo = undefined;  // No target client
+        component.encrypt();
+        tick();
+        expect(backendRequestServiceSpy.encrypt).not.toHaveBeenCalled();
+        expect(dialogServiceSpy.endTimedCalc).not.toHaveBeenCalled();
+    }));
+
+
 });
