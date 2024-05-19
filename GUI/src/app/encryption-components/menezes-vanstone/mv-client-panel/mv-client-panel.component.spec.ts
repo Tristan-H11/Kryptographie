@@ -148,6 +148,9 @@ describe('MvClientPanelComponent', () => {
         fixture = TestBed.createComponent(MvClientPanelComponent);
         component = fixture.componentInstance;
         fixture.detectChanges();
+        backendRequestServiceSpy = TestBed.inject(MvBackendRequestService) as jasmine.SpyObj<MvBackendRequestService>;
+        dialogServiceSpy = TestBed.inject(DialogService) as jasmine.SpyObj<DialogService>;
+
     });
 
     it('should create', () => {
@@ -208,5 +211,13 @@ describe('MvClientPanelComponent', () => {
         expect(dialogServiceSpy.endTimedCalc).not.toHaveBeenCalled();
     }));
 
+    it('should not decrypt message when key pair is not set', fakeAsync(() => {
+        component.client = {...target_client, keyPair: undefined};  // No key pair
+        component.decrypt();
+        tick();
+
+        expect(backendRequestServiceSpy.decrypt).not.toHaveBeenCalled();
+        expect(dialogServiceSpy.endTimedCalc).not.toHaveBeenCalled();
+    }));
 
 });
