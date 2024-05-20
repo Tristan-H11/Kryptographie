@@ -1,4 +1,4 @@
-import {Component, Input} from '@angular/core';
+import {Component} from '@angular/core';
 import {
     MatAccordion,
     MatExpansionPanel, MatExpansionPanelActionRow,
@@ -99,7 +99,6 @@ export class MenezesVanstoneSingleComponent {
         this.backendRequestService.encrypt(request).pipe(
             concatMap(ciphertext => {
                 this.client.ciphertext = copyMvCipherText(ciphertext);
-                this.client.plaintext = "";
 
                 if (!this.client.keyPair) {
                     this.dialogService.endTimedCalc(loadingCalcKey, "Nachricht verschlüsselt.");
@@ -110,6 +109,7 @@ export class MenezesVanstoneSingleComponent {
                     private_key: this.client.keyPair.private_key,
                     message: this.client.plaintext
                 };
+                this.client.plaintext = "";
                 return this.backendRequestService.sign(body);
             })
         ).subscribe(signature => {
