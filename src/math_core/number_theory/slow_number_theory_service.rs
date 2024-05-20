@@ -4,7 +4,7 @@ use bigdecimal::num_bigint::BigInt;
 use bigdecimal::num_traits::Euclid;
 use bigdecimal::{One, Zero};
 
-use crate::math_core::number_theory::number_theory_service::NumberTheoryServiceSpeed::Slow;
+use crate::math_core::number_theory::number_theory_service::NumberTheoryServiceSpeed::{Fast, Slow};
 use crate::math_core::number_theory::number_theory_service::{
     NumberTheoryService, NumberTheoryServiceTrait,
 };
@@ -90,6 +90,11 @@ impl NumberTheoryServiceTrait for SlowNumberTheoryService {
         random_generator: &PseudoRandomNumberGenerator,
     ) -> bool {
         let primality_test = PrimalityTest::new(NumberTheoryService::new(Slow));
+
+        if PrimalityTest::fails_primitive_prime_checks(p) {
+            return false;
+        }
+
         primality_test.miller_rabin(p, repeats, random_generator)
     }
 }
