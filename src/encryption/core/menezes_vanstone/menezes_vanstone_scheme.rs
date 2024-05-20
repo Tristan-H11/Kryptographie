@@ -20,7 +20,7 @@ use crate::encryption::string_schemes::decimal_unicode_schemes::keys::DecimalUni
 use crate::encryption::symmetric_encryption_types::SymmetricDecryptor;
 use crate::math_core::ecc::finite_field_elliptic_curve_point::FiniteFieldEllipticCurvePoint;
 use crate::math_core::ecc::secure_finite_field_elliptic_curve::SecureFiniteFieldEllipticCurve;
-use crate::math_core::number_theory::number_theory_service::NumberTheoryServiceSpeed::Fast;
+use crate::math_core::number_theory::number_theory_service::NumberTheoryServiceSpeed::Slow;
 use crate::math_core::number_theory::number_theory_service::{
     NumberTheoryService, NumberTheoryServiceTrait,
 };
@@ -94,7 +94,7 @@ impl MenezesVanstoneScheme {
             SecureFiniteFieldEllipticCurve::new(n.into(), modul_width, miller_rabin_iterations)
                 .context("Failed to create secure elliptic curve")?;
 
-        let prng = PseudoRandomNumberGenerator::new(random_seed, NumberTheoryService::new(Fast)); // TODO übergeben
+        let prng = PseudoRandomNumberGenerator::new(random_seed, NumberTheoryService::new(Slow)); // TODO übergeben
         let counter = RelaxedCounter::new(1);
         let order_of_subgroup = &curve.order_of_subgroup;
         let (mut x, mut y);

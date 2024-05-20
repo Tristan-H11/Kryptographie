@@ -7,7 +7,7 @@ use std::fmt::Display;
 use std::ops::Add;
 
 use crate::math_core::ecc::secure_finite_field_elliptic_curve::SecureFiniteFieldEllipticCurve;
-use crate::math_core::number_theory::number_theory_service::NumberTheoryServiceSpeed::Fast;
+use crate::math_core::number_theory::number_theory_service::NumberTheoryServiceSpeed::Slow;
 use crate::math_core::number_theory::number_theory_service::{
     NumberTheoryService, NumberTheoryServiceTrait,
 };
@@ -95,7 +95,7 @@ impl FiniteFieldEllipticCurvePoint {
 
         let prime = &curve.prime;
 
-        let service = NumberTheoryService::new(Fast); // TODO X: Später korrigieren
+        let service = NumberTheoryService::new(Slow);
 
         // Zähler der Steigung berechnen
         let slope_numer = &other.y - &self.y;
@@ -125,7 +125,7 @@ impl FiniteFieldEllipticCurvePoint {
         if self.y.is_zero() {
             return FiniteFieldEllipticCurvePoint::infinite();
         }
-        let service = NumberTheoryService::new(Fast); // TODO X: Später korrigieren
+        let service = NumberTheoryService::new(Slow);
         let p = &curve.prime;
         // Zähler der Steigung berechnen
         let slope_numer = 3 * (&self.x).pow(2) + &curve.a;

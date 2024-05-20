@@ -12,7 +12,7 @@ use num::Integer;
 
 use crate::math_core::complex_number::{complex_euclidean_algorithm, ComplexNumber};
 use crate::math_core::ecc::finite_field_elliptic_curve_point::FiniteFieldEllipticCurvePoint;
-use crate::math_core::number_theory::number_theory_service::NumberTheoryServiceSpeed::Fast;
+use crate::math_core::number_theory::number_theory_service::NumberTheoryServiceSpeed::Slow;
 use crate::math_core::number_theory::number_theory_service::{
     NumberTheoryService, NumberTheoryServiceTrait,
 };
@@ -149,7 +149,7 @@ impl SecureFiniteFieldEllipticCurve {
         let double_n = BigInt::from(n).double();
         let mut prime = prime.clone();
         let mut q: BigInt;
-        let service = NumberTheoryService::new(Fast); // TODO übergeben lassen
+        let service = NumberTheoryService::new(Slow);
         let prng = PseudoRandomNumberGenerator::new_seeded(); // TODO übergeben lassen
 
         // Die Schleife, die läuft, bis 'q = N / 8' eine Primzahl ergibt.
@@ -210,7 +210,7 @@ impl SecureFiniteFieldEllipticCurve {
         // w(p, z) = z ^ ((p - 1) / 4) (mod p)
         // gilt anschließend w(p, z)^2 + 1 = 0 (mod p), ist der Wert gültig.
         // Andernfalls wiederholen mit z = z + 2
-        let service = NumberTheoryService::new(Fast); // TODO übergeben lassen
+        let service = NumberTheoryService::new(Slow);
         let mut w: BigInt;
         loop {
             w = service.fast_exponentiation(&z, &(prime.decrement().div(4)), prime);
@@ -264,7 +264,7 @@ impl SecureFiniteFieldEllipticCurve {
     /// (a/p) := (+1 falls a quadratischer Rest mod p, -1 falls a quadratischer Nichtrest mod p, 0 falls a = 0)
     //TODO Auch aufnehmen, dass b eine Primzahl > 3 sein muss
     pub fn calculate_legendre_symbol(a: &BigInt, prime: &BigInt) -> BigInt {
-        let service = NumberTheoryService::new(Fast); // TODO übergeben lassen
+        let service = NumberTheoryService::new(Slow);
         let negative_one = BigInt::from(-1);
 
         if a.is_multiple_of(prime) {
@@ -311,7 +311,7 @@ impl SecureFiniteFieldEllipticCurve {
         counter: &RelaxedCounter,
     ) -> Result<FiniteFieldEllipticCurvePoint> {
         let mut generator: FiniteFieldEllipticCurvePoint;
-        let service = NumberTheoryService::new(Fast); // TODO übergeben lassen
+        let service = NumberTheoryService::new(Slow);
 
         // Schleife, die läuft, bis ein Generator gefunden wurde, der nicht den Punkt im Unendlichen
         // darstellt oder dessen Ordnung nicht N/8 ist.
