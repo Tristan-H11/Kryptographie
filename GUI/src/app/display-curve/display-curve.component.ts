@@ -119,20 +119,13 @@ export class DisplayCurveComponent implements OnInit {
         let x3: number;
         let y3: number;
 
-        console.log("Point in Addition function -- P: ", p)
-        console.log("Point in Addition function --  Q: ", q)
-
         // Check condition 1: Page 57 P+O := O+P := P --> see function checkInfinityPoint
         if (this.checkInfinityPoint(p, q)) {
-            console.log("Point P is the point at infinity. The result is point Q.", q);
             return q;
         }
         if (this.checkInfinityPoint(q, p)) {
-            console.log("Point Q is the point at infinity. The result is point P.", p);
             return p;
         }
-
-        console.log("No Point is the point at infinity. Continue with calculation.")
 
         // Check condition 2: Page 57 P1, P2 ∈ E(IF) mit P1 = (x1, y1), P2 = (x2, y2), x1 = x2 und y1 + y2 = 0 gilt
         // P1 + P2 := O
@@ -142,7 +135,6 @@ export class DisplayCurveComponent implements OnInit {
         const q_y = Number(q.y);
 
         if (p_x == q_x && p_y + q_y == 0) {
-            console.log("Point P and Q are the same but have different signs. The result is the point at infinity.");
             return new InfinityPoint();
         }
         // Check condition 3: Page 57 SehnenTangentenVerfahren
@@ -151,24 +143,36 @@ export class DisplayCurveComponent implements OnInit {
                 slope = (q_y - p_y) / (q_x - p_x);
                 x3 = Math.pow(slope, 2) - p_x - q_x;
                 y3 = -slope * (x3 - p_x) - p_y;
-                console.log("Point P and Q are different. Calculate point R." + x3 + " " + y3);
                 return new Point(x3, y3);
             }
             if (p_x == q_x && p_y == q_y && q_y != 0) {
                 slope = (3 * Math.pow(p_x, 2) + this.a_add) / (2 * p_y);
                 x3 = Math.pow(slope, 2) - 2 * p_x;
                 y3 = -slope * (x3 - p_x) - p_y;
-                console.log("Point P and Q are the same. Calculate point R." + x3 + " " + y3);
                 return new Point(x3, y3);
             }
         }
         //Default
-        console.log("Default case. Return point at infinity.");
         return new InfinityPoint();
     }
 
     public add_calculation() {
-        console.log(this.P_add);
+        if (isNaN(this.a_add) ) {
+            this.dialogService.showInformationDialog("Please enter a value for A");
+            return;
+        }
+        if (isNaN(this.b_add) ) {
+            this.dialogService.showInformationDialog("Please enter a value for B");
+            return;
+        }
+        if (this.P_add instanceof InfinityPoint) {
+            this.dialogService.showInformationDialog("Please enter a value for P");
+            return;
+        }
+        if (this.Q_add instanceof InfinityPoint) {
+            this.dialogService.showInformationDialog("Please enter a value for Q");
+            return;
+        }
         if (!this.checkIfPointIsOnCurve(this.P_add, this.a_add, this.b_add)) { // checks y^2 = x^3 + ax + b is true
                 this.P_add = this.calculateYCoordinate(this.P_add);
             }
@@ -176,14 +180,27 @@ export class DisplayCurveComponent implements OnInit {
             this.Q_add = this.calculateYCoordinate(this.Q_add);
         }
 
-        console.log("Point P: ", this.P_add)
-        console.log("Point Q: ", this.Q_add)
-
         this.R_add = this.calculatePointAddition(this.P_add, this.Q_add);
         this.pointAdditionPlotCurve();
     }
 
     public mul_calculation() {
+        if (isNaN(this.a_mul) ) {
+            this.dialogService.showInformationDialog("Please enter a value for A");
+            return;
+        }
+        if (isNaN(this.b_mul) ) {
+            this.dialogService.showInformationDialog("Please enter a value for B");
+            return;
+        }
+        if (isNaN(this.n_mul) ) {
+            this.dialogService.showInformationDialog("Please enter a value for n");
+            return;
+        }
+        if (this.P_mul instanceof InfinityPoint) {
+            this.dialogService.showInformationDialog("Please enter a value for P");
+            return;
+        }
         if (!this.checkIfPointIsOnCurve(this.P_mul, this.a_mul, this.b_mul)) {
             this.P_mul = this.calculateYCoordinate(this.P_mul);
         }

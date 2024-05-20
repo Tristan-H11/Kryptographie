@@ -26,6 +26,7 @@ export class CoordinateInputComponent {
 
   _val_a: number | undefined = undefined;
   _val_b: number | undefined = undefined;
+  _val_n: number | undefined = undefined;
   _point_x: number | string = "";
   _point_y: number | string = "";
 
@@ -35,6 +36,10 @@ export class CoordinateInputComponent {
 
   @Input() set val_b(value: number) {
     this._val_b = value;
+  }
+
+  @Input() set val_n(value: number) {
+    this._val_n = value;
   }
 
   @Input() set point_x(value: number | string) {
@@ -55,6 +60,7 @@ export class CoordinateInputComponent {
 
   @Output() val_aChange = new EventEmitter<number>();
   @Output() val_bChange = new EventEmitter<number>();
+  @Output() val_nChange = new EventEmitter<number>();
   @Output() point_xChange = new EventEmitter<number | string>();
   @Output() point_yChange = new EventEmitter<number | string>();
 
@@ -66,6 +72,10 @@ export class CoordinateInputComponent {
 
   onValBChange(value: string) {
     this.val_bChange.emit(parseFloat(value));
+  }
+
+  onValNChange(value: string) {
+    this.val_nChange.emit(parseFloat(value));
   }
 
   onPointXChange(value: string) {
