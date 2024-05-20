@@ -24,7 +24,7 @@ abstract class AbstractPoint {
 }
 
 // Konkrete Implementierung der Klasse Point, die von AbstractPoint erbt
-class Point extends AbstractPoint {
+export class Point extends AbstractPoint {
     constructor(x: number, y: number) {
         super(x, y);  // Aufruf des Konstruktors der abstrakten Klasse
     }
