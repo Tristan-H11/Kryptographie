@@ -46,9 +46,12 @@
         <mat-action-row>
             <button mat-raised-button color="primary" (click)="add_calculation()">Berechnen</button>
         </mat-action-row>
+
+        <div #plotContainerAdd id="plot-container-add" class="plot-container"></div>
+
     </mat-expansion-panel>
 </mat-accordion>
-<div #plotContainerAdd id="plot-container-add" class="plot-container"></div>
+
 
 <mat-accordion multi>
     <mat-expansion-panel expanded>
@@ -95,7 +98,8 @@
         <mat-action-row>
             <button mat-raised-button color="primary" (click)="mul_calculation()">Berechnen</button>
         </mat-action-row>
+
+        <div #plotContainerMul id="plot-container-mul" class="plot-container"></div>
     </mat-expansion-panel>
 </mat-accordion>
 
-<div #plotContainerMul id="plot-container-mul" class="plot-container"></div>
