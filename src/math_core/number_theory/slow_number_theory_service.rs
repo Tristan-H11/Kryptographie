@@ -39,7 +39,15 @@ impl NumberTheoryServiceTrait for SlowNumberTheoryService {
             m = tmp;
             xy.rotate_right(2);
         }
-        ExtendedEuclidResult::new(n, xy[0].clone(), xy[1].clone())
+        if n >= BigInt::zero() {
+            ExtendedEuclidResult::new(n, xy[0].clone(), xy[1].clone())
+        } else {
+            ExtendedEuclidResult::new(
+                BigInt::zero() - n,
+                BigInt::zero() - xy[0].clone(),
+                BigInt::zero() - xy[1].clone(),
+            )
+        }
     }
 
     fn fast_exponentiation(&self, base: &BigInt, exponent: &BigInt, modul: &BigInt) -> BigInt {
