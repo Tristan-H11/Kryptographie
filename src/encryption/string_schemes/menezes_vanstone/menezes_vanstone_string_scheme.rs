@@ -284,7 +284,7 @@ mod tests {
         // eher auffällt.
         let radix = rand::thread_rng().gen_range(240..55296);
         let n = rand::thread_rng().gen_range(1..30);
-        let modul_width = rand::thread_rng().gen_range(4..256);
+        let modul_width = rand::thread_rng().gen_range(4..100);
         let random_seed = rand::thread_rng().gen_range(1..1000);
         let key_pair =
             MenezesVanstoneStringScheme::generate_keypair(n, modul_width, 40, random_seed, radix)

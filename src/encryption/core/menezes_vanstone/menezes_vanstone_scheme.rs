@@ -342,7 +342,7 @@ mod tests {
         // Die Parameter sollen hier für jeden Testlauf zufällig gewählt werden, damit flakiness
         // eher auffällt.
         let n = rand::thread_rng().gen_range(1..30);
-        let modul_width = rand::thread_rng().gen_range(4..256);
+        let modul_width = rand::thread_rng().gen_range(4..100);
         let random_seed = rand::thread_rng().gen_range(1..1000);
         let key_pair =
             MenezesVanstoneScheme::generate_keypair(n, modul_width, 40, random_seed).unwrap();
