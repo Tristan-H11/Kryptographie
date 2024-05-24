@@ -343,7 +343,7 @@ impl SecureFiniteFieldEllipticCurve {
                     .fast_exponentiation(&(BigInt::from(4) * r), &exponent, &prime)
                     .half();
             }
-            // Den Generator mit den berechnen Koordinaten erstellen und prüfen.
+            // Den Generator mit den berechneten Koordinaten erstellen und prüfen.
             generator = FiniteFieldEllipticCurvePoint::new(x, y);
 
             // Falls der generierte Punkt nicht auf der Kurve liegt, wird ein neuer Punkt generiert.
