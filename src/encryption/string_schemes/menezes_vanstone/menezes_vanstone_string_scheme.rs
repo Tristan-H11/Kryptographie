@@ -308,4 +308,51 @@ mod tests {
             MenezesVanstoneStringScheme::decrypt(&private_key, &ciphertext, service).unwrap();
         assert_eq!(plaintext, decrypted_plaintext);
     }
+
+    #[test]
+    fn test_encryption_decryption_as_integrated_test() {
+        // Alice's Schlüsselpaar generieren
+        let alice_n = 3;
+        let alice_modul_width = 512;
+        let alice_seed = 11;
+        let miller_rabin_iterations = 40;
+        let radix = 55296;
+        let alice_keypair = MenezesVanstoneStringScheme::generate_keypair(
+            alice_n,
+            alice_modul_width,
+            miller_rabin_iterations,
+            alice_seed,
+            radix,
+        )
+        .unwrap();
+        let alice_public_key = alice_keypair.public_key.clone();
+        let alice_private_key = alice_keypair.private_key.clone();
+
+        let bob_n = 3;
+        let bob_modul_width = 512;
+        let bob_seed = 7;
+        let bob_keypair = MenezesVanstoneStringScheme::generate_keypair(
+            bob_n,
+            bob_modul_width,
+            miller_rabin_iterations,
+            bob_seed,
+            radix,
+        )
+        .unwrap();
+        let bob_public_key = bob_keypair.public_key.clone();
+        let bob_private_key = bob_keypair.private_key.clone();
+        let plaintext_string = "Hallo mein Homieeeeeeeeeeeeeeeeee was geht ab ??? 3232 !\"!\"!\"!";
+        let service = NumberTheoryService::new(Fast);
+        let ciphertext = MenezesVanstoneStringScheme::encrypt(
+            &bob_public_key,
+            &plaintext_string,
+            service.clone(),
+        )
+        .unwrap();
+
+        let decrypted_plaintext =
+            MenezesVanstoneStringScheme::decrypt(&bob_private_key, &ciphertext, service.clone())
+                .unwrap();
+        assert_eq!(plaintext_string, decrypted_plaintext);
+    }
 }
