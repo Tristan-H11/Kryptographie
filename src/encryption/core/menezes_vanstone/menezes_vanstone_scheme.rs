@@ -309,6 +309,7 @@ impl<'a> Verifier<MenezesVanstoneScheme> for MenezesVanstoneScheme {
 
 #[cfg(test)]
 mod tests {
+    use crate::encryption::string_schemes::menezes_vanstone::menezes_vanstone_string_scheme::MenezesVanstoneStringScheme;
     use rand::Rng;
 
     use crate::math_core::number_theory::number_theory_service::NumberTheoryServiceSpeed::Fast;
