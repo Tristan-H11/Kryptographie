@@ -31,6 +31,7 @@ use crate::math_core::traits::logarithm::Logarithm;
 use crate::shared::errors::MenezesVanstoneError;
 use crate::shared::hashing::sha256;
 
+
 #[derive(Clone, Debug, PartialEq)]
 pub struct MenezesVanstonePlaintext {
     pub first: BigInt,
