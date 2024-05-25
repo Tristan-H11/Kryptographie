@@ -2,6 +2,7 @@ use actix_web::web::{Json, Query};
 use actix_web::{HttpResponse, Responder};
 use log::info;
 use serde::{Deserialize, Serialize};
+use std::cmp::max;
 
 use crate::api::basic::call_checked_with_parsed_big_ints;
 use crate::api::serializable_models::{SingleStringResponse, UseFastQuery};
@@ -29,6 +30,7 @@ use crate::math_core::number_theory::number_theory_service::NumberTheoryService;
 use crate::math_core::number_theory::number_theory_service::NumberTheoryServiceSpeed::{
     Fast, Slow,
 };
+use crate::math_core::traits::logarithm::Logarithm;
 
 #[derive(Deserialize, Clone)]
 pub struct MvCreateKeyPairRequestBean {
@@ -161,10 +163,15 @@ impl From<MenezesVanstoneSignature> for MvSignatureBean {
     fn from(signature: MenezesVanstoneSignature) -> Self {
         //TODO Sauber ausarbeiten!
         let blocks = vec![signature.r.clone(), signature.s.clone()];
-        let key = DecimalUnicodeConversionSchemeKey {
-            radix: 55296,
-            block_size: 4,
-        };
+
+        let radix = 55296;
+
+        // Die größere der beiden Blockgrößen, damit sicher beide Werte enthalten sein werden.
+        let block_size = max(
+            signature.r.log(&radix.into()) + 1,
+            signature.s.log(&radix.into()) + 1,
+        );
+        let key = DecimalUnicodeConversionSchemeKey { block_size, radix };
         let string_representation = FromDecimalBlockScheme::encrypt(&blocks, &key);
 
         MvSignatureBean {
