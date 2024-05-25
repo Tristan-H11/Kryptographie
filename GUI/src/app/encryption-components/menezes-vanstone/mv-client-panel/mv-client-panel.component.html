@@ -68,11 +68,11 @@
     <br>
 
     <div class="card-container" style="display:flex; justify-content: space-between">
-        <mat-card class="spaced-card" style="flex: 1; margin-right: 1%;">
+        <mat-card class="spaced-card" style="flex: 0 0 50%; margin-right: 1%;">
             <mat-card-header>
                 <mat-card-title>Signatur</mat-card-title>
             </mat-card-header>
-            <mat-card-content>
+            <mat-card-content style="overflow-wrap: anywhere">
                 r = <strong>{{ client.signature.r }}</strong>
                 <br>
                 s = <strong>{{ client.signature.s }}</strong>
@@ -80,7 +80,7 @@
             </mat-card-content>
         </mat-card>
 
-        <mat-expansion-panel class="spaced-card" style="flex: 1; margin-left: 1%;">
+        <mat-expansion-panel class="spaced-card" style="flex: 0 0 50%; margin-left: 1%;">
             <mat-expansion-panel-header>
                 <mat-panel-title>
                     Geheimtext - Punkte
