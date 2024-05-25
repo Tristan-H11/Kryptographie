@@ -351,9 +351,28 @@ impl SecureFiniteFieldEllipticCurve {
                 continue;
             }
 
+            // Prüfe, ob 2*Generator, 4*Generator oder 8*Generator den Punkt im Unendlichen hat und
+            // ob die Ordnung des Punktes gleich q ist und der Generator nicht im Unendlichen liegt.
+            if generator.is_infinite {
+                continue;
+            }
+
+            let double_generator = generator.double(curve);
+            if double_generator.is_infinite {
+                continue;
+            }
+            let quadruple_generator = double_generator.double(curve);
+            if quadruple_generator.is_infinite {
+                continue;
+            }
+            let octuple_generator = quadruple_generator.double(curve);
+            if octuple_generator.is_infinite {
+                continue;
+            }
+
             // Der Generator selber darf nicht im Unendlichen liegen und auch die Ordnung
             // des Punktes muss gleich q sein, also muss Generator*q im Unendlichen liegen.
-            if !generator.is_infinite && generator.multiply(q, curve)?.is_infinite {
+            if generator.multiply(q, curve)?.is_infinite {
                 break;
             }
         }
