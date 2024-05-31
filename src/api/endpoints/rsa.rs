@@ -21,6 +21,7 @@ use bigdecimal::num_bigint::{BigInt, ParseBigIntError};
 use log::{debug, info};
 use serde::{Deserialize, Serialize};
 use std::str::FromStr;
+use crate::math_core::number_theory_with_prng_service::NumberTheoryWithPrngService;
 
 #[derive(Deserialize)]
 pub struct RsaCreateKeyPairRequestBean {
@@ -177,9 +178,10 @@ pub(crate) async fn encrypt(
     call_checked_with_parsed_big_ints(|| {
         let public_key = req_body.key_pair.to_public_key()?;
 
+        // Hier wird ein Dummy-Seed verwendet, weil er für RSA nicht notwendig ist.
         let number_theory_service = match use_fast {
-            true => NumberTheoryService::new(Fast),
-            false => NumberTheoryService::new(Slow),
+            true => NumberTheoryWithPrngService::new(Fast, 13),
+            false => NumberTheoryWithPrngService::new(Slow, 13),
         };
 
         let rsa_with_string_key = RsaWithStringPublicKey {
@@ -188,7 +190,7 @@ pub(crate) async fn encrypt(
         };
 
         let ciphertext =
-            RsaWithStringScheme::encrypt(&rsa_with_string_key, &plaintext, number_theory_service);
+            RsaWithStringScheme::encrypt(&rsa_with_string_key, &plaintext, &number_theory_service);
         let response = SingleStringResponse {
             message: ciphertext,
         };
@@ -220,17 +222,19 @@ pub(crate) async fn decrypt(
     call_checked_with_parsed_big_ints(|| {
         let private_key = req_body.key_pair.to_private_key()?;
 
+        // Hier wird ein Dummy-Seed verwendet, weil er für RSA nicht notwendig ist.
         let number_theory_service = match use_fast {
-            true => NumberTheoryService::new(Fast),
-            false => NumberTheoryService::new(Slow),
+            true => NumberTheoryWithPrngService::new(Fast, 13),
+            false => NumberTheoryWithPrngService::new(Slow, 13),
         };
+
         let rsa_with_string_key = RsaWithStringPrivateKey {
             rsa_private_key: private_key,
             radix: number_system_base,
         };
 
         let plaintext =
-            RsaWithStringScheme::decrypt(&rsa_with_string_key, &ciphertext, number_theory_service);
+            RsaWithStringScheme::decrypt(&rsa_with_string_key, &ciphertext, &number_theory_service);
         let response = SingleStringResponse { message: plaintext };
 
         Ok(HttpResponse::Ok().json(response))
@@ -262,9 +266,10 @@ pub(crate) async fn sign(
     call_checked_with_parsed_big_ints(|| {
         let private_key = req_body.key_pair.to_private_key()?;
 
+        // Hier wird ein Dummy-Seed verwendet, weil er für RSA nicht notwendig ist.
         let number_theory_service = match use_fast {
-            true => NumberTheoryService::new(Fast),
-            false => NumberTheoryService::new(Slow),
+            true => NumberTheoryWithPrngService::new(Fast, 13),
+            false => NumberTheoryWithPrngService::new(Slow, 13),
         };
 
         let rsa_with_string_key = RsaWithStringPrivateKey {
@@ -273,7 +278,7 @@ pub(crate) async fn sign(
         };
 
         let signature =
-            RsaWithStringScheme::sign(&rsa_with_string_key, &plaintext, number_theory_service);
+            RsaWithStringScheme::sign(&rsa_with_string_key, &plaintext, &number_theory_service);
         let response = SingleStringResponse { message: signature };
 
         Ok(HttpResponse::Ok().json(response))
@@ -306,9 +311,10 @@ pub(crate) async fn verify(
     call_checked_with_parsed_big_ints(|| {
         let public_key = req_body.key_pair.to_public_key()?;
 
+        // Hier wird ein Dummy-Seed verwendet, weil er für RSA nicht notwendig ist.
         let number_theory_service = match use_fast {
-            true => NumberTheoryService::new(Fast),
-            false => NumberTheoryService::new(Slow),
+            true => NumberTheoryWithPrngService::new(Fast, 13),
+            false => NumberTheoryWithPrngService::new(Slow, 13),
         };
 
         let rsa_with_string_key = RsaWithStringPublicKey {
@@ -320,7 +326,7 @@ pub(crate) async fn verify(
             &rsa_with_string_key,
             &signature,
             &plaintext,
-            number_theory_service,
+            &number_theory_service,
         );
         let response = SingleStringResponse {
             message: plaintext.to_string(),
@@ -342,9 +348,10 @@ pub(crate) async fn multiplication(
     let req_body: RsaMultiplicationRequestBean = req_body.into_inner();
     let use_fast = query.use_fast;
 
+    // Hier wird ein Dummy-Seed verwendet, weil er für RSA nicht notwendig ist.
     let number_theory_service = match use_fast {
-        true => NumberTheoryService::new(Fast),
-        false => NumberTheoryService::new(Slow),
+        true => NumberTheoryWithPrngService::new(Fast, 13),
+        false => NumberTheoryWithPrngService::new(Slow, 13),
     };
 
     call_checked_with_parsed_big_ints(|| {
@@ -355,13 +362,13 @@ pub(crate) async fn multiplication(
         let private_key = req_body.key_pair.to_private_key()?;
 
         let encrypted_factor_one =
-            RsaScheme::encrypt(&public_key, &factor_one, number_theory_service);
+            RsaScheme::encrypt(&public_key, &factor_one, &number_theory_service);
         let encrypted_factor_two =
-            RsaScheme::encrypt(&public_key, &factor_two, number_theory_service);
+            RsaScheme::encrypt(&public_key, &factor_two, &number_theory_service);
 
         let encrypted_result = &encrypted_factor_one * &encrypted_factor_two;
 
-        let result = RsaScheme::decrypt(&private_key, &encrypted_result, number_theory_service);
+        let result = RsaScheme::decrypt(&private_key, &encrypted_result, &number_theory_service);
 
         let response = RsaMultiplicationResponseBean {
             encrypted_factor_one: encrypted_factor_one.to_str_radix(10),
