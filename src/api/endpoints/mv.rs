@@ -30,6 +30,7 @@ use crate::math_core::number_theory::number_theory_service::NumberTheoryService;
 use crate::math_core::number_theory::number_theory_service::NumberTheoryServiceSpeed::{
     Fast, Slow,
 };
+use crate::math_core::number_theory_with_prng_service::NumberTheoryWithPrngService;
 use crate::math_core::traits::logarithm::Logarithm;
 
 #[derive(Deserialize, Clone)]
@@ -258,9 +259,10 @@ pub(crate) async fn encrypt(
 
         let message = &req_body.message;
 
+        let random_seed = 14; // TODO: Random_seed erwarten
         let service = match query.use_fast {
-            true => NumberTheoryService::new(Fast),
-            false => NumberTheoryService::new(Slow),
+            true => NumberTheoryWithPrngService::new(Fast, random_seed),
+            false => NumberTheoryWithPrngService::new(Slow, random_seed),
         };
 
         let ciphertext = MenezesVanstoneStringScheme::encrypt(&public_key, &message, service);
@@ -299,9 +301,10 @@ pub(crate) async fn decrypt(
 
         let ciphertext = req_body.cipher_text.clone().into();
 
+        let random_seed = 14; // TODO: Random_seed erwarten
         let service = match query.use_fast {
-            true => NumberTheoryService::new(Fast),
-            false => NumberTheoryService::new(Slow),
+            true => NumberTheoryWithPrngService::new(Fast, random_seed),
+            false => NumberTheoryWithPrngService::new(Slow, random_seed),
         };
 
         let plaintext = MenezesVanstoneStringScheme::decrypt(&private_key, &ciphertext, service);
@@ -327,9 +330,10 @@ pub(crate) async fn sign(
         let private_key = req_body.private_key.clone().into();
         let message = &req_body.message;
 
+        let random_seed = 14; // TODO: Random_seed erwarten
         let service = match query.use_fast {
-            true => NumberTheoryService::new(Fast),
-            false => NumberTheoryService::new(Slow),
+            true => NumberTheoryWithPrngService::new(Fast, random_seed),
+            false => NumberTheoryWithPrngService::new(Slow, random_seed),
         };
 
         let signature = MenezesVanstoneScheme::sign(&private_key, message, service);
@@ -356,9 +360,10 @@ pub(crate) async fn verify(
         let message = &req_body.message;
         let signature = &req_body.signature.clone().into();
 
+        let random_seed = 14; // TODO: Random_seed erwarten
         let service = match query.use_fast {
-            true => NumberTheoryService::new(Fast),
-            false => NumberTheoryService::new(Slow),
+            true => NumberTheoryWithPrngService::new(Fast, random_seed),
+            false => NumberTheoryWithPrngService::new(Slow, random_seed),
         };
 
         let verified = MenezesVanstoneScheme::verify(&public_key, signature, message, service);
