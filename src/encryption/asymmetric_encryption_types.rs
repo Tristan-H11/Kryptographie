@@ -1,8 +1,8 @@
 use crate::encryption::encryption_types::{Decryptor, EncryptionScheme, Encryptor, Key};
 use crate::math_core::number_theory::number_theory_service::NumberTheoryService;
 
-use std::fmt::Debug;
 use crate::math_core::number_theory_with_prng_service::NumberTheoryWithPrngService;
+use std::fmt::Debug;
 
 /// Ein asymmetrisches Verschlüsselungsschema.
 pub trait AsymmetricEncryptionScheme: EncryptionScheme {}
@@ -136,7 +136,11 @@ pub trait Signer<T: AsymmetricEncryptionScheme> {
     ///
     /// # Rückgabe
     /// Die Signatur der Nachricht.
-    fn sign(key: &Self::Key, message: &Self::Input, service: &NumberTheoryWithPrngService) -> Self::Output;
+    fn sign(
+        key: &Self::Key,
+        message: &Self::Input,
+        service: &NumberTheoryWithPrngService,
+    ) -> Self::Output;
 }
 
 /// Ein Verifizierer für das asymmetrische Verschlüsselungsschema.

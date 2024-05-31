@@ -7,6 +7,7 @@ use crate::encryption::encryption_types::{Decryptor, EncryptionScheme, Encryptor
 use crate::math_core::number_theory::number_theory_service::{
     NumberTheoryService, NumberTheoryServiceTrait,
 };
+use crate::math_core::number_theory_with_prng_service::NumberTheoryWithPrngService;
 use crate::math_core::pseudo_random_number_generator::PseudoRandomNumberGenerator;
 use crate::math_core::traits::increment::Increment;
 use anyhow::Result;
@@ -14,7 +15,6 @@ use atomic_counter::RelaxedCounter;
 use bigdecimal::num_bigint::BigInt;
 use bigdecimal::One;
 use log::{debug, trace};
-use crate::math_core::number_theory_with_prng_service::NumberTheoryWithPrngService;
 
 pub struct RsaScheme {}
 
@@ -89,7 +89,9 @@ impl AsymmetricEncryptor<RsaScheme> for RsaScheme {
         plaintext: &Self::Input,
         service: &NumberTheoryWithPrngService,
     ) -> Self::Output {
-        service.number_theory_service.fast_exponentiation(plaintext, &key.e, &key.n)
+        service
+            .number_theory_service
+            .fast_exponentiation(plaintext, &key.e, &key.n)
     }
 }
 
@@ -105,7 +107,9 @@ impl AsymmetricDecryptor<RsaScheme> for RsaScheme {
         ciphertext: &Self::Input,
         service: &NumberTheoryWithPrngService,
     ) -> Self::Output {
-        service.number_theory_service.fast_exponentiation(ciphertext, &key.d, &key.n)
+        service
+            .number_theory_service
+            .fast_exponentiation(ciphertext, &key.d, &key.n)
     }
 }
 
@@ -114,8 +118,14 @@ impl Signer<RsaScheme> for RsaScheme {
     type Output = BigInt;
     type Key = RsaPrivateKey;
 
-    fn sign(key: &Self::Key, message: &Self::Input, service: &NumberTheoryWithPrngService) -> Self::Output {
-        service.number_theory_service.fast_exponentiation(message, &key.d, &key.n)
+    fn sign(
+        key: &Self::Key,
+        message: &Self::Input,
+        service: &NumberTheoryWithPrngService,
+    ) -> Self::Output {
+        service
+            .number_theory_service
+            .fast_exponentiation(message, &key.d, &key.n)
     }
 }
 
@@ -131,7 +141,9 @@ impl Verifier<RsaScheme> for RsaScheme {
         message: &Self::Message,
         service: &NumberTheoryWithPrngService,
     ) -> Self::Output {
-        let decrypted_signature = service.number_theory_service.fast_exponentiation(signature, &key.e, &key.n);
+        let decrypted_signature = service
+            .number_theory_service
+            .fast_exponentiation(signature, &key.e, &key.n);
         decrypted_signature == *message
     }
 }

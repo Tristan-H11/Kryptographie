@@ -150,7 +150,8 @@ impl AsymmetricEncryptor<MenezesVanstoneScheme> for MenezesVanstoneScheme {
         loop {
             // Dadurch, dass ein Wert < |H| gewählt wird, ist garantiert, dass der Punkt k*g niemals
             // im Unendlichen liegen wird.
-            k = service.take_random_number_in_range(&1.into(), &curve.order_of_subgroup.decrement());
+            k = service
+                .take_random_number_in_range(&1.into(), &curve.order_of_subgroup.decrement());
             let point = key
                 .y
                 .multiply(&k, curve)
@@ -205,10 +206,12 @@ impl AsymmetricDecryptor<MenezesVanstoneScheme> for MenezesVanstoneScheme {
             .multiply(&key.x, &key.curve)
             .context("Failed to calculate Point (c1, c2)")?;
         let (c1, c2) = (point.x, point.y);
-        let c1_inverse = service.number_theory_service
+        let c1_inverse = service
+            .number_theory_service
             .modulo_inverse(&c1, prime)
             .context("Failed to find modulo inverse for c1 during decryption")?;
-        let c2_inverse = service.number_theory_service
+        let c2_inverse = service
+            .number_theory_service
             .modulo_inverse(&c2, prime)
             .context("Failed to find modulo inverse for c2 during decryption")?;
 
@@ -227,7 +230,11 @@ impl<'a> Signer<MenezesVanstoneScheme> for MenezesVanstoneScheme {
     type Output = Result<MenezesVanstoneSignature>;
     type Key = MenezesVanstonePrivateKey;
 
-    fn sign(key: &Self::Key, message: &Self::Input, service: &NumberTheoryWithPrngService) -> Self::Output {
+    fn sign(
+        key: &Self::Key,
+        message: &Self::Input,
+        service: &NumberTheoryWithPrngService,
+    ) -> Self::Output {
         let curve = &key.curve;
         let q = &curve.order_of_subgroup;
 
@@ -378,16 +385,9 @@ mod tests {
         let service = NumberTheoryWithPrngService::new(Fast, 13);
 
         let message = "Hello World!";
-        let signature =
-            MenezesVanstoneScheme::sign(&private_key, message, &service)
-                .unwrap();
-        let is_verified = MenezesVanstoneScheme::verify(
-            &public_key,
-            &signature,
-            message,
-            &service,
-        )
-        .unwrap();
+        let signature = MenezesVanstoneScheme::sign(&private_key, message, &service).unwrap();
+        let is_verified =
+            MenezesVanstoneScheme::verify(&public_key, &signature, message, &service).unwrap();
         assert!(is_verified);
     }
 
@@ -458,19 +458,13 @@ mod tests {
         let service = NumberTheoryWithPrngService::new(Fast, 13);
 
         let message = "Hello my Friend!";
-        let signature =
-            MenezesVanstoneScheme::sign(&private_key, message, &service)
-                .unwrap();
+        let signature = MenezesVanstoneScheme::sign(&private_key, message, &service).unwrap();
 
         let another_message = "I hate you the most!";
 
-        let is_verified = MenezesVanstoneScheme::verify(
-            &public_key,
-            &signature,
-            another_message,
-            &service,
-        )
-        .unwrap();
+        let is_verified =
+            MenezesVanstoneScheme::verify(&public_key, &signature, another_message, &service)
+                .unwrap();
         assert!(!is_verified);
     }
 }

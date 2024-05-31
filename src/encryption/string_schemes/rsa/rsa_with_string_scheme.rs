@@ -120,7 +120,11 @@ impl<'a> Signer<RsaWithStringScheme> for RsaWithStringScheme {
     /// # Rückgabe
     /// * `String` - Die Signatur.
     ///
-    fn sign(key: &Self::Key, message: &Self::Input, service: &NumberTheoryWithPrngService) -> Self::Output {
+    fn sign(
+        key: &Self::Key,
+        message: &Self::Input,
+        service: &NumberTheoryWithPrngService,
+    ) -> Self::Output {
         let radix = key.radix;
         let rsa_key = &key.rsa_private_key;
         let block_size = rsa_key.n.log(&radix.into());
@@ -376,8 +380,7 @@ mod tests {
 
         let signature = RsaWithStringScheme::sign(private_key, message, &service);
 
-        let is_valid =
-            RsaWithStringScheme::verify(public_key, &signature, message, &service);
+        let is_valid = RsaWithStringScheme::verify(public_key, &signature, message, &service);
         assert_eq!(expected, is_valid);
     }
 }

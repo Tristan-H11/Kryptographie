@@ -1,7 +1,9 @@
 use atomic_counter::{AtomicCounter, RelaxedCounter};
 use bigdecimal::num_bigint::BigInt;
 
-use crate::math_core::number_theory::number_theory_service::{NumberTheoryService, NumberTheoryServiceSpeed};
+use crate::math_core::number_theory::number_theory_service::{
+    NumberTheoryService, NumberTheoryServiceSpeed,
+};
 use crate::math_core::pseudo_random_number_generator::PseudoRandomNumberGenerator;
 
 /// Ein Wrapper für die Kombination aus NumberTheoryService und einem PseudoRandomNumberGenerator.
@@ -67,7 +69,8 @@ impl NumberTheoryWithPrngService {
     /// Die generierte Primzahl.
     pub fn generate_prime_with_width(&self, size: u32, miller_rabin_iterations: u32) -> BigInt {
         // TODO Schnelle Lib Variante einbauen, je nach dem, welcher Speed hier gewrapped ist.
-        self.prng.generate_prime(size, miller_rabin_iterations, &self.prng_counter)
+        self.prng
+            .generate_prime(size, miller_rabin_iterations, &self.prng_counter)
     }
 
     /// Setzt den Wert des Counters für den PRNG zurück auf 1.

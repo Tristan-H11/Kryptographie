@@ -9,12 +9,12 @@ use crate::encryption::encryption_types::{Decryptor, EncryptionScheme, Encryptor
 use crate::math_core::number_theory::number_theory_service::{
     NumberTheoryService, NumberTheoryServiceTrait,
 };
+use crate::math_core::number_theory_with_prng_service::NumberTheoryWithPrngService;
 use crate::math_core::pseudo_random_number_generator::PseudoRandomNumberGenerator;
 use crate::math_core::traits::increment::Increment;
 use atomic_counter::RelaxedCounter;
 use bigdecimal::num_bigint::BigInt;
 use log::debug;
-use crate::math_core::number_theory_with_prng_service::NumberTheoryWithPrngService;
 
 pub struct ElGamalScheme;
 
@@ -163,7 +163,9 @@ impl AsymmetricDecryptor<ElGamalScheme> for ElGamalScheme {
         let (a, b) = ciphertext;
 
         // Berechnen von z = (a^x)^-1 mod p = a^(p-1-x) mod p
-        let z = service.number_theory_service.fast_exponentiation(a, &(p.decrement() - x), p);
+        let z = service
+            .number_theory_service
+            .fast_exponentiation(a, &(p.decrement() - x), p);
 
         // Berechnen des Klartextes m = b * z mod p
         let plaintext = (b * z) % p;
@@ -174,10 +176,10 @@ impl AsymmetricDecryptor<ElGamalScheme> for ElGamalScheme {
 
 #[cfg(test)]
 mod tests {
-    use std::time::SystemTime;
     use super::*;
     use crate::math_core::number_theory::number_theory_service::NumberTheoryServiceSpeed::Fast;
     use bigdecimal::FromPrimitive;
+    use std::time::SystemTime;
 
     #[test]
     fn test_el_gamal_key_generation_happy_flow() {
