@@ -118,7 +118,7 @@ impl AsymmetricEncryptor<ElGamalScheme> for ElGamalScheme {
     fn encrypt(
         key: &Self::Key,
         plaintext: &Self::Input,
-        service: NumberTheoryWithPrngService,
+        service: &NumberTheoryWithPrngService,
     ) -> Self::Output {
         let p = &key.p;
         let g = &key.g;
@@ -166,7 +166,7 @@ impl AsymmetricDecryptor<ElGamalScheme> for ElGamalScheme {
     fn decrypt(
         key: &Self::Key,
         ciphertext: &Self::Input,
-        service: NumberTheoryWithPrngService,
+        service: &NumberTheoryWithPrngService,
     ) -> Self::Output {
         let p = &key.p;
         let x = &key.x;

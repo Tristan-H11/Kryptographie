@@ -138,7 +138,7 @@ impl AsymmetricEncryptor<MenezesVanstoneScheme> for MenezesVanstoneScheme {
     fn encrypt(
         key: &Self::Key,
         plaintext: &Self::Input,
-        service: NumberTheoryWithPrngService,
+        service: &NumberTheoryWithPrngService,
     ) -> Self::Output {
         let m1 = &plaintext.first;
         let m2 = &plaintext.second;
@@ -200,7 +200,7 @@ impl AsymmetricDecryptor<MenezesVanstoneScheme> for MenezesVanstoneScheme {
     fn decrypt(
         key: &Self::Key,
         ciphertext: &Self::Input,
-        service: NumberTheoryWithPrngService,
+        service: &NumberTheoryWithPrngService,
     ) -> Self::Output {
         let a = &ciphertext.point;
         let b1 = &ciphertext.first;
@@ -233,7 +233,7 @@ impl<'a> Signer<MenezesVanstoneScheme> for MenezesVanstoneScheme {
     type Output = Result<MenezesVanstoneSignature>;
     type Key = MenezesVanstonePrivateKey;
 
-    fn sign(key: &Self::Key, message: &Self::Input, service: NumberTheoryWithPrngService) -> Self::Output {
+    fn sign(key: &Self::Key, message: &Self::Input, service: &NumberTheoryWithPrngService) -> Self::Output {
         let prng = PseudoRandomNumberGenerator::new(17, service); // TODO übergeben
         let counter = RelaxedCounter::new(1);
         let curve = &key.curve;
@@ -279,7 +279,7 @@ impl<'a> Verifier<MenezesVanstoneScheme> for MenezesVanstoneScheme {
         key: &Self::Key,
         signature: &Self::Signature,
         message: &Self::Message,
-        service: NumberTheoryWithPrngService,
+        service: &NumberTheoryWithPrngService,
     ) -> Self::Output {
         let curve = &key.curve;
         let r = &signature.r;

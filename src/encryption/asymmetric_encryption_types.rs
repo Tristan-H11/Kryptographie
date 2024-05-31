@@ -100,7 +100,7 @@ pub trait AsymmetricEncryptor<T: AsymmetricEncryptionScheme>: Encryptor<T> {
     fn encrypt(
         key: &Self::Key,
         plaintext: &Self::Input,
-        service: NumberTheoryWithPrngService,
+        service: &NumberTheoryWithPrngService,
     ) -> Self::Output;
 }
 
@@ -118,7 +118,7 @@ pub trait AsymmetricDecryptor<T: AsymmetricEncryptionScheme>: Decryptor<T> {
     fn decrypt(
         key: &Self::Key,
         ciphertext: &Self::Input,
-        service: NumberTheoryWithPrngService,
+        service: &NumberTheoryWithPrngService,
     ) -> Self::Output;
 }
 
@@ -136,7 +136,7 @@ pub trait Signer<T: AsymmetricEncryptionScheme> {
     ///
     /// # Rückgabe
     /// Die Signatur der Nachricht.
-    fn sign(key: &Self::Key, message: &Self::Input, service: NumberTheoryWithPrngService) -> Self::Output;
+    fn sign(key: &Self::Key, message: &Self::Input, service: &NumberTheoryWithPrngService) -> Self::Output;
 }
 
 /// Ein Verifizierer für das asymmetrische Verschlüsselungsschema.
@@ -159,6 +159,6 @@ pub trait Verifier<T: AsymmetricEncryptionScheme> {
         key: &Self::Key,
         signature: &Self::Signature,
         message: &Self::Message,
-        service: NumberTheoryWithPrngService,
+        service: &NumberTheoryWithPrngService,
     ) -> Self::Output;
 }

@@ -99,7 +99,7 @@ impl AsymmetricEncryptor<MenezesVanstoneStringScheme> for MenezesVanstoneStringS
     fn encrypt(
         key: &Self::Key,
         plaintext: &Self::Input,
-        service: NumberTheoryWithPrngService,
+        service: &NumberTheoryWithPrngService,
     ) -> Self::Output {
         let radix = key.radix;
         let block_size = key.mv_key.curve.prime.log(&radix.into());
@@ -180,7 +180,7 @@ impl AsymmetricDecryptor<MenezesVanstoneStringScheme> for MenezesVanstoneStringS
     fn decrypt(
         key: &Self::Key,
         ciphertext: &Self::Input,
-        service: NumberTheoryWithPrngService,
+        service: &NumberTheoryWithPrngService,
     ) -> Self::Output {
         let ciphertext_string = &ciphertext.ciphertext;
         let points = &ciphertext.points;
@@ -247,7 +247,7 @@ impl<'a> Signer<MenezesVanstoneStringScheme> for MenezesVanstoneStringScheme {
     fn sign(
         key: &Self::Key,
         message: &Self::Input,
-        service: NumberTheoryWithPrngService,
+        service: &NumberTheoryWithPrngService,
     ) -> Self::Output {
         todo!()
     }
@@ -263,7 +263,7 @@ impl<'a> Verifier<MenezesVanstoneStringScheme> for MenezesVanstoneStringScheme {
         key: &Self::Key,
         signature: &Self::Signature,
         message: &Self::Message,
-        service: NumberTheoryWithPrngService,
+        service: &NumberTheoryWithPrngService,
     ) -> Self::Output {
         todo!()
     }
