@@ -302,11 +302,11 @@ mod tests {
             .take(random_string_length)
             .collect();
 
-        let service = NumberTheoryService::new(Fast);
+        let service = NumberTheoryWithPrngService::new(Fast, 13);
         let ciphertext =
-            MenezesVanstoneStringScheme::encrypt(&public_key, &plaintext, service).unwrap();
+            MenezesVanstoneStringScheme::encrypt(&public_key, &plaintext, &service).unwrap();
         let decrypted_plaintext =
-            MenezesVanstoneStringScheme::decrypt(&private_key, &ciphertext, service).unwrap();
+            MenezesVanstoneStringScheme::decrypt(&private_key, &ciphertext, &service).unwrap();
         assert_eq!(plaintext, decrypted_plaintext);
     }
 
@@ -343,16 +343,16 @@ mod tests {
         let bob_public_key = bob_keypair.public_key.clone();
         let bob_private_key = bob_keypair.private_key.clone();
         let plaintext_string = "Hallo mein Homieeeeeeeeeeeeeeeeee was geht ab ??? 3232 !\"!\"!\"!";
-        let service = NumberTheoryService::new(Fast);
+        let service = NumberTheoryWithPrngService::new(Fast, 13);
         let ciphertext = MenezesVanstoneStringScheme::encrypt(
             &bob_public_key,
             &plaintext_string,
-            service.clone(),
+            &service,
         )
         .unwrap();
 
         let decrypted_plaintext =
-            MenezesVanstoneStringScheme::decrypt(&bob_private_key, &ciphertext, service.clone())
+            MenezesVanstoneStringScheme::decrypt(&bob_private_key, &ciphertext, &service)
                 .unwrap();
         assert_eq!(plaintext_string, decrypted_plaintext);
     }

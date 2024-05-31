@@ -89,7 +89,7 @@ impl AsymmetricEncryptor<RsaScheme> for RsaScheme {
         plaintext: &Self::Input,
         service: &NumberTheoryWithPrngService,
     ) -> Self::Output {
-        service.fast_exponentiation(plaintext, &key.e, &key.n)
+        service.number_theory_service.fast_exponentiation(plaintext, &key.e, &key.n)
     }
 }
 
@@ -105,7 +105,7 @@ impl AsymmetricDecryptor<RsaScheme> for RsaScheme {
         ciphertext: &Self::Input,
         service: &NumberTheoryWithPrngService,
     ) -> Self::Output {
-        service.fast_exponentiation(ciphertext, &key.d, &key.n)
+        service.number_theory_service.fast_exponentiation(ciphertext, &key.d, &key.n)
     }
 }
 
@@ -115,7 +115,7 @@ impl Signer<RsaScheme> for RsaScheme {
     type Key = RsaPrivateKey;
 
     fn sign(key: &Self::Key, message: &Self::Input, service: &NumberTheoryWithPrngService) -> Self::Output {
-        service.fast_exponentiation(message, &key.d, &key.n)
+        service.number_theory_service.fast_exponentiation(message, &key.d, &key.n)
     }
 }
 
@@ -131,7 +131,7 @@ impl Verifier<RsaScheme> for RsaScheme {
         message: &Self::Message,
         service: &NumberTheoryWithPrngService,
     ) -> Self::Output {
-        let decrypted_signature = service.fast_exponentiation(message, &key.e, &key.n);
+        let decrypted_signature = service.number_theory_service.fast_exponentiation(message, &key.e, &key.n);
         decrypted_signature == *message
     }
 }

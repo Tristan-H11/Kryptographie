@@ -224,9 +224,9 @@ mod tests {
 
     use super::*;
 
-    fn run_test_for_all_services(test: impl Fn(NumberTheoryService)) {
-        test(NumberTheoryService::new(Slow)); // Langsame, eigene Implementierung
-        test(NumberTheoryService::new(Fast)); // Schnelle, externe Implementierung
+    fn run_test_for_all_services(test: impl Fn(NumberTheoryWithPrngService)) {
+        test(NumberTheoryWithPrngService::new(Slow, 13)); // Langsame, eigene Implementierung
+        test(NumberTheoryWithPrngService::new(Fast, 13)); // Schnelle, externe Implementierung
     }
 
     #[test]
@@ -238,7 +238,7 @@ mod tests {
                 key_size: 1024,
                 miller_rabin_iterations: 30,
                 random_seed: 73,
-                number_theory_service: service.clone(),
+                number_theory_service: NumberTheoryService::new(Fast),
             };
             encryption_decryption_assert(config, message, service);
         });
@@ -253,7 +253,7 @@ mod tests {
                 key_size: 512,
                 miller_rabin_iterations: 30,
                 random_seed: 3,
-                number_theory_service: service.clone(),
+                number_theory_service: NumberTheoryService::new(Fast),
             };
             encryption_decryption_assert(config, message, service);
         });
@@ -268,7 +268,7 @@ mod tests {
                 key_size: 64,
                 miller_rabin_iterations: 30,
                 random_seed: 874,
-                number_theory_service: service.clone(),
+                number_theory_service: NumberTheoryService::new(Fast),
             };
             encryption_decryption_assert(config, message, service);
         });
@@ -279,16 +279,16 @@ mod tests {
     fn encryption_decryption_assert(
         config: RsaKeyGenConfig,
         message: &str,
-        service: NumberTheoryService,
+        service: NumberTheoryWithPrngService,
     ) {
         let radix = 55296;
         let key_pair = RsaWithStringScheme::generate_keypair(&config, radix);
         let (public_key, private_key) = (&key_pair.public_key, &key_pair.private_key);
 
-        let encrypted_message = RsaWithStringScheme::encrypt(public_key, message, service.clone());
+        let encrypted_message = RsaWithStringScheme::encrypt(public_key, message, &service);
 
         let decrypted_message =
-            RsaWithStringScheme::decrypt(private_key, &encrypted_message, service.clone());
+            RsaWithStringScheme::decrypt(private_key, &encrypted_message, &service);
         assert_eq!(message, decrypted_message);
     }
 
@@ -301,7 +301,7 @@ mod tests {
                 key_size: 1024,
                 miller_rabin_iterations: 30,
                 random_seed: 653,
-                number_theory_service: service.clone(),
+                number_theory_service: NumberTheoryService::new(Fast),
             };
             sign_verify_assert(config, 55296, message, service, true);
         });
@@ -317,7 +317,7 @@ mod tests {
                 key_size: 512,
                 miller_rabin_iterations: 30,
                 random_seed: 55,
-                number_theory_service: service.clone(),
+                number_theory_service: NumberTheoryService::new(Fast),
             };
             sign_verify_assert(config, 55296, message, service, true);
         });
@@ -332,7 +332,7 @@ mod tests {
                 key_size: 257,
                 miller_rabin_iterations: 30,
                 random_seed: 40,
-                number_theory_service: service.clone(),
+                number_theory_service: NumberTheoryService::new(Fast),
             };
             sign_verify_assert(config, 55296, message, service, true);
         });
@@ -348,7 +348,7 @@ mod tests {
                 key_size: 512,
                 miller_rabin_iterations: 30,
                 random_seed: 17,
-                number_theory_service: service.clone(),
+                number_theory_service: NumberTheoryService::new(Fast),
             };
             let radix = 55296;
             let key_pair = RsaWithStringScheme::generate_keypair(&config, radix);
@@ -356,10 +356,10 @@ mod tests {
 
             let _radix = 55296;
 
-            let signature = RsaWithStringScheme::sign(private_key, message_one, service.clone());
+            let signature = RsaWithStringScheme::sign(private_key, message_one, &service);
 
             let is_valid =
-                RsaWithStringScheme::verify(public_key, &signature, message_two, service.clone());
+                RsaWithStringScheme::verify(public_key, &signature, message_two, &service);
             assert!(!is_valid);
         });
     }
@@ -368,16 +368,16 @@ mod tests {
         config: RsaKeyGenConfig,
         radix: u32,
         message: &str,
-        service: NumberTheoryService,
+        service: NumberTheoryWithPrngService,
         expected: bool,
     ) {
         let key_pair = RsaWithStringScheme::generate_keypair(&config, radix);
         let (public_key, private_key) = (&key_pair.public_key, &key_pair.private_key);
 
-        let signature = RsaWithStringScheme::sign(private_key, message, service.clone());
+        let signature = RsaWithStringScheme::sign(private_key, message, &service);
 
         let is_valid =
-            RsaWithStringScheme::verify(public_key, &signature, message, service.clone());
+            RsaWithStringScheme::verify(public_key, &signature, message, &service);
         assert_eq!(expected, is_valid);
     }
 }

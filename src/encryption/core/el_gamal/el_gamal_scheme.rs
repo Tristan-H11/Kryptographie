@@ -124,24 +124,15 @@ impl AsymmetricEncryptor<ElGamalScheme> for ElGamalScheme {
         let g = &key.g;
         let y = &key.y;
 
-        // TODO Der Seed für die Generierung der Zufallszahl für das Verschlüsseln der Nachricht
-        // wird vorerst aus der aktuellen Systemzeit generiert und auf 2^16 begrenzt.
-        let random_seed = SystemTime::now()
-            .duration_since(SystemTime::UNIX_EPOCH)
-            .unwrap()
-            .as_secs() as u16;
-        let random_generator = PseudoRandomNumberGenerator::new(random_seed as u32, service);
-        let counter = RelaxedCounter::new(1);
-
         // Generieren des Zufallszahl k (Zufallszahl zwischen 1 und p-2)
         let p_minus_two = p.decrement().decrement();
-        let k = random_generator.take(&1.into(), &p_minus_two, &counter);
+        let k = service.take_random_number_in_range(&1.into(), &p_minus_two);
 
         // Berechnen des ersten verschlüsselten Nachrichtenteils c1
-        let a = service.fast_exponentiation(g, &k, p);
+        let a = service.number_theory_service.fast_exponentiation(g, &k, p);
 
         // Berechnen des zweiten verschlüsselten Nachrichtenteils c2
-        let b = (service.fast_exponentiation(y, &k, p) * plaintext) % p;
+        let b = (service.number_theory_service.fast_exponentiation(y, &k, p) * plaintext) % p;
 
         (a, b)
     }
@@ -173,7 +164,7 @@ impl AsymmetricDecryptor<ElGamalScheme> for ElGamalScheme {
         let (a, b) = ciphertext;
 
         // Berechnen von z = (a^x)^-1 mod p = a^(p-1-x) mod p
-        let z = service.fast_exponentiation(a, &(p.decrement() - x), p);
+        let z = service.number_theory_service.fast_exponentiation(a, &(p.decrement() - x), p);
 
         // Berechnen des Klartextes m = b * z mod p
         let plaintext = (b * z) % p;
@@ -225,13 +216,15 @@ mod tests {
             number_theory_service: service,
         };
 
+        let service = NumberTheoryWithPrngService::new(Fast, 13);
+
         let keypair = ElGamalScheme::generate_keypair(&config);
         let public_key = keypair.public_key;
         let private_key = keypair.private_key;
 
         let plaintext = BigInt::from_i32(42).unwrap();
-        let ciphertext = ElGamalScheme::encrypt(&public_key, &plaintext, service);
-        let decrypted_plaintext = ElGamalScheme::decrypt(&private_key, &ciphertext, service);
+        let ciphertext = ElGamalScheme::encrypt(&public_key, &plaintext, &service);
+        let decrypted_plaintext = ElGamalScheme::decrypt(&private_key, &ciphertext, &service);
 
         assert_eq!(plaintext, decrypted_plaintext);
     }
@@ -246,26 +239,28 @@ mod tests {
             number_theory_service: service,
         };
 
+        let service = NumberTheoryWithPrngService::new(Fast, 13);
+
         let keypair = ElGamalScheme::generate_keypair(&config);
         let public_key = keypair.public_key;
         let private_key = keypair.private_key;
 
         let plaintext = BigInt::from_i32(156776).unwrap();
-        let ciphertext = ElGamalScheme::encrypt(&public_key, &plaintext, service);
+        let ciphertext = ElGamalScheme::encrypt(&public_key, &plaintext, &service);
         println!("ciphertext: {:?}", ciphertext);
-        let decrypted_plaintext = ElGamalScheme::decrypt(&private_key, &ciphertext, service);
+        let decrypted_plaintext = ElGamalScheme::decrypt(&private_key, &ciphertext, &service);
 
         assert_eq!(plaintext, decrypted_plaintext);
     }
 
     #[test]
     fn test_trivial_with_zero_input() {
-        let service = NumberTheoryService::new(Fast);
+        let service = NumberTheoryWithPrngService::new(Fast, 13);
         let config = ElGamalKeyGenConfig {
             modulus_width: 32,
             miller_rabin_iterations: 100,
             random_seed: 77,
-            number_theory_service: service,
+            number_theory_service: NumberTheoryService::new(Fast),
         };
 
         let keypair = ElGamalScheme::generate_keypair(&config);
@@ -273,11 +268,11 @@ mod tests {
         let private_key = keypair.private_key;
 
         let plaintext = BigInt::from_i32(0).unwrap();
-        let ciphertext = ElGamalScheme::encrypt(&public_key, &plaintext, service);
+        let ciphertext = ElGamalScheme::encrypt(&public_key, &plaintext, &service);
         // Der zweite Teil muss offensichtlich 0 sein, weil er ein Produkt mit 0 (plaintext) ist.
         assert_eq!(ciphertext.1, 0.into());
         println!("ciphertext: {:?}", ciphertext);
-        let decrypted_plaintext = ElGamalScheme::decrypt(&private_key, &ciphertext, service);
+        let decrypted_plaintext = ElGamalScheme::decrypt(&private_key, &ciphertext, &service);
 
         assert_eq!(plaintext, decrypted_plaintext);
     }
