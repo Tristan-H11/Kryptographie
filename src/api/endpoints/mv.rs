@@ -265,7 +265,7 @@ pub(crate) async fn encrypt(
             false => NumberTheoryWithPrngService::new(Slow, random_seed),
         };
 
-        let ciphertext = MenezesVanstoneStringScheme::encrypt(&public_key, &message, service);
+        let ciphertext = MenezesVanstoneStringScheme::encrypt(&public_key, &message, &service);
 
         match ciphertext {
             Ok(ciphertext) => {
@@ -307,7 +307,7 @@ pub(crate) async fn decrypt(
             false => NumberTheoryWithPrngService::new(Slow, random_seed),
         };
 
-        let plaintext = MenezesVanstoneStringScheme::decrypt(&private_key, &ciphertext, service);
+        let plaintext = MenezesVanstoneStringScheme::decrypt(&private_key, &ciphertext, &service);
 
         match plaintext {
             Ok(plaintext) => {
@@ -336,7 +336,7 @@ pub(crate) async fn sign(
             false => NumberTheoryWithPrngService::new(Slow, random_seed),
         };
 
-        let signature = MenezesVanstoneScheme::sign(&private_key, message, service);
+        let signature = MenezesVanstoneScheme::sign(&private_key, message, &service);
 
         match signature {
             Ok(signature) => {
@@ -366,7 +366,7 @@ pub(crate) async fn verify(
             false => NumberTheoryWithPrngService::new(Slow, random_seed),
         };
 
-        let verified = MenezesVanstoneScheme::verify(&public_key, signature, message, service);
+        let verified = MenezesVanstoneScheme::verify(&public_key, signature, message, &service);
 
         match verified {
             Ok(verified) => {
