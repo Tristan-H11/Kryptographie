@@ -13,6 +13,7 @@ use crate::encryption::string_schemes::rsa::keys::{
 };
 use crate::encryption::symmetric_encryption_types::{SymmetricDecryptor, SymmetricEncryptor};
 use crate::math_core::number_theory::number_theory_service::NumberTheoryService;
+use crate::math_core::number_theory_with_prng_service::NumberTheoryWithPrngService;
 use crate::math_core::traits::logarithm::Logarithm;
 use crate::shared::hashing::sha256;
 
@@ -43,7 +44,7 @@ impl AsymmetricEncryptor<RsaWithStringScheme> for RsaWithStringScheme {
     fn encrypt(
         key: &Self::Key,
         plaintext: &Self::Input,
-        service: NumberTheoryService,
+        service: NumberTheoryWithPrngService,
     ) -> Self::Output {
         let radix = key.radix;
         let block_size = key.rsa_public_key.n.log(&radix.into());
@@ -87,7 +88,7 @@ impl AsymmetricDecryptor<RsaWithStringScheme> for RsaWithStringScheme {
     fn decrypt(
         key: &Self::Key,
         ciphertext: &Self::Input,
-        service: NumberTheoryService,
+        service: NumberTheoryWithPrngService,
     ) -> Self::Output {
         let radix = key.radix;
         let rsa_key = &key.rsa_private_key;
@@ -120,7 +121,7 @@ impl<'a> Signer<RsaWithStringScheme> for RsaWithStringScheme {
     /// # Rückgabe
     /// * `String` - Die Signatur.
     ///
-    fn sign(key: &Self::Key, message: &Self::Input, service: NumberTheoryService) -> Self::Output {
+    fn sign(key: &Self::Key, message: &Self::Input, service: NumberTheoryWithPrngService) -> Self::Output {
         let radix = key.radix;
         let rsa_key = &key.rsa_private_key;
         let block_size = rsa_key.n.log(&radix.into());
@@ -162,7 +163,7 @@ impl<'a> Verifier<RsaWithStringScheme> for RsaWithStringScheme {
         key: &Self::Key,
         signature: &Self::Signature,
         message: &Self::Message,
-        service: NumberTheoryService,
+        service: NumberTheoryWithPrngService,
     ) -> Self::Output {
         let radix = key.radix;
         let rsa_key = &key.rsa_public_key;

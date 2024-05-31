@@ -14,6 +14,7 @@ use atomic_counter::RelaxedCounter;
 use bigdecimal::num_bigint::BigInt;
 use bigdecimal::One;
 use log::{debug, trace};
+use crate::math_core::number_theory_with_prng_service::NumberTheoryWithPrngService;
 
 pub struct RsaScheme {}
 
@@ -86,7 +87,7 @@ impl AsymmetricEncryptor<RsaScheme> for RsaScheme {
     fn encrypt(
         key: &Self::Key,
         plaintext: &Self::Input,
-        service: NumberTheoryService,
+        service: NumberTheoryWithPrngService,
     ) -> Self::Output {
         service.fast_exponentiation(plaintext, &key.e, &key.n)
     }
@@ -102,7 +103,7 @@ impl AsymmetricDecryptor<RsaScheme> for RsaScheme {
     fn decrypt(
         key: &Self::Key,
         ciphertext: &Self::Input,
-        service: NumberTheoryService,
+        service: NumberTheoryWithPrngService,
     ) -> Self::Output {
         service.fast_exponentiation(ciphertext, &key.d, &key.n)
     }
@@ -113,7 +114,7 @@ impl Signer<RsaScheme> for RsaScheme {
     type Output = BigInt;
     type Key = RsaPrivateKey;
 
-    fn sign(key: &Self::Key, message: &Self::Input, service: NumberTheoryService) -> Self::Output {
+    fn sign(key: &Self::Key, message: &Self::Input, service: NumberTheoryWithPrngService) -> Self::Output {
         service.fast_exponentiation(message, &key.d, &key.n)
     }
 }
@@ -126,11 +127,11 @@ impl Verifier<RsaScheme> for RsaScheme {
 
     fn verify(
         key: &Self::Key,
-        message: &Self::Signature,
         signature: &Self::Signature,
-        service: NumberTheoryService,
+        message: &Self::Message,
+        service: NumberTheoryWithPrngService,
     ) -> Self::Output {
-        let decrypted_signature = service.fast_exponentiation(signature, &key.e, &key.n);
+        let decrypted_signature = service.fast_exponentiation(message, &key.e, &key.n);
         decrypted_signature == *message
     }
 }

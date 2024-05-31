@@ -20,6 +20,7 @@ use crate::shared::errors::MenezesVanstoneError;
 use anyhow::{ensure, Context, Result};
 use bigdecimal::num_bigint::BigInt;
 use bigdecimal::Zero;
+use crate::math_core::number_theory_with_prng_service::NumberTheoryWithPrngService;
 
 pub struct MenezesVanstoneStringScheme {}
 
@@ -98,7 +99,7 @@ impl AsymmetricEncryptor<MenezesVanstoneStringScheme> for MenezesVanstoneStringS
     fn encrypt(
         key: &Self::Key,
         plaintext: &Self::Input,
-        service: NumberTheoryService,
+        service: NumberTheoryWithPrngService,
     ) -> Self::Output {
         let radix = key.radix;
         let block_size = key.mv_key.curve.prime.log(&radix.into());
@@ -179,7 +180,7 @@ impl AsymmetricDecryptor<MenezesVanstoneStringScheme> for MenezesVanstoneStringS
     fn decrypt(
         key: &Self::Key,
         ciphertext: &Self::Input,
-        service: NumberTheoryService,
+        service: NumberTheoryWithPrngService,
     ) -> Self::Output {
         let ciphertext_string = &ciphertext.ciphertext;
         let points = &ciphertext.points;
@@ -244,9 +245,9 @@ impl<'a> Signer<MenezesVanstoneStringScheme> for MenezesVanstoneStringScheme {
     type Key = MenezesVanstoneStringPrivateKey;
 
     fn sign(
-        _key: &Self::Key,
-        _message: &Self::Input,
-        _service: NumberTheoryService,
+        key: &Self::Key,
+        message: &Self::Input,
+        service: NumberTheoryWithPrngService,
     ) -> Self::Output {
         todo!()
     }
@@ -259,10 +260,10 @@ impl<'a> Verifier<MenezesVanstoneStringScheme> for MenezesVanstoneStringScheme {
     type Key = MenezesVanstoneStringPublicKey;
 
     fn verify(
-        _key: &Self::Key,
-        _signature: &Self::Signature,
-        _message: &Self::Message,
-        _service: NumberTheoryService,
+        key: &Self::Key,
+        signature: &Self::Signature,
+        message: &Self::Message,
+        service: NumberTheoryWithPrngService,
     ) -> Self::Output {
         todo!()
     }

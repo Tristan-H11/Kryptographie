@@ -15,6 +15,7 @@ use atomic_counter::RelaxedCounter;
 use bigdecimal::num_bigint::BigInt;
 use log::debug;
 use std::time::SystemTime;
+use crate::math_core::number_theory_with_prng_service::NumberTheoryWithPrngService;
 
 pub struct ElGamalScheme;
 
@@ -117,7 +118,7 @@ impl AsymmetricEncryptor<ElGamalScheme> for ElGamalScheme {
     fn encrypt(
         key: &Self::Key,
         plaintext: &Self::Input,
-        service: NumberTheoryService,
+        service: NumberTheoryWithPrngService,
     ) -> Self::Output {
         let p = &key.p;
         let g = &key.g;
@@ -165,7 +166,7 @@ impl AsymmetricDecryptor<ElGamalScheme> for ElGamalScheme {
     fn decrypt(
         key: &Self::Key,
         ciphertext: &Self::Input,
-        service: NumberTheoryService,
+        service: NumberTheoryWithPrngService,
     ) -> Self::Output {
         let p = &key.p;
         let x = &key.x;
