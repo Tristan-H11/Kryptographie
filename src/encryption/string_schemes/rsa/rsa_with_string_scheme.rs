@@ -191,7 +191,7 @@ impl<'a> Verifier<RsaWithStringScheme> for RsaWithStringScheme {
             .iter()
             .zip(encrypted_signature_chunks.iter())
             .all(|(message_chunk, encrypted_signature_chunk)| {
-                RsaScheme::verify(rsa_key, message_chunk, encrypted_signature_chunk, service)
+                RsaScheme::verify(rsa_key, encrypted_signature_chunk, message_chunk, service)
             })
     }
 }
