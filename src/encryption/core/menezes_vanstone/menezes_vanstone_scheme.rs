@@ -7,7 +7,6 @@ use atomic_counter::RelaxedCounter;
 use bigdecimal::num_bigint::BigInt;
 use bigdecimal::num_traits::Euclid;
 use bigdecimal::Zero;
-use rand::RngCore;
 
 use crate::encryption::asymmetric_encryption_types::{
     AsymmetricDecryptor, AsymmetricEncryptionScheme, AsymmetricEncryptor, Signer, Verifier,
@@ -303,7 +302,6 @@ impl<'a> Verifier<MenezesVanstoneScheme> for MenezesVanstoneScheme {
 
 #[cfg(test)]
 mod tests {
-    use crate::encryption::string_schemes::menezes_vanstone::menezes_vanstone_string_scheme::MenezesVanstoneStringScheme;
     use rand::Rng;
 
     use crate::math_core::number_theory::number_theory_service::NumberTheoryServiceSpeed::Fast;
@@ -428,7 +426,6 @@ mod tests {
         let key_pair =
             MenezesVanstoneScheme::generate_keypair(n, modul_width, 40, random_seed).unwrap();
         let public_key = key_pair.public_key;
-        let private_key = key_pair.private_key;
         let message = "Hello My Friend!";
 
         // Manipulation der Signatur

@@ -131,7 +131,7 @@ impl Verifier<RsaScheme> for RsaScheme {
         message: &Self::Message,
         service: &NumberTheoryWithPrngService,
     ) -> Self::Output {
-        let decrypted_signature = service.number_theory_service.fast_exponentiation(message, &key.e, &key.n);
+        let decrypted_signature = service.number_theory_service.fast_exponentiation(signature, &key.e, &key.n);
         decrypted_signature == *message
     }
 }

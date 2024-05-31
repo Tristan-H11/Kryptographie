@@ -12,7 +12,6 @@ use crate::encryption::string_schemes::rsa::keys::{
     RsaWithStringKeyPair, RsaWithStringPrivateKey, RsaWithStringPublicKey,
 };
 use crate::encryption::symmetric_encryption_types::{SymmetricDecryptor, SymmetricEncryptor};
-use crate::math_core::number_theory::number_theory_service::NumberTheoryService;
 use crate::math_core::number_theory_with_prng_service::NumberTheoryWithPrngService;
 use crate::math_core::traits::logarithm::Logarithm;
 use crate::shared::hashing::sha256;
@@ -218,6 +217,7 @@ impl RsaWithStringScheme {
 #[cfg(test)]
 mod tests {
     use crate::encryption::core::rsa::rsa_scheme::RsaKeyGenConfig;
+    use crate::math_core::number_theory::number_theory_service::NumberTheoryService;
     use crate::math_core::number_theory::number_theory_service::NumberTheoryServiceSpeed::{
         Fast, Slow,
     };

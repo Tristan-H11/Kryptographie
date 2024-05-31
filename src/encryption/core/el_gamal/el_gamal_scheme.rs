@@ -14,7 +14,6 @@ use crate::math_core::traits::increment::Increment;
 use atomic_counter::RelaxedCounter;
 use bigdecimal::num_bigint::BigInt;
 use log::debug;
-use std::time::SystemTime;
 use crate::math_core::number_theory_with_prng_service::NumberTheoryWithPrngService;
 
 pub struct ElGamalScheme;
@@ -175,6 +174,7 @@ impl AsymmetricDecryptor<ElGamalScheme> for ElGamalScheme {
 
 #[cfg(test)]
 mod tests {
+    use std::time::SystemTime;
     use super::*;
     use crate::math_core::number_theory::number_theory_service::NumberTheoryServiceSpeed::Fast;
     use bigdecimal::FromPrimitive;

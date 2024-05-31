@@ -14,7 +14,6 @@ use crate::encryption::string_schemes::menezes_vanstone::keys::{
 };
 use crate::encryption::symmetric_encryption_types::{SymmetricDecryptor, SymmetricEncryptor};
 use crate::math_core::ecc::finite_field_elliptic_curve_point::FiniteFieldEllipticCurvePoint;
-use crate::math_core::number_theory::number_theory_service::NumberTheoryService;
 use crate::math_core::traits::logarithm::Logarithm;
 use crate::shared::errors::MenezesVanstoneError;
 use anyhow::{ensure, Context, Result};
@@ -327,7 +326,6 @@ mod tests {
         )
         .unwrap();
         let alice_public_key = alice_keypair.public_key.clone();
-        let alice_private_key = alice_keypair.private_key.clone();
 
         let bob_n = 3;
         let bob_modul_width = 512;
