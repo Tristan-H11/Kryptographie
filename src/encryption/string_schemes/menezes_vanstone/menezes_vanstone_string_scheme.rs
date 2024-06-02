@@ -114,26 +114,10 @@ impl AsymmetricEncryptor<MenezesVanstoneStringScheme> for MenezesVanstoneStringS
         let message = ToDecimalBlockScheme::encrypt(&plaintext, &decimal_unicode_key);
 
         // Die Zahlen in eine Liste von MenezesVanstonePlaintext mappen
-        let mut plaintext_list: Vec<MenezesVanstonePlaintext> = Vec::new();
-        for chunk in message.chunks(2) {
-            // Falls es den zweiten Block nicht gibt, soll eine 0 eingefügt werden.
-            // Dadurch kann die Nachricht "\u{0]" nicht mehr eindeutig entschlüsselt werden, weil
-            // diese im BlockChiffre keine eindeutige Repräsentation hat.
-            // Dieser Tradeoff ist aber in Ordnung und wird in der Praxis nicht relevant sein.
-            if chunk.len() < 2 {
-                let plaintext_chunk = MenezesVanstonePlaintext {
-                    first: chunk[0].clone(),
-                    second: BigInt::zero(),
-                };
-                plaintext_list.push(plaintext_chunk);
-            } else {
-                let plaintext_chunk = MenezesVanstonePlaintext {
-                    first: chunk[0].clone(),
-                    second: chunk[1].clone(),
-                };
-                plaintext_list.push(plaintext_chunk);
-            }
-        }
+        let plaintext_list: Vec<MenezesVanstonePlaintext> = message
+            .chunks(2)
+            .map(|chunk| MenezesVanstonePlaintext::from_chunk(chunk))
+            .collect();
 
         // Jeden einzelnen Plaintext für sich verschlüsseln
         let mut ciphertext_list: Vec<MenezesVanstoneCiphertext> = Vec::new();
@@ -144,11 +128,11 @@ impl AsymmetricEncryptor<MenezesVanstoneStringScheme> for MenezesVanstoneStringS
         }
 
         // Die Zahlen wieder in Strings konvertieren
-        let mut big_int_vec: Vec<BigInt> = Vec::new();
-        for ciphertext in &ciphertext_list {
-            big_int_vec.push(ciphertext.first.clone());
-            big_int_vec.push(ciphertext.second.clone());
-        }
+        let big_int_vec: Vec<BigInt> = ciphertext_list
+            .iter()
+            .flat_map(|ciphertext| vec![ciphertext.first.clone(), ciphertext.second.clone()])
+            .filter_map(|x| x)
+            .collect();
 
         let conversion_post_key = DecimalUnicodeConversionSchemeKey {
             radix,
@@ -211,8 +195,8 @@ impl AsymmetricDecryptor<MenezesVanstoneStringScheme> for MenezesVanstoneStringS
 
             let ciphertext = MenezesVanstoneCiphertext {
                 point: points[i / 2].clone(),
-                first,
-                second,
+                first: Some(first),
+                second: Some(second),
             };
             ciphertext_list.push(ciphertext);
         }
@@ -225,12 +209,12 @@ impl AsymmetricDecryptor<MenezesVanstoneStringScheme> for MenezesVanstoneStringS
             plaintext_list.push(plaintext);
         }
 
-        // Die Zahlen in einer flachen Liste sammeln und in Strings konvertieren
-        let mut big_int_vec: Vec<BigInt> = Vec::new();
-        for plaintext in &plaintext_list {
-            big_int_vec.push(plaintext.first.clone());
-            big_int_vec.push(plaintext.second.clone());
-        }
+        let big_int_vec: Vec<BigInt> = plaintext_list
+            .iter()
+            .flat_map(|plaintext| vec![plaintext.first.clone(), plaintext.second.clone()])
+            .filter_map(|x| x)
+            .collect();
+
         Ok(ToDecimalBlockScheme::decrypt(
             &big_int_vec,
             &decimal_unicode_key,
