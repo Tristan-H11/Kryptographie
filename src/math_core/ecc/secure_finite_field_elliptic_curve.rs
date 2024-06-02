@@ -152,14 +152,14 @@ impl SecureFiniteFieldEllipticCurve {
         let service = NumberTheoryService::new(Slow);
         let prng = PseudoRandomNumberGenerator::new_seeded(); // TODO übergeben lassen
 
-        // Die Schleife, die läuft, bis 'q = N / 8' eine Primzahl ergibt.
+        // Die Schleife läuft, bis 'q = N / 8' eine Primzahl ergibt.
         loop {
-            // Die Schleife, die eine passende Primzahl bestimmt.
+            // Die Schleife bestimmt eine passende Primzahl.
             loop {
                 // Wenn die Primzahl folgende Bedingungen erfüllt, so genügt sie dem Verfahren:
                 // 1. Sie ist eine Primzahl
-                // 2. Sie ist ein quadratischer Rest zu p, also n^((p-1)/2) = 1 (mod p) -- Skript Satz 1.15
-                // 3. Sie ist kein Vielfaches von 2n
+                // 2. n ist ein quadratischer Rest zu p, also n^((p-1)/2) = 1 (mod p) -- Skript Satz 1.15
+                // 3. Sie ist kein Teiler von 2n
                 if service.is_probably_prime(&prime, miller_rabin_iterations, &prng)
                     && service
                         .fast_exponentiation(&n.into(), &prime.decrement().half(), &prime)
