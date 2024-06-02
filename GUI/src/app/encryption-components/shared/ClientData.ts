@@ -103,7 +103,7 @@ export class MvClientData extends ClientData {
             },
             "",
             {encrypted_message: "", points: []},
-            {r: "Empty", s: "Empty"},
+            {r: "", s: ""},
             "ungeprüft",
             undefined,
             undefined);
