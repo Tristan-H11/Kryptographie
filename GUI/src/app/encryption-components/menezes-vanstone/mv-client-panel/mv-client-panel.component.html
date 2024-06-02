@@ -73,14 +73,19 @@
                 <mat-card-title>Signatur</mat-card-title>
             </mat-card-header>
             <mat-card-content style="overflow-wrap: anywhere; margin-top: 1%">
-                <mat-form-field appearance="outline">
+                <mat-form-field appearance="outline" style="width: 99%; margin-right: 1%;">
                     <mat-label>r</mat-label>
-                    <input matInput type="text" [(ngModel)]="client.signature.r">
+                    <textarea matInput [(ngModel)]="client.signature.r" rows="1"></textarea>
                 </mat-form-field>
                 <br>
-                <mat-form-field appearance="outline">
+                <mat-form-field appearance="outline" style="width: 99%; margin-right: 1%;">
                     <mat-label>s</mat-label>
-                    <input matInput type="text" [(ngModel)]="client.signature.s">
+                    <textarea matInput [(ngModel)]="client.signature.s" rows="1"></textarea>
+                </mat-form-field>
+                <br>
+                <mat-form-field appearance="outline" style="width: 99%; margin-right: 1%;">
+                    <mat-label>Stringdarstellung</mat-label>
+                    <textarea matInput [(ngModel)]="client.signature.string_representation" rows="1"></textarea>
                 </mat-form-field>
                 <p>Die soeben entschlüsselte Nachricht ist <strong>{{ client.signature_valid }}</strong></p>
             </mat-card-content>
