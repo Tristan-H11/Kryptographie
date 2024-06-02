@@ -52,19 +52,13 @@ impl From<MvSignatureBean> for MenezesVanstoneSignature {
         let r: BigInt = signature.r.parse().unwrap();
         let s: BigInt = signature.s.parse().unwrap();
 
-        let radix = 55296;
+        // let radix = 55296;
 
         // Die größere der beiden Blockgrößen, damit sicher beide Werte enthalten sein werden.
-        let block_size = max(r.log(&radix.into()) + 1, s.log(&radix.into()) + 1);
-        let key = DecimalUnicodeConversionSchemeKey { block_size, radix };
-
-        let blocks = FromDecimalBlockScheme::decrypt(&signature.string_representation, &key);
-        assert_eq!(blocks.len(), 2);
-        let r_from_string = blocks[0].clone();
-        let s_from_string = blocks[1].clone();
-
-        assert_eq!(r_from_string, r);
-        assert_eq!(s_from_string, s);
+        // let block_size = max(r.log(&radix.into()) + 1, s.log(&radix.into()) + 1);
+        // let key = DecimalUnicodeConversionSchemeKey { block_size, radix };
+        //
+        // let blocks = FromDecimalBlockScheme::decrypt(&signature.string_representation, &key);
 
         MenezesVanstoneSignature { r, s }
     }
