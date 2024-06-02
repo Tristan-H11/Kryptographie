@@ -122,7 +122,7 @@ impl MenezesVanstoneScheme {
                 .take_random_number_in_range(&1.into(), &order_of_subgroup.decrement());
             y = curve
                 .generator
-                .multiply(&x, &curve)
+                .multiply(&x, &curve, &service_wrapper.number_theory_service)
                 .context("Failed to calculate key-component y")?;
             if !y.x.is_zero() && !y.y.is_zero() {
                 break;
@@ -170,7 +170,7 @@ impl AsymmetricEncryptor<MenezesVanstoneScheme> for MenezesVanstoneScheme {
                 .take_random_number_in_range(&1.into(), &curve.order_of_subgroup.decrement());
             let point = key
                 .y
-                .multiply(&k, curve)
+                .multiply(&k, curve, &service.number_theory_service)
                 .context("Failed to calculate Point (c1, c2)")?;
 
             ensure!(
@@ -192,7 +192,7 @@ impl AsymmetricEncryptor<MenezesVanstoneScheme> for MenezesVanstoneScheme {
         let a = key
             .curve
             .generator
-            .multiply(&k, curve)
+            .multiply(&k, curve, &service.number_theory_service)
             .context("Failed to calculate Point a")?;
         let b1 = m1.and_then(|m| Some((c1 * m) % prime));
         let b2 = m2.and_then(|m| Some((c2 * m) % prime));
@@ -223,7 +223,7 @@ impl AsymmetricDecryptor<MenezesVanstoneScheme> for MenezesVanstoneScheme {
         let prime = &key.curve.prime;
 
         let point = a
-            .multiply(&key.x, &key.curve)
+            .multiply(&key.x, &key.curve, &service.number_theory_service)
             .context("Failed to calculate Point (c1, c2)")?;
         let (c1, c2) = (point.x, point.y);
         let c1_inverse = service
@@ -270,7 +270,7 @@ impl<'a> Signer<MenezesVanstoneScheme> for MenezesVanstoneScheme {
             let k = &service.take_random_number_in_range(&1.into(), &q.decrement());
             let point = curve
                 .generator
-                .multiply(k, curve)
+                .multiply(k, curve, &service.number_theory_service)
                 .context("Failed to calculate Point (c1, c2)")?;
 
             ensure!(
@@ -318,14 +318,14 @@ impl<'a> Verifier<MenezesVanstoneScheme> for MenezesVanstoneScheme {
 
         let first_point = curve
             .generator
-            .multiply(&u1, curve)
+            .multiply(&u1, curve, &service.number_theory_service)
             .context("Failed to calculate first point")?;
         let second_point = key
             .y
-            .multiply(&u2, curve)
+            .multiply(&u2, curve, &service.number_theory_service)
             .context("Failed to calculate second point")?;
         let point = first_point
-            .add(&second_point, curve)
+            .add(&second_point, curve, &service.number_theory_service)
             .context("Failed to calculate verification point")?;
 
         let v = point.x.rem_euclid(q);
