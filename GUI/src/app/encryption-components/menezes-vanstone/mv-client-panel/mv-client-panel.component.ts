@@ -95,7 +95,8 @@ export class MvClientPanelComponent extends AbstractClientPanelComponent<MvClien
         let request: MvEncryptRequest = {
             public_key: copyMvPublicKey(this.client.sendingTo.keyPair.public_key),
             message: this.client.plaintext,
-            radix: this.config.numberSystem
+            radix: this.config.numberSystem,
+            random_seed: this.config.randomSeed
         };
 
         this.backendRequestService.encrypt(request).pipe(
@@ -109,7 +110,8 @@ export class MvClientPanelComponent extends AbstractClientPanelComponent<MvClien
 
                 let body: MvSignRequest = {
                     private_key: this.client.keyPair.private_key,
-                    message: this.client.plaintext
+                    message: this.client.plaintext,
+                    random_seed: this.config.randomSeed
                 };
                 return this.backendRequestService.sign(body);
             })

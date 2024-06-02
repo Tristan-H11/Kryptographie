@@ -260,7 +260,7 @@ pub(crate) async fn encrypt(
 
         let message = &req_body.message;
 
-        let random_seed = 14; // TODO: Random_seed erwarten
+        let random_seed = req_body.random_seed;
         let service = match query.use_fast {
             true => NumberTheoryWithPrngService::new(Fast, random_seed),
             false => NumberTheoryWithPrngService::new(Slow, random_seed),
@@ -331,7 +331,7 @@ pub(crate) async fn sign(
         let private_key = req_body.private_key.clone().into();
         let message = &req_body.message;
 
-        let random_seed = 14; // TODO: Random_seed erwarten
+        let random_seed = req_body.random_seed;
         let service = match query.use_fast {
             true => NumberTheoryWithPrngService::new(Fast, random_seed),
             false => NumberTheoryWithPrngService::new(Slow, random_seed),

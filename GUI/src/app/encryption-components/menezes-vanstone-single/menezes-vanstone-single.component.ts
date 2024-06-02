@@ -87,7 +87,8 @@ export class MenezesVanstoneSingleComponent {
         let request: MvEncryptRequest = {
             public_key: copyMvPublicKey(this.client.keyPair.public_key),
             message: this.client.plaintext,
-            radix: this.config.numberSystem
+            radix: this.config.numberSystem,
+            random_seed: this.config.randomSeed
         };
 
         this.client.signature = {
@@ -107,7 +108,8 @@ export class MenezesVanstoneSingleComponent {
 
                 let body: MvSignRequest = {
                     private_key: this.client.keyPair.private_key,
-                    message: this.client.plaintext
+                    message: this.client.plaintext,
+                    random_seed: this.config.randomSeed
                 };
                 this.client.plaintext = "";
                 return this.backendRequestService.sign(body);
