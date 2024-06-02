@@ -150,6 +150,7 @@ export class MvClientPanelComponent extends AbstractClientPanelComponent<MvClien
                     message: this.client.plaintext,
                     signature: this.client.signature
                 };
+                this.client.receivedFrom = undefined;
                 return this.backendRequestService.verify(body);
             })
         ).subscribe(result => {
