@@ -20,6 +20,7 @@ use crate::shared::errors::MenezesVanstoneError;
 use anyhow::{ensure, Context, Result};
 use bigdecimal::num_bigint::BigInt;
 use bigdecimal::Zero;
+use rayon::iter::{IntoParallelRefIterator, ParallelIterator};
 
 pub struct MenezesVanstoneStringScheme {}
 
@@ -120,12 +121,14 @@ impl AsymmetricEncryptor<MenezesVanstoneStringScheme> for MenezesVanstoneStringS
             .collect();
 
         // Jeden einzelnen Plaintext für sich verschlüsseln
-        let mut ciphertext_list: Vec<MenezesVanstoneCiphertext> = Vec::new();
-        for plaintext in plaintext_list {
-            let ciphertext = MenezesVanstoneScheme::encrypt(&key.mv_key, &plaintext, service)
-                .context("Verschlüsselung im MenezesVanstone-Kern fehlgeschlagen. Fehler: {:#?}")?;
-            ciphertext_list.push(ciphertext);
-        }
+        let ciphertext_list: Vec<MenezesVanstoneCiphertext> = plaintext_list
+            .par_iter()
+            .map(|plaintext| {
+                MenezesVanstoneScheme::encrypt(&key.mv_key, plaintext, service).context(
+                    "Verschlüsselung im MenezesVanstone-Kern fehlgeschlagen. Fehler: {:#?}",
+                )
+            })
+            .collect::<Result<Vec<MenezesVanstoneCiphertext>>>()?;
 
         // Die Zahlen wieder in Strings konvertieren
         let big_int_vec: Vec<BigInt> = ciphertext_list
@@ -202,12 +205,13 @@ impl AsymmetricDecryptor<MenezesVanstoneStringScheme> for MenezesVanstoneStringS
         }
 
         // Jeden einzelnen Ciphertext für sich entschlüsseln
-        let mut plaintext_list: Vec<MenezesVanstonePlaintext> = Vec::new();
-        for ciphertext in ciphertext_list {
-            let plaintext = MenezesVanstoneScheme::decrypt(&key.mv_key, &ciphertext, service)
-                .context("Entschlüsselung im MenezesVanstone-Kern fehlgeschlagen.")?;
-            plaintext_list.push(plaintext);
-        }
+        let plaintext_list: Vec<MenezesVanstonePlaintext> = ciphertext_list
+            .par_iter()
+            .map(|ciphertext| {
+                MenezesVanstoneScheme::decrypt(&key.mv_key, ciphertext, service)
+                    .context("Entschlüsselung im MenezesVanstone-Kern fehlgeschlagen.")
+            })
+            .collect::<Result<Vec<MenezesVanstonePlaintext>>>()?;
 
         let big_int_vec: Vec<BigInt> = plaintext_list
             .iter()
