@@ -7,7 +7,6 @@ use std::fmt::Display;
 use std::ops::Add;
 
 use crate::math_core::ecc::secure_finite_field_elliptic_curve::SecureFiniteFieldEllipticCurve;
-use crate::math_core::number_theory::number_theory_service::NumberTheoryServiceSpeed::Slow;
 use crate::math_core::number_theory::number_theory_service::{
     NumberTheoryService, NumberTheoryServiceTrait,
 };
@@ -64,7 +63,12 @@ impl FiniteFieldEllipticCurvePoint {
 
     /// Addiert zwei Punkte auf einer elliptischen Kurve.
     /// Die Punkte müssen auf der gleichen elliptischen Kurve liegen.
-    pub fn add(&self, other: &Self, curve: &SecureFiniteFieldEllipticCurve) -> Result<Self> {
+    pub fn add(
+        &self,
+        other: &Self,
+        curve: &SecureFiniteFieldEllipticCurve,
+        service: &NumberTheoryService,
+    ) -> Result<Self> {
         // Liegen die Punkte nicht auf der gleichen Kurve, ist das Ergebnis undefiniert.
         ensure!(
             curve.has_point(self),
@@ -90,12 +94,10 @@ impl FiniteFieldEllipticCurvePoint {
 
         // Handelt es sich um identische Punkte, so wird der Punkt verdoppelt.
         if self == other {
-            return Ok(self.double(curve));
+            return Ok(self.double(curve, service));
         }
 
         let prime = &curve.prime;
-
-        let service = NumberTheoryService::new(Slow);
 
         // Zähler der Steigung berechnen
         let slope_numer = &other.y - &self.y;
@@ -116,7 +118,11 @@ impl FiniteFieldEllipticCurvePoint {
     }
 
     /// Verdoppelt einen Punkt auf einer elliptischen Kurve.
-    pub fn double(&self, curve: &SecureFiniteFieldEllipticCurve) -> Self {
+    pub fn double(
+        &self,
+        curve: &SecureFiniteFieldEllipticCurve,
+        service: &NumberTheoryService,
+    ) -> Self {
         if self.is_infinite {
             return self.clone();
         }
@@ -125,7 +131,6 @@ impl FiniteFieldEllipticCurvePoint {
         if self.y.is_zero() {
             return FiniteFieldEllipticCurvePoint::infinite();
         }
-        let service = NumberTheoryService::new(Slow);
         let p = &curve.prime;
         // Zähler der Steigung berechnen
         let slope_numer = 3 * (&self.x).pow(2) + &curve.a;
@@ -149,6 +154,7 @@ impl FiniteFieldEllipticCurvePoint {
         &self,
         scalar: &BigInt,
         curve: &SecureFiniteFieldEllipticCurve,
+        service: &NumberTheoryService,
     ) -> Result<Self> {
         // Bei einer 1 passiert nichts
         if scalar.is_one() {
@@ -156,7 +162,7 @@ impl FiniteFieldEllipticCurvePoint {
         }
         // Bei einer 2 wird verdoppelt
         if scalar == &BigInt::from(2) {
-            return Ok(self.double(curve));
+            return Ok(self.double(curve, service));
         }
         // Ist der Punkt der Generator und der Skalar die Ordnung des Generators, wird der Punkt
         // im Unendlichen zurückgegeben.
@@ -170,10 +176,10 @@ impl FiniteFieldEllipticCurvePoint {
         while n > BigInt::zero() {
             if n.is_odd() {
                 result = result
-                    .add(&addend, &curve)
+                    .add(&addend, &curve, service)
                     .context("Error while adding point in multiply operation")?;
             }
-            addend = addend.double(curve);
+            addend = addend.double(curve, service);
             n = n >> 1;
         }
         Ok(result)
@@ -196,6 +202,7 @@ impl FiniteFieldEllipticCurvePoint {
 
 #[cfg(test)]
 mod tests {
+
     use super::*;
     use crate::math_core::number_theory::number_theory_service::NumberTheoryServiceSpeed::Fast;
     use crate::math_core::number_theory_with_prng_service::NumberTheoryWithPrngService;
@@ -208,11 +215,15 @@ mod tests {
     #[test]
     fn test_add_trivial() {
         let curve = get_curve();
+        let service = &NumberTheoryService::new(Fast);
         assert!(curve.order_of_subgroup > 8.into());
         let p1 = curve.generator.clone();
-        let p2 = curve.generator.multiply(&4.into(), &curve).unwrap();
-        let p3 = p1.add(&p2, &curve).unwrap();
-        let expected = p1.multiply(&5.into(), &curve).unwrap();
+        let p2 = curve
+            .generator
+            .multiply(&4.into(), &curve, service)
+            .unwrap();
+        let p3 = p1.add(&p2, &curve, service).unwrap();
+        let expected = p1.multiply(&5.into(), &curve, service).unwrap();
         assert_eq!(p3, expected);
         let has_point = curve.has_point(&p3);
         assert!(has_point, "{:?}, {:?}", p3, curve);
@@ -221,54 +232,64 @@ mod tests {
     #[test]
     fn test_add_identical_points_doubles() {
         let curve = get_curve();
+        let service = &NumberTheoryService::new(Fast);
         let p1 = curve.generator.clone();
-        let result = p1.add(&p1, &curve).unwrap();
-        assert_eq!(result, p1.double(&curve));
+        let result = p1.add(&p1, &curve, service).unwrap();
+        assert_eq!(result, p1.double(&curve, service));
     }
 
     #[test]
     fn test_add_two_points_at_infinity() {
         let curve = get_curve();
+        let service = &NumberTheoryService::new(Fast);
         let infinity = FiniteFieldEllipticCurvePoint::infinite();
-        let result = infinity.add(&infinity, &curve).unwrap();
+        let result = infinity.add(&infinity, &curve, service).unwrap();
         let expected = FiniteFieldEllipticCurvePoint::infinite();
         assert_eq!(result, expected);
     }
 
     #[test]
     fn test_multiply_trivial() {
+        let service = &NumberTheoryService::new(Fast);
         let curve = get_curve();
         let p1 = curve.generator.clone();
-        let identical = p1.multiply(&1.into(), &curve).unwrap();
+        let identical = p1.multiply(&1.into(), &curve, service).unwrap();
         assert_eq!(p1, identical);
 
-        let doubled = p1.multiply(&2.into(), &curve).unwrap();
-        let expected = curve.generator.double(&curve);
+        let doubled = p1.multiply(&2.into(), &curve, service).unwrap();
+        let expected = curve.generator.double(&curve, service);
         assert_eq!(doubled, expected);
 
-        let p2 = doubled.multiply(&8.into(), &curve).unwrap();
-        let expected = curve.generator.multiply(&16.into(), &curve).unwrap();
+        let p2 = doubled.multiply(&8.into(), &curve, service).unwrap();
+        let expected = curve
+            .generator
+            .multiply(&16.into(), &curve, service)
+            .unwrap();
         assert_eq!(p2, expected);
     }
 
     #[test]
     fn test_add_point_to_itself_multiple_times() {
         let curve = get_curve();
+        let service = &NumberTheoryService::new(Fast);
         let generator = curve.generator.clone();
         let result = generator
-            .add(&generator, &curve)
+            .add(&generator, &curve, service)
             .unwrap()
-            .add(&generator, &curve)
+            .add(&generator, &curve, service)
             .unwrap();
-        let expected = generator.multiply(&3.into(), &curve).unwrap();
+        let expected = generator.multiply(&3.into(), &curve, service).unwrap();
         assert_eq!(result, expected);
     }
 
     #[test]
     fn test_multiply_by_order_gives_infinity() {
         let curve = get_curve();
+        let service = &NumberTheoryService::new(Fast);
         let p1 = curve.generator.clone();
-        let p2 = p1.multiply(&curve.order_of_subgroup, &curve).unwrap();
+        let p2 = p1
+            .multiply(&curve.order_of_subgroup, &curve, service)
+            .unwrap();
         let expected = FiniteFieldEllipticCurvePoint::infinite();
         assert_eq!(p2, expected);
     }
@@ -276,7 +297,11 @@ mod tests {
     #[test]
     fn test_multiply_with_zero() {
         let curve = get_curve();
-        let p2 = curve.generator.multiply(&0.into(), &curve).unwrap();
+        let service = &NumberTheoryService::new(Fast);
+        let p2 = curve
+            .generator
+            .multiply(&0.into(), &curve, service)
+            .unwrap();
         let expected = FiniteFieldEllipticCurvePoint::infinite();
         assert_eq!(p2, expected);
     }
@@ -284,26 +309,28 @@ mod tests {
     #[test]
     fn test_add_with_infinity() {
         let curve = get_curve();
+        let service = &NumberTheoryService::new(Fast);
         let generator = curve.generator.clone();
         let infinity = FiniteFieldEllipticCurvePoint::infinite();
 
         // Point + 0 = Point
-        let p2 = generator.add(&infinity, &curve).unwrap();
+        let p2 = generator.add(&infinity, &curve, service).unwrap();
         assert_eq!(p2, generator);
 
         // 0 + Point = Point
-        let p3 = infinity.add(&generator, &curve).unwrap();
+        let p3 = infinity.add(&generator, &curve, service).unwrap();
         assert_eq!(p3, generator);
     }
 
     #[test]
     fn test_add_point_to_its_negation() {
         let curve = get_curve();
+        let service = &NumberTheoryService::new(Fast);
         let generator = curve.generator.clone();
         let negated_generator =
             FiniteFieldEllipticCurvePoint::new(generator.x.clone(), -generator.y.clone());
         // Addiere negativen Generator --> Infinity
-        let result = generator.add(&negated_generator, &curve).unwrap();
+        let result = generator.add(&negated_generator, &curve, service).unwrap();
         let expected = FiniteFieldEllipticCurvePoint::infinite();
         assert_eq!(
             result, expected,
@@ -315,11 +342,12 @@ mod tests {
     fn test_multiply_by_large_scalar() {
         let curve = get_curve();
         let generator = curve.generator.clone();
+        let service = &NumberTheoryService::new(Fast);
         let large_scalar = BigInt::from(1000000000);
         // Multiplying the generator by a large scalar
-        let result = generator.multiply(&large_scalar, &curve).unwrap();
+        let result = generator.multiply(&large_scalar, &curve, service).unwrap();
         let expected = generator
-            .multiply(&BigInt::from(1000000000), &curve)
+            .multiply(&BigInt::from(1000000000), &curve, service)
             .unwrap();
         assert_eq!(result, expected);
     }

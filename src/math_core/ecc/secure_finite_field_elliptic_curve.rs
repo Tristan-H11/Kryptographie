@@ -368,22 +368,22 @@ impl SecureFiniteFieldEllipticCurve {
                 continue;
             }
 
-            let double_generator = generator.double(curve);
+            let double_generator = generator.double(curve, service);
             if double_generator.is_infinite {
                 continue;
             }
-            let quadruple_generator = double_generator.double(curve);
+            let quadruple_generator = double_generator.double(curve, service);
             if quadruple_generator.is_infinite {
                 continue;
             }
-            let octuple_generator = quadruple_generator.double(curve);
+            let octuple_generator = quadruple_generator.double(curve, service);
             if octuple_generator.is_infinite {
                 continue;
             }
 
             // Der Generator selber darf nicht im Unendlichen liegen und auch die Ordnung
             // des Punktes muss gleich q sein, also muss Generator*q im Unendlichen liegen.
-            if generator.multiply(q, curve)?.is_infinite {
+            if generator.multiply(q, curve, &service)?.is_infinite {
                 break;
             }
         }
@@ -481,7 +481,10 @@ mod tests {
     fn test_has_point() {
         let service = NumberTheoryWithPrngService::new(Fast, 17);
         let curve = SecureFiniteFieldEllipticCurve::new(5, 16, 40, &service).unwrap();
-        let point = curve.generator.multiply(&3.into(), &curve).unwrap();
+        let point = curve
+            .generator
+            .multiply(&3.into(), &curve, &service.number_theory_service)
+            .unwrap();
         assert!(curve.has_point(&point));
 
         let point = FiniteFieldEllipticCurvePoint::new(0.into(), 0.into());
@@ -532,7 +535,10 @@ mod tests {
     fn test_has_point_on_curve_with_negative_n() {
         let service = NumberTheoryWithPrngService::new(Fast, 17);
         let curve = SecureFiniteFieldEllipticCurve::new(-3, 17, 40, &service).unwrap();
-        let point = curve.generator.multiply(&3.into(), &curve).unwrap();
+        let point = curve
+            .generator
+            .multiply(&3.into(), &curve, &service.number_theory_service)
+            .unwrap();
         assert!(curve.has_point(&point));
 
         let point = FiniteFieldEllipticCurvePoint::new(0.into(), 0.into());

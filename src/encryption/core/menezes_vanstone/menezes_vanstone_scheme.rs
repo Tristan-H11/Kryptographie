@@ -1,6 +1,5 @@
 use anyhow::Context;
 use anyhow::{ensure, Result};
-use std::cmp::max;
 
 use crate::api::endpoints::mv::MvSignatureBean;
 use bigdecimal::num_bigint::BigInt;
@@ -15,29 +14,53 @@ use crate::encryption::core::menezes_vanstone::keys::{
     MenezesVanstoneKeyPair, MenezesVanstonePrivateKey, MenezesVanstonePublicKey,
 };
 use crate::encryption::encryption_types::{Decryptor, EncryptionScheme, Encryptor};
-use crate::encryption::string_schemes::decimal_unicode_schemes::from_decimal_block_scheme::FromDecimalBlockScheme;
-use crate::encryption::string_schemes::decimal_unicode_schemes::keys::DecimalUnicodeConversionSchemeKey;
-use crate::encryption::symmetric_encryption_types::SymmetricDecryptor;
 use crate::math_core::ecc::finite_field_elliptic_curve_point::FiniteFieldEllipticCurvePoint;
 use crate::math_core::ecc::secure_finite_field_elliptic_curve::SecureFiniteFieldEllipticCurve;
 use crate::math_core::number_theory::number_theory_service::NumberTheoryServiceTrait;
 use crate::math_core::number_theory_with_prng_service::NumberTheoryWithPrngService;
 use crate::math_core::traits::increment::Increment;
-use crate::math_core::traits::logarithm::Logarithm;
 use crate::shared::errors::MenezesVanstoneError;
 use crate::shared::hashing::sha256;
 
 #[derive(Clone, Debug, PartialEq)]
 pub struct MenezesVanstonePlaintext {
-    pub first: BigInt,
-    pub second: BigInt,
+    pub first: Option<BigInt>,
+    pub second: Option<BigInt>,
+}
+
+impl MenezesVanstonePlaintext {
+    /// Erstellt eine Plaintext-Instanz aus einem BigInt-Wert
+    pub fn single(value: BigInt) -> Self {
+        MenezesVanstonePlaintext {
+            first: Some(value),
+            second: None,
+        }
+    }
+
+    /// Erstellt eine Plaintext-Instanz aus zwei BigInt-Werten
+    pub fn double(value1: BigInt, value2: BigInt) -> Self {
+        MenezesVanstonePlaintext {
+            first: Some(value1),
+            second: Some(value2),
+        }
+    }
+
+    /// Erstellt eine Plaintext-Instanz aus einem BigInt-Chunk
+    /// Panics, wenn der Chunk nicht die Länge 1 oder 2 hat.
+    pub fn from_chunk(chunk: &[BigInt]) -> Self {
+        match chunk.len() {
+            1 => MenezesVanstonePlaintext::single(chunk[0].clone()),
+            2 => MenezesVanstonePlaintext::double(chunk[0].clone(), chunk[1].clone()),
+            _ => panic!("Chunk size must be 1 or 2, but was {}", chunk.len()),
+        }
+    }
 }
 
 #[derive(Clone, Debug, PartialEq)]
 pub struct MenezesVanstoneCiphertext {
     pub point: FiniteFieldEllipticCurvePoint,
-    pub first: BigInt,
-    pub second: BigInt,
+    pub first: Option<BigInt>,
+    pub second: Option<BigInt>,
 }
 
 #[derive(Clone, Debug, PartialEq)]
@@ -99,7 +122,7 @@ impl MenezesVanstoneScheme {
                 .take_random_number_in_range(&1.into(), &order_of_subgroup.decrement());
             y = curve
                 .generator
-                .multiply(&x, &curve)
+                .multiply(&x, &curve, &service_wrapper.number_theory_service)
                 .context("Failed to calculate key-component y")?;
             if !y.x.is_zero() && !y.y.is_zero() {
                 break;
@@ -132,8 +155,8 @@ impl AsymmetricEncryptor<MenezesVanstoneScheme> for MenezesVanstoneScheme {
         plaintext: &Self::Input,
         service: &NumberTheoryWithPrngService,
     ) -> Self::Output {
-        let m1 = &plaintext.first;
-        let m2 = &plaintext.second;
+        let m1 = plaintext.first.clone();
+        let m2 = plaintext.second.clone();
         let prime = &key.curve.prime;
 
         let curve = &key.curve;
@@ -147,7 +170,7 @@ impl AsymmetricEncryptor<MenezesVanstoneScheme> for MenezesVanstoneScheme {
                 .take_random_number_in_range(&1.into(), &curve.order_of_subgroup.decrement());
             let point = key
                 .y
-                .multiply(&k, curve)
+                .multiply(&k, curve, &service.number_theory_service)
                 .context("Failed to calculate Point (c1, c2)")?;
 
             ensure!(
@@ -169,10 +192,10 @@ impl AsymmetricEncryptor<MenezesVanstoneScheme> for MenezesVanstoneScheme {
         let a = key
             .curve
             .generator
-            .multiply(&k, curve)
+            .multiply(&k, curve, &service.number_theory_service)
             .context("Failed to calculate Point a")?;
-        let b1 = (c1 * m1) % prime;
-        let b2 = (c2 * m2) % prime;
+        let b1 = m1.and_then(|m| Some((c1 * m) % prime));
+        let b2 = m2.and_then(|m| Some((c2 * m) % prime));
 
         Ok(MenezesVanstoneCiphertext {
             point: a,
@@ -195,12 +218,12 @@ impl AsymmetricDecryptor<MenezesVanstoneScheme> for MenezesVanstoneScheme {
         service: &NumberTheoryWithPrngService,
     ) -> Self::Output {
         let a = &ciphertext.point;
-        let b1 = &ciphertext.first;
-        let b2 = &ciphertext.second;
+        let b1 = ciphertext.first.clone();
+        let b2 = ciphertext.second.clone();
         let prime = &key.curve.prime;
 
         let point = a
-            .multiply(&key.x, &key.curve)
+            .multiply(&key.x, &key.curve, &service.number_theory_service)
             .context("Failed to calculate Point (c1, c2)")?;
         let (c1, c2) = (point.x, point.y);
         let c1_inverse = service
@@ -213,12 +236,12 @@ impl AsymmetricDecryptor<MenezesVanstoneScheme> for MenezesVanstoneScheme {
             .context("Failed to find modulo inverse for c2 during decryption")?;
 
         debug!(
-            "MV: Entschlüsselung mit c1 = {}, c2 = {}, b1 = {} und b2 = {}",
+            "MV: Entschlüsselung mit c1 = {}, c2 = {}, b1 = {:?} und b2 = {:?}",
             c1, c2, b1, b2
         );
 
-        let m1 = (b1 * c1_inverse) % prime;
-        let m2 = (b2 * c2_inverse) % prime;
+        let m1 = b1.and_then(|b| Some((b * c1_inverse) % prime));
+        let m2 = b2.and_then(|b| Some((b * c2_inverse) % prime));
 
         Ok(MenezesVanstonePlaintext {
             first: m1,
@@ -247,7 +270,7 @@ impl<'a> Signer<MenezesVanstoneScheme> for MenezesVanstoneScheme {
             let k = &service.take_random_number_in_range(&1.into(), &q.decrement());
             let point = curve
                 .generator
-                .multiply(k, curve)
+                .multiply(k, curve, &service.number_theory_service)
                 .context("Failed to calculate Point (c1, c2)")?;
 
             ensure!(
@@ -295,14 +318,14 @@ impl<'a> Verifier<MenezesVanstoneScheme> for MenezesVanstoneScheme {
 
         let first_point = curve
             .generator
-            .multiply(&u1, curve)
+            .multiply(&u1, curve, &service.number_theory_service)
             .context("Failed to calculate first point")?;
         let second_point = key
             .y
-            .multiply(&u2, curve)
+            .multiply(&u2, curve, &service.number_theory_service)
             .context("Failed to calculate second point")?;
         let point = first_point
-            .add(&second_point, curve)
+            .add(&second_point, curve, &service.number_theory_service)
             .context("Failed to calculate verification point")?;
 
         let v = point.x.rem_euclid(q);
@@ -340,8 +363,8 @@ mod tests {
 
         // 3 und 5 sind definitiv kleiner als jeder generierte 4Bit Modul
         let plaintext = MenezesVanstonePlaintext {
-            first: 3.into(),
-            second: 5.into(),
+            first: Some(3.into()),
+            second: Some(5.into()),
         };
 
         let service = NumberTheoryWithPrngService::new(Fast, 13);
@@ -368,8 +391,8 @@ mod tests {
 
         let value_bigger_prime: BigInt = BigInt::from(2).pow(modul_width) + 1;
         let plaintext = MenezesVanstonePlaintext {
-            first: value_bigger_prime.clone(),
-            second: value_bigger_prime,
+            first: Some(value_bigger_prime.clone()),
+            second: Some(value_bigger_prime),
         };
 
         let service = NumberTheoryWithPrngService::new(Fast, 13);
