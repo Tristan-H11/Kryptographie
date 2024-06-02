@@ -26,7 +26,6 @@ use crate::encryption::string_schemes::menezes_vanstone::menezes_vanstone_string
 use crate::encryption::symmetric_encryption_types::SymmetricEncryptor;
 use crate::math_core::ecc::finite_field_elliptic_curve_point::FiniteFieldEllipticCurvePoint;
 use crate::math_core::ecc::secure_finite_field_elliptic_curve::SecureFiniteFieldEllipticCurve;
-use crate::math_core::number_theory::number_theory_service::NumberTheoryService;
 use crate::math_core::number_theory::number_theory_service::NumberTheoryServiceSpeed::{
     Fast, Slow,
 };
@@ -214,16 +213,16 @@ pub(crate) async fn create_key_pair(
     let req_body: MvCreateKeyPairRequestBean = req_body.into_inner();
     let use_fast = query.use_fast;
 
-    let _number_theory_service = match use_fast {
-        true => NumberTheoryService::new(Fast),
-        false => NumberTheoryService::new(Slow),
+    let service = match use_fast {
+        true => NumberTheoryWithPrngService::new(Fast, req_body.random_seed),
+        false => NumberTheoryWithPrngService::new(Slow, req_body.random_seed),
     };
 
     let key_pair = MenezesVanstoneScheme::generate_keypair(
         req_body.coef_a,
         req_body.modulus_width,
         req_body.miller_rabin_rounds,
-        req_body.random_seed,
+        &service,
     );
 
     match key_pair {

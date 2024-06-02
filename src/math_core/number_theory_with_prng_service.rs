@@ -2,7 +2,7 @@ use atomic_counter::{AtomicCounter, RelaxedCounter};
 use bigdecimal::num_bigint::BigInt;
 
 use crate::math_core::number_theory::number_theory_service::{
-    NumberTheoryService, NumberTheoryServiceSpeed,
+    NumberTheoryService, NumberTheoryServiceSpeed, NumberTheoryServiceTrait,
 };
 use crate::math_core::pseudo_random_number_generator::PseudoRandomNumberGenerator;
 
@@ -71,6 +71,19 @@ impl NumberTheoryWithPrngService {
         // TODO Schnelle Lib Variante einbauen, je nach dem, welcher Speed hier gewrapped ist.
         self.prng
             .generate_prime(size, miller_rabin_iterations, &self.prng_counter)
+    }
+
+    /// Prüft, ob die übergebene Zahl wahrscheinlich eine Primzahl ist.
+    ///
+    /// # Argumente
+    /// * `p` - Die zu prüfende Zahl.
+    /// * `repeats` - Die Anzahl der Wiederholungen für den Miller-Rabin-Test.
+    ///
+    /// # Rückgabe
+    /// Wahr, wenn die Zahl wahrscheinlich eine Primzahl ist, sonst falsch.
+    pub fn is_probably_prime(&self, p: &BigInt, repeats: u32) -> bool {
+        self.number_theory_service
+            .is_probably_prime(p, repeats, &self.prng)
     }
 
     /// Setzt den Wert des Counters für den PRNG zurück auf 1.

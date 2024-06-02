@@ -196,11 +196,13 @@ impl FiniteFieldEllipticCurvePoint {
 
 #[cfg(test)]
 mod tests {
-
     use super::*;
+    use crate::math_core::number_theory::number_theory_service::NumberTheoryServiceSpeed::Fast;
+    use crate::math_core::number_theory_with_prng_service::NumberTheoryWithPrngService;
 
     fn get_curve() -> SecureFiniteFieldEllipticCurve {
-        SecureFiniteFieldEllipticCurve::new(5, 16, 40).unwrap()
+        let service = NumberTheoryWithPrngService::new(Fast, 17);
+        SecureFiniteFieldEllipticCurve::new(5, 16, 40, &service).unwrap()
     }
 
     #[test]

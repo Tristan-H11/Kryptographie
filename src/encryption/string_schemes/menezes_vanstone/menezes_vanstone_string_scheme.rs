@@ -47,7 +47,7 @@ impl MenezesVanstoneStringScheme {
         n: i32,
         modul_width: u32,
         miller_rabin_iterations: u32,
-        random_seed: u32,
+        service_wrapper: &NumberTheoryWithPrngService,
         radix: u32,
     ) -> Result<MenezesVanstoneStringKeyPair> {
         ensure!(n != 0, MenezesVanstoneError::InvalidNValueError(n));
@@ -64,7 +64,7 @@ impl MenezesVanstoneStringScheme {
             n,
             modul_width,
             miller_rabin_iterations,
-            random_seed,
+            service_wrapper,
         )
         .context("Error while creating keypair for MenezesVanstone-Core. Error: {:#?}")?;
 
@@ -256,8 +256,9 @@ mod tests {
         let n = rand::thread_rng().gen_range(1..30);
         let modul_width = rand::thread_rng().gen_range(4..100);
         let random_seed = rand::thread_rng().gen_range(1..1000);
+        let service = NumberTheoryWithPrngService::new(Fast, random_seed);
         let key_pair =
-            MenezesVanstoneStringScheme::generate_keypair(n, modul_width, 40, random_seed, radix)
+            MenezesVanstoneStringScheme::generate_keypair(n, modul_width, 40, &service, radix)
                 .unwrap();
 
         let public_key = key_pair.public_key;
@@ -287,11 +288,12 @@ mod tests {
         let alice_seed = 11;
         let miller_rabin_iterations = 40;
         let radix = 55296;
+        let service = NumberTheoryWithPrngService::new(Fast, alice_seed);
         let alice_keypair = MenezesVanstoneStringScheme::generate_keypair(
             alice_n,
             alice_modul_width,
             miller_rabin_iterations,
-            alice_seed,
+            &service,
             radix,
         )
         .unwrap();
@@ -299,11 +301,12 @@ mod tests {
         let bob_n = 3;
         let bob_modul_width = 512;
         let bob_seed = 7;
+        let service = NumberTheoryWithPrngService::new(Fast, bob_seed);
         let bob_keypair = MenezesVanstoneStringScheme::generate_keypair(
             bob_n,
             bob_modul_width,
             miller_rabin_iterations,
-            bob_seed,
+            &service,
             radix,
         )
         .unwrap();

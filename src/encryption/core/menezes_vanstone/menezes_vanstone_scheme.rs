@@ -3,7 +3,6 @@ use anyhow::{ensure, Result};
 use std::cmp::max;
 
 use crate::api::endpoints::mv::MvSignatureBean;
-use atomic_counter::RelaxedCounter;
 use bigdecimal::num_bigint::BigInt;
 use bigdecimal::num_traits::Euclid;
 use bigdecimal::Zero;
@@ -20,12 +19,8 @@ use crate::encryption::string_schemes::decimal_unicode_schemes::keys::DecimalUni
 use crate::encryption::symmetric_encryption_types::SymmetricDecryptor;
 use crate::math_core::ecc::finite_field_elliptic_curve_point::FiniteFieldEllipticCurvePoint;
 use crate::math_core::ecc::secure_finite_field_elliptic_curve::SecureFiniteFieldEllipticCurve;
-use crate::math_core::number_theory::number_theory_service::NumberTheoryServiceSpeed::Slow;
-use crate::math_core::number_theory::number_theory_service::{
-    NumberTheoryService, NumberTheoryServiceTrait,
-};
+use crate::math_core::number_theory::number_theory_service::NumberTheoryServiceTrait;
 use crate::math_core::number_theory_with_prng_service::NumberTheoryWithPrngService;
-use crate::math_core::pseudo_random_number_generator::PseudoRandomNumberGenerator;
 use crate::math_core::traits::increment::Increment;
 use crate::math_core::traits::logarithm::Logarithm;
 use crate::shared::errors::MenezesVanstoneError;
@@ -86,7 +81,7 @@ impl MenezesVanstoneScheme {
         n: i32,
         modul_width: u32,
         miller_rabin_iterations: u32,
-        random_seed: u32,
+        service_wrapper: &NumberTheoryWithPrngService,
     ) -> Result<MenezesVanstoneKeyPair> {
         ensure!(n != 0, MenezesVanstoneError::InvalidNValueError(n));
         ensure!(
@@ -94,16 +89,19 @@ impl MenezesVanstoneScheme {
             MenezesVanstoneError::InvalidModulusWidthError(modul_width)
         );
 
-        let curve =
-            SecureFiniteFieldEllipticCurve::new(n.into(), modul_width, miller_rabin_iterations)
-                .context("Failed to create secure elliptic curve")?;
+        let curve = SecureFiniteFieldEllipticCurve::new(
+            n.into(),
+            modul_width,
+            miller_rabin_iterations,
+            service_wrapper,
+        )
+        .context("Failed to create secure elliptic curve")?;
 
-        let prng = PseudoRandomNumberGenerator::new(random_seed, NumberTheoryService::new(Slow)); // TODO übergeben
-        let counter = RelaxedCounter::new(1);
         let order_of_subgroup = &curve.order_of_subgroup;
         let (mut x, mut y);
         loop {
-            x = prng.take(&1.into(), &order_of_subgroup.decrement(), &counter);
+            x = service_wrapper
+                .take_random_number_in_range(&1.into(), &order_of_subgroup.decrement());
             y = curve
                 .generator
                 .multiply(&x, &curve)
@@ -322,8 +320,9 @@ mod tests {
         let n = 7; //rand::thread_rng().gen_range(1..30);
         let modul_width = 128; //rand::thread_rng().gen_range(4..256);
         let random_seed = 300; //rand::thread_rng().gen_range(1..1000);
+        let service = NumberTheoryWithPrngService::new(Fast, random_seed);
         let key_pair =
-            MenezesVanstoneScheme::generate_keypair(n, modul_width, 40, random_seed).unwrap();
+            MenezesVanstoneScheme::generate_keypair(n, modul_width, 40, &service).unwrap();
 
         let public_key = key_pair.public_key;
         let private_key = key_pair.private_key;
@@ -349,8 +348,9 @@ mod tests {
         let n = rand::thread_rng().gen_range(1..30);
         let modul_width = rand::thread_rng().gen_range(4..100);
         let random_seed = rand::thread_rng().gen_range(1..1000);
+        let service = NumberTheoryWithPrngService::new(Fast, random_seed);
         let key_pair =
-            MenezesVanstoneScheme::generate_keypair(n, modul_width, 40, random_seed).unwrap();
+            MenezesVanstoneScheme::generate_keypair(n, modul_width, 40, &service).unwrap();
 
         let public_key = key_pair.public_key;
         let private_key = key_pair.private_key;
@@ -375,8 +375,9 @@ mod tests {
         let n = 5; //rand::thread_rng().gen_range(1..30);
         let modul_width = 16; //rand::thread_rng().gen_range(4..16);
         let random_seed = 73; //rand::thread_rng().gen_range(1..1000);
+        let service = NumberTheoryWithPrngService::new(Fast, random_seed);
         let key_pair =
-            MenezesVanstoneScheme::generate_keypair(n, modul_width, 40, random_seed).unwrap();
+            MenezesVanstoneScheme::generate_keypair(n, modul_width, 40, &service).unwrap();
 
         let public_key = key_pair.public_key;
         let private_key = key_pair.private_key;
@@ -394,7 +395,8 @@ mod tests {
     #[test]
     fn test_invalid_n_value_error() {
         // Testet, ob ein Fehler zurückgegeben wird, wenn n = 0 ist
-        let result = MenezesVanstoneScheme::generate_keypair(0, 128, 40, 123);
+        let service = NumberTheoryWithPrngService::new(Fast, 13);
+        let result = MenezesVanstoneScheme::generate_keypair(0, 128, 40, &service);
         match result {
             Err(err) => match err.downcast_ref::<MenezesVanstoneError>() {
                 Some(&MenezesVanstoneError::InvalidNValueError(_)) => assert!(true),
@@ -407,7 +409,8 @@ mod tests {
     #[test]
     fn test_invalid_modulus_width_error() {
         // Testet, ob ein Fehler zurückgegeben wird, wenn die Breite des Moduls <= 3 ist
-        let result = MenezesVanstoneScheme::generate_keypair(5, 3, 40, 123);
+        let service = NumberTheoryWithPrngService::new(Fast, 13);
+        let result = MenezesVanstoneScheme::generate_keypair(5, 3, 40, &service);
         match result {
             Err(err) => match err.downcast_ref::<MenezesVanstoneError>() {
                 Some(&MenezesVanstoneError::InvalidModulusWidthError(_)) => assert!(true),
@@ -423,8 +426,9 @@ mod tests {
         let n = 5;
         let modul_width = 16;
         let random_seed = 73;
+        let service = NumberTheoryWithPrngService::new(Fast, random_seed);
         let key_pair =
-            MenezesVanstoneScheme::generate_keypair(n, modul_width, 40, random_seed).unwrap();
+            MenezesVanstoneScheme::generate_keypair(n, modul_width, 40, &service).unwrap();
         let public_key = key_pair.public_key;
         let message = "Hello My Friend!";
 
@@ -449,8 +453,9 @@ mod tests {
         let n = 5;
         let modul_width = 16;
         let random_seed = 73;
+        let service = NumberTheoryWithPrngService::new(Fast, random_seed);
         let key_pair =
-            MenezesVanstoneScheme::generate_keypair(n, modul_width, 40, random_seed).unwrap();
+            MenezesVanstoneScheme::generate_keypair(n, modul_width, 40, &service).unwrap();
 
         let public_key = key_pair.public_key;
         let private_key = key_pair.private_key;

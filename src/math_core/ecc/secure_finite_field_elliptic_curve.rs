@@ -12,10 +12,10 @@ use num::Integer;
 
 use crate::math_core::complex_number::{complex_euclidean_algorithm, ComplexNumber};
 use crate::math_core::ecc::finite_field_elliptic_curve_point::FiniteFieldEllipticCurvePoint;
-use crate::math_core::number_theory::number_theory_service::NumberTheoryServiceSpeed::Slow;
 use crate::math_core::number_theory::number_theory_service::{
     NumberTheoryService, NumberTheoryServiceTrait,
 };
+use crate::math_core::number_theory_with_prng_service::NumberTheoryWithPrngService;
 use crate::math_core::pseudo_random_number_generator::PseudoRandomNumberGenerator;
 use crate::math_core::traits::divisible::Divisible;
 use crate::math_core::traits::increment::Increment;
@@ -75,7 +75,12 @@ impl SecureFiniteFieldEllipticCurve {
     /// - Eine zyklische Untergruppe der Ordnung q muss existieren, wobei für q gilt:
     /// -- q = N / 8, wobei N = |E(Z_p)| (Ordnung der Kurve) und
     /// -- q muss eine Primzahl sein
-    pub fn new(n: i64, modul_width: u32, miller_rabin_iterations: u32) -> Result<Self> {
+    pub fn new(
+        n: i64,
+        modul_width: u32,
+        miller_rabin_iterations: u32,
+        service_wrapper: &NumberTheoryWithPrngService,
+    ) -> Result<Self> {
         ensure!(n != 0, "Der Koeffizient a darf nicht 0 sein!");
         ensure!(
             modul_width >= 4,
@@ -98,13 +103,11 @@ impl SecureFiniteFieldEllipticCurve {
             }
         }
 
-        let counter = RelaxedCounter::new(1);
-
         // Manchmal wird ein Generator bestimmt, der nicht auf der Kurve liegt. In dem Fall soll
         // die Berechnung wiederholt werden, bis ein gültiger Generator gefunden wurde.
         loop {
             let (prime, order_of_subgroup) =
-                Self::calculate_p_and_q(&prime, n, miller_rabin_iterations);
+                Self::calculate_p_and_q(&prime, n, miller_rabin_iterations, service_wrapper);
 
             let curve = Self {
                 a,
@@ -120,7 +123,7 @@ impl SecureFiniteFieldEllipticCurve {
                 a,
                 &order_of_subgroup,
                 &curve,
-                &counter,
+                service_wrapper,
             )
             .context("Error while calculating signature generator")?;
 
@@ -145,12 +148,12 @@ impl SecureFiniteFieldEllipticCurve {
         prime: &BigInt,
         n: i64,
         miller_rabin_iterations: u32,
+        service_wrapper: &NumberTheoryWithPrngService,
     ) -> (BigInt, BigInt) {
+        let service = &service_wrapper.number_theory_service;
         let double_n = BigInt::from(n).double();
         let mut prime = prime.clone();
         let mut q: BigInt;
-        let service = NumberTheoryService::new(Slow);
-        let prng = PseudoRandomNumberGenerator::new_seeded(); // TODO übergeben lassen
 
         // Die Schleife läuft, bis 'q = N / 8' eine Primzahl ergibt.
         loop {
@@ -160,7 +163,7 @@ impl SecureFiniteFieldEllipticCurve {
                 // 1. Sie ist eine Primzahl
                 // 2. n ist ein quadratischer Rest zu p, also n^((p-1)/2) = 1 (mod p) -- Skript Satz 1.15
                 // 3. Sie ist kein Teiler von 2n
-                if service.is_probably_prime(&prime, miller_rabin_iterations, &prng)
+                if service_wrapper.is_probably_prime(&prime, miller_rabin_iterations)
                     && service
                         .fast_exponentiation(&n.into(), &prime.decrement().half(), &prime)
                         .is_one()
@@ -172,11 +175,11 @@ impl SecureFiniteFieldEllipticCurve {
                 prime.add_assign(BigInt::from(8));
             }
 
-            let big_n = Self::calculate_big_n(&prime, n);
+            let big_n = Self::calculate_big_n(&prime, n, service);
 
             q = big_n.div(8);
             // Ist q = N / 8 eine Primzahl, so wird die Schleife verlassen und das q ist gültig.
-            if service.is_probably_prime(&q, miller_rabin_iterations, &prng) {
+            if service_wrapper.is_probably_prime(&q, miller_rabin_iterations) {
                 return (prime, q);
             }
             // Ist q keine Primzahl, wird prime um 8 erhöht und ein neuer Versuch gestartet.
@@ -185,10 +188,10 @@ impl SecureFiniteFieldEllipticCurve {
         }
     }
 
-    fn calculate_big_n(prime: &BigInt, n: i64) -> BigInt {
+    fn calculate_big_n(prime: &BigInt, n: i64, service: &NumberTheoryService) -> BigInt {
         let first_complex_number = ComplexNumber::new(prime.clone(), BigInt::zero());
         let second_complex_number =
-            ComplexNumber::new(Self::calculate_w(&prime, 2.into()), BigInt::one());
+            ComplexNumber::new(Self::calculate_w(&prime, 2.into(), service), BigInt::one());
         let gg_t: ComplexNumber =
             complex_euclidean_algorithm(first_complex_number, second_complex_number);
 
@@ -202,15 +205,14 @@ impl SecureFiniteFieldEllipticCurve {
             alpha = ComplexNumber::new(gg_t.real.clone().abs(), gg_t.imaginary.clone().abs());
         }
 
-        prime.increment() - Self::calculate_real_part(alpha, &prime, n).double()
+        prime.increment() - Self::calculate_real_part(alpha, &prime, n, service).double()
     }
 
-    pub fn calculate_w(prime: &BigInt, z: BigInt) -> BigInt {
+    pub fn calculate_w(prime: &BigInt, z: BigInt, service: &NumberTheoryService) -> BigInt {
         let mut z: BigInt = z.clone();
         // w(p, z) = z ^ ((p - 1) / 4) (mod p)
         // gilt anschließend w(p, z)^2 + 1 = 0 (mod p), ist der Wert gültig.
         // Andernfalls wiederholen mit z = z + 2
-        let service = NumberTheoryService::new(Slow);
         let mut w: BigInt;
         loop {
             w = service.fast_exponentiation(&z, &(prime.decrement().div(4)), prime);
@@ -223,13 +225,20 @@ impl SecureFiniteFieldEllipticCurve {
         w
     }
 
-    pub fn calculate_real_part(alpha: ComplexNumber, prime: &BigInt, n: i64) -> BigInt {
+    pub fn calculate_real_part(
+        alpha: ComplexNumber,
+        prime: &BigInt,
+        n: i64,
+        service: &NumberTheoryService,
+    ) -> BigInt {
         let mut count = 4;
         let mut alpha = alpha.clone();
         // Schleife, die alle möglichen Konjugationen von alpha durchgeht
         loop {
-            let complex_legendre_symbol =
-                ComplexNumber::new(Self::calculate_legendre_symbol(&n.into(), prime), 0.into());
+            let complex_legendre_symbol = ComplexNumber::new(
+                Self::calculate_legendre_symbol(&n.into(), prime, service),
+                0.into(),
+            );
             let two_two = ComplexNumber::new(2.into(), 2.into());
             // Produkt aus der Differenz von alpha und dessen Legendre-Symbol und dem konjugierten Wert von 2 + 2i
             let product = (&alpha - &complex_legendre_symbol) * two_two.conjugate();
@@ -263,8 +272,11 @@ impl SecureFiniteFieldEllipticCurve {
     /// Sei p eine ungerade Primzahl und a Element Z, dann gilt:
     /// (a/p) := (+1 falls a quadratischer Rest mod p, -1 falls a quadratischer Nichtrest mod p, 0 falls a = 0)
     //TODO Auch aufnehmen, dass b eine Primzahl > 3 sein muss
-    pub fn calculate_legendre_symbol(a: &BigInt, prime: &BigInt) -> BigInt {
-        let service = NumberTheoryService::new(Slow);
+    pub fn calculate_legendre_symbol(
+        a: &BigInt,
+        prime: &BigInt,
+        service: &NumberTheoryService,
+    ) -> BigInt {
         let negative_one = BigInt::from(-1);
 
         if a.is_multiple_of(prime) {
@@ -308,19 +320,18 @@ impl SecureFiniteFieldEllipticCurve {
         a: i64,
         q: &BigInt,
         curve: &SecureFiniteFieldEllipticCurve,
-        counter: &RelaxedCounter,
+        service_wrapper: &NumberTheoryWithPrngService,
     ) -> Result<FiniteFieldEllipticCurvePoint> {
         let mut generator: FiniteFieldEllipticCurvePoint;
-        let service = NumberTheoryService::new(Slow);
+        let service = &service_wrapper.number_theory_service;
 
         // Schleife, die läuft, bis ein Generator gefunden wurde, der nicht den Punkt im Unendlichen
         // darstellt oder dessen Ordnung nicht N/8 ist.
         loop {
-            let prng = PseudoRandomNumberGenerator::new_seeded(); // TODO übergeben lassen
             let (mut x, mut r);
             // Schleife, die bis zum Fund eines validen quadratischen Rests läuft
             loop {
-                x = prng.take(&BigInt::one(), &prime.decrement(), &counter);
+                x = service_wrapper.take_random_number_in_range(&BigInt::one(), &prime.decrement());
                 r = service.fast_exponentiation(&x, &BigInt::from(3), prime) + a * &x;
                 // Kriterium für den quadratischen Rest
                 if service
@@ -394,43 +405,69 @@ impl SecureFiniteFieldEllipticCurve {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::math_core::number_theory::number_theory_service::NumberTheoryServiceSpeed::Fast;
 
     #[test]
     fn test_calculate_big_n() {
         let mut prime = BigInt::from(17);
         let n = 2;
-        let big_n = SecureFiniteFieldEllipticCurve::calculate_big_n(&mut prime, n);
+        let big_n = SecureFiniteFieldEllipticCurve::calculate_big_n(
+            &mut prime,
+            n,
+            &NumberTheoryService::new(Fast),
+        );
         assert_eq!(big_n, BigInt::from(16));
 
         let mut prime = BigInt::from(13);
         let n = 1;
-        let big_n = SecureFiniteFieldEllipticCurve::calculate_big_n(&mut prime, n);
+        let big_n = SecureFiniteFieldEllipticCurve::calculate_big_n(
+            &mut prime,
+            n,
+            &NumberTheoryService::new(Fast),
+        );
         assert_eq!(big_n, BigInt::from(8));
 
         let mut prime = BigInt::from(17);
         let n = 1;
-        let big_n = SecureFiniteFieldEllipticCurve::calculate_big_n(&mut prime, n);
+        let big_n = SecureFiniteFieldEllipticCurve::calculate_big_n(
+            &mut prime,
+            n,
+            &NumberTheoryService::new(Fast),
+        );
         assert_eq!(big_n, BigInt::from(16));
 
         let mut prime = BigInt::from(13);
         let n = 3;
-        let big_n = SecureFiniteFieldEllipticCurve::calculate_big_n(&mut prime, n);
+        let big_n = SecureFiniteFieldEllipticCurve::calculate_big_n(
+            &mut prime,
+            n,
+            &NumberTheoryService::new(Fast),
+        );
         assert_eq!(big_n, BigInt::from(8));
 
         let mut prime = BigInt::from(13);
         let n = 2;
-        let big_n = SecureFiniteFieldEllipticCurve::calculate_big_n(&mut prime, n);
+        let big_n = SecureFiniteFieldEllipticCurve::calculate_big_n(
+            &mut prime,
+            n,
+            &NumberTheoryService::new(Fast),
+        );
         assert_eq!(big_n, BigInt::from(20));
 
         let mut prime = BigInt::from(509);
         let n = 2;
-        let big_n = SecureFiniteFieldEllipticCurve::calculate_big_n(&mut prime, n);
+        let big_n = SecureFiniteFieldEllipticCurve::calculate_big_n(
+            &mut prime,
+            n,
+            &NumberTheoryService::new(Fast),
+        );
         assert_eq!(big_n, BigInt::from(500));
     }
 
     #[test]
     fn test_has_point_not() {
-        let curve = SecureFiniteFieldEllipticCurve::new(7, 17, 20).unwrap();
+        let service = NumberTheoryWithPrngService::new(Fast, 17);
+        let curve = SecureFiniteFieldEllipticCurve::new(7, 17, 20, &service).unwrap();
         let point = FiniteFieldEllipticCurvePoint::new(5.into(), 7.into());
         // (5, 7) liegt nicht auf y^2 = x^3 + 7 (mod 17)
         assert!(!curve.has_point(&point));
@@ -442,7 +479,8 @@ mod tests {
 
     #[test]
     fn test_has_point() {
-        let curve = SecureFiniteFieldEllipticCurve::new(5, 16, 40).unwrap();
+        let service = NumberTheoryWithPrngService::new(Fast, 17);
+        let curve = SecureFiniteFieldEllipticCurve::new(5, 16, 40, &service).unwrap();
         let point = curve.generator.multiply(&3.into(), &curve).unwrap();
         assert!(curve.has_point(&point));
 
@@ -452,8 +490,9 @@ mod tests {
 
     #[test]
     fn test_with_invalid_n() {
+        let service = NumberTheoryWithPrngService::new(Fast, 17);
         // Test mit einem ungültigen Wert für n (0)
-        let result = SecureFiniteFieldEllipticCurve::new(0, 16, 40);
+        let result = SecureFiniteFieldEllipticCurve::new(0, 16, 40, &service);
         match result {
             Err(err) => {
                 assert_eq!(err.to_string(), "Der Koeffizient a darf nicht 0 sein!");
@@ -464,7 +503,8 @@ mod tests {
 
     #[test]
     fn test_with_invalid_modulus_width() {
-        let result = SecureFiniteFieldEllipticCurve::new(5, 3, 40);
+        let service = NumberTheoryWithPrngService::new(Fast, 17);
+        let result = SecureFiniteFieldEllipticCurve::new(5, 3, 40, &service);
         match result {
             Err(err) => {
                 assert_eq!(
@@ -476,7 +516,7 @@ mod tests {
         }
 
         // Test mit einem ungültigen Wert für die Breite des Modulus p (0)
-        let result = SecureFiniteFieldEllipticCurve::new(5, 0, 40);
+        let result = SecureFiniteFieldEllipticCurve::new(5, 0, 40, &service);
         match result {
             Err(err) => {
                 assert_eq!(
@@ -490,7 +530,8 @@ mod tests {
 
     #[test]
     fn test_has_point_on_curve_with_negative_n() {
-        let curve = SecureFiniteFieldEllipticCurve::new(-3, 17, 40).unwrap();
+        let service = NumberTheoryWithPrngService::new(Fast, 17);
+        let curve = SecureFiniteFieldEllipticCurve::new(-3, 17, 40, &service).unwrap();
         let point = curve.generator.multiply(&3.into(), &curve).unwrap();
         assert!(curve.has_point(&point));
 
@@ -502,16 +543,25 @@ mod tests {
     fn test_calculate_legendre_symbol() {
         let prime = BigInt::from(13);
         // Test mit quadratischem Rest
-        let legendre_symbol_1 =
-            SecureFiniteFieldEllipticCurve::calculate_legendre_symbol(&12.into(), &prime); // Satz 1.18
+        let legendre_symbol_1 = SecureFiniteFieldEllipticCurve::calculate_legendre_symbol(
+            &12.into(),
+            &prime,
+            &NumberTheoryService::new(Fast),
+        ); // Satz 1.18
         assert_eq!(legendre_symbol_1, BigInt::one());
         // Test mit quadratischem Nichtrest
-        let legendre_symbol_2 =
-            SecureFiniteFieldEllipticCurve::calculate_legendre_symbol(&2.into(), &prime); // Satz 1.19
+        let legendre_symbol_2 = SecureFiniteFieldEllipticCurve::calculate_legendre_symbol(
+            &2.into(),
+            &prime,
+            &NumberTheoryService::new(Fast),
+        ); // Satz 1.19
         assert_eq!(legendre_symbol_2, BigInt::from(-1));
         // Test mit a = 0 (Punkt liegt auf der y-Achse)
-        let legendre_symbol_3 =
-            SecureFiniteFieldEllipticCurve::calculate_legendre_symbol(&BigInt::zero(), &prime); // Definition 1.27 Punkt 2
+        let legendre_symbol_3 = SecureFiniteFieldEllipticCurve::calculate_legendre_symbol(
+            &BigInt::zero(),
+            &prime,
+            &NumberTheoryService::new(Fast),
+        ); // Definition 1.27 Punkt 2
         assert_eq!(legendre_symbol_3, BigInt::zero());
     }
 
@@ -519,11 +569,19 @@ mod tests {
     fn test_calculate_w() {
         // Testet das Berechnen von w(p, z)
         let prime_1 = BigInt::from(13);
-        let w_1 = SecureFiniteFieldEllipticCurve::calculate_w(&prime_1, BigInt::from(2));
+        let w_1 = SecureFiniteFieldEllipticCurve::calculate_w(
+            &prime_1,
+            BigInt::from(2),
+            &NumberTheoryService::new(Fast),
+        );
         assert_eq!(w_1, BigInt::from(8));
 
         let prime_2 = BigInt::from(17);
-        let w_2 = SecureFiniteFieldEllipticCurve::calculate_w(&prime_2, BigInt::from(3));
+        let w_2 = SecureFiniteFieldEllipticCurve::calculate_w(
+            &prime_2,
+            BigInt::from(3),
+            &NumberTheoryService::new(Fast),
+        );
         assert_eq!(w_2, BigInt::from(13));
     }
 }
