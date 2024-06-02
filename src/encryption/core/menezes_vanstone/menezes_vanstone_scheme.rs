@@ -6,6 +6,7 @@ use crate::api::endpoints::mv::MvSignatureBean;
 use bigdecimal::num_bigint::BigInt;
 use bigdecimal::num_traits::Euclid;
 use bigdecimal::Zero;
+use log::debug;
 
 use crate::encryption::asymmetric_encryption_types::{
     AsymmetricDecryptor, AsymmetricEncryptionScheme, AsymmetricEncryptor, Signer, Verifier,
@@ -158,6 +159,10 @@ impl AsymmetricEncryptor<MenezesVanstoneScheme> for MenezesVanstoneScheme {
             (c1, c2) = (point.x, point.y);
             // Sind beide Werte ungleich 0, so ist das Paar (c1, c2) gültig
             if !c1.is_zero() && !c2.is_zero() {
+                debug!(
+                    "MV: Verschlüsselung mit k = {}, c1 = {} und c2 = {}",
+                    k, c1, c2
+                );
                 break;
             }
         }
@@ -207,6 +212,11 @@ impl AsymmetricDecryptor<MenezesVanstoneScheme> for MenezesVanstoneScheme {
             .modulo_inverse(&c2, prime)
             .context("Failed to find modulo inverse for c2 during decryption")?;
 
+        debug!(
+            "MV: Entschlüsselung mit c1 = {}, c2 = {}, b1 = {} und b2 = {}",
+            c1, c2, b1, b2
+        );
+
         let m1 = (b1 * c1_inverse) % prime;
         let m2 = (b2 * c2_inverse) % prime;
 
@@ -255,6 +265,7 @@ impl<'a> Signer<MenezesVanstoneScheme> for MenezesVanstoneScheme {
             if s.is_zero() {
                 continue;
             }
+            debug!("MV: Signatur mit k = {}, r = {} und s = {}", k, r, s);
             return Ok(MenezesVanstoneSignature { r, s });
         }
     }
@@ -295,6 +306,12 @@ impl<'a> Verifier<MenezesVanstoneScheme> for MenezesVanstoneScheme {
             .context("Failed to calculate verification point")?;
 
         let v = point.x.rem_euclid(q);
+
+        debug!(
+            "MV: Verifikation mit r = {}, s = {}, u1 = {}, u2 = {}, v = {}",
+            r, s, u1, u2, v
+        );
+
         Ok(v == *r)
     }
 }
