@@ -37,6 +37,7 @@ export interface MvEncryptRequest {
     public_key: MvPublicKey;
     message: string;
     radix: number;
+    random_seed: number,
 }
 
 export interface MvCipherText {
@@ -53,6 +54,7 @@ export interface MvDecryptRequest {
 export interface MvSignRequest {
     private_key: MvPrivateKey;
     message: string;
+    random_seed: number;
 }
 
 export interface MvSignature {
@@ -110,6 +112,7 @@ export function copyMvSignRequest(signRequest: MvSignRequest): MvSignRequest {
     return {
         private_key: copyMvPrivateKey(signRequest.private_key),
         message: signRequest.message,
+        random_seed: signRequest.random_seed
     };
 }
 

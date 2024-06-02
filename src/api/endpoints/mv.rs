@@ -126,6 +126,7 @@ pub struct MvEncryptRequestBean {
     pub public_key: MvPublicKeyBean,
     pub message: String,
     pub radix: u32,
+    pub random_seed: u32,
 }
 
 #[derive(Deserialize, Serialize, Clone)]
@@ -186,6 +187,7 @@ impl From<MenezesVanstoneSignature> for MvSignatureBean {
 pub struct MvSignRequestBean {
     pub private_key: MvPrivateKeyBean,
     pub message: String,
+    pub random_seed: u32,
 }
 
 #[derive(Deserialize, Clone)]
