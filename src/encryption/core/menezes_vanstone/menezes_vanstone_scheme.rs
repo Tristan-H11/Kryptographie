@@ -1,3 +1,4 @@
+use std::cmp::max;
 use anyhow::Context;
 use anyhow::{ensure, Result};
 
@@ -14,11 +15,15 @@ use crate::encryption::core::menezes_vanstone::keys::{
     MenezesVanstoneKeyPair, MenezesVanstonePrivateKey, MenezesVanstonePublicKey,
 };
 use crate::encryption::encryption_types::{Decryptor, EncryptionScheme, Encryptor};
+use crate::encryption::string_schemes::decimal_unicode_schemes::from_decimal_block_scheme::FromDecimalBlockScheme;
+use crate::encryption::string_schemes::decimal_unicode_schemes::keys::DecimalUnicodeConversionSchemeKey;
+use crate::encryption::symmetric_encryption_types::SymmetricDecryptor;
 use crate::math_core::ecc::finite_field_elliptic_curve_point::FiniteFieldEllipticCurvePoint;
 use crate::math_core::ecc::secure_finite_field_elliptic_curve::SecureFiniteFieldEllipticCurve;
 use crate::math_core::number_theory::number_theory_service::NumberTheoryServiceTrait;
 use crate::math_core::number_theory_with_prng_service::NumberTheoryWithPrngService;
 use crate::math_core::traits::increment::Increment;
+use crate::math_core::traits::logarithm::Logarithm;
 use crate::shared::errors::MenezesVanstoneError;
 use crate::shared::hashing::sha256;
 
@@ -76,13 +81,19 @@ impl From<MvSignatureBean> for MenezesVanstoneSignature {
         let r: BigInt = signature.r.parse().unwrap();
         let s: BigInt = signature.s.parse().unwrap();
 
+        // TODO Präsi: Einkommentieren, wenn der String manipuliert werden soll.
         // let radix = 55296;
-
-        // Die größere der beiden Blockgrößen, damit sicher beide Werte enthalten sein werden.
+        //
+        // // Die größere der beiden Blockgrößen, damit sicher beide Werte enthalten sein werden.
         // let block_size = max(r.log(&radix.into()) + 1, s.log(&radix.into()) + 1);
         // let key = DecimalUnicodeConversionSchemeKey { block_size, radix };
         //
         // let blocks = FromDecimalBlockScheme::decrypt(&signature.string_representation, &key);
+        //
+        // assert!(blocks.len() > 1);
+        //
+        // let r = blocks[0].clone();
+        // let s = blocks[1].clone();
 
         MenezesVanstoneSignature { r, s }
     }
