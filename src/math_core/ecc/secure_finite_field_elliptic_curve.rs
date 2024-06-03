@@ -217,7 +217,6 @@ impl SecureFiniteFieldEllipticCurve {
         loop {
             w = service.fast_exponentiation(&z, &(prime.decrement().div(4)), prime);
             if (w.pow(2) + BigInt::one()).rem_euclid(prime).is_zero() {
-                // TODO gegen Service.fastExponentiation austauschen
                 break;
             }
             z.add_assign(BigInt::from(2));
