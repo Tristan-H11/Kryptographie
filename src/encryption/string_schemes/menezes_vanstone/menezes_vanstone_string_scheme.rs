@@ -177,32 +177,16 @@ impl AsymmetricDecryptor<MenezesVanstoneStringScheme> for MenezesVanstoneStringS
         let decimal_unicode_key = DecimalUnicodeConversionSchemeKey { radix, block_size };
         let big_int_vec = FromDecimalBlockScheme::decrypt(&ciphertext_string, &decimal_unicode_key);
 
-        // Wenn wir hier keine zusammenpassende Anzahl von Punkten und Tupeln haben,
-        // dann ist die Nachricht nicht korrekt verschlüsselt oder grob manipuliert worden.
-        // Durch '*2' wird ebenfalls sichergestellt, dass es eine gerade Anzahl von Tupeln gibt.
-        ensure!(
-            points.len() * 2 == big_int_vec.len(),
-            "Die Anzahl der Punkte und Tupel stimmen nicht überein."
-        );
-
         // Die Zahlen in eine Liste von MenezesVanstoneCiphertext mappen
-        let mut ciphertext_list: Vec<MenezesVanstoneCiphertext> = Vec::new();
-        for i in (0..big_int_vec.len()).step_by(2) {
-            // TODO Aufhübschen
-            let first = big_int_vec[i].clone();
-            let second = if i + 1 < big_int_vec.len() {
-                big_int_vec[i + 1].clone()
-            } else {
-                BigInt::zero()
-            };
-
-            let ciphertext = MenezesVanstoneCiphertext {
-                point: points[i / 2].clone(),
-                first: Some(first),
-                second: Some(second),
-            };
-            ciphertext_list.push(ciphertext);
-        }
+        let ciphertext_list: Vec<MenezesVanstoneCiphertext> = big_int_vec
+            .chunks(2)
+            .zip(points.iter().cloned())
+            .map(|(chunk, point)| MenezesVanstoneCiphertext {
+                point,
+                first: chunk.get(0).cloned(),
+                second: chunk.get(1).cloned(),
+            })
+            .collect();
 
         // Jeden einzelnen Ciphertext für sich entschlüsseln
         let plaintext_list: Vec<MenezesVanstonePlaintext> = ciphertext_list
