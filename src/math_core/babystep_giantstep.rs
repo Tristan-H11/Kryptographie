@@ -1,13 +1,13 @@
 use std::collections::BTreeMap;
 
-use bigdecimal::num_bigint::BigInt;
-use bigdecimal::{One, Zero};
-use serde::Serialize;
 use crate::math_core::number_theory::number_theory_service::{
     NumberTheoryService, NumberTheoryServiceTrait,
 };
 use crate::math_core::traits::increment::Increment;
 use crate::shared::errors::ArithmeticError;
+use bigdecimal::num_bigint::BigInt;
+use bigdecimal::{One, Zero};
+use serde::Serialize;
 
 #[derive(Clone, Copy)]
 pub struct Shanks {
@@ -16,7 +16,7 @@ pub struct Shanks {
 
 pub struct ShanksResult {
     pub result: BigInt,
-    pub map: Vec<(BigInt, BigInt)>
+    pub map: Vec<(BigInt, BigInt)>,
 }
 
 impl Shanks {
@@ -68,7 +68,9 @@ impl Shanks {
         }
 
         // Map in einen Vektor von Tupeln umwandeln
-        let mut sorted_map: Vec<(BigInt, BigInt)> = map.clone().into_iter()
+        let mut sorted_map: Vec<(BigInt, BigInt)> = map
+            .clone()
+            .into_iter()
             .map(|(key, value)| (value, key))
             .collect();
 
@@ -90,7 +92,7 @@ impl Shanks {
                 let final_value = (&m * pair.unwrap() + &i) % (modul - BigInt::one());
                 let result = ShanksResult {
                     result: final_value,
-                    map: sorted_map
+                    map: sorted_map,
                 };
                 return Ok(result);
             }

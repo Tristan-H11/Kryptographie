@@ -38,11 +38,11 @@ impl From<ShanksResult> for ShanksResponse {
     fn from(value: ShanksResult) -> Self {
         ShanksResponse {
             result: value.result.to_str_radix(10),
-            giantsteps: value.map
+            giantsteps: value
+                .map
                 .iter()
-                .map(|(s, g)|
-                    (s.to_str_radix(10), g.to_str_radix(10))
-                ).collect()
+                .map(|(s, g)| (s.to_str_radix(10), g.to_str_radix(10)))
+                .collect(),
         }
     }
 }
