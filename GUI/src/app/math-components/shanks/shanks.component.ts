@@ -68,8 +68,6 @@ export class ShanksComponent {
     }
 
     public shouldHighlightRow(row: StepValuePair): boolean {
-        console.log(this.babyStepsDataSource?.data.at(-1)?.value)
-        console.log(row.value);
         return row.value == this.babyStepsDataSource?.data.at(-1)?.value;
     }
 }
