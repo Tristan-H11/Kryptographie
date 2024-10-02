@@ -8,13 +8,14 @@ import {MatExpansionModule} from "@angular/material/expansion";
 import {MatFormFieldModule} from "@angular/material/form-field";
 import {MatInputModule} from "@angular/material/input";
 import {MatDialog} from "@angular/material/dialog";
-import {catchError, EMPTY} from "rxjs";
-import {ErrorDialogComponent} from "../../dialogs/error-dialog/error-dialog.component";
+import {MatCard, MatCardContent, MatCardTitle} from "@angular/material/card";
+import {MatList, MatListItem} from "@angular/material/list";
+import {MatLine} from "@angular/material/core";
 
 @Component({
     selector: "app-shanks",
     standalone: true,
-    imports: [CommonModule, FormsModule, MatButtonModule, MatExpansionModule, MatFormFieldModule, MatInputModule],
+    imports: [CommonModule, FormsModule, MatButtonModule, MatExpansionModule, MatFormFieldModule, MatInputModule, MatCard, MatCardTitle, MatCardContent, MatList, MatListItem, MatLine],
     templateUrl: "./shanks.component.html",
 })
 export class ShanksComponent {

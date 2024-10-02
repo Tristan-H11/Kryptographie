@@ -46,5 +46,19 @@
                       [(ngModel)]="result"></textarea>
         </mat-form-field>
 
+        <div *ngIf="giantsteps.length > 0">
+            <mat-list>
+                <mat-list-item *ngFor="let step of giantsteps">
+                    <div matLine><strong>{{ step[0] }}</strong></div>
+                    <div matLine>{{ step[1] }}</div>
+                </mat-list-item>
+            </mat-list>
+        </div>
+
+        <!-- Fallback, wenn giantsteps leer ist -->
+        <div *ngIf="giantsteps.length === 0">
+            <p>No GiantSteps Available</p>
+        </div>
+
     </mat-expansion-panel>
 </mat-accordion>
