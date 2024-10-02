@@ -25,6 +25,7 @@ export class ShanksComponent {
     public modul = "";
     //Output field
     public result = "";
+    public giantsteps: [string,string][] = [];
 
     constructor(private backendRequestService: RsaBackendRequestService, private dialog: MatDialog) {
     }
@@ -35,7 +36,8 @@ export class ShanksComponent {
     public calculate() {
         let body = new ShanksRequest(this.base, this.element, this.modul);
         this.backendRequestService.shanks(body).subscribe(result => {
-            this.result = result.message;
+            this.result = result.result;
+            this.giantsteps = result.giantsteps;
         });
     }
 }

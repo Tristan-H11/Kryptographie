@@ -17,6 +17,7 @@ import {ModularInversRequest} from "../../models/modular-invers-request";
 import {MultiplicationRequest} from "../../models/multiplication-request";
 import {MultiplicationResponse} from "../../models/multiplication-response";
 import {DialogService} from "../utility/dialogs.service";
+import {ShanksResponse} from "../../models/ShanksResponse";
 
 @Injectable({
     providedIn: "root"
@@ -166,10 +167,10 @@ export class RsaBackendRequestService {
         );
     }
 
-    public shanks(body: ShanksRequest): Observable<SingleMessageModel> {
+    public shanks(body: ShanksRequest): Observable<ShanksResponse> {
         const params = this.getParams();
         const options = {params};
-        const response = this.http.post<SingleMessageModel>(this.endpointsService.getShanksEndpoint(), body, options);
+        const response = this.http.post<ShanksResponse>(this.endpointsService.getShanksEndpoint(), body, options);
         return response.pipe(
             catchError(
                 (error) => {
