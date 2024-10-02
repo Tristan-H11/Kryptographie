@@ -32,6 +32,7 @@ pub struct ShanksRequest {
 pub struct ShanksResponse {
     pub result: String,
     pub giantsteps: Vec<(String, String)>,
+    pub babysteps: Vec<(String, String)>
 }
 
 impl From<ShanksResult> for ShanksResponse {
@@ -39,10 +40,16 @@ impl From<ShanksResult> for ShanksResponse {
         ShanksResponse {
             result: value.result.to_str_radix(10),
             giantsteps: value
-                .map
+                .giant_steps
                 .iter()
                 .map(|(s, g)| (s.to_str_radix(10), g.to_str_radix(10)))
                 .collect(),
+            babysteps: value
+                .baby_steps
+                .iter()
+                .map(|(s, g)| (s.to_str_radix(10), g.to_str_radix(10)))
+                .collect(),
+
         }
     }
 }

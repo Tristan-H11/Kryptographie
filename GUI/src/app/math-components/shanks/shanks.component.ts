@@ -8,21 +8,21 @@ import {MatExpansionModule} from "@angular/material/expansion";
 import {MatFormFieldModule} from "@angular/material/form-field";
 import {MatInputModule} from "@angular/material/input";
 import {MatDialog} from "@angular/material/dialog";
-import {MatCard, MatCardContent, MatCardTitle} from "@angular/material/card";
-import {MatList, MatListItem} from "@angular/material/list";
-import {MatLine} from "@angular/material/core";
-import {MatDivider} from "@angular/material/divider";
 import {
     MatCell,
     MatCellDef,
     MatColumnDef,
-    MatHeaderCell, MatHeaderCellDef,
-    MatHeaderRow, MatHeaderRowDef,
-    MatRow, MatRowDef,
-    MatTable, MatTableDataSource
+    MatHeaderCell,
+    MatHeaderCellDef,
+    MatHeaderRow,
+    MatHeaderRowDef,
+    MatRow,
+    MatRowDef,
+    MatTable,
+    MatTableDataSource
 } from "@angular/material/table";
 
-interface GiantStep {
+interface StepValuePair {
     step: string;
     value: string;
 }
@@ -30,7 +30,7 @@ interface GiantStep {
 @Component({
     selector: "app-shanks",
     standalone: true,
-    imports: [CommonModule, FormsModule, MatButtonModule, MatExpansionModule, MatFormFieldModule, MatInputModule, MatCard, MatCardTitle, MatCardContent, MatList, MatListItem, MatLine, MatDivider, MatTable, MatColumnDef, MatHeaderCell, MatCell, MatHeaderRow, MatRow, MatCellDef, MatHeaderCellDef, MatHeaderRowDef, MatRowDef],
+    imports: [CommonModule, FormsModule, MatButtonModule, MatExpansionModule, MatFormFieldModule, MatInputModule, MatTable, MatColumnDef, MatHeaderCell, MatCell, MatHeaderRow, MatRow, MatCellDef, MatHeaderCellDef, MatHeaderRowDef, MatRowDef],
     templateUrl: "./shanks.component.html",
 })
 export class ShanksComponent {
@@ -41,9 +41,10 @@ export class ShanksComponent {
     public modul = "";
     //Output field
     public result = "";
-    public dataSource = new MatTableDataSource<GiantStep>();
+    public giantStepsDataSource = new MatTableDataSource<StepValuePair>();
+    public babyStepsDataSource = new MatTableDataSource<StepValuePair>();
 
-    displayedColumns: string[] = ['value', 'secondValue'];
+    displayedColumns: string[] = ["value", "secondValue"];
 
     constructor(private backendRequestService: RsaBackendRequestService, private dialog: MatDialog) {
     }
@@ -55,10 +56,20 @@ export class ShanksComponent {
         let body = new ShanksRequest(this.base, this.element, this.modul);
         this.backendRequestService.shanks(body).subscribe(result => {
             this.result = result.result;
-            this.dataSource.data = result.giantsteps.map(step => ({
+            this.giantStepsDataSource.data = result.giantsteps.map(step => ({
+                step: step[0],
+                value: step[1]
+            }));
+            this.babyStepsDataSource.data = result.babysteps.map(step => ({
                 step: step[0],
                 value: step[1]
             }));
         });
+    }
+
+    public shouldHighlightRow(row: StepValuePair): boolean {
+        console.log(this.babyStepsDataSource?.data.at(-1)?.value)
+        console.log(row.value);
+        return row.value == this.babyStepsDataSource?.data.at(-1)?.value;
     }
 }

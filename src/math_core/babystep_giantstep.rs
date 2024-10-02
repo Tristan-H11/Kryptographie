@@ -16,7 +16,8 @@ pub struct Shanks {
 
 pub struct ShanksResult {
     pub result: BigInt,
-    pub map: Vec<(BigInt, BigInt)>,
+    pub giant_steps: Vec<(BigInt, BigInt)>,
+    pub baby_steps: Vec<(BigInt, BigInt)>,
 }
 
 impl Shanks {
@@ -68,17 +69,18 @@ impl Shanks {
         }
 
         // Map in einen Vektor von Tupeln umwandeln
-        let mut sorted_map: Vec<(BigInt, BigInt)> = map
+        let mut sorted_giant_steps: Vec<(BigInt, BigInt)> = map
             .clone()
             .into_iter()
             .map(|(key, value)| (value, key))
             .collect();
 
         // Vektor nach den Values sortieren (also nach dem 2. Element des Tupels)
-        sorted_map.sort_by(|a, b| a.0.cmp(&b.0));
+        sorted_giant_steps.sort_by(|a, b| a.0.cmp(&b.0));
 
         //Berechnet Babysteps und vergleicht sie mit Giantsteps
         let mut i = BigInt::zero();
+        let mut sorted_baby_steps: Vec<(BigInt, BigInt)> = Vec::new();
         while i < m {
             let babystep = (element
                 * self.number_theory_service.fast_exponentiation(
@@ -87,12 +89,14 @@ impl Shanks {
                     modul,
                 ))
                 % modul;
+            sorted_baby_steps.push((i.clone(), babystep.clone()));
             let pair = map.get(&babystep);
             if pair.is_some() {
                 let final_value = (&m * pair.unwrap() + &i) % (modul - BigInt::one());
                 let result = ShanksResult {
                     result: final_value,
-                    map: sorted_map,
+                    giant_steps: sorted_giant_steps,
+                    baby_steps: sorted_baby_steps,
                 };
                 return Ok(result);
             }
