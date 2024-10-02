@@ -1,6 +1,6 @@
 use crate::api::basic::call_checked_with_parsed_big_ints;
 use crate::api::serializable_models::{SingleStringResponse, UseFastQuery};
-use crate::math_core::babystep_giantstep::Shanks;
+use crate::math_core::babystep_giantstep::{Shanks, ShanksResult};
 use crate::math_core::number_theory::extended_euclid_result::ExtendedEuclidResult;
 use crate::math_core::number_theory::number_theory_service::NumberTheoryServiceSpeed::{
     Fast, Slow,
@@ -26,6 +26,25 @@ pub struct ShanksRequest {
     pub base: String,
     pub element: String,
     pub modul: String,
+}
+
+#[derive(Serialize)]
+pub struct ShanksResponse {
+    pub result: String,
+    pub giantsteps: Vec<(String, String)>,
+}
+
+impl From<ShanksResult> for ShanksResponse {
+    fn from(value: ShanksResult) -> Self {
+        ShanksResponse {
+            result: value.result.to_str_radix(10),
+            giantsteps: value.map
+                .iter()
+                .map(|(s, g)|
+                    (s.to_str_radix(10), g.to_str_radix(10))
+                ).collect()
+        }
+    }
 }
 
 #[derive(Deserialize)]
@@ -138,11 +157,9 @@ pub(crate) async fn shanks_endpoint(
 
         let result = shanks_service.calculate(&base, &element, &modul);
         let response = match result {
-            Ok(x) => {
-                let response = SingleStringResponse {
-                    message: x.to_string(),
-                };
-                HttpResponse::Ok().json(response)
+            Ok(shanks_result) => {
+                let shanks_response: ShanksResponse = shanks_result.into();
+                HttpResponse::Ok().json(shanks_response)
             }
             Err(_) => HttpResponse::BadRequest().json(SingleStringResponse {
                 message: "Fehler beim Berechnen des diskreten Logarithmus".to_string(),

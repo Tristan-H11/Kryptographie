@@ -2,7 +2,7 @@ use std::collections::BTreeMap;
 
 use bigdecimal::num_bigint::BigInt;
 use bigdecimal::{One, Zero};
-
+use serde::Serialize;
 use crate::math_core::number_theory::number_theory_service::{
     NumberTheoryService, NumberTheoryServiceTrait,
 };
@@ -12,6 +12,11 @@ use crate::shared::errors::ArithmeticError;
 #[derive(Clone, Copy)]
 pub struct Shanks {
     number_theory_service: NumberTheoryService,
+}
+
+pub struct ShanksResult {
+    pub result: BigInt,
+    pub map: Vec<(BigInt, BigInt)>
 }
 
 impl Shanks {
@@ -31,29 +36,17 @@ impl Shanks {
     ///
     /// # Rückgabewert
     ///
-    /// * Der berechnete Logarithmus.
+    /// * Der berechnete Logarithmus und die zugrundeliegende Tabelle der GiantSteps.
     ///
     /// # Fehler
     ///
     /// * `ArithmeticError::NoDiscreteLogarithmError` - Wenn der Logarithmus nicht existiert.
-    ///
-    /// # Beispiel
-    ///
-    /// ```rust
-    /// let base = BigInt::from(3);
-    /// let element = BigInt::from(4);
-    /// let modul = BigInt::from(7);
-    ///
-    /// let result = Shanks::calculate(&base, &element, &modul, true);
-    ///
-    /// assert_eq!(result, Ok(BigInt::from(4)));
-    /// ```
     pub fn calculate(
         self,
         base: &BigInt,
         element: &BigInt,
         modul: &BigInt,
-    ) -> Result<BigInt, ArithmeticError> {
+    ) -> Result<ShanksResult, ArithmeticError> {
         //aufrundung: nachkommateil abschneiden (to_bigint) +1
         let mut m = (modul - BigInt::one()).sqrt();
         if (&m * &m) != (modul - BigInt::one()) {
@@ -74,6 +67,14 @@ impl Shanks {
             j.increment_assign();
         }
 
+        // Map in einen Vektor von Tupeln umwandeln
+        let mut sorted_map: Vec<(BigInt, BigInt)> = map.clone().into_iter()
+            .map(|(key, value)| (value, key))
+            .collect();
+
+        // Vektor nach den Values sortieren (also nach dem 2. Element des Tupels)
+        sorted_map.sort_by(|a, b| a.0.cmp(&b.0));
+
         //Berechnet Babysteps und vergleicht sie mit Giantsteps
         let mut i = BigInt::zero();
         while i < m {
@@ -86,14 +87,19 @@ impl Shanks {
                 % modul;
             let pair = map.get(&babystep);
             if pair.is_some() {
-                return Ok((&m * pair.unwrap() + &i) % (modul - BigInt::one()));
+                let final_value = (&m * pair.unwrap() + &i) % (modul - BigInt::one());
+                let result = ShanksResult {
+                    result: final_value,
+                    map: sorted_map
+                };
+                return Ok(result);
             }
             i.increment_assign();
         }
-        return Err(ArithmeticError::NoDiscreteLogarithmError(
+        Err(ArithmeticError::NoDiscreteLogarithmError(
             base.to_str_radix(10),
             element.to_str_radix(10),
-        ));
+        ))
     }
 }
 
@@ -116,19 +122,23 @@ mod tests {
             let shanks_service = Shanks::new(service);
             let result = shanks_service
                 .calculate(&8.into(), &555.into(), &677.into())
-                .unwrap();
+                .unwrap()
+                .result;
             assert_eq!(result, 134.into());
             let result = shanks_service
                 .calculate(&11.into(), &3.into(), &29.into())
-                .unwrap();
+                .unwrap()
+                .result;
             assert_eq!(result, 17.into());
             let result = shanks_service
                 .calculate(&10.into(), &25.into(), &97.into())
-                .unwrap();
+                .unwrap()
+                .result;
             assert_eq!(result, 22.into());
             let result = shanks_service
                 .calculate(&3.into(), &4.into(), &7.into())
-                .unwrap();
+                .unwrap()
+                .result;
             assert_eq!(result, 4.into());
             let result = shanks_service.calculate(&4.into(), &6.into(), &7.into());
             assert!(result.is_err());
