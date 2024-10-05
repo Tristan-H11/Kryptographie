@@ -22,7 +22,9 @@
                 <mat-card-content>
                     Modulus (n): <strong>{{ client.keyPair | emptyIfUndefined:'modulus' }}</strong>
                     <br>
+                    <br>
                     Öffentlicher Exponent (e): <strong>{{ client.keyPair | emptyIfUndefined:'e' }}</strong>
+                    <br>
                     <br>
                     Blockgröße: <strong>{{ client.keyPair | emptyIfUndefined:'block_size_pub' }}</strong> Zeichen
                 </mat-card-content>
@@ -33,9 +35,8 @@
                     <mat-card-title>Private Komponenten</mat-card-title>
                 </mat-card-header>
                 <mat-card-content>
-                    Modulus (n): <strong>{{ client.keyPair | emptyIfUndefined:'modulus' }}</strong>
-                    <br>
                     Privater Exponent (d): <strong>{{ client.keyPair | emptyIfUndefined:'d' }}</strong>
+                    <br>
                     <br>
                     Blockgröße: <strong>{{ client.keyPair | emptyIfUndefined:'block_size_priv' }}</strong> Zeichen
                 </mat-card-content>

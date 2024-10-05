@@ -17,6 +17,6 @@ export class RsaKeyPair {
 	}
 
 	public static createEmptyKeyPair() {
-		return new RsaKeyPair("", "", "", "", "");
+		return new RsaKeyPair("Empty", "Empty", "Empty", "Empty", "Empty");
 	}
 }

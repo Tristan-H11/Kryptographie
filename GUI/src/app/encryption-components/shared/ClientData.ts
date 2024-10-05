@@ -30,7 +30,7 @@ export class RsaClientData extends ClientData {
     public override sendingTo: RsaClientData | undefined;
     public override receivedFrom: RsaClientData | undefined;
 
-    constructor(name: string, keyPair: RsaKeyPair, plaintext: string, ciphertext: string, signature: string, signature_valid: string, sendingTo: RsaClientData | undefined, receivedFrom: RsaClientData | undefined) {
+    constructor(name: string, keyPair: RsaKeyPair | undefined, plaintext: string, ciphertext: string, signature: string, signature_valid: string, sendingTo: RsaClientData | undefined, receivedFrom: RsaClientData | undefined) {
         super(name, keyPair, plaintext, ciphertext, signature, signature_valid, sendingTo, receivedFrom);
         this.keyPair = keyPair;
         this.ciphertext = ciphertext;
@@ -42,7 +42,7 @@ export class RsaClientData extends ClientData {
     public static createDefaultWithName(name: string): RsaClientData {
         return new RsaClientData(
             name,
-            RsaKeyPair.createEmptyKeyPair(),
+            undefined,
             "",
             "",
             "",
@@ -71,36 +71,7 @@ export class MvClientData extends ClientData {
     public static createDefaultWithName(name: string): MvClientData {
         return new MvClientData(
             name,
-            {
-                public_key: {
-                    curve: {
-                        a: NaN, prime: "Empty",
-                        generator: {
-                            x: "Empty",
-                            y: "Empty",
-                            is_infinite: false
-                        },
-                        order_of_subgroup: "Empty"
-                    },
-                    y: {
-                        x: "Empty",
-                        y: "Empty",
-                        is_infinite: false
-                    }
-                },
-                private_key: {
-                    curve: {
-                        a: NaN, prime: "Empty",
-                        generator: {
-                            x: "Empty",
-                            y: "Empty",
-                            is_infinite: false
-                        },
-                        order_of_subgroup: "Empty"
-                    },
-                    x: "Empty"
-                }
-            },
+            undefined,
             "",
             {encrypted_message: "", points: []},
             {r: "", s: ""},
