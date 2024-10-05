@@ -11,7 +11,7 @@ export class EmptyIfUndefinedPipe implements PipeTransform {
 
     transform(obj: any, path: string): any {
         const value = this.getValue(obj, path);
-        return value ?? 'Empty';
+        return (value === null || value === undefined || value === '') ? 'Empty' : value;
     }
 
     private getValue(obj: any, path: string): any {

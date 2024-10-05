@@ -78,6 +78,10 @@ input.text-align-right {
         flex: $flex-1;
         transition: $transition-effect; // smooth transition effect
 
+        word-wrap: break-word; // Umbrüche an beliebigen Stellen des Texts erlauben
+        word-break: break-all; // Zahlen und lange Wörter mitten im Text umbrechen
+        overflow-wrap: break-word; // Zusätzliche Absicherung für Umbrüche
+
         &:hover {
             background-color: $hover-background-color; // change background color on hover
             box-shadow: $box-shadow-hover; // add box shadow on hover

@@ -209,7 +209,7 @@ pub(crate) async fn create_key_pair(
     query: Query<UseFastQuery>,
 ) -> impl Responder {
     info!(
-        "Endpunkt /rsa/createKeyPair wurde aufgerufen, use_fast: {}",
+        "Endpunkt /menezesVanstone/createKeyPair wurde aufgerufen, use_fast: {}",
         query.use_fast
     );
     let req_body: MvCreateKeyPairRequestBean = req_body.into_inner();
