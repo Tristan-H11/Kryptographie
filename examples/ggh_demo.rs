@@ -5,9 +5,9 @@ fn main() {
 
     // Konfiguration
     let config = GghKeyGenConfig {
-        dimension: 4,
-        basis_vector_length: 10,
-        unimodular_iterations: 8,
+        dimension: 7,
+        basis_vector_length: 100000,
+        unimodular_iterations: 10,
         random_seed: 42,
     };
 
@@ -28,7 +28,15 @@ fn main() {
     println!("{}", GghScheme::format_matrix(&keypair.public_key.bad_basis));
 
     // Nachricht
-    let message = IntVector::from_vec(vec![3, -2, 5, 1]);
+    let message = {
+        let mut vec = Vec::with_capacity(config.dimension);
+        for _ in 0..config.dimension as usize {
+            // random values in range -10..=10
+            let val = (rand::random::<i32>() % 21) - 10;
+            vec.push(val as i64);
+        }
+        IntVector::from_vec(vec)
+    };
     println!("Nachricht: {}", GghScheme::format_vector(&message));
 
     // Verschlüsseln
@@ -47,25 +55,6 @@ fn main() {
         println!("\n✓ Erfolgreich! Die entschlüsselte Nachricht stimmt mit dem Original überein.");
     } else {
         println!("\n✗ Fehler! Die entschlüsselte Nachricht stimmt NICHT mit dem Original überein.");
-    }
-
-    // Noch ein Beispiel mit anderen Werten
-    println!("\n=== Zweites Beispiel ===\n");
-    let message2 = IntVector::from_vec(vec![-5, 10, 0, 7]);
-    println!("Nachricht: {}", GghScheme::format_vector(&message2));
-
-    let ciphertext2 = GghScheme::encrypt(&message2, &keypair.public_key, 3, 456)
-        .expect("Verschlüsselung fehlgeschlagen");
-    println!("Verschlüsselt: {}", GghScheme::format_vector(&ciphertext2));
-
-    let decrypted2 = GghScheme::decrypt(&ciphertext2, &keypair.private_key)
-        .expect("Entschlüsselung fehlgeschlagen");
-    println!("Entschlüsselt: {}", GghScheme::format_vector(&decrypted2));
-
-    if decrypted2 == message2 {
-        println!("\n✓ Erfolgreich!");
-    } else {
-        println!("\n✗ Fehler!");
     }
 }
 
