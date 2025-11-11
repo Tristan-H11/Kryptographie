@@ -5,7 +5,7 @@ use simple_logger::SimpleLogger;
 
 fn main() {
     SimpleLogger::new()
-        .with_level(LevelFilter::Info)
+        .with_level(LevelFilter::Trace)
         .with_colors(true)
         .init()
         .unwrap();
@@ -21,15 +21,14 @@ fn main() {
     const DIMENSION: usize = 3;
     const BASIS_VECTOR_LENGTH: i64 = 10;
     const UNIMODULAR_ITERATIONS: usize = 3;
-    const RANDOM_SEED: u64 = 42;
+    const RANDOM_SEED: u64 = 43;
 
     // Nachricht
     const RANDOM_MESSAGE: bool = false;
-    const MESSAGE: [i64; DIMENSION] = [2, -1, 3];
+    const MESSAGE: [i64; DIMENSION] = [0, 0, 0];
 
     // Verschlüsselung
     const ERROR_RADIUS: i64 = 2;
-    const ENCRYPTION_SEED: u64 = 123;
 
     // ========================================================================
 
@@ -84,7 +83,7 @@ fn main() {
     info!("Nachricht: {}", GghScheme::format_vector(&message));
 
     // Verschlüsseln
-    let ciphertext = GghScheme::encrypt(&message, &keypair.public_key, ERROR_RADIUS, ENCRYPTION_SEED)
+    let ciphertext = GghScheme::encrypt(&message, &keypair.public_key, ERROR_RADIUS, RANDOM_SEED)
         .expect("Verschlüsselung fehlgeschlagen");
     info!("Ciphertext: {}", GghScheme::format_vector(&ciphertext));
 
