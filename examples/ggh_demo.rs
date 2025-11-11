@@ -18,14 +18,14 @@ fn main() {
     // ========================================================================
 
     // GGH Parameter
-    const DIMENSION: usize = 3;
+    const DIMENSION: usize = 2;
     const BASIS_VECTOR_LENGTH: i64 = 10;
-    const UNIMODULAR_ITERATIONS: usize = 3;
-    const RANDOM_SEED: u64 = 43;
+    const UNIMODULAR_ITERATIONS: usize = 5;
+    const RANDOM_SEED: u64 = 50;
 
     // Nachricht
-    const RANDOM_MESSAGE: bool = false;
-    const MESSAGE: [i64; DIMENSION] = [0, 0, 0];
+    const RANDOM_MESSAGE: bool = true;
+    const MESSAGE: [i64; DIMENSION] = [0, 0];
 
     // Verschlüsselung
     const ERROR_RADIUS: i64 = 2;

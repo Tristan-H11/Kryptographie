@@ -84,11 +84,11 @@ impl GghScheme {
             .expect("B sollte invertierbar sein (Diagonalmatrix).");
         trace!("Inverse der guten Basis erfolgreich berechnet");
 
-        // 2) schlechte Basis H = B * U und die unimodulare Matrix U
+        // 2) schlechte Basis B' = B * U und die unimodulare Matrix U
         info!("Generiere schlechte (öffentliche) Basis durch unimodulare Transformationen");
         let (bad_basis, unimodular_matrix, unimodular_matrix_inverse) = Self::generate_bad_basis(&good_basis, config);
         debug!("Schlechte Basis generiert:\n{}", Self::format_matrix(&bad_basis));
-        trace!("Unimodulare Matrix:\n{}", Self::format_matrix(&unimodular_matrix));
+        trace!("Unimodulare Matrix U_{}:\n{}", config.unimodular_iterations,  Self::format_matrix(&unimodular_matrix));
 
         info!("GGH-Schlüsselpaar erfolgreich generiert");
 
@@ -131,7 +131,7 @@ impl GghScheme {
             u_product = u_product * &unimodular;
         }
 
-        trace!("Berechne schlechte Basis: H = B * U");
+        trace!("Berechne schlechte Basis: B' = B * U");
         let bad_basis = good_basis * &u_product;
 
         trace!("Invertiere unimodulare Matrix");
@@ -224,7 +224,7 @@ impl GghScheme {
         }
 
         // Matrix-Vektor-Multiplikation mit nalgebra
-        trace!("Berechne H * m (Matrix-Vektor-Multiplikation)");
+        trace!("Berechne B' * m (Matrix-Vektor-Multiplikation)");
         let mut encrypted = &public_key.bad_basis * message;
         debug!("Nach Multiplikation mit schlechter Basis: {}", Self::format_vector(&encrypted));
 
