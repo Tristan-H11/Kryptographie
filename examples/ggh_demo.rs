@@ -1,13 +1,14 @@
-use encryption_tool::encryption::core::ggh::ggh_integer::{GghScheme, GghKeyGenConfig, IntVector, GghKeyPair};
+use encryption_tool::encryption::core::ggh::ggh_integer::{GghScheme, GghKeyGenConfig, IntVector};
+use num_bigint::ToBigInt;
 
 fn main() {
     println!("=== GGH (Goldreich-Goldwasser-Halevi) Verschlüsselung ===\n");
 
     // Konfiguration
     let config = GghKeyGenConfig {
-        dimension: 7,
-        basis_vector_length: 100000,
-        unimodular_iterations: 10,
+        dimension: 4,
+        basis_vector_length: 1000,
+        unimodular_iterations: 1,
         random_seed: 42,
     };
 
@@ -30,10 +31,9 @@ fn main() {
     // Nachricht
     let message = {
         let mut vec = Vec::with_capacity(config.dimension);
-        for _ in 0..config.dimension as usize {
-            // random values in range -10..=10
+        for _ in 0..config.dimension {
             let val = (rand::random::<i32>() % 21) - 10;
-            vec.push(val as i64);
+            vec.push(val.to_bigint().unwrap());
         }
         IntVector::from_vec(vec)
     };
@@ -51,10 +51,15 @@ fn main() {
     println!("Entschlüsselt: {}", GghScheme::format_vector(&decrypted));
 
     // Prüfen
+    let green = "\x1b[32m";
+    let red = "\x1b[31m";
+    let reset = "\x1b[0m";
+
     if decrypted == message {
-        println!("\n✓ Erfolgreich! Die entschlüsselte Nachricht stimmt mit dem Original überein.");
+        println!("\n{}✓ Erfolgreich! Die entschlüsselte Nachricht stimmt mit dem Original überein.{}",
+                 green, reset);
     } else {
-        println!("\n✗ Fehler! Die entschlüsselte Nachricht stimmt NICHT mit dem Original überein.");
+        println!("\n{}✗ Fehler! Die entschlüsselte Nachricht stimmt NICHT mit dem Original überein.{}",
+                 red, reset);
     }
 }
-
