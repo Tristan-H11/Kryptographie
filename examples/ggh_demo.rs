@@ -1,20 +1,31 @@
 use encryption_tool::encryption::core::ggh::ggh_integer::{GghScheme, GghKeyGenConfig, IntVector};
 use num_bigint::ToBigInt;
+use log::{info, debug, LevelFilter};
+use simple_logger::SimpleLogger;
 
 fn main() {
+    SimpleLogger::new()
+        .with_level(LevelFilter::Info)
+        .with_colors(true)
+        .init()
+        .unwrap();
+
+    info!("=== GGH (Goldreich-Goldwasser-Halevi) Verschlüsselung ===");
+    info!("");
+
     // ========================================================================
     // DEMO KONFIGURATION - Hier alle Parameter festlegen
     // ========================================================================
 
     // GGH Parameter
-    const DIMENSION: usize = 4;
-    const BASIS_VECTOR_LENGTH: i64 = 1000;
-    const UNIMODULAR_ITERATIONS: usize = 1;
+    const DIMENSION: usize = 3;
+    const BASIS_VECTOR_LENGTH: i64 = 10;
+    const UNIMODULAR_ITERATIONS: usize = 3;
     const RANDOM_SEED: u64 = 42;
 
     // Nachricht
     const RANDOM_MESSAGE: bool = false;
-    const MESSAGE: [i64; DIMENSION] = [3, -5, 7, 2];
+    const MESSAGE: [i64; DIMENSION] = [2, -1, 3];
 
     // Verschlüsselung
     const ERROR_RADIUS: i64 = 2;
@@ -22,7 +33,6 @@ fn main() {
 
     // ========================================================================
 
-    println!("=== GGH (Goldreich-Goldwasser-Halevi) Verschlüsselung ===\n");
 
     // Konfiguration
     let config = GghKeyGenConfig {
@@ -32,24 +42,30 @@ fn main() {
         random_seed: RANDOM_SEED,
     };
 
-    println!("Konfiguration:");
-    println!("  Dimension: {}", config.dimension);
-    println!("  Basisvektor-Länge: {}", config.basis_vector_length);
-    println!("  Unimodulare Iterationen: {}", config.unimodular_iterations);
-    println!("  Random Seed: {}", config.random_seed);
-    println!("  Fehlerradius: {}", ERROR_RADIUS);
-    println!("  Zufällige Nachricht: {}", RANDOM_MESSAGE);
-    println!();
+    info!("Konfiguration:");
+    info!("  Dimension: {}", config.dimension);
+    info!("  Basisvektor-Länge: {}", config.basis_vector_length);
+    info!("  Unimodulare Iterationen: {}", config.unimodular_iterations);
+    debug!("  Random Seed: {}", config.random_seed);
+    info!("  Fehlerradius: {}", ERROR_RADIUS);
+    debug!("  Zufällige Nachricht: {}", RANDOM_MESSAGE);
+    info!("");
 
     // Schlüsselpaar generieren
-    println!("Generiere Schlüsselpaar...");
+    info!("=== SCHLÜSSELGENERIERUNG ===");
     let keypair = GghScheme::generate_keypair(&config);
 
-    println!("\nGute Basis (privat):");
-    println!("{}", GghScheme::format_matrix(&keypair.private_key.good_basis));
+    info!("");
+    info!("Gute Basis (privat):");
+    for line in GghScheme::format_matrix(&keypair.private_key.good_basis).lines() {
+        info!("{}", line);
+    }
 
-    println!("Schlechte Basis (öffentlich):");
-    println!("{}", GghScheme::format_matrix(&keypair.public_key.bad_basis));
+    info!("");
+    info!("Schlechte Basis (öffentlich):");
+    for line in GghScheme::format_matrix(&keypair.public_key.bad_basis).lines() {
+        info!("{}", line);
+    }
 
     // Nachricht
     let message = if RANDOM_MESSAGE {
@@ -62,28 +78,34 @@ fn main() {
     } else {
         IntVector::from_vec(MESSAGE.iter().map(|&x| x.to_bigint().unwrap()).collect())
     };
-    println!("Nachricht: {}", GghScheme::format_vector(&message));
+
+    info!("");
+    info!("=== VERSCHLÜSSELUNG ===");
+    info!("Nachricht: {}", GghScheme::format_vector(&message));
 
     // Verschlüsseln
     let ciphertext = GghScheme::encrypt(&message, &keypair.public_key, ERROR_RADIUS, ENCRYPTION_SEED)
         .expect("Verschlüsselung fehlgeschlagen");
-    println!("Verschlüsselt (mit Fehlerradius {}): {}", ERROR_RADIUS, GghScheme::format_vector(&ciphertext));
+    info!("Ciphertext: {}", GghScheme::format_vector(&ciphertext));
 
     // Entschlüsseln
+    info!("");
+    info!("=== ENTSCHLÜSSELUNG ===");
     let decrypted = GghScheme::decrypt(&ciphertext, &keypair.private_key)
         .expect("Entschlüsselung fehlgeschlagen");
-    println!("Entschlüsselt: {}", GghScheme::format_vector(&decrypted));
+    info!("Entschlüsselte Nachricht: {}", GghScheme::format_vector(&decrypted));
 
     // Prüfen
     let green = "\x1b[32m";
     let red = "\x1b[31m";
     let reset = "\x1b[0m";
 
+    info!("");
     if decrypted == message {
-        println!("\n{}✓ Erfolgreich! Die entschlüsselte Nachricht stimmt mit dem Original überein.{}",
+        info!("{}✓ Erfolgreich! Die entschlüsselte Nachricht stimmt mit dem Original überein.{}",
                  green, reset);
     } else {
-        println!("\n{}✗ Fehler! Die entschlüsselte Nachricht stimmt NICHT mit dem Original überein.{}",
+        info!("{}✗ Fehler! Die entschlüsselte Nachricht stimmt NICHT mit dem Original überein.{}",
                  red, reset);
     }
 }

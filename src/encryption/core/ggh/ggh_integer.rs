@@ -3,7 +3,8 @@ use num_bigint::{BigInt, ToBigInt};
 use num_rational::BigRational;
 use rand::{Rng, SeedableRng};
 use rand_chacha::ChaCha8Rng;
-use num::{Zero, One};
+use num::{Zero, One, ToPrimitive};
+use log::{debug, info, trace};
 
 /// GGH mit ganzzahligen Matrizen (wie es sein sollte!)
 pub type IntMatrix = DMatrix<BigInt>;
@@ -66,14 +67,30 @@ pub struct GghScheme;
 impl GghScheme {
     /// Generiert ein GGH-Schlüsselpaar
     pub fn generate_keypair(config: &GghKeyGenConfig) -> GghKeyPair {
+        info!("Starte GGH-Schlüsselgenerierung mit Dimension {}, Basisvektor-Länge {}, {} unimodulare Iterationen",
+            config.dimension, config.basis_vector_length, config.unimodular_iterations);
+        debug!("Konfiguration: seed={}", config.random_seed);
+
         // 1) gute Basis B und ihre Inverse
+        trace!("Generiere gute (private) Basis als Diagonalmatrix");
         let good_basis = Self::generate_good_basis(config);
+        debug!("Gute Basis generiert:\n{}", Self::format_matrix(&good_basis));
+
+        trace!("Konvertiere gute Basis zu rationaler Matrix für Invertierung");
         let good_basis_rational = good_basis.map(|x| BigRational::from(x.clone()));
+
+        trace!("Berechne Inverse der guten Basis");
         let good_basis_inverse = Self::try_inverse_rational(&good_basis_rational)
             .expect("B sollte invertierbar sein (Diagonalmatrix).");
+        trace!("Inverse der guten Basis erfolgreich berechnet");
 
         // 2) schlechte Basis H = B * U und die unimodulare Matrix U
+        info!("Generiere schlechte (öffentliche) Basis durch unimodulare Transformationen");
         let (bad_basis, unimodular_matrix, unimodular_matrix_inverse) = Self::generate_bad_basis(&good_basis, config);
+        debug!("Schlechte Basis generiert:\n{}", Self::format_matrix(&bad_basis));
+        trace!("Unimodulare Matrix:\n{}", Self::format_matrix(&unimodular_matrix));
+
+        info!("GGH-Schlüsselpaar erfolgreich generiert");
 
         GghKeyPair {
             private_key: GghPrivateKey {
@@ -93,26 +110,35 @@ impl GghScheme {
 
     /// Generiert eine gute Basis (Diagonalmatrix)
     fn generate_good_basis(config: &GghKeyGenConfig) -> IntMatrix {
+        trace!("Erstelle Diagonalmatrix mit {} auf der Diagonale", config.basis_vector_length);
         let mut basis = IntMatrix::zeros(config.dimension, config.dimension);
         for i in 0..config.dimension {
             basis[(i, i)] = config.basis_vector_length.to_bigint().unwrap();
         }
+        trace!("Gute Basis (Diagonalmatrix) erstellt");
         basis
     }
 
     /// Generiert eine schlechte Basis durch unimodulare Transformationen
     fn generate_bad_basis(good_basis: &IntMatrix, config: &GghKeyGenConfig) -> (IntMatrix, IntMatrix, IntMatrix) {
+        debug!("Beginne mit Generierung der schlechten Basis ({} unimodulare Iterationen)", config.unimodular_iterations);
         let mut u_product = IntMatrix::identity(config.dimension, config.dimension);
         let mut rng = ChaCha8Rng::seed_from_u64(config.random_seed);
 
-        for _ in 0..config.unimodular_iterations {
+        for i in 0..config.unimodular_iterations {
+            trace!("Unimodulare Iteration {}/{}", i + 1, config.unimodular_iterations);
             let unimodular = Self::generate_unimodular_matrix(config.dimension, &mut rng);
             u_product = u_product * &unimodular;
         }
 
+        trace!("Berechne schlechte Basis: H = B * U");
         let bad_basis = good_basis * &u_product;
+
+        trace!("Invertiere unimodulare Matrix");
         let u_product_inverse = Self::invert_unimodular_int(&u_product)
             .expect("Das Produkt der unimodularen Matrizen sollte invertierbar sein.");
+
+        debug!("Schlechte Basis erfolgreich generiert");
 
         (bad_basis, u_product, u_product_inverse)
     }
@@ -120,14 +146,16 @@ impl GghScheme {
 
     /// Generiert eine unimodulare Matrix (det = ±1)
     fn generate_unimodular_matrix(dimension: usize, rng: &mut ChaCha8Rng) -> IntMatrix {
+        trace!("Generiere unimodulare Matrix mit Dimension {}", dimension);
         let mut matrix = IntMatrix::identity(dimension, dimension);
 
-        for _ in 0..dimension * 2 {
+        for op in 0..dimension * 2 {
             let i = rng.gen_range(0..dimension);
             let j = rng.gen_range(0..dimension);
 
             if i != j {
                 let factor = rng.gen_range(-2..=2).to_bigint().unwrap();
+                trace!("  Operation {}: Addiere {} * Spalte {} zu Spalte {}", op + 1, factor, j, i);
                 // Spaltenoperation: Addiere factor * Spalte j zu Spalte i
                 // Wir müssen den Wert von matrix[(k, j)] klonen, um den Borrow-Checker zufriedenzustellen,
                 // da matrix gleichzeitig mutabel und immutabel ausgeliehen wird.
@@ -138,19 +166,23 @@ impl GghScheme {
             }
         }
 
+        trace!("Unimodulare Matrix generiert");
         matrix
     }
 
     /// Invertiert eine ganzzahlige unimodulare Matrix exakt (det = ±1)
     fn invert_unimodular_int(matrix: &IntMatrix) -> Result<IntMatrix, String> {
         let n = matrix.nrows();
+        trace!("Invertiere unimodulare {}x{} Matrix", n, n);
 
         // Konvertiere zu Rational für die Invertierung
+        trace!("Konvertiere zu rationaler Matrix");
         let matrix_rational = matrix.map(|x| BigRational::from(x.clone()));
         let inverse_rational = Self::try_inverse_rational(&matrix_rational)
             .ok_or("Matrix ist nicht invertierbar")?;
 
         // Konvertiere zurück zu BigInt. Da die Matrix unimodular ist, muss die Inverse ganzzahlig sein.
+        trace!("Konvertiere Inverse zurück zu ganzzahliger Matrix");
         let inverse_int = inverse_rational.map(|x| {
             if x.is_integer() {
                 x.to_integer()
@@ -161,6 +193,7 @@ impl GghScheme {
         });
 
         // Verifiziere: M * M^(-1) = I
+        trace!("Verifiziere: M * M^(-1) = I");
         let product = matrix * &inverse_int;
         let identity = IntMatrix::identity(n, n);
 
@@ -168,6 +201,7 @@ impl GghScheme {
             return Err("Inverse ist nicht korrekt (Validierungsfehler)".to_string());
         }
 
+        trace!("Inverse erfolgreich berechnet und verifiziert");
         Ok(inverse_int)
     }
 
@@ -178,6 +212,9 @@ impl GghScheme {
         error_radius: i64,
         random_seed: u64,
     ) -> Result<IntVector, String> {
+        info!("Starte GGH-Verschlüsselung mit Fehlerradius {}", error_radius);
+        debug!("Nachricht: {}", Self::format_vector(message));
+
         if message.len() != public_key.dimension {
             return Err(format!(
                 "Nachrichtendimension {} stimmt nicht mit Schlüsseldimension {} überein",
@@ -187,20 +224,33 @@ impl GghScheme {
         }
 
         // Matrix-Vektor-Multiplikation mit nalgebra
+        trace!("Berechne H * m (Matrix-Vektor-Multiplikation)");
         let mut encrypted = &public_key.bad_basis * message;
+        debug!("Nach Multiplikation mit schlechter Basis: {}", Self::format_vector(&encrypted));
 
         // Füge ganzzahligen Fehlervektor hinzu
+        trace!("Generiere und addiere Fehlervektor (seed={})", random_seed);
         let mut rng = ChaCha8Rng::seed_from_u64(random_seed);
+        let mut error_vec = Vec::with_capacity(encrypted.len());
         for i in 0..encrypted.len() {
             let error = rng.gen_range(-error_radius..=error_radius).to_bigint().unwrap();
+            trace!("  Fehler[{}] = {}", i, error);
+            error_vec.push(error.clone());
             encrypted[i] += error;
         }
+        debug!("Fehlervektor: {}", Self::format_vector(&IntVector::from_vec(error_vec)));
+
+        info!("Verschlüsselung erfolgreich abgeschlossen");
+        debug!("Ciphertext: {}", Self::format_vector(&encrypted));
 
         Ok(encrypted)
     }
 
     /// Entschlüsselt einen Vektor (Babai's Closest Vertex Algorithm)
     pub fn decrypt(ciphertext: &IntVector, private_key: &GghPrivateKey) -> Result<IntVector, String> {
+        info!("Starte GGH-Entschlüsselung mit Babai's Closest Vertex Algorithm");
+        debug!("Ciphertext: {}", Self::format_vector(ciphertext));
+
         if ciphertext.len() != private_key.dimension {
             return Err(format!(
                 "Ciphertext-Dimension {} stimmt nicht mit Schlüsseldimension {} überein",
@@ -212,13 +262,25 @@ impl GghScheme {
         // Schritt 1: Babai's Algorithm mit guter Basis
         // Gegeben: c = B * U₁ * U₂ * ... * Uₙ * m + e
         // Berechne: x = round(B⁻¹ * c) ≈ U * m
+        trace!("Schritt 1: Konvertiere Ciphertext zu rationalen Zahlen");
         let ciphertext_rational = ciphertext.map(|x| BigRational::from(x.clone()));
+
+        trace!("Schritt 2: Berechne B⁻¹ * c");
         let coefficients = &private_key.good_basis_inverse * ciphertext_rational;
+        debug!("Koeffizienten vor Rundung: [{}]",
+            coefficients.iter().map(|x| format!("{:.4}", x.to_f64().unwrap_or(0.0))).collect::<Vec<_>>().join(", "));
+
+        trace!("Schritt 3: Runde Koeffizienten zu nächsten Ganzzahlen");
         let x_rounded = coefficients.map(|x| x.round().to_integer());
+        debug!("Gerundete Koeffizienten x: {}", Self::format_vector(&x_rounded));
 
         // Schritt 2: Wende die inverse unimodulare Matrix an
         // m = U⁻¹ * x
+        trace!("Schritt 4: Berechne m = U⁻¹ * x");
         let m = &private_key.unimodular_matrix_inverse * x_rounded;
+
+        info!("Entschlüsselung erfolgreich abgeschlossen");
+        debug!("Entschlüsselte Nachricht: {}", Self::format_vector(&m));
 
         Ok(m)
     }
@@ -426,10 +488,7 @@ mod tests {
         for i in 0..config.dimension {
             for j in 0..config.dimension {
                 let expected = if i == j { BigRational::one() } else { BigRational::zero() };
-                assert!(
-                    identity_approx[(i, j)] == expected,
-                    "B * B^(-1) sollte Identität sein"
-                );
+                assert_eq!(identity_approx[(i, j)], expected, "B * B^(-1) sollte Identität sein");
             }
         }
     }
@@ -442,10 +501,7 @@ mod tests {
             let unimodular = GghScheme::generate_unimodular_matrix(4, &mut rng);
             let det = GghScheme::determinant_rational(&unimodular.map(|x| BigRational::from(x.clone())));
 
-            assert!(
-                det.abs() == BigRational::one(),
-                "Determinante sollte ±1 sein, ist aber {} (seed={})", det, seed
-            );
+            assert_eq!(det.abs(), BigRational::one(), "Determinante sollte ±1 sein, ist aber {} (seed={})", det, seed);
         }
     }
 
