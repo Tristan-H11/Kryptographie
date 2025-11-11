@@ -2,20 +2,43 @@ use encryption_tool::encryption::core::ggh::ggh_integer::{GghScheme, GghKeyGenCo
 use num_bigint::ToBigInt;
 
 fn main() {
+    // ========================================================================
+    // DEMO KONFIGURATION - Hier alle Parameter festlegen
+    // ========================================================================
+
+    // GGH Parameter
+    const DIMENSION: usize = 4;
+    const BASIS_VECTOR_LENGTH: i64 = 1000;
+    const UNIMODULAR_ITERATIONS: usize = 1;
+    const RANDOM_SEED: u64 = 42;
+
+    // Nachricht
+    const RANDOM_MESSAGE: bool = false;
+    const MESSAGE: [i64; DIMENSION] = [3, -5, 7, 2];
+
+    // Verschlüsselung
+    const ERROR_RADIUS: i64 = 2;
+    const ENCRYPTION_SEED: u64 = 123;
+
+    // ========================================================================
+
     println!("=== GGH (Goldreich-Goldwasser-Halevi) Verschlüsselung ===\n");
 
     // Konfiguration
     let config = GghKeyGenConfig {
-        dimension: 4,
-        basis_vector_length: 1000,
-        unimodular_iterations: 1,
-        random_seed: 42,
+        dimension: DIMENSION,
+        basis_vector_length: BASIS_VECTOR_LENGTH,
+        unimodular_iterations: UNIMODULAR_ITERATIONS,
+        random_seed: RANDOM_SEED,
     };
 
     println!("Konfiguration:");
     println!("  Dimension: {}", config.dimension);
     println!("  Basisvektor-Länge: {}", config.basis_vector_length);
     println!("  Unimodulare Iterationen: {}", config.unimodular_iterations);
+    println!("  Random Seed: {}", config.random_seed);
+    println!("  Fehlerradius: {}", ERROR_RADIUS);
+    println!("  Zufällige Nachricht: {}", RANDOM_MESSAGE);
     println!();
 
     // Schlüsselpaar generieren
@@ -29,21 +52,22 @@ fn main() {
     println!("{}", GghScheme::format_matrix(&keypair.public_key.bad_basis));
 
     // Nachricht
-    let message = {
+    let message = if RANDOM_MESSAGE {
         let mut vec = Vec::with_capacity(config.dimension);
         for _ in 0..config.dimension {
             let val = (rand::random::<i32>() % 21) - 10;
             vec.push(val.to_bigint().unwrap());
         }
         IntVector::from_vec(vec)
+    } else {
+        IntVector::from_vec(MESSAGE.iter().map(|&x| x.to_bigint().unwrap()).collect())
     };
     println!("Nachricht: {}", GghScheme::format_vector(&message));
 
     // Verschlüsseln
-    let error_radius = 2;
-    let ciphertext = GghScheme::encrypt(&message, &keypair.public_key, error_radius, 123)
+    let ciphertext = GghScheme::encrypt(&message, &keypair.public_key, ERROR_RADIUS, ENCRYPTION_SEED)
         .expect("Verschlüsselung fehlgeschlagen");
-    println!("Verschlüsselt (mit Fehlerradius {}): {}", error_radius, GghScheme::format_vector(&ciphertext));
+    println!("Verschlüsselt (mit Fehlerradius {}): {}", ERROR_RADIUS, GghScheme::format_vector(&ciphertext));
 
     // Entschlüsseln
     let decrypted = GghScheme::decrypt(&ciphertext, &keypair.private_key)
