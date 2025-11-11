@@ -19,7 +19,6 @@ use crate::math_core::traits::logarithm::Logarithm;
 use crate::shared::errors::MenezesVanstoneError;
 use anyhow::{ensure, Context, Result};
 use bigdecimal::num_bigint::BigInt;
-use bigdecimal::Zero;
 use rayon::iter::{IntoParallelRefIterator, ParallelIterator};
 
 pub struct MenezesVanstoneStringScheme {}
@@ -261,7 +260,7 @@ mod tests {
         let miller_rabin_iterations = 40;
         let radix = 55296;
         let service = NumberTheoryWithPrngService::new(Fast, alice_seed);
-        let alice_keypair = MenezesVanstoneStringScheme::generate_keypair(
+        let _alice_keypair = MenezesVanstoneStringScheme::generate_keypair(
             alice_n,
             alice_modul_width,
             miller_rabin_iterations,

@@ -7,7 +7,6 @@ use crate::math_core::traits::increment::Increment;
 use crate::shared::errors::ArithmeticError;
 use bigdecimal::num_bigint::BigInt;
 use bigdecimal::{One, Zero};
-use serde::Serialize;
 
 #[derive(Clone, Copy)]
 pub struct Shanks {
