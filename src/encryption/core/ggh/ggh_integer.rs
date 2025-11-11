@@ -1,11 +1,14 @@
 use nalgebra::{DMatrix, DVector};
+use num_bigint::{BigInt, ToBigInt};
+use num_rational::BigRational;
 use rand::{Rng, SeedableRng};
 use rand_chacha::ChaCha8Rng;
+use num::{Zero, One};
 
 /// GGH mit ganzzahligen Matrizen (wie es sein sollte!)
-pub type IntMatrix = DMatrix<i64>;
-pub type IntVector = DVector<i64>;
-pub type FloatMatrix = DMatrix<f64>;
+pub type IntMatrix = DMatrix<BigInt>;
+pub type IntVector = DVector<BigInt>;
+pub type RationalMatrix = DMatrix<BigRational>;
 
 /// GGH Schlüsselpaar
 #[derive(Clone, Debug)]
@@ -19,10 +22,12 @@ pub struct GghKeyPair {
 pub struct GghPrivateKey {
     /// Die gute (private) Basis (Spalten sind Basisvektoren)
     pub good_basis: IntMatrix,
-    /// Inverse der guten Basis (für Entschlüsselung, als Float-Matrix)
-    pub good_basis_inverse: FloatMatrix,
-    /// Inverse der kumulierten unimodularen Matrix U (als Float-Matrix)
-    pub unimodular_inverse: FloatMatrix,
+    /// Inverse der guten Basis (für Entschlüsselung, als Rationale-Matrix)
+    pub good_basis_inverse: RationalMatrix,
+    /// Die unimodulare Matrix, die die gute in die schlechte Basis überführt.
+    pub unimodular_matrix: IntMatrix,
+    /// Die Inverse der unimodularen Matrix.
+    pub unimodular_matrix_inverse: IntMatrix,
     pub dimension: usize,
 }
 
@@ -63,25 +68,19 @@ impl GghScheme {
     pub fn generate_keypair(config: &GghKeyGenConfig) -> GghKeyPair {
         // 1) gute Basis B und ihre Inverse
         let good_basis = Self::generate_good_basis(config);
-        let good_basis_float = good_basis.map(|x| x as f64);
-        let good_basis_inverse = good_basis_float
-            .try_inverse()
+        let good_basis_rational = good_basis.map(|x| BigRational::from(x.clone()));
+        let good_basis_inverse = Self::try_inverse_rational(&good_basis_rational)
             .expect("B sollte invertierbar sein (Diagonalmatrix).");
 
-        // 2) schlechte Basis H = B * U und U selbst
-        let (bad_basis, u_total) = Self::generate_bad_basis(&good_basis, config);
-
-        // 3) U^{-1} als FloatMatrix (für einfache, robuste Demo-Rundung)
-        let u_total_float = u_total.map(|x| x as f64);
-        let unimodular_inverse = u_total_float
-            .try_inverse()
-            .expect("U muss invertierbar sein (unimodular).");
+        // 2) schlechte Basis H = B * U und die unimodulare Matrix U
+        let (bad_basis, unimodular_matrix, unimodular_matrix_inverse) = Self::generate_bad_basis(&good_basis, config);
 
         GghKeyPair {
             private_key: GghPrivateKey {
                 good_basis,
                 good_basis_inverse,
-                unimodular_inverse,
+                unimodular_matrix,
+                unimodular_matrix_inverse,
                 dimension: config.dimension,
             },
             public_key: GghPublicKey {
@@ -96,24 +95,26 @@ impl GghScheme {
     fn generate_good_basis(config: &GghKeyGenConfig) -> IntMatrix {
         let mut basis = IntMatrix::zeros(config.dimension, config.dimension);
         for i in 0..config.dimension {
-            basis[(i, i)] = config.basis_vector_length;
+            basis[(i, i)] = config.basis_vector_length.to_bigint().unwrap();
         }
         basis
     }
 
     /// Generiert eine schlechte Basis durch unimodulare Transformationen
-    fn generate_bad_basis(good_basis: &IntMatrix, config: &GghKeyGenConfig) -> (IntMatrix, IntMatrix) {
-        let mut result = good_basis.clone();                     // wird B * U
-        let mut u_total = IntMatrix::identity(config.dimension, config.dimension); // U = I
+    fn generate_bad_basis(good_basis: &IntMatrix, config: &GghKeyGenConfig) -> (IntMatrix, IntMatrix, IntMatrix) {
+        let mut u_product = IntMatrix::identity(config.dimension, config.dimension);
         let mut rng = ChaCha8Rng::seed_from_u64(config.random_seed);
 
         for _ in 0..config.unimodular_iterations {
             let unimodular = Self::generate_unimodular_matrix(config.dimension, &mut rng);
-            result = result * &unimodular;      // B := B * M
-            u_total = u_total * unimodular;     // U := U * M
+            u_product = u_product * &unimodular;
         }
 
-        (result, u_total)
+        let bad_basis = good_basis * &u_product;
+        let u_product_inverse = Self::invert_unimodular_int(&u_product)
+            .expect("Das Produkt der unimodularen Matrizen sollte invertierbar sein.");
+
+        (bad_basis, u_product, u_product_inverse)
     }
 
 
@@ -126,15 +127,48 @@ impl GghScheme {
             let j = rng.gen_range(0..dimension);
 
             if i != j {
-                let factor = rng.gen_range(-2..=2);
+                let factor = rng.gen_range(-2..=2).to_bigint().unwrap();
                 // Spaltenoperation: Addiere factor * Spalte j zu Spalte i
+                // Wir müssen den Wert von matrix[(k, j)] klonen, um den Borrow-Checker zufriedenzustellen,
+                // da matrix gleichzeitig mutabel und immutabel ausgeliehen wird.
                 for k in 0..dimension {
-                    matrix[(k, i)] += factor * matrix[(k, j)];
+                    let val = matrix[(k, j)].clone();
+                    matrix[(k, i)] += &factor * &val;
                 }
             }
         }
 
         matrix
+    }
+
+    /// Invertiert eine ganzzahlige unimodulare Matrix exakt (det = ±1)
+    fn invert_unimodular_int(matrix: &IntMatrix) -> Result<IntMatrix, String> {
+        let n = matrix.nrows();
+
+        // Konvertiere zu Rational für die Invertierung
+        let matrix_rational = matrix.map(|x| BigRational::from(x.clone()));
+        let inverse_rational = Self::try_inverse_rational(&matrix_rational)
+            .ok_or("Matrix ist nicht invertierbar")?;
+
+        // Konvertiere zurück zu BigInt. Da die Matrix unimodular ist, muss die Inverse ganzzahlig sein.
+        let inverse_int = inverse_rational.map(|x| {
+            if x.is_integer() {
+                x.to_integer()
+            } else {
+                // Sollte nie passieren für eine unimodulare Matrix
+                panic!("Inverse einer unimodularen Matrix ist nicht ganzzahlig.")
+            }
+        });
+
+        // Verifiziere: M * M^(-1) = I
+        let product = matrix * &inverse_int;
+        let identity = IntMatrix::identity(n, n);
+
+        if product != identity {
+            return Err("Inverse ist nicht korrekt (Validierungsfehler)".to_string());
+        }
+
+        Ok(inverse_int)
     }
 
     /// Verschlüsselt einen Vektor
@@ -158,7 +192,7 @@ impl GghScheme {
         // Füge ganzzahligen Fehlervektor hinzu
         let mut rng = ChaCha8Rng::seed_from_u64(random_seed);
         for i in 0..encrypted.len() {
-            let error = rng.gen_range(-error_radius..=error_radius);
+            let error = rng.gen_range(-error_radius..=error_radius).to_bigint().unwrap();
             encrypted[i] += error;
         }
 
@@ -175,23 +209,28 @@ impl GghScheme {
             ));
         }
 
-        // Schritt 1: x ≈ U m via Babai/Koordinatenrundung in der guten Basis
-        let ciphertext_float = ciphertext.map(|x| x as f64);
-        let coefficients = &private_key.good_basis_inverse * ciphertext_float; // B^{-1} c
-        let rounded_coefficients_int = coefficients.map(|x| x.round() as i64); // x = round(B^{-1} c)
+        // Schritt 1: Babai's Algorithm mit guter Basis
+        // Gegeben: c = B * U₁ * U₂ * ... * Uₙ * m + e
+        // Berechne: x = round(B⁻¹ * c) ≈ U * m
+        let ciphertext_rational = ciphertext.map(|x| BigRational::from(x.clone()));
+        let coefficients = &private_key.good_basis_inverse * ciphertext_rational;
+        let x_rounded = coefficients.map(|x| x.round().to_integer());
 
-        // Schritt 2: m = U^{-1} x
-        let x_float = rounded_coefficients_int.map(|t| t as f64);
-        let m_float = &private_key.unimodular_inverse * x_float;
-        let m_int = m_float.map(|v| v.round() as i64);
+        // Schritt 2: Wende die inverse unimodulare Matrix an
+        // m = U⁻¹ * x
+        let m = &private_key.unimodular_matrix_inverse * x_rounded;
 
-        Ok(m_int)
+        Ok(m)
     }
 
     /// Berechnet die euklidische Distanz zwischen zwei Vektoren (nalgebra)
     pub fn vector_distance(a: &IntVector, b: &IntVector) -> f64 {
-        // Konvertiere zu Float, da norm() ComplexField benötigt
-        let diff = (a - b).map(|x| x as f64);
+        // Konvertiere zu Float für die Norm-Berechnung
+        let diff = (a - b).map(|x| {
+            // Versuche, BigInt in f64 umzuwandeln.
+            // Dies kann an Präzision verlieren für sehr große Zahlen, aber f��r die Distanz ist es oft ok.
+            x.to_string().parse::<f64>().unwrap_or(f64::INFINITY)
+        });
         diff.norm()
     }
 
@@ -220,11 +259,108 @@ impl GghScheme {
         }
         result
     }
+
+    // ========================================================================
+    // Manuelle Implementierungen für BigRational-Matrizen
+    // ========================================================================
+
+    /// Berechnet die Determinante einer RationalMatrix mittels Gauß-Jordan-Elimination.
+    fn determinant_rational(matrix: &RationalMatrix) -> BigRational {
+        let mut mat = matrix.clone();
+        let n = mat.nrows();
+        if n != mat.ncols() {
+            return BigRational::zero(); // Nur für quadratische Matrizen
+        }
+
+        let mut det = BigRational::one();
+
+        for i in 0..n {
+            // Finde Pivot
+            let mut pivot_row = i;
+            while pivot_row < n && mat[(pivot_row, i)].is_zero() {
+                pivot_row += 1;
+            }
+
+            if pivot_row == n {
+                return BigRational::zero(); // Keine eindeutige Lösung
+            }
+
+            if pivot_row != i {
+                mat.swap_rows(i, pivot_row);
+                det = -det;
+            }
+
+            let pivot_val = mat[(i, i)].clone();
+            det *= &pivot_val;
+
+            for j in i..n {
+                mat[(i, j)] /= &pivot_val;
+            }
+
+            for row in 0..n {
+                if row != i {
+                    let factor = mat[(row, i)].clone();
+                    for col in i..n {
+                        let temp = mat[(i, col)].clone();
+                        mat[(row, col)] -= &factor * &temp;
+                    }
+                }
+            }
+        }
+        det
+    }
+
+    /// Invertiert eine RationalMatrix mittels Gauß-Jordan-Elimination.
+    fn try_inverse_rational(matrix: &RationalMatrix) -> Option<RationalMatrix> {
+        let n = matrix.nrows();
+        if n != matrix.ncols() {
+            return None; // Nur für quadratische Matrizen
+        }
+
+        let mut mat = matrix.clone();
+        let mut inv = RationalMatrix::identity(n, n);
+
+        for i in 0..n {
+            // Finde Pivot
+            let mut pivot_row = i;
+            while pivot_row < n && mat[(pivot_row, i)].is_zero() {
+                pivot_row += 1;
+            }
+
+            if pivot_row == n {
+                return None; // Nicht invertierbar
+            }
+
+            mat.swap_rows(i, pivot_row);
+            inv.swap_rows(i, pivot_row);
+
+            let pivot_val = mat[(i, i)].clone();
+            for j in 0..n {
+                mat[(i, j)] /= &pivot_val;
+                inv[(i, j)] /= &pivot_val;
+            }
+
+            for row in 0..n {
+                if row != i {
+                    let factor = mat[(row, i)].clone();
+                    for col in 0..n {
+                        let temp_mat = mat[(i, col)].clone();
+                        let temp_inv = inv[(i, col)].clone();
+                        mat[(row, col)] -= &factor * &temp_mat;
+                        inv[(row, col)] -= &factor * &temp_inv;
+                    }
+                }
+            }
+        }
+        Some(inv)
+    }
 }
 
 #[cfg(test)]
 mod tests {
+    use num::{One, Signed, Zero};
     use super::*;
+    use num_bigint::ToBigInt;
 
     // ========================================================================
     // SCHLÜSSELGENERIERUNG TESTS
@@ -256,6 +392,7 @@ mod tests {
         let config = GghKeyGenConfig::default();
         let keypair = GghScheme::generate_keypair(&config);
         let basis = &keypair.private_key.good_basis;
+        let expected_val = config.basis_vector_length.to_bigint().unwrap();
 
         // Gute Basis muss Diagonalmatrix sein
         for i in 0..config.dimension {
@@ -263,13 +400,13 @@ mod tests {
                 if i == j {
                     assert_eq!(
                         basis[(i, j)],
-                        config.basis_vector_length,
+                        expected_val,
                         "Diagonalelement ({}, {}) sollte basis_vector_length sein", i, j
                     );
                 } else {
                     assert_eq!(
                         basis[(i, j)],
-                        0,
+                        BigInt::zero(),
                         "Nicht-Diagonalelement ({}, {}) sollte 0 sein", i, j
                     );
                 }
@@ -282,15 +419,15 @@ mod tests {
         let config = GghKeyGenConfig::default();
         let keypair = GghScheme::generate_keypair(&config);
 
-        // Prüfe dass Inverse existiert und B * B^(-1) ≈ I
-        let basis_float = keypair.private_key.good_basis.map(|x| x as f64);
-        let identity_approx = &basis_float * &keypair.private_key.good_basis_inverse;
+        // Prüfe dass Inverse existiert und B * B^(-1) = I
+        let basis_rational = keypair.private_key.good_basis.map(|x| BigRational::from(x.clone()));
+        let identity_approx = &basis_rational * &keypair.private_key.good_basis_inverse;
 
         for i in 0..config.dimension {
             for j in 0..config.dimension {
-                let expected = if i == j { 1.0 } else { 0.0 };
+                let expected = if i == j { BigRational::one() } else { BigRational::zero() };
                 assert!(
-                    (identity_approx[(i, j)] - expected).abs() < 1e-10,
+                    identity_approx[(i, j)] == expected,
                     "B * B^(-1) sollte Identität sein"
                 );
             }
@@ -303,10 +440,10 @@ mod tests {
         for seed in [42, 123, 456, 789, 1000] {
             let mut rng = ChaCha8Rng::seed_from_u64(seed);
             let unimodular = GghScheme::generate_unimodular_matrix(4, &mut rng);
-            let det = unimodular.map(|x| x as f64).determinant();
+            let det = GghScheme::determinant_rational(&unimodular.map(|x| BigRational::from(x.clone())));
 
             assert!(
-                (det.abs() - 1.0).abs() < 0.01,
+                det.abs() == BigRational::one(),
                 "Determinante sollte ±1 sein, ist aber {} (seed={})", det, seed
             );
         }
@@ -324,17 +461,17 @@ mod tests {
 
         // Beide Basen sollten das gleiche Gitter aufspannen
         // Test: Jeder Vektor im Gitter der schlechten Basis sollte auch im Gitter der guten Basis sein
-        let test_coeffs = IntVector::from_vec(vec![2, -3, 5]);
+        let test_coeffs = IntVector::from_vec(vec![2.to_bigint().unwrap(), (-3).to_bigint().unwrap(), 5.to_bigint().unwrap()]);
         let point_bad = &keypair.public_key.bad_basis * &test_coeffs;
 
         // Prüfe ob dieser Punkt durch die gute Basis darstellbar ist
-        let point_float = point_bad.map(|x| x as f64);
-        let coeffs_good = &keypair.private_key.good_basis_inverse * point_float;
+        let point_rational = point_bad.map(|x| BigRational::from(x.clone()));
+        let coeffs_good = &keypair.private_key.good_basis_inverse * point_rational;
 
         // Koeffizienten sollten ganzzahlig sein (bei exakter Darstellung)
         for coeff in coeffs_good.iter() {
             assert!(
-                (coeff.round() - coeff).abs() < 1e-6,
+                coeff.is_integer(),
                 "Koeffizient {} sollte ganzzahlig sein für gleiches Gitter", coeff
             );
         }
@@ -382,7 +519,7 @@ mod tests {
         ];
 
         for (idx, msg_vec) in test_messages.iter().enumerate() {
-            let message = IntVector::from_vec(msg_vec.clone());
+            let message = IntVector::from_vec(msg_vec.iter().map(|&x| x.to_bigint().unwrap()).collect());
             let ciphertext = GghScheme::encrypt(&message, &keypair.public_key, error_radius, 123 + idx as u64)
                 .expect("Verschlüsselung sollte funktionieren");
             let decrypted = GghScheme::decrypt(&ciphertext, &keypair.private_key)
@@ -418,7 +555,7 @@ mod tests {
         ];
 
         for msg_vec in boundary_messages {
-            let message = IntVector::from_vec(msg_vec.clone());
+            let message = IntVector::from_vec(msg_vec.iter().map(|&x| x.to_bigint().unwrap()).collect());
             let ciphertext = GghScheme::encrypt(&message, &keypair.public_key, 1, 999)
                 .expect("Verschlüsselung sollte funktionieren");
             let decrypted = GghScheme::decrypt(&ciphertext, &keypair.private_key)
@@ -432,7 +569,7 @@ mod tests {
     fn test_overflow_prevention() {
         // Dieser Test dokumentiert die praktischen Grenzen von GGH
         // Bei sehr großen Nachrichten kann die Multiplikation Basis * Nachricht
-        // zu i64 Overflow führen
+        // zu i64 Overflow führen. Mit BigInt sollte dies kein Problem mehr sein.
         let config = GghKeyGenConfig {
             dimension: 3,
             basis_vector_length: 100,
@@ -441,17 +578,16 @@ mod tests {
         };
         let keypair = GghScheme::generate_keypair(&config);
 
-        // Sichere Obergrenze: message[i] << basis_vector_length * max(bad_basis entries)
-        // Für primitive GGH: max_safe_message ≈ i64::MAX / (basis_length * dimension * iterations)
-        let safe_limit = 1_000_000; // Konservativ sicher
+        // Verwende eine Zahl, die i64 sprengen würde
+        let large_val = BigInt::from(i64::MAX) * BigInt::from(100);
 
-        let message = IntVector::from_vec(vec![safe_limit, -safe_limit, safe_limit / 2]);
+        let message = IntVector::from_vec(vec![large_val.clone(), -large_val.clone(), large_val / 2.to_bigint().unwrap()]);
         let ciphertext = GghScheme::encrypt(&message, &keypair.public_key, 5, 123)
             .expect("Verschlüsselung sollte bei sicheren Werten funktionieren");
         let decrypted = GghScheme::decrypt(&ciphertext, &keypair.private_key)
             .expect("Entschlüsselung sollte funktionieren");
 
-        assert_eq!(decrypted, message, "Verschlüsselung bei sicheren Grenzwerten fehlgeschlagen");
+        assert_eq!(decrypted, message, "Verschlüsselung bei großen Werten fehlgeschlagen");
     }
 
     #[test]
@@ -460,7 +596,7 @@ mod tests {
         let keypair = GghScheme::generate_keypair(&config);
 
         // Nachricht mit falscher Dimension
-        let wrong_message = IntVector::from_vec(vec![1, 2, 3]); // Dimension 3 statt 4
+        let wrong_message = IntVector::from_vec(vec![1.to_bigint().unwrap(), 2.to_bigint().unwrap(), 3.to_bigint().unwrap()]); // Dimension 3 statt 4
 
         let result = GghScheme::encrypt(&wrong_message, &keypair.public_key, 2, 123);
         assert!(result.is_err(), "Verschlüsselung sollte bei falscher Dimension fehlschlagen");
@@ -473,7 +609,7 @@ mod tests {
         let keypair = GghScheme::generate_keypair(&config);
 
         // Ciphertext mit falscher Dimension
-        let wrong_ciphertext = IntVector::from_vec(vec![1, 2, 3]); // Dimension 3 statt 4
+        let wrong_ciphertext = IntVector::from_vec(vec![1.to_bigint().unwrap(), 2.to_bigint().unwrap(), 3.to_bigint().unwrap()]); // Dimension 3 statt 4
 
         let result = GghScheme::decrypt(&wrong_ciphertext, &keypair.private_key);
         assert!(result.is_err(), "Entschlüsselung sollte bei falscher Dimension fehlschlagen");
@@ -490,7 +626,7 @@ mod tests {
             random_seed: 42,
         };
         let keypair = GghScheme::generate_keypair(&config);
-        let message = IntVector::from_vec(vec![2, -1, 3]);
+        let message = IntVector::from_vec(vec![2.to_bigint().unwrap(), (-1).to_bigint().unwrap(), 3.to_bigint().unwrap()]);
 
         let ciphertext = GghScheme::encrypt(&message, &keypair.public_key, 0, 123).unwrap();
         let decrypted = GghScheme::decrypt(&ciphertext, &keypair.private_key).unwrap();
@@ -513,7 +649,7 @@ mod tests {
         let safe_error_radius = config.basis_vector_length / 10; // 10% der Basislänge
 
         for i in 0..10 {
-            let message = IntVector::from_vec(vec![i, i+1, i+2, i+3]);
+            let message = IntVector::from_vec(vec![i.to_bigint().unwrap(), (i+1).to_bigint().unwrap(), (i+2).to_bigint().unwrap(), (i+3).to_bigint().unwrap()]);
             let ciphertext = GghScheme::encrypt(&message, &keypair.public_key, safe_error_radius, 100 + i as u64).unwrap();
             let decrypted = GghScheme::decrypt(&ciphertext, &keypair.private_key).unwrap();
 
@@ -531,7 +667,7 @@ mod tests {
             random_seed: 43,
         };
         let keypair = GghScheme::generate_keypair(&config);
-        let message = IntVector::from_vec(vec![1, 2, 3]);
+        let message = IntVector::from_vec(vec![1.to_bigint().unwrap(), 2.to_bigint().unwrap(), 3.to_bigint().unwrap()]);
 
         // Fehlerradius größer als 0.5 * basis_vector_length
         let unsafe_error_radius = (config.basis_vector_length as f64 * 0.8) as i64;
@@ -557,7 +693,7 @@ mod tests {
             random_seed: 42,
         };
         let keypair = GghScheme::generate_keypair(&config);
-        let message = IntVector::from_vec(vec![5, -2, 7]);
+        let message = IntVector::from_vec(vec![5.to_bigint().unwrap(), (-2).to_bigint().unwrap(), 7.to_bigint().unwrap()]);
 
         // Kritischer Fehlerradius (knapp unter der theoretischen Grenze)
         let critical_error_radius = (config.basis_vector_length as f64 * 0.45) as i64;
@@ -587,7 +723,7 @@ mod tests {
         // Gleiche Nachricht sollte zu verschiedenen Ciphertexten führen (wegen Fehlervektor)
         let config = GghKeyGenConfig::default();
         let keypair = GghScheme::generate_keypair(&config);
-        let message = IntVector::from_vec(vec![1, 2, 3, 4]);
+        let message = IntVector::from_vec(vec![1.to_bigint().unwrap(), 2.to_bigint().unwrap(), 3.to_bigint().unwrap(), 4.to_bigint().unwrap()]);
 
         let ciphertext1 = GghScheme::encrypt(&message, &keypair.public_key, 2, 111).unwrap();
         let ciphertext2 = GghScheme::encrypt(&message, &keypair.public_key, 2, 222).unwrap();
@@ -609,8 +745,8 @@ mod tests {
 
     #[test]
     fn test_vector_distance_computation() {
-        let a = IntVector::from_vec(vec![0, 0, 0]);
-        let b = IntVector::from_vec(vec![3, 4, 0]);
+        let a = IntVector::from_vec(vec![0.to_bigint().unwrap(), 0.to_bigint().unwrap(), 0.to_bigint().unwrap()]);
+        let b = IntVector::from_vec(vec![3.to_bigint().unwrap(), 4.to_bigint().unwrap(), 0.to_bigint().unwrap()]);
 
         let distance = GghScheme::vector_distance(&a, &b);
 
@@ -620,7 +756,7 @@ mod tests {
 
     #[test]
     fn test_vector_distance_identity() {
-        let a = IntVector::from_vec(vec![1, 2, 3, 4]);
+        let a = IntVector::from_vec(vec![1.to_bigint().unwrap(), 2.to_bigint().unwrap(), 3.to_bigint().unwrap(), 4.to_bigint().unwrap()]);
 
         let distance = GghScheme::vector_distance(&a, &a);
 
@@ -629,7 +765,7 @@ mod tests {
 
     #[test]
     fn test_format_vector_output() {
-        let vec = IntVector::from_vec(vec![1, -5, 10]);
+        let vec = IntVector::from_vec(vec![1.to_bigint().unwrap(), (-5).to_bigint().unwrap(), 10.to_bigint().unwrap()]);
         let formatted = GghScheme::format_vector(&vec);
 
         assert!(formatted.contains("1"), "Formatierung sollte '1' enthalten");
@@ -641,7 +777,7 @@ mod tests {
 
     #[test]
     fn test_format_matrix_output() {
-        let matrix = IntMatrix::from_vec(2, 2, vec![1, 2, 3, 4]);
+        let matrix = IntMatrix::from_vec(2, 2, vec![1.to_bigint().unwrap(), 2.to_bigint().unwrap(), 3.to_bigint().unwrap(), 4.to_bigint().unwrap()]);
         let formatted = GghScheme::format_matrix(&matrix);
 
         assert!(formatted.contains("1"), "Matrix-Formatierung sollte '1' enthalten");
@@ -664,7 +800,7 @@ mod tests {
                 random_seed: 42,
             };
             let keypair = GghScheme::generate_keypair(&config);
-            let message = IntVector::from_vec(vec![2, -1, 3]);
+            let message = IntVector::from_vec(vec![2.to_bigint().unwrap(), (-1).to_bigint().unwrap(), 3.to_bigint().unwrap()]);
 
             // Angepasster Fehlerradius (10% der Basislänge)
             let error_radius = length / 10;
@@ -687,7 +823,7 @@ mod tests {
                 random_seed: 42,
             };
             let keypair = GghScheme::generate_keypair(&config);
-            let message = IntVector::from_vec(vec![1, 2, 3]);
+            let message = IntVector::from_vec(vec![1.to_bigint().unwrap(), 2.to_bigint().unwrap(), 3.to_bigint().unwrap()]);
 
             let ciphertext = GghScheme::encrypt(&message, &keypair.public_key, 2, 456).unwrap();
             let decrypted = GghScheme::decrypt(&ciphertext, &keypair.private_key).unwrap();
@@ -706,7 +842,7 @@ mod tests {
             random_seed: 42,
         };
         let keypair = GghScheme::generate_keypair(&config);
-        let message = IntVector::from_vec(vec![3, -2]);
+        let message = IntVector::from_vec(vec![3.to_bigint().unwrap(), (-2).to_bigint().unwrap()]);
 
         let ciphertext = GghScheme::encrypt(&message, &keypair.public_key, 1, 789).unwrap();
         let decrypted = GghScheme::decrypt(&ciphertext, &keypair.private_key).unwrap();
@@ -725,7 +861,7 @@ mod tests {
             random_seed: 42,
         };
         let keypair = GghScheme::generate_keypair(&config);
-        let message = IntVector::from_vec((0..dimension as i64).collect());
+        let message = IntVector::from_vec((0..dimension as i64).map(|i| i.to_bigint().unwrap()).collect());
 
         let ciphertext = GghScheme::encrypt(&message, &keypair.public_key, 2, 999).unwrap();
         let decrypted = GghScheme::decrypt(&ciphertext, &keypair.private_key).unwrap();
@@ -745,17 +881,17 @@ mod tests {
         // U = (2  3)     U^(-1) = ( 5  -3)
         //     (3  5)               (-3   2)
         //
-        // Schlechte Basis: B' = BU = (14   9)
-        //                             (21  15)
+        // Schlechte Basis: B' = B * U = (14  21)  <- In Spalten-Major-Notation
+        //                              ( 9  15)
         //
         // Nachricht: m = (3, -7)
         // Fehlervektor: e = (1, -1)
         // Ciphertext: c = B'm + e = (-104, -79)
         //
         // Entschlüsselung:
-        // 1. cB^(-1) = (-104/7, -79/3) ≈ (-14.857, -26.333)
-        // 2. Rundung: (-15, -26)
-        // 3. m = U^(-1)(-15, -26) = (3, -7) ✓
+        // 1. B⁻¹c = (-104/7, -79/3) ≈ (-14.857, -26.333)
+        // 2. Rundung: v = (-15, -26)
+        // 3. m = U⁻¹v = (3, -7) ✓
 
         // Manuelle Schlüsselerzeugung für exakte Kontrolle
         let dimension = 2;
@@ -763,93 +899,96 @@ mod tests {
         // Gute Basis B (Diagonalmatrix)
         // Verwende from_row_slice für intuitive Zeilen-Notation
         let good_basis = IntMatrix::from_row_slice(2, 2, &[
-            7, 0,  // Zeile 0
-            0, 3,  // Zeile 1
+            7.to_bigint().unwrap(), 0.to_bigint().unwrap(),  // Zeile 0
+            0.to_bigint().unwrap(), 3.to_bigint().unwrap(),  // Zeile 1
         ]);
 
-        // B^(-1) als Float
-        let good_basis_inverse = FloatMatrix::from_row_slice(2, 2, &[
-            1.0/7.0, 0.0,
-            0.0, 1.0/3.0,
+        // B^(-1) als Rational-Matrix
+        let good_basis_inverse = RationalMatrix::from_row_slice(2, 2, &[
+            BigRational::new(1.to_bigint().unwrap(), 7.to_bigint().unwrap()), BigRational::zero(),
+            BigRational::zero(), BigRational::new(1.to_bigint().unwrap(), 3.to_bigint().unwrap()),
         ]);
 
         // Unimodulare Matrix U
         let u_matrix = IntMatrix::from_row_slice(2, 2, &[
-            2, 3,  // Zeile 0
-            3, 5,  // Zeile 1
+            2.to_bigint().unwrap(), 3.to_bigint().unwrap(),  // Zeile 0
+            3.to_bigint().unwrap(), 5.to_bigint().unwrap(),  // Zeile 1
         ]);
 
-        // U^(-1) als Float
-        let u_inverse = FloatMatrix::from_row_slice(2, 2, &[
-             5.0, -3.0,
-            -3.0,  2.0,
+        // U^(-1) als Int-Matrix
+        let u_inverse = IntMatrix::from_row_slice(2, 2, &[
+             5.to_bigint().unwrap(), (-3).to_bigint().unwrap(),
+            (-3).to_bigint().unwrap(),  2.to_bigint().unwrap(),
         ]);
 
-        // Schlechte Basis B' = UB (wie im Foto)
-        let bad_basis = &u_matrix * &good_basis;
+        // Schlechte Basis B' = B * U (nalgebra ist Spalten-major, das ist die korrekte Reihenfolge)
+        let bad_basis = &good_basis * &u_matrix;
 
-        // Verifiziere B' = (14   9)
-        //                  (21  15)
-        assert_eq!(bad_basis[(0, 0)], 14, "B'[0,0] sollte 14 sein");
-        assert_eq!(bad_basis[(0, 1)], 9, "B'[0,1] sollte 9 sein");
-        assert_eq!(bad_basis[(1, 0)], 21, "B'[1,0] sollte 21 sein");
-        assert_eq!(bad_basis[(1, 1)], 15, "B'[1,1] sollte 15 sein");
+        // Verifiziere B'
+        // B * U = (7 0) * (2 3) = (14 21)
+        //         (0 3)   (3 5)   ( 9 15)
+        assert_eq!(bad_basis[(0, 0)], 14.to_bigint().unwrap());
+        assert_eq!(bad_basis[(0, 1)], 21.to_bigint().unwrap());
+        assert_eq!(bad_basis[(1, 0)], 9.to_bigint().unwrap());
+        assert_eq!(bad_basis[(1, 1)], 15.to_bigint().unwrap());
 
         // Erstelle Schlüsselpaar manuell
         let private_key = GghPrivateKey {
             good_basis: good_basis.clone(),
             good_basis_inverse: good_basis_inverse.clone(),
-            unimodular_inverse: u_inverse.clone(),
+            unimodular_matrix: u_matrix.clone(),
+            unimodular_matrix_inverse: u_inverse.clone(),
             dimension,
         };
 
-        let public_key = GghPublicKey {
+        let _public_key = GghPublicKey {
             bad_basis: bad_basis.clone(),
             dimension,
         };
 
         // Nachricht m = (3, -7)
-        let message = IntVector::from_vec(vec![3, -7]);
+        let message = IntVector::from_vec(vec![3.to_bigint().unwrap(), (-7).to_bigint().unwrap()]);
 
         // Manuelle Verschlüsselung mit bekanntem Fehlervektor e = (1, -1)
-        // Im Foto: c = mB' + e, wobei m ein Zeilenvektor ist
-        // In nalgebra: c = B'^T * m (Transponierte!)
-        let bad_basis_t = bad_basis.transpose();
-        let mut ciphertext = &bad_basis_t * &message;
+        // c = B'm + e
+        let mut ciphertext = &bad_basis * &message;
         // Füge Fehlervektor (1, -1) hinzu
-        ciphertext[0] += 1;
-        ciphertext[1] += -1;
+        ciphertext[0] += 1.to_bigint().unwrap();
+        ciphertext[1] += (-1).to_bigint().unwrap();
 
         // Verifiziere c = (-104, -79)
-        assert_eq!(ciphertext[0], -104, "Ciphertext[0] sollte -104 sein");
-        assert_eq!(ciphertext[1], -79, "Ciphertext[1] sollte -79 sein");
+        // B'm = (14*3 + 21*-7, 9*3 + 15*-7) = (42 - 147, 27 - 105) = (-105, -78)
+        // c = (-105+1, -78-1) = (-104, -79)
+        assert_eq!(ciphertext[0], (-104).to_bigint().unwrap(), "Ciphertext[0] sollte -104 sein");
+        assert_eq!(ciphertext[1], (-79).to_bigint().unwrap(), "Ciphertext[1] sollte -79 sein");
 
         // Entschlüsselung
         let decrypted = GghScheme::decrypt(&ciphertext, &private_key)
             .expect("Entschlüsselung sollte funktionieren");
 
         // Verifiziere m = (3, -7)
-        assert_eq!(decrypted[0], 3, "Entschlüsselte Nachricht[0] sollte 3 sein");
-        assert_eq!(decrypted[1], -7, "Entschlüsselte Nachricht[1] sollte -7 sein");
+        assert_eq!(decrypted[0], 3.to_bigint().unwrap(), "Entschlüsselte Nachricht[0] sollte 3 sein");
+        assert_eq!(decrypted[1], (-7).to_bigint().unwrap(), "Entschlüsselte Nachricht[1] sollte -7 sein");
         assert_eq!(decrypted, message, "Vollständige Nachricht sollte wiederhergestellt sein");
 
         // Zusätzliche Verifikationen der Zwischenschritte:
 
-        // Schritt 1: cB^(-1) sollte ungefähr (-14.857, -26.333) sein
-        let ciphertext_float = ciphertext.map(|x| x as f64);
-        let coords = &good_basis_inverse * ciphertext_float;
-        assert!((coords[0] - (-104.0/7.0)).abs() < 0.001, "coords[0] sollte -104/7 ≈ -14.857 sein");
-        assert!((coords[1] - (-79.0/3.0)).abs() < 0.001, "coords[1] sollte -79/3 ≈ -26.333 sein");
+        // Schritt 1: B⁻¹ * c sollte (-104/7, -79/3) sein
+        let ciphertext_rational = ciphertext.map(|x| BigRational::from(x.clone()));
+        let coords = &private_key.good_basis_inverse * ciphertext_rational;
+        assert_eq!(coords[0], BigRational::new((-104).to_bigint().unwrap(), 7.to_bigint().unwrap()), "coords[0] sollte -104/7 sein");
+        assert_eq!(coords[1], BigRational::new((-79).to_bigint().unwrap(), 3.to_bigint().unwrap()), "coords[1] sollte -79/3 sein");
 
         // Schritt 2: Rundung sollte (-15, -26) ergeben
-        let rounded = coords.map(|x| x.round());
-        assert_eq!(rounded[0], -15.0, "Gerundeter Wert[0] sollte -15 sein");
-        assert_eq!(rounded[1], -26.0, "Gerundeter Wert[1] sollte -26 sein");
+        let rounded = coords.map(|x| x.round().to_integer());
+        assert_eq!(rounded[0], (-15).to_bigint().unwrap(), "Gerundeter Wert[0] sollte -15 sein");
+        assert_eq!(rounded[1], (-26).to_bigint().unwrap(), "Gerundeter Wert[1] sollte -26 sein");
 
-        // Schritt 3: (-15, -26)U^(-1) sollte (3, -7) ergeben
-        let m_recovered = &u_inverse * rounded;
-        assert!((m_recovered[0] - 3.0).abs() < 0.001, "Wiederhergestellte Nachricht[0] sollte 3 sein");
-        assert!((m_recovered[1] - (-7.0)).abs() < 0.001, "Wiederhergestellte Nachricht[1] sollte -7 sein");
+        // Schritt 3: U⁻¹ * (-15, -26) sollte (3, -7) ergeben
+        let rounded_int = rounded.map(|x| x.clone());
+        let m_recovered_int = &u_inverse * rounded_int;
+        assert_eq!(m_recovered_int[0], 3.to_bigint().unwrap(), "Wiederhergestellte Nachricht[0] sollte 3 sein");
+        assert_eq!(m_recovered_int[1], (-7).to_bigint().unwrap(), "Wiederhergestellte Nachricht[1] sollte -7 sein");
     }
 }
 
