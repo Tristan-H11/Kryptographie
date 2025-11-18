@@ -1,6 +1,7 @@
 use std::char::from_u32;
 
 use bigdecimal::{Signed, ToPrimitive};
+use bigdecimal::Zero;
 use num::BigInt;
 
 pub trait ToRadixString {
@@ -20,8 +21,17 @@ impl ToRadixString for BigInt {
     fn to_radix_string(&self, radix: &u32) -> Option<String> {
         assert!(radix > &1, "Die Basis muss größer als 1 sein.");
 
+        if self.is_zero() {
+            return Some(String::new());
+        }
+
         let mut decimal = self.clone();
         let mut result = String::new();
+        let negative = decimal.is_negative();
+
+        if negative {
+            decimal = decimal.abs();
+        }
 
         while decimal.is_positive() {
             // Hier werden die u32-Operationen statt .div_rem(&BigInt) genutzt, weil diese schneller sind.
@@ -30,6 +40,11 @@ impl ToRadixString for BigInt {
             let char = from_u32(remainder.to_u32()?)?;
             result.push(char);
         }
+
+        if negative {
+            result.push('-');
+        }
+
         Some(result.chars().rev().collect())
     }
 }
@@ -78,6 +93,17 @@ mod tests {
         let decimal = BigInt::from_str("12345678987654321").unwrap();
         let radix = 55296;
         let expected = "IЇ秜咱";
+
+        let result = decimal.to_radix_string(&radix);
+
+        assert_eq!(result.unwrap(), expected);
+    }
+
+    #[test]
+    fn test_to_radix_negative_number() {
+        let decimal = BigInt::from(-255);
+        let radix = 16;
+        let expected = "-\u{f}\u{f}";
 
         let result = decimal.to_radix_string(&radix);
 

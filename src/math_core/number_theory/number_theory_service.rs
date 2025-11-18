@@ -91,8 +91,12 @@ pub trait NumberTheoryServiceTrait {
     ///
     /// # Beispiel
     ///
-    /// ```rust
-    /// let result = NumberTheoryService.extended_euclid(&BigInt::from(12), &BigInt::from(30));
+    /// ```rust,ignore
+    /// use bigdecimal::num_bigint::BigInt;
+    /// use encryption_tool::math_core::number_theory::number_theory_service::{NumberTheoryService, NumberTheoryServiceSpeed};
+    ///
+    /// let service = NumberTheoryService::new(NumberTheoryServiceSpeed::Fast);
+    /// let result = service.extended_euclid(&BigInt::from(12), &BigInt::from(30));
     ///
     /// assert_eq!(result.ggT, BigInt::from(6));
     /// assert_eq!(result.x, BigInt::from(-2));
@@ -115,12 +119,16 @@ pub trait NumberTheoryServiceTrait {
     ///
     /// # Beispiel
     ///
-    /// ```rust
+    /// ```rust,ignore
+    /// use bigdecimal::num_bigint::BigInt;
+    /// use encryption_tool::math_core::number_theory::number_theory_service::{NumberTheoryService, NumberTheoryServiceSpeed};
+    ///
+    /// let service = NumberTheoryService::new(NumberTheoryServiceSpeed::Fast);
     /// let base = BigInt::from(2);
     /// let exponent = BigInt::from(3);
     /// let modulus = BigInt::from(5);
     ///
-    /// let result = NumberTheoryService.fast_exponentiation(&base, &exponent, &modulus, true);
+    /// let result = service.fast_exponentiation(&base, &exponent, &modulus);
     ///
     /// assert_eq!(result, BigInt::from(3));
     /// ```
@@ -143,11 +151,15 @@ pub trait NumberTheoryServiceTrait {
     ///
     /// # Beispiel
     ///
-    /// ```rust
+    /// ```rust,ignore
+    /// use bigdecimal::num_bigint::BigInt;
+    /// use encryption_tool::math_core::number_theory::number_theory_service::{NumberTheoryService, NumberTheoryServiceSpeed};
+    ///
+    /// let service = NumberTheoryService::new(NumberTheoryServiceSpeed::Fast);
     /// let n = BigInt::from(2);
     /// let modul = BigInt::from(5);
     ///
-    /// let result = NumberTheoryService.modulo_inverse(&n, &modul, true);
+    /// let result = service.modulo_inverse(&n, &modul);
     ///
     /// assert_eq!(result, Ok(BigInt::from(3)));
     /// ```
