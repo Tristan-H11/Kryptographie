@@ -14,6 +14,7 @@ export class EndpointsService {
     private rsaEndpoint: string = "/rsa";
     private mvEndpoint: string = "/menezesVanstone";
     private mathEndpoint: string = "/math";
+    private gghEndpoint: string = "/ggh";
 
     /**
      * Gibt den Healthcheck-Endpoint zurück.
@@ -125,5 +126,26 @@ export class EndpointsService {
      */
     getRsaMultiplicationEndpoint() {
         return this.domain + this.rsaEndpoint + "/multiplication";
+    }
+
+    /**
+     * Gibt den Endpoint zum Erstellen eines GGH-Schlüsselpaares zurück.
+     */
+    getGghCreateKeyPairEndpoint(): string {
+        return this.domain + this.gghEndpoint + "/createKeyPair";
+    }
+
+    /**
+     * Gibt den Endpoint zum GGH-Verschlüsseln zurück.
+     */
+    getGghEncryptEndpoint(): string {
+        return this.domain + this.gghEndpoint + "/encrypt";
+    }
+
+    /**
+     * Gibt den Endpoint zum GGH-Entschlüsseln zurück.
+     */
+    getGghDecryptEndpoint(): string {
+        return this.domain + this.gghEndpoint + "/decrypt";
     }
 }

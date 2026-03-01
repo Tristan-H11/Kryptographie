@@ -6,7 +6,7 @@ use serde::Serialize;
 use crate::api::endpoints::math_endpoints::{
     euclid_endpoint, exponentiation, modular_inverse_endpoint, shanks_endpoint,
 };
-use crate::api::endpoints::{mv, rsa};
+use crate::api::endpoints::{ggh, mv, rsa};
 use crate::api::serializable_models::SingleStringResponse;
 
 #[derive(Serialize)]
@@ -32,6 +32,12 @@ pub fn config_app(cfg: &mut web::ServiceConfig) {
                 .route("/decrypt", web::post().to(mv::decrypt))
                 .route("/sign", web::post().to(mv::sign))
                 .route("/verify", web::post().to(mv::verify)),
+        )
+        .service(
+            web::scope("/ggh")
+                .route("/createKeyPair", web::post().to(ggh::create_key_pair))
+                .route("/encrypt", web::post().to(ggh::encrypt))
+                .route("/decrypt", web::post().to(ggh::decrypt)),
         )
         .service(
             web::scope("/math")

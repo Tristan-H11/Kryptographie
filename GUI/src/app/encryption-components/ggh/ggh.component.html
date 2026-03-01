@@ -1,0 +1,119 @@
+<mat-accordion multi>
+
+  <!-- Key Generation -->
+  <mat-expansion-panel expanded>
+    <mat-expansion-panel-header>
+      <mat-panel-title>Schlüsselgenerierung</mat-panel-title>
+      <mat-panel-description>GGH-Schlüsselpaar aus Gitterbasis erzeugen</mat-panel-description>
+    </mat-expansion-panel-header>
+
+    <mat-form-field appearance="outline" class="width-100">
+      <mat-label>Dimension</mat-label>
+      <input matInput type="number" placeholder="z.B. 4" [(ngModel)]="dimension">
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="width-100">
+      <mat-label>Basisvektor-Länge</mat-label>
+      <input matInput type="number" placeholder="z.B. 10" [(ngModel)]="basisVectorLength">
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="width-100">
+      <mat-label>Unimodulare Iterationen</mat-label>
+      <input matInput type="number" placeholder="z.B. 10" [(ngModel)]="unimodularIterations">
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="width-100">
+      <mat-label>Seed</mat-label>
+      <input matInput type="number" placeholder="z.B. 42" [(ngModel)]="keyGenSeed">
+    </mat-form-field>
+
+    <mat-action-row>
+      <button mat-raised-button color="primary" (click)="generateKeyPair()">Schlüsselpaar generieren</button>
+    </mat-action-row>
+  </mat-expansion-panel>
+
+  <!-- Key Info -->
+  <mat-expansion-panel [expanded]="hasKeyPair">
+    <mat-expansion-panel-header>
+      <mat-panel-title>Schlüsselinformationen</mat-panel-title>
+      <mat-panel-description>Details zum generierten Schlüsselpaar</mat-panel-description>
+    </mat-expansion-panel-header>
+
+    <mat-form-field appearance="outline" class="width-100">
+      <mat-label>Dimension</mat-label>
+      <input matInput [value]="keyPairDimension" readonly>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="width-100">
+      <mat-label>Öffentliche (schlechte) Basis</mat-label>
+      <textarea matInput rows="4" [value]="keyPair ? (keyPair.bad_basis | json) : ''" readonly
+                placeholder="Wird nach Schlüsselgenerierung befüllt."></textarea>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="width-100">
+      <mat-label>Private (gute) Basis</mat-label>
+      <textarea matInput rows="4" [value]="keyPair ? (keyPair.good_basis | json) : ''" readonly
+                placeholder="Wird nach Schlüsselgenerierung befüllt."></textarea>
+    </mat-form-field>
+  </mat-expansion-panel>
+
+  <!-- Encryption -->
+  <mat-expansion-panel expanded>
+    <mat-expansion-panel-header>
+      <mat-panel-title>Verschlüsselung</mat-panel-title>
+      <mat-panel-description>Nachrichtenvektor mit öffentlichem Schlüssel verschlüsseln</mat-panel-description>
+    </mat-expansion-panel-header>
+
+    <mat-form-field appearance="outline" class="width-100">
+      <mat-label>Nachrichtenvektor (kommaseparierte Ganzzahlen)</mat-label>
+      <textarea matInput rows="2" placeholder="z.B. 3, 7, -2, 5" [(ngModel)]="messageInput"></textarea>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="width-100">
+      <mat-label>Fehlerradius</mat-label>
+      <input matInput type="number" placeholder="z.B. 2" [(ngModel)]="errorRadius">
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="width-100">
+      <mat-label>Seed (Fehlervektor)</mat-label>
+      <input matInput type="number" placeholder="z.B. 99" [(ngModel)]="encryptSeed">
+    </mat-form-field>
+
+    <mat-action-row>
+      <button mat-raised-button color="primary" [disabled]="!hasKeyPair" (click)="encrypt()">Verschlüsseln</button>
+    </mat-action-row>
+  </mat-expansion-panel>
+
+  <!-- Decryption -->
+  <mat-expansion-panel expanded>
+    <mat-expansion-panel-header>
+      <mat-panel-title>Entschlüsselung</mat-panel-title>
+      <mat-panel-description>Geheimtextvektor mit privatem Schlüssel entschlüsseln</mat-panel-description>
+    </mat-expansion-panel-header>
+
+    <mat-form-field appearance="outline" class="width-100">
+      <mat-label>Geheimtext</mat-label>
+      <textarea matInput rows="2" [value]="ciphertextDisplay" readonly
+                placeholder="Wird nach Verschlüsselung automatisch befüllt."></textarea>
+    </mat-form-field>
+
+    <mat-action-row>
+      <button mat-raised-button color="accent" [disabled]="!hasCiphertext" (click)="decrypt()">Entschlüsseln</button>
+    </mat-action-row>
+  </mat-expansion-panel>
+
+  <!-- Result -->
+  <mat-expansion-panel [expanded]="decryptedDisplay.length > 0">
+    <mat-expansion-panel-header>
+      <mat-panel-title>Ergebnis</mat-panel-title>
+      <mat-panel-description>Entschlüsselter Nachrichtenvektor</mat-panel-description>
+    </mat-expansion-panel-header>
+
+    <mat-form-field appearance="outline" class="width-100">
+      <mat-label>Entschlüsselte Nachricht</mat-label>
+      <textarea matInput rows="2" [value]="decryptedDisplay" readonly
+                placeholder="Wird nach Entschlüsselung automatisch befüllt."></textarea>
+    </mat-form-field>
+  </mat-expansion-panel>
+
+</mat-accordion>
