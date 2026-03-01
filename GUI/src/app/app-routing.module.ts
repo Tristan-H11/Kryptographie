@@ -19,6 +19,10 @@ export const routes: Routes = [
         loadComponent: () => import("./encryption-components/rsa/rsa.component").then(m => m.RsaComponent)
     },
     {
+        path: "ggh",
+        loadComponent: () => import("./encryption-components/ggh/ggh.component").then(m => m.GghComponent)
+    },
+    {
         path: "modPow",
         loadComponent: () => import("./math-components/exponentiation/exponentiation.component").then(m => m.ExponentiationComponent)
     },
