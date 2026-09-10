@@ -1,8 +1,6 @@
-# RSA Implementation
+# Kryptographie - Akademisches Lernprojekt
 
-[![Rust-CI](https://github.com/Tristan-H11/RSA-Implementation/actions/workflows/rust-ci.yml/badge.svg)](https://github.com/Tristan-H11/RSA-Implementation/actions/workflows/rust-ci.yml)
-
-Dieses Projekt ist eine Implementierung des RSA-Algorithmus und einiger ElGamal-Derivate in Rust und TypeScript.
+Dieses Projekt ist eine Implementierung des RSA-Algorithmus (Verschlüsselung und Signatur) und einiger ElGamal-Derivate auf Basis endlicher Gruppen und im speziellen auch elliptischen Kurven in Rust und TypeScript.
 
 ## Installation
 
@@ -22,7 +20,7 @@ npm install
 cargo build
 ```
 
-Falls die Toolschain für Rust nicht installiert ist, kann sie [hier](https://www.rust-lang.org/tools/install) 
+Falls die Toolchain für Rust nicht installiert ist, kann sie [hier](https://www.rust-lang.org/tools/install) 
 heruntergeladen werden.
 Falls die Version nicht aktuell ist und für hinterlegte Abhängigkeiten aktualisiert werden muss, öffnen Sie 
 CDM (Komandozeile) und geben folgendes ein " rustup update stable ".
