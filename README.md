@@ -23,7 +23,7 @@ cargo build
 Falls die Toolchain für Rust nicht installiert ist, kann sie [hier](https://www.rust-lang.org/tools/install) 
 heruntergeladen werden.
 Falls die Version nicht aktuell ist und für hinterlegte Abhängigkeiten aktualisiert werden muss, öffnen Sie 
-CDM (Komandozeile) und geben folgendes ein " rustup update stable ".
+CMD (Komandozeile) und geben folgendes ein " rustup update stable ".
 
 
 ## Verwendung
